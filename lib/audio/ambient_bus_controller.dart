@@ -10,9 +10,19 @@ class AmbientBusController extends ChangeNotifier {
   final Map<String, AudioPlayer> _activePlayers = {};
   final Map<String, FadeController> _fadeControllers = {};
   double _masterAmbientVolume = 1.0;
+  Duration _defaultFadeDuration;
+
+  AmbientBusController({
+    Duration defaultFadeDuration = const Duration(milliseconds: 1000),
+  }) : _defaultFadeDuration = defaultFadeDuration;
 
   List<AmbientLayer> get layers => List.unmodifiable(_layers);
   double get masterVolume => _masterAmbientVolume;
+  Duration get defaultFadeDuration => _defaultFadeDuration;
+
+  void setDefaultFadeDuration(Duration duration) {
+    _defaultFadeDuration = duration;
+  }
 
   void addLayer(AmbientLayer layer) {
     if (!_layers.any((l) => l.id == layer.id)) {
@@ -26,8 +36,9 @@ class AmbientBusController extends ChangeNotifier {
 
   Future<void> toggleLayer(
     String layerId, {
-    Duration fadeDuration = const Duration(milliseconds: 1000),
+    Duration? fadeDuration,
   }) async {
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
     final index = _layers.indexWhere((l) => l.id == layerId);
     if (index != -1) {
       final layer = _layers[index];
@@ -35,9 +46,9 @@ class AmbientBusController extends ChangeNotifier {
       _layers[index] = layer.copyWith(isActive: newActive);
 
       if (newActive) {
-        await _startLayerAudio(_layers[index], fadeDuration: fadeDuration);
+        await _startLayerAudio(_layers[index], fadeDuration: effectiveFade);
       } else {
-        await _stopLayerAudio(layerId, fadeDuration: fadeDuration);
+        await _stopLayerAudio(layerId, fadeDuration: effectiveFade);
       }
 
       notifyListeners();
@@ -105,14 +116,15 @@ class AmbientBusController extends ChangeNotifier {
   }
 
   Future<void> stopAllLayers({
-    Duration fadeDuration = const Duration(milliseconds: 1000),
+    Duration? fadeDuration,
   }) async {
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
     final futures = <Future<void>>[];
     for (int i = 0; i < _layers.length; i++) {
       if (_layers[i].isActive) {
         final id = _layers[i].id;
         _layers[i] = _layers[i].copyWith(isActive: false);
-        futures.add(_stopLayerAudio(id, fadeDuration: fadeDuration));
+        futures.add(_stopLayerAudio(id, fadeDuration: effectiveFade));
       }
     }
     await Future.wait(futures);
@@ -121,8 +133,9 @@ class AmbientBusController extends ChangeNotifier {
 
   Future<void> _startLayerAudio(
     AmbientLayer layer, {
-    Duration fadeDuration = const Duration(milliseconds: 1000),
+    Duration? fadeDuration,
   }) async {
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
     final file = File(layer.filePath);
     if (!file.existsSync()) {
       LoggerService().warning('AmbientBus: File does not exist', details: 'Path: ${layer.filePath}');
@@ -134,7 +147,7 @@ class AmbientBusController extends ChangeNotifier {
 
       final player = AudioPlayer();
       final targetVolume = layer.volume * _masterAmbientVolume;
-      final startVolume = fadeDuration.inMilliseconds > 0 ? 0.0 : targetVolume;
+      final startVolume = effectiveFade.inMilliseconds > 0 ? 0.0 : targetVolume;
 
       await player.setVolume(startVolume);
       await player.setReleaseMode(ReleaseMode.loop);
@@ -145,12 +158,12 @@ class AmbientBusController extends ChangeNotifier {
       _activePlayers[layer.id] = player;
       LoggerService().info('AmbientBus: Layer "${layer.title}" started successfully!');
 
-      if (fadeDuration.inMilliseconds > 0) {
+      if (effectiveFade.inMilliseconds > 0) {
         final fader = _fadeControllers.putIfAbsent(layer.id, () => FadeController());
         fader.startFade(
           from: 0.0,
           to: targetVolume,
-          duration: fadeDuration,
+          duration: effectiveFade,
           onUpdate: (val) {
             try {
               player.setVolume(val);

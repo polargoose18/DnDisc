@@ -348,10 +348,12 @@ void main() {
 
     test('Что проверяем: Установка мастер-громкости движка (setMasterVolume). '
         'Входные данные: setMasterVolume(0.5). '
-        'Ожидаемый результат: Громкость ambientBus и sfxBus обновляется до 0.5.', () {
+        'Ожидаемый результат: Громкость musicBus, ambientBus и sfxBus обновляется до 0.5, effectiveVolume музыки уменьшается пропорционально.', () {
       engine.setMasterVolume(0.5);
 
       expect(engine.masterVolume, equals(0.5));
+      expect(engine.musicBus.masterVolume, equals(0.5));
+      expect(engine.musicBus.effectiveVolume, equals(0.5));
       expect(engine.ambientBus.masterVolume, equals(0.5));
       expect(engine.sfxBus.masterVolume, equals(0.5));
     });

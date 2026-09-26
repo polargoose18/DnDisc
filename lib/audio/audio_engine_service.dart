@@ -28,8 +28,12 @@ class AudioEngineService extends ChangeNotifier {
       releaseDuration: settings?.duckReleaseDuration ?? const Duration(milliseconds: 1200),
     );
 
-    musicBus = MusicBusController();
-    ambientBus = AmbientBusController();
+    musicBus = MusicBusController(
+      defaultFadeDuration: settings?.musicFadeDuration ?? const Duration(milliseconds: 1500),
+    );
+    ambientBus = AmbientBusController(
+      defaultFadeDuration: settings?.ambientFadeDuration ?? const Duration(milliseconds: 1000),
+    );
     sfxBus = SfxBusController(
       onSfxTriggered: _handleSfxDucking,
     );
@@ -57,12 +61,14 @@ class AudioEngineService extends ChangeNotifier {
         attack: _settings!.duckAttackDuration,
         release: _settings!.duckReleaseDuration,
       );
+      musicBus.setDefaultFadeDuration(_settings!.musicFadeDuration);
+      ambientBus.setDefaultFadeDuration(_settings!.ambientFadeDuration);
     }
   }
 
   void setMasterVolume(double volume) {
     _masterVolume = volume.clamp(0.0, 1.0);
-    musicBus.setVolume(musicBus.rawVolume);
+    musicBus.setMasterVolume(_masterVolume);
     ambientBus.setMasterVolume(_masterVolume);
     sfxBus.setMasterVolume(_masterVolume);
     notifyListeners();

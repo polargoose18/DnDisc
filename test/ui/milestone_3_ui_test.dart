@@ -162,8 +162,8 @@ void main() {
 
   group('CreateEditSceneDialog Widget Tests', () {
     testWidgets(
-      'Что проверяем: Создание новой сцены через диалог CreateEditSceneDialog. '
-      'Входные данные: Ввод названия "Тронный Зал" и нажатие кнопки "Создать". '
+      'Что проверяем: Создание новой сцены через диалог CreateEditSceneDialog с фильтрацией поиска. '
+      'Входные данные: Ввод названия "Тронный Зал", поиск трека и нажатие кнопки "Создать". '
       'Ожидаемый результат: Диалог закрывается и возвращает объект SceneModel с name="Тронный Зал".',
       (WidgetTester tester) async {
         final library = MediaLibraryService(autoLoad: false);
@@ -201,6 +201,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        // Проверяем наличие полей поиска для каждого канала
+        expect(find.widgetWithText(TextField, 'Поиск музыки по названию или тегам...'), findsOneWidget);
+        expect(find.widgetWithText(TextField, 'Поиск эмбиента по названию или тегам...'), findsOneWidget);
+        expect(find.widgetWithText(TextField, 'Поиск SFX по названию или тегам...'), findsOneWidget);
+
         // Нажимаем "Создать"
         await tester.tap(find.text('Создать'));
         await tester.pumpAndSettle();
@@ -215,9 +220,9 @@ void main() {
 
   group('SettingsScreen Widget Tests', () {
     testWidgets(
-      'Что проверяем: Отображение параметров и управление слайдерами в SettingsScreen. '
+      'Что проверяем: Отображение параметров и управление слайдерами и переключателями в SettingsScreen. '
       'Входные данные: SettingsScreen с дефолтными настройками. '
-      'Ожидаемый результат: Отображаются разделы фейдов, даккинга и кнопки экспорта/импорта.',
+      'Ожидаемый результат: Отображаются разделы интерфейса, фейдов, даккинга и кнопки экспорта/импорта.',
       (WidgetTester tester) async {
         final settings = SettingsService();
         final library = MediaLibraryService(autoLoad: false);
@@ -236,11 +241,21 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Настройки звукового движка'), findsOneWidget);
+        expect(find.text('Интерфейс и панель управления'), findsOneWidget);
+        expect(find.text('Отображать иконку консоли логов'), findsOneWidget);
         expect(find.text('Плавные переходы (Fade Engine)'), findsOneWidget);
         expect(find.text('Авто-приглушение музыки при SFX (Ducking)'), findsOneWidget);
         expect(find.text('Пакеты Пресетов (ZIP Архивы)'), findsOneWidget);
         expect(find.text('Импорт пресета (ZIP)'), findsOneWidget);
         expect(find.text('Экспорт пресета в ZIP'), findsOneWidget);
+
+        // Проверяем переключение иконки логов
+        final logSwitch = find.widgetWithText(SwitchListTile, 'Отображать иконку консоли логов');
+        await tester.scrollUntilVisible(logSwitch, 200);
+        expect(logSwitch, findsOneWidget);
+        await tester.tap(logSwitch);
+        await tester.pumpAndSettle();
+        expect(settings.showLogConsoleIcon, isFalse);
 
         // Проверяем изменение значения фейда музыки через сервис
         settings.setMusicFadeMs(2500);

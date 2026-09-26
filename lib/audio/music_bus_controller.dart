@@ -8,28 +8,47 @@ import 'fade_controller.dart';
 class MusicBusController extends ChangeNotifier {
   AudioTrack? _currentTrack;
   double _volume = 1.0;
+  double _masterVolume = 1.0;
   double _duckingMultiplier = 1.0;
   double _fadeMultiplier = 1.0;
   bool _isPlaying = false;
   MusicIntensity _currentIntensity = MusicIntensity.calm;
+  Duration _defaultFadeDuration;
 
   AudioPlayer? _player;
   AudioPlayer? _outgoingPlayer; // For crossfading
   final FadeController _fadeController = FadeController();
   final FadeController _outgoingFadeController = FadeController();
 
+  MusicBusController({
+    Duration defaultFadeDuration = const Duration(milliseconds: 1500),
+  }) : _defaultFadeDuration = defaultFadeDuration;
+
   AudioTrack? get currentTrack => _currentTrack;
   double get rawVolume => _volume;
+  double get masterVolume => _masterVolume;
   double get duckingMultiplier => _duckingMultiplier;
   double get fadeMultiplier => _fadeMultiplier;
-  double get effectiveVolume => (_volume * _duckingMultiplier * _fadeMultiplier).clamp(0.0, 1.0);
+  Duration get defaultFadeDuration => _defaultFadeDuration;
+  double get effectiveVolume => (_volume * _masterVolume * _duckingMultiplier * _fadeMultiplier).clamp(0.0, 1.0);
   bool get isPlaying => _isPlaying;
   MusicIntensity get currentIntensity => _currentIntensity;
 
+  void setDefaultFadeDuration(Duration duration) {
+    _defaultFadeDuration = duration;
+  }
+
+  void setMasterVolume(double volume) {
+    _masterVolume = volume.clamp(0.0, 1.0);
+    _applyPlayerVolume();
+    notifyListeners();
+  }
+
   Future<void> playTrack(
     AudioTrack track, {
-    Duration fadeDuration = const Duration(milliseconds: 1500),
+    Duration? fadeDuration,
   }) async {
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
     _currentTrack = track;
     _currentIntensity = track.intensity;
 
@@ -45,7 +64,7 @@ class MusicBusController extends ChangeNotifier {
 
     try {
       // If we already have an active player, initiate crossfade
-      if (_player != null && _isPlaying && fadeDuration.inMilliseconds > 0) {
+      if (_player != null && _isPlaying && effectiveFade.inMilliseconds > 0) {
         _outgoingFadeController.stop();
         _outgoingPlayer?.dispose();
         _outgoingPlayer = _player;
@@ -56,7 +75,7 @@ class MusicBusController extends ChangeNotifier {
         _outgoingFadeController.startFade(
           from: currentVol,
           to: 0.0,
-          duration: fadeDuration,
+          duration: effectiveFade,
           onUpdate: (val) {
             try {
               oldPlayer?.setVolume(val);
@@ -77,7 +96,7 @@ class MusicBusController extends ChangeNotifier {
       }
 
       _player = AudioPlayer();
-      _fadeMultiplier = fadeDuration.inMilliseconds > 0 ? 0.0 : 1.0;
+      _fadeMultiplier = effectiveFade.inMilliseconds > 0 ? 0.0 : 1.0;
       await _player!.setVolume(effectiveVolume);
       await _player!.setReleaseMode(ReleaseMode.loop);
 
@@ -87,11 +106,11 @@ class MusicBusController extends ChangeNotifier {
       _isPlaying = true;
       LoggerService().info('MusicBus: Playback started successfully!');
 
-      if (fadeDuration.inMilliseconds > 0) {
+      if (effectiveFade.inMilliseconds > 0) {
         _fadeController.startFade(
           from: 0.0,
           to: 1.0,
-          duration: fadeDuration,
+          duration: effectiveFade,
           onUpdate: (val) {
             _fadeMultiplier = val;
             _applyPlayerVolume();
@@ -129,15 +148,16 @@ class MusicBusController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> pause({Duration fadeDuration = const Duration(milliseconds: 600)}) async {
+  Future<void> pause({Duration? fadeDuration}) async {
     if (!_isPlaying) return;
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
 
-    if (fadeDuration.inMilliseconds > 0 && _player != null) {
+    if (effectiveFade.inMilliseconds > 0 && _player != null) {
       final startFade = _fadeMultiplier;
       _fadeController.startFade(
         from: startFade,
         to: 0.0,
-        duration: fadeDuration,
+        duration: effectiveFade,
         onUpdate: (val) {
           _fadeMultiplier = val;
           _applyPlayerVolume();
@@ -168,12 +188,13 @@ class MusicBusController extends ChangeNotifier {
     }
   }
 
-  Future<void> resume({Duration fadeDuration = const Duration(milliseconds: 1000)}) async {
+  Future<void> resume({Duration? fadeDuration}) async {
     if (_currentTrack != null) {
+      final effectiveFade = fadeDuration ?? _defaultFadeDuration;
       _isPlaying = true;
       if (_player != null) {
         try {
-          if (fadeDuration.inMilliseconds > 0) {
+          if (effectiveFade.inMilliseconds > 0) {
             _fadeMultiplier = 0.0;
             await _player!.setVolume(0.0);
             await _player!.resume();
@@ -182,7 +203,7 @@ class MusicBusController extends ChangeNotifier {
             _fadeController.startFade(
               from: 0.0,
               to: 1.0,
-              duration: fadeDuration,
+              duration: effectiveFade,
               onUpdate: (val) {
                 _fadeMultiplier = val;
                 _applyPlayerVolume();
@@ -206,13 +227,14 @@ class MusicBusController extends ChangeNotifier {
     }
   }
 
-  Future<void> stop({Duration fadeDuration = const Duration(milliseconds: 800)}) async {
-    if (fadeDuration.inMilliseconds > 0 && _player != null && _isPlaying) {
+  Future<void> stop({Duration? fadeDuration}) async {
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
+    if (effectiveFade.inMilliseconds > 0 && _player != null && _isPlaying) {
       final startFade = _fadeMultiplier;
       _fadeController.startFade(
         from: startFade,
         to: 0.0,
-        duration: fadeDuration,
+        duration: effectiveFade,
         onUpdate: (val) {
           _fadeMultiplier = val;
           _applyPlayerVolume();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../audio/audio_engine_service.dart';
+import '../../services/settings_service.dart';
 import '../widgets/scene_selector_panel.dart';
 import '../widgets/music_player_panel.dart';
 import '../widgets/ambient_mixer_panel.dart';
@@ -64,11 +65,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.terminal_rounded, color: Colors.amberAccent),
-            tooltip: 'Открыть консоль логов и отладки',
-            onPressed: () {
-              _scaffoldKey.currentState?.openEndDrawer();
+          Consumer<SettingsService>(
+            builder: (context, settings, _) {
+              if (!settings.showLogConsoleIcon) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.terminal_rounded, color: Colors.amberAccent),
+                tooltip: 'Открыть консоль логов и отладки',
+                onPressed: () {
+                  _scaffoldKey.currentState?.openEndDrawer();
+                },
+              );
             },
           ),
           const SizedBox(width: 8),

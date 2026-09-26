@@ -7,6 +7,7 @@ class SettingsService extends ChangeNotifier {
   int _duckAttackMs;
   int _duckReleaseMs;
   double _duckMultiplier;
+  bool _showLogConsoleIcon;
 
   SettingsService({
     int musicFadeMs = 1500,
@@ -14,17 +15,20 @@ class SettingsService extends ChangeNotifier {
     int duckAttackMs = 300,
     int duckReleaseMs = 1200,
     double duckMultiplier = 0.4,
+    bool showLogConsoleIcon = true,
   })  : _musicFadeMs = musicFadeMs,
         _ambientFadeMs = ambientFadeMs,
         _duckAttackMs = duckAttackMs,
         _duckReleaseMs = duckReleaseMs,
-        _duckMultiplier = duckMultiplier;
+        _duckMultiplier = duckMultiplier,
+        _showLogConsoleIcon = showLogConsoleIcon;
 
   int get musicFadeMs => _musicFadeMs;
   int get ambientFadeMs => _ambientFadeMs;
   int get duckAttackMs => _duckAttackMs;
   int get duckReleaseMs => _duckReleaseMs;
   double get duckMultiplier => _duckMultiplier;
+  bool get showLogConsoleIcon => _showLogConsoleIcon;
 
   Duration get musicFadeDuration => Duration(milliseconds: _musicFadeMs);
   Duration get ambientFadeDuration => Duration(milliseconds: _ambientFadeMs);
@@ -61,12 +65,19 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setShowLogConsoleIcon(bool show) {
+    _showLogConsoleIcon = show;
+    LoggerService().info('SettingsService: Show log console icon set to $_showLogConsoleIcon');
+    notifyListeners();
+  }
+
   void resetToDefaults() {
     _musicFadeMs = 1500;
     _ambientFadeMs = 1000;
     _duckAttackMs = 300;
     _duckReleaseMs = 1200;
     _duckMultiplier = 0.4;
+    _showLogConsoleIcon = true;
     LoggerService().info('SettingsService: Reset all settings to default values');
     notifyListeners();
   }
@@ -78,6 +89,7 @@ class SettingsService extends ChangeNotifier {
       'duckAttackMs': _duckAttackMs,
       'duckReleaseMs': _duckReleaseMs,
       'duckMultiplier': _duckMultiplier,
+      'showLogConsoleIcon': _showLogConsoleIcon,
     };
   }
 
@@ -87,6 +99,7 @@ class SettingsService extends ChangeNotifier {
     if (map.containsKey('duckAttackMs')) _duckAttackMs = (map['duckAttackMs'] as num).toInt().clamp(0, 5000);
     if (map.containsKey('duckReleaseMs')) _duckReleaseMs = (map['duckReleaseMs'] as num).toInt().clamp(0, 10000);
     if (map.containsKey('duckMultiplier')) _duckMultiplier = (map['duckMultiplier'] as num).toDouble().clamp(0.0, 1.0);
+    if (map.containsKey('showLogConsoleIcon')) _showLogConsoleIcon = map['showLogConsoleIcon'] as bool;
     notifyListeners();
   }
 }

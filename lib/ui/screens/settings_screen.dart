@@ -361,9 +361,38 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              // Section 4: Interface Options
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.display_settings_rounded, color: Colors.amberAccent),
+                          SizedBox(width: 8),
+                          Text(
+                            'Интерфейс и панель управления',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 24),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Отображать иконку консоли логов'),
+                        subtitle: const Text('Показывать кнопку быстрого открытия консоли логов в верхней панели мастера'),
+                        value: settings.showLogConsoleIcon,
+                        onChanged: (val) => settings.setShowLogConsoleIcon(val),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
 
-              // Section 4: Defaults
+              // Section 5: Defaults
               Center(
                 child: TextButton.icon(
                   icon: const Icon(Icons.restore_rounded, color: Colors.grey),
