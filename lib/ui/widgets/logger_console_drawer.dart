@@ -1,0 +1,105 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../services/logger_service.dart';
+
+class LoggerConsoleDrawer extends StatelessWidget {
+  const LoggerConsoleDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<LoggerService>(
+      builder: (context, logger, _) {
+        return Drawer(
+          width: 450,
+          child: Column(
+            children: [
+              AppBar(
+                title: const Text('Консоль логов и отладки'),
+                automaticallyImplyLeading: false,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    tooltip: 'Очистить логи',
+                    onPressed: () => logger.clear(),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: logger.logs.isEmpty
+                    ? const Center(child: Text('Логи пусты', style: TextStyle(color: Colors.grey)))
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: logger.logs.length,
+                        itemBuilder: (context, index) {
+                          final log = logger.logs[index];
+                          final color = _getColor(log.level);
+
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 4),
+                            color: const Color(0xFF1E1E2A),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '[${log.formattedTime}]',
+                                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: color.withAlpha(40),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          log.level.name.toUpperCase(),
+                                          style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  SelectableText(
+                                    log.message,
+                                    style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                                  ),
+                                  if (log.details != null) ...[
+                                    const SizedBox(height: 4),
+                                    SelectableText(
+                                      log.details!,
+                                      style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.redAccent),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Color _getColor(LogLevel level) {
+    switch (level) {
+      case LogLevel.info:
+        return Colors.blueAccent;
+      case LogLevel.warning:
+        return Colors.orangeAccent;
+      case LogLevel.error:
+        return Colors.redAccent;
+    }
+  }
+}

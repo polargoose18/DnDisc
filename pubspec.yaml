@@ -1,0 +1,33 @@
+name: ttrpg_audio_player
+description: A cross-platform audio, ambient, and soundboard player for TTRPG Game Masters.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_soloud: ^2.0.0
+  audioplayers: ^6.0.0
+  provider: ^6.1.2
+  path_provider: ^2.1.2
+  path: ^1.9.0
+  uuid: ^4.3.3
+  file_picker: ^8.0.0
+  sqflite: ^2.3.2
+  sqflite_common_ffi: ^2.3.2
+  archive: ^4.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  path_provider_platform_interface: ^2.1.2
+  plugin_platform_interface: ^2.1.8
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
