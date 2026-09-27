@@ -15,7 +15,6 @@ import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart'
 import 'package:ttrpg_audio_player/ui/view_models/theme_view_model.dart';
 import 'package:ttrpg_audio_player/domain/models/scene_model.dart';
 import 'package:ttrpg_audio_player/domain/models/library_track.dart';
-import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
 import 'package:ttrpg_audio_player/theme/app_themes.dart';
 
 class FakePathProviderPlatform extends Fake

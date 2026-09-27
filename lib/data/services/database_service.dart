@@ -36,8 +36,16 @@ class DatabaseService {
     return await openDatabase(
       dbPath,
       version: 3,
+      onConfigure: (db) async {
+        await db.execute('PRAGMA journal_mode = WAL;');
+        await db.execute('PRAGMA synchronous = NORMAL;');
+      },
       onCreate: (db, version) async {
         await _createTables(db);
+        await _createIndexes(db);
+      },
+      onOpen: (db) async {
+        await _createIndexes(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -49,8 +57,15 @@ class DatabaseService {
             await db.execute('ALTER TABLE scenes ADD COLUMN image_path TEXT;');
           } catch (_) {}
         }
+        await _createIndexes(db);
       },
     );
+  }
+
+  static Future<void> _createIndexes(Database db) async {
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_library_tracks_bus_type ON library_tracks(bus_type);');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_library_tracks_title ON library_tracks(title);');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_scenes_created_at ON scenes(created_at);');
   }
 
   static Future<void> _createTables(Database db) async {
@@ -123,6 +138,20 @@ class DatabaseService {
       track.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  Future<void> insertTracksBatch(List<LibraryTrack> tracks) async {
+    if (tracks.isEmpty) return;
+    final db = await database;
+    final batch = db.batch();
+    for (final track in tracks) {
+      batch.insert(
+        'library_tracks',
+        track.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 
   Future<void> updateTrack(LibraryTrack track) async {

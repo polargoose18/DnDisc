@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../audio/ambient_bus_controller.dart';
 import '../../domain/models/ambient_layer.dart';
 import '../../domain/models/library_track.dart';
+import '../../domain/models/custom_theme_model.dart';
 import '../../ui/view_models/media_library_view_model.dart';
 import '../../ui/view_models/theme_view_model.dart';
 import '../../theme/app_themes.dart';
@@ -14,8 +15,9 @@ class AmbientMixerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeViewModel = context.watch<ThemeViewModel?>();
-    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
+    final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
+      (vm) => vm?.activeTheme ?? AppThemes.deepDark,
+    );
 
     return Consumer<AmbientBusController>(
       builder: (context, ambient, _) {

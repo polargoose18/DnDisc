@@ -158,9 +158,9 @@ class PresetService {
 
       map['file_path'] = absolutePath;
       final track = LibraryTrack.fromMap(map);
-      await _mediaRepo.insertTrack(track);
       importedTracks.add(track);
     }
+    await _mediaRepo.insertTracksBatch(importedTracks);
 
     // 3. Process and save Scenes
     final importedScenes = <SceneModel>[];

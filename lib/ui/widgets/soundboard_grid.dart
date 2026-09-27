@@ -7,6 +7,7 @@ import '../../domain/models/sfx_trigger.dart';
 import '../../domain/models/library_track.dart';
 import '../../ui/view_models/media_library_view_model.dart';
 import '../../ui/view_models/theme_view_model.dart';
+import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 
 class SoundboardGrid extends StatelessWidget {
@@ -14,8 +15,9 @@ class SoundboardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeViewModel = context.watch<ThemeViewModel?>();
-    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
+    final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
+      (vm) => vm?.activeTheme ?? AppThemes.deepDark,
+    );
 
     return Consumer<SfxBusController>(
       builder: (context, sfx, _) {

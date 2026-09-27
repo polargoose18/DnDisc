@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import '../../services/media_library_service.dart';
 import '../../data/repositories/media_library_repository.dart';
 import '../../domain/models/library_track.dart';
-import '../../domain/models/audio_track.dart';
 import '../../audio/audio_engine_service.dart';
 
 /// MediaLibraryViewModel manages UI state, filtering, search, and track operations in compliance with MVVM architecture.

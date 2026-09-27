@@ -5,6 +5,7 @@ import '../../domain/models/scene_model.dart';
 import '../../ui/view_models/scene_view_model.dart';
 import '../../ui/view_models/media_library_view_model.dart';
 import '../../ui/view_models/theme_view_model.dart';
+import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 import '../../audio/audio_engine_service.dart';
 import 'create_edit_scene_dialog.dart';
@@ -34,8 +35,9 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
     final sceneViewModel = context.watch<SceneViewModel>();
     final mediaLibrary = context.watch<MediaLibraryViewModel>();
     final audioEngine = context.watch<AudioEngineService>();
-    final themeViewModel = context.watch<ThemeViewModel?>();
-    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
+    final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
+      (vm) => vm?.activeTheme ?? AppThemes.deepDark,
+    );
     final l10n = AppLocalizations.of(context);
 
     final allScenes = sceneViewModel.scenes;

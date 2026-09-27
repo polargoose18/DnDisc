@@ -5,6 +5,7 @@ abstract class MediaLibraryRepository {
   Future<List<LibraryTrack>> getAllTracks();
   Future<LibraryTrack?> getTrackById(String id);
   Future<void> insertTrack(LibraryTrack track);
+  Future<void> insertTracksBatch(List<LibraryTrack> tracks);
   Future<void> updateTrack(LibraryTrack track);
   Future<void> deleteTrack(String id);
   Future<List<LibraryTrack>> searchTracks(String query, {AudioBusType? filterBus});
@@ -23,6 +24,9 @@ class SqliteMediaLibraryRepository implements MediaLibraryRepository {
 
   @override
   Future<void> insertTrack(LibraryTrack track) => _db.insertTrack(track);
+
+  @override
+  Future<void> insertTracksBatch(List<LibraryTrack> tracks) => _db.insertTracksBatch(tracks);
 
   @override
   Future<void> updateTrack(LibraryTrack track) => _db.updateTrack(track);
