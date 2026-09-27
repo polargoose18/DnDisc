@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/scene_model.dart';
 import '../../models/audio_track.dart';
 import '../../services/theme_service.dart';
@@ -30,6 +31,7 @@ class SceneCard extends StatelessWidget {
     final themeService = context.watch<ThemeService?>();
     final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
     final sceneColor = Color(scene.colorHex);
+    final l10n = AppLocalizations.of(context);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -133,9 +135,9 @@ class SceneCard extends StatelessWidget {
                             color: activeTheme.primary,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Text(
-                            'АКТИВНА',
-                            style: TextStyle(
+                          child: Text(
+                            l10n?.activeBadge ?? 'АКТИВНА',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -159,7 +161,7 @@ class SceneCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.edit_outlined, size: 16, color: activeTheme.textPrimary),
                                 const SizedBox(width: 8),
-                                Text('Редактировать', style: TextStyle(color: activeTheme.textPrimary)),
+                                Text(l10n?.edit ?? 'Редактировать', style: TextStyle(color: activeTheme.textPrimary)),
                               ],
                             ),
                           ),
@@ -169,17 +171,17 @@ class SceneCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.copy_rounded, size: 16, color: activeTheme.textPrimary),
                                 const SizedBox(width: 8),
-                                Text('Дублировать', style: TextStyle(color: activeTheme.textPrimary)),
+                                Text(l10n?.duplicate ?? 'Дублировать', style: TextStyle(color: activeTheme.textPrimary)),
                               ],
                             ),
                           ),
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
-                                SizedBox(width: 8),
-                                Text('Удалить', style: TextStyle(color: Colors.redAccent)),
+                                const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
+                                const SizedBox(width: 8),
+                                Text(l10n?.delete ?? 'Удалить', style: const TextStyle(color: Colors.redAccent)),
                               ],
                             ),
                           ),
@@ -249,7 +251,7 @@ class SceneCard extends StatelessWidget {
                                   const Icon(Icons.waves, size: 12, color: Colors.tealAccent),
                                   const SizedBox(width: 2),
                                   Text(
-                                    '${scene.ambientLayerVolumes.length} эмбиент',
+                                    '${scene.ambientLayerVolumes.length} ${l10n?.ambient ?? "эмбиент"}',
                                     style: const TextStyle(
                                       color: Colors.tealAccent,
                                       fontSize: 9,
@@ -270,7 +272,7 @@ class SceneCard extends StatelessWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         icon: Icon(isActive ? Icons.volume_up_rounded : Icons.play_arrow_rounded, size: 14),
-                        label: Text(isActive ? 'Активна' : 'Включить', style: const TextStyle(fontSize: 11)),
+                        label: Text(isActive ? (l10n?.activeBadge ?? 'АКТИВНА') : (l10n?.enableSceneBtn ?? 'Включить'), style: const TextStyle(fontSize: 11)),
                         onPressed: onActivate,
                       ),
                     ],

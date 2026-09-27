@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/scene_model.dart';
 import '../../services/scene_service.dart';
 import '../../services/media_library_service.dart';
@@ -35,6 +36,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
     final audioEngine = context.watch<AudioEngineService>();
     final themeService = context.watch<ThemeService?>();
     final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final l10n = AppLocalizations.of(context);
 
     final allScenes = sceneService.scenes;
     final activeSceneId = sceneService.activeSceneId;
@@ -59,7 +61,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Атмосферные Сцены',
+                    l10n?.scenesTitle ?? 'Атмосферные Сцены',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -71,7 +73,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 const SizedBox(width: 4),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.add_rounded, size: 14),
-                  label: const Text('Создать сцену', style: TextStyle(fontSize: 11)),
+                  label: Text(l10n?.createSceneBtn ?? 'Создать сцену', style: const TextStyle(fontSize: 11)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: activeTheme.primary,
                     foregroundColor: Colors.white,
@@ -97,7 +99,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 controller: _searchController,
                 style: TextStyle(color: activeTheme.textPrimary, fontSize: 13),
                 decoration: InputDecoration(
-                  hintText: 'Поиск сцен...',
+                  hintText: l10n?.searchPlaceholder ?? 'Поиск сцен...',
                   hintStyle: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                   prefixIcon: Icon(Icons.search, size: 18, color: activeTheme.textSecondary),
                   suffixIcon: _searchQuery.isNotEmpty
@@ -134,7 +136,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 child: Center(
                   child: Text(
                     allScenes.isEmpty
-                        ? 'Сцены пока не созданы.\nНажмите «Новая сцена» для добавления.'
+                        ? (l10n?.noScenesHint ?? 'Сцены пока не созданы.\nНажмите «Новая сцена» для добавления.')
                         : 'Сцен по запросу не найдено.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),

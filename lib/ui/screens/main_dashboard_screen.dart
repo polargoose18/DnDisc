@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../audio/audio_engine_service.dart';
 import '../../services/settings_service.dart';
@@ -33,17 +34,19 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: const LoggerConsoleDrawer(),
       appBar: AppBar(
-        title: const Text('TTRPG Audio Master'),
+        title: Text(l10n?.appTitle ?? 'TTRPG Audio Master'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.dashboard_rounded), text: 'Панель Мастера'),
-            Tab(icon: Icon(Icons.library_music_rounded), text: 'Общая Библиотека'),
-            Tab(icon: Icon(Icons.settings_rounded), text: 'Настройки'),
+          tabs: [
+            Tab(icon: const Icon(Icons.dashboard_rounded), text: l10n?.tabGmDashboard ?? 'Панель Мастера'),
+            Tab(icon: const Icon(Icons.library_music_rounded), text: l10n?.tabLibrary ?? 'Общая Библиотека'),
+            Tab(icon: const Icon(Icons.settings_rounded), text: l10n?.tabSettings ?? 'Настройки'),
           ],
         ),
         actions: [
@@ -52,7 +55,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
             builder: (context, engine, _) {
               return IconButton(
                 icon: const Icon(Icons.volume_down_rounded),
-                tooltip: 'Ручной Ducking [D]',
+                tooltip: l10n?.manualDuckingTooltip ?? 'Ручной Ducking [D]',
                 onPressed: () => engine.triggerManualDuck(),
               );
             },
@@ -64,7 +67,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                 children: [
                   IconButton(
                     icon: Icon(engine.isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded),
-                    tooltip: engine.isMuted ? 'Включить звук [M]' : 'Заглушить [M]',
+                    tooltip: engine.isMuted
+                        ? (l10n?.unmuteTooltip ?? 'Включить звук [M]')
+                        : (l10n?.muteTooltip ?? 'Заглушить [M]'),
                     color: engine.isMuted ? Colors.redAccent : null,
                     onPressed: () => engine.toggleMute(),
                   ),
@@ -84,24 +89,13 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               );
             },
           ),
-          // Fullscreen Toggle
-          Consumer<ShortcutService?>(
-            builder: (context, shortcuts, _) {
-              final isFull = shortcuts?.isFullscreen ?? false;
-              return IconButton(
-                icon: Icon(isFull ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded),
-                tooltip: 'Полноэкранный режим [F11]',
-                onPressed: () => shortcuts?.handleActionDirectly(AppShortcutAction.toggleFullscreen),
-              );
-            },
-          ),
           // Log Console
           Consumer<SettingsService>(
             builder: (context, settings, _) {
               if (!settings.showLogConsoleIcon) return const SizedBox.shrink();
               return IconButton(
                 icon: const Icon(Icons.terminal_rounded, color: Colors.amberAccent),
-                tooltip: 'Открыть консоль логов и отладки',
+                tooltip: l10n?.logConsoleTooltip ?? 'Открыть консоль логов и отладки',
                 onPressed: () {
                   _scaffoldKey.currentState?.openEndDrawer();
                 },

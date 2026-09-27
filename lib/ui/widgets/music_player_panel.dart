@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../audio/music_bus_controller.dart';
 import '../../models/audio_track.dart';
 import '../../services/theme_service.dart';
@@ -13,6 +14,7 @@ class MusicPlayerPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeService = context.watch<ThemeService?>();
     final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final l10n = AppLocalizations.of(context);
 
     return Consumer<MusicBusController>(
       builder: (context, music, _) {
@@ -33,7 +35,7 @@ class MusicPlayerPanel extends StatelessWidget {
                         Icon(Icons.music_note_rounded, color: activeTheme.primary),
                         const SizedBox(width: 8),
                         Text(
-                          'Музыкальная дорожка',
+                          l10n?.musicTrack ?? 'Музыкальная дорожка',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
@@ -59,8 +61,8 @@ class MusicPlayerPanel extends StatelessWidget {
                     Expanded(
                       child: Text(
                         track != null
-                            ? 'Сейчас играет: ${track.title} ${music.isPlaying ? '' : '(Пауза)'}'
-                            : 'Музыка не воспроизводится',
+                            ? '${l10n?.nowPlaying ?? "Сейчас играет"}: ${track.title} ${music.isPlaying ? '' : '(Пауза)'}'
+                            : (l10n?.musicNotPlaying ?? 'Музыка не воспроизводится'),
                         style: TextStyle(
                           color: track != null ? activeTheme.textPrimary : activeTheme.textSecondary,
                           fontWeight: track != null ? FontWeight.w500 : FontWeight.normal,
@@ -78,7 +80,7 @@ class MusicPlayerPanel extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Уровень Интенсивности:',
+                      '${l10n?.intensityLevel ?? "Уровень Интенсивности"}:',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
@@ -173,7 +175,7 @@ class MusicPlayerPanel extends StatelessWidget {
                       icon: const Icon(Icons.stop_circle_outlined),
                       iconSize: 32,
                       color: activeTheme.textSecondary,
-                      tooltip: 'Остановить музыку',
+                      tooltip: l10n?.stopMusic ?? 'Остановить музыку',
                       onPressed: () => music.stop(),
                     ),
                     const SizedBox(width: 8),

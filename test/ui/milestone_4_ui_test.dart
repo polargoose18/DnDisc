@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -69,16 +71,28 @@ Widget createTestApp({
       ChangeNotifierProvider<MediaLibraryService>(create: (_) => MediaLibraryService(autoLoad: false)),
       ChangeNotifierProvider<SceneService>.value(value: scenes),
     ],
-    child: MaterialApp(
-      theme: themes.currentThemeData,
-      home: MediaQuery(
-        data: MediaQueryData(size: screenSize),
-        child: SizedBox(
-          width: screenSize.width,
-          height: screenSize.height,
-          child: Scaffold(body: child),
-        ),
-      ),
+    child: Consumer<SettingsService>(
+      builder: (context, settings, _) {
+        return MaterialApp(
+          theme: themes.currentThemeData,
+          locale: settings.currentLocale ?? const Locale('ru'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: MediaQuery(
+            data: MediaQueryData(size: screenSize),
+            child: SizedBox(
+              width: screenSize.width,
+              height: screenSize.height,
+              child: Scaffold(body: child),
+            ),
+          ),
+        );
+      },
     ),
   );
 }
@@ -195,7 +209,7 @@ void main() {
         expect(find.text('Уютный очаг и звон кружек'), findsOneWidget);
         expect(find.text('АКТИВНА'), findsWidgets);
 
-        await tester.tap(find.text('Активна'));
+        await tester.tap(find.byType(ElevatedButton));
         expect(activated, isTrue);
       },
     );

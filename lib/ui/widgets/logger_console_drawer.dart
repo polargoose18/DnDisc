@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../services/logger_service.dart';
 
@@ -7,6 +8,8 @@ class LoggerConsoleDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Consumer<LoggerService>(
       builder: (context, logger, _) {
         return Drawer(
@@ -14,12 +17,12 @@ class LoggerConsoleDrawer extends StatelessWidget {
           child: Column(
             children: [
               AppBar(
-                title: const Text('Консоль логов и отладки'),
+                title: Text(l10n?.logConsoleTitle ?? 'Консоль логов и отладки'),
                 automaticallyImplyLeading: false,
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
-                    tooltip: 'Очистить логи',
+                    tooltip: l10n?.clearLogs ?? 'Очистить логи',
                     onPressed: () => logger.clear(),
                   ),
                   IconButton(
@@ -30,7 +33,7 @@ class LoggerConsoleDrawer extends StatelessWidget {
               ),
               Expanded(
                 child: logger.logs.isEmpty
-                    ? const Center(child: Text('Логи пусты', style: TextStyle(color: Colors.grey)))
+                    ? Center(child: Text(l10n?.noLogs ?? 'Логи пусты', style: const TextStyle(color: Colors.grey)))
                     : ListView.builder(
                         padding: const EdgeInsets.all(8),
                         itemCount: logger.logs.length,

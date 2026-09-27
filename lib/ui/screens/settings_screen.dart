@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import '../../l10n/app_localizations.dart';
 import '../../services/settings_service.dart';
 import '../../services/theme_service.dart';
 import '../../services/shortcut_service.dart';
@@ -24,6 +25,7 @@ class SettingsScreen extends StatelessWidget {
     final mediaLibrary = context.watch<MediaLibraryService>();
     final sceneService = context.watch<SceneService>();
     final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -50,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Настройки звукового движка',
+                              l10n?.settingsTitle ?? 'Настройки звукового движка',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -59,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Темы оформления, горячие клавиши, звуковой движок и управление пресетами',
+                              l10n?.settingsSubtitle ?? 'Темы оформления, горячие клавиши, звуковой движок и управление пресетами',
                               style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                             ),
                           ],
@@ -72,11 +74,11 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Section 1: Themes & Styling (Presets + Custom Themes)
-              _buildThemesSection(context, themeService, activeTheme),
+              _buildThemesSection(context, themeService, activeTheme, l10n),
               const SizedBox(height: 16),
 
               // Section 2: Centralized Hotkeys Reference
-              _buildHotkeysSection(context, shortcutService, activeTheme),
+              _buildHotkeysSection(context, shortcutService, activeTheme, l10n),
               const SizedBox(height: 16),
 
               // Section 3: Fade Engine Settings
@@ -91,7 +93,7 @@ class SettingsScreen extends StatelessWidget {
                           Icon(Icons.graphic_eq_rounded, color: activeTheme.primary),
                           const SizedBox(width: 8),
                           Text(
-                            'Плавные переходы (Fade Engine)',
+                            l10n?.fadeEngineTitle ?? 'Плавные переходы (Fade Engine)',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -105,7 +107,7 @@ class SettingsScreen extends StatelessWidget {
                       // Music Fade
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('Длительность нарастания/затухания музыки', style: TextStyle(color: activeTheme.textPrimary)),
+                        title: Text(l10n?.musicFadeTitle ?? 'Длительность нарастания/затухания музыки', style: TextStyle(color: activeTheme.textPrimary)),
                         subtitle: Text('${settings.musicFadeMs} мс (${(settings.musicFadeMs / 1000).toStringAsFixed(1)} сек)', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
@@ -123,7 +125,7 @@ class SettingsScreen extends StatelessWidget {
                       // Ambient Fade
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('Длительность плавного включения/выключения эмбиента', style: TextStyle(color: activeTheme.textPrimary)),
+                        title: Text(l10n?.ambientFadeTitle ?? 'Длительность плавного включения/выключения эмбиента', style: TextStyle(color: activeTheme.textPrimary)),
                         subtitle: Text('${settings.ambientFadeMs} мс (${(settings.ambientFadeMs / 1000).toStringAsFixed(1)} сек)', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
@@ -155,7 +157,7 @@ class SettingsScreen extends StatelessWidget {
                           Icon(Icons.volume_down_rounded, color: activeTheme.duckingBadge),
                           const SizedBox(width: 8),
                           Text(
-                            'Авто-приглушение музыки при SFX (Ducking)',
+                            l10n?.duckingTitle ?? 'Авто-приглушение музыки при SFX (Ducking)',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -169,8 +171,8 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Attack
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('Время атаки (Duck Attack Time)', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.duckAttackMs} мс — скорость затухания музыки при ударе SFX', style: TextStyle(color: activeTheme.textSecondary)),
+                        title: Text(l10n?.duckAttackTitle ?? 'Время атаки (Duck Attack Time)', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${settings.duckAttackMs} ms — ${l10n?.duckAttackSubtitle ?? 'скорость затухания музыки при ударе SFX'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -187,8 +189,8 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Release
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('Время восстановления (Duck Release Time)', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.duckReleaseMs} мс — скорость возврата музыки на полную громкость', style: TextStyle(color: activeTheme.textSecondary)),
+                        title: Text(l10n?.duckReleaseTitle ?? 'Время восстановления (Duck Release Time)', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${settings.duckReleaseMs} ms — ${l10n?.duckReleaseSubtitle ?? 'скорость возврата музыки на полную громкость'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -205,8 +207,8 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Multiplier
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('Глубина приглушения (Ducking Depth)', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${(settings.duckMultiplier * 100).toInt()}% от исходной громкости музыки', style: TextStyle(color: activeTheme.textSecondary)),
+                        title: Text(l10n?.duckMultiplierTitle ?? 'Глубина приглушения (Ducking Depth)', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${(settings.duckMultiplier * 100).toInt()}% ${l10n?.duckMultiplierSubtitle ?? 'от исходной громкости музыки'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -237,7 +239,7 @@ class SettingsScreen extends StatelessWidget {
                           Icon(Icons.archive_rounded, color: activeTheme.secondary),
                           const SizedBox(width: 8),
                           Text(
-                            'Пакеты Пресетов (ZIP Архивы)',
+                            l10n?.presetPacksTitle ?? 'Пакеты Пресетов (ZIP Архивы)',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -248,7 +250,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       const Divider(height: 24),
                       Text(
-                        'Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые пакеты приключений.',
+                        l10n?.presetPacksSubtitle ?? 'Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые пакеты приключений.',
                         style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                       ),
                       const SizedBox(height: 16),
@@ -258,7 +260,7 @@ class SettingsScreen extends StatelessWidget {
                         children: [
                           ElevatedButton.icon(
                             icon: const Icon(Icons.file_download_rounded),
-                            label: const Text('Импорт пресета (ZIP)'),
+                            label: Text(l10n?.importPresetBtn ?? 'Импорт пресета (ZIP)'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.teal.shade700,
                               foregroundColor: Colors.white,
@@ -309,7 +311,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           ElevatedButton.icon(
                             icon: const Icon(Icons.file_upload_rounded),
-                            label: const Text('Экспорт пресета в ZIP'),
+                            label: Text(l10n?.exportPresetBtn ?? 'Экспорт пресета в ZIP'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: activeTheme.primary,
                               foregroundColor: Colors.white,
@@ -403,7 +405,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Section 6: Interface Options
+              // Section 6: Language & Interface Options
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -412,10 +414,57 @@ class SettingsScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
+                          Icon(Icons.language_rounded, color: activeTheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n?.language ?? 'Язык интерфейса',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: activeTheme.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 24),
+                      DropdownButtonFormField<String>(
+                        key: const ValueKey('language_selector_dropdown'),
+                        initialValue: settings.appLanguage,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          filled: true,
+                          fillColor: activeTheme.surface,
+                        ),
+                        dropdownColor: activeTheme.surface,
+                        style: TextStyle(color: activeTheme.textPrimary),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'system',
+                            child: Text(l10n?.languageSystem ?? 'Системный', style: TextStyle(color: activeTheme.textPrimary)),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ru',
+                            child: Text(l10n?.languageRussian ?? 'Русский', style: TextStyle(color: activeTheme.textPrimary)),
+                          ),
+                          DropdownMenuItem(
+                            value: 'en',
+                            child: Text(l10n?.languageEnglish ?? 'English', style: TextStyle(color: activeTheme.textPrimary)),
+                          ),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            settings.setAppLanguage(val);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
                           Icon(Icons.display_settings_rounded, color: activeTheme.secondary),
                           const SizedBox(width: 8),
                           Text(
-                            'Интерфейс и панель управления',
+                            l10n?.interfaceTitle ?? 'Интерфейс и панель управления',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -427,9 +476,9 @@ class SettingsScreen extends StatelessWidget {
                       const Divider(height: 24),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('Отображать иконку консоли логов', style: TextStyle(color: activeTheme.textPrimary)),
+                        title: Text(l10n?.showLogConsoleTitle ?? 'Отображать иконку консоли логов', style: TextStyle(color: activeTheme.textPrimary)),
                         subtitle: Text(
-                          'Показывать кнопку быстрого открытия консоли логов в верхней панели мастера',
+                          l10n?.showLogConsoleSubtitle ?? 'Показывать кнопку быстрого открытия консоли логов в верхней панели мастера',
                           style: TextStyle(color: activeTheme.textSecondary),
                         ),
                         value: settings.showLogConsoleIcon,
@@ -445,11 +494,11 @@ class SettingsScreen extends StatelessWidget {
               Center(
                 child: TextButton.icon(
                   icon: Icon(Icons.restore_rounded, color: activeTheme.textSecondary),
-                  label: Text('Сбросить все настройки по умолчанию', style: TextStyle(color: activeTheme.textSecondary)),
+                  label: Text(l10n?.resetDefaultsBtn ?? 'Сбросить все настройки по умолчанию', style: TextStyle(color: activeTheme.textSecondary)),
                   onPressed: () {
                     settings.resetToDefaults();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Настройки звукового движка сброшены.')),
+                      SnackBar(content: Text(l10n?.settingsResetToast ?? 'Настройки звукового движка сброшены.')),
                     );
                   },
                 ),
@@ -466,6 +515,7 @@ class SettingsScreen extends StatelessWidget {
     BuildContext context,
     ThemeService? themeService,
     CustomThemeModel activeTheme,
+    AppLocalizations? l10n,
   ) {
     final presets = themeService?.builtInPresets ?? AppThemes.presets;
     final activeThemeId = themeService?.activeThemeId ?? AppThemes.deepDarkId;
@@ -482,7 +532,7 @@ class SettingsScreen extends StatelessWidget {
                 Icon(Icons.palette_rounded, color: activeTheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Темы оформления (Themes)',
+                  l10n?.themesTitle ?? 'Темы оформления (Themes)',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -495,7 +545,7 @@ class SettingsScreen extends StatelessWidget {
 
             // Subsection 1: Built-in Presets
             Text(
-              'Встроенные пресеты (5 вариантов)',
+              l10n?.builtinThemes ?? 'Встроенные пресеты (5 вариантов)',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -600,7 +650,7 @@ class SettingsScreen extends StatelessWidget {
                         Icon(Icons.brush_rounded, size: 16, color: activeTheme.secondary),
                         const SizedBox(width: 6),
                         Text(
-                          'Пользовательские темы (${customThemes.length})',
+                          '${l10n?.customThemes ?? "Пользовательские темы"} (${customThemes.length})',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -628,7 +678,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'У вас пока нет кастомных тем. Создайте свою тему с уникальной палитрой цветов!',
+                    l10n?.noCustomThemes ?? 'У вас пока нет кастомных тем. Создайте свою тему с уникальной палитрой цветов!',
                     style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
                   ),
                 ),
@@ -689,7 +739,7 @@ class SettingsScreen extends StatelessWidget {
                                 icon: const Icon(Icons.edit_outlined, size: 16),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
-                                tooltip: 'Редактировать',
+                                tooltip: l10n?.edit ?? 'Редактировать',
                                 onPressed: () async {
                                   final edited = await showDialog<CustomThemeModel>(
                                     context: context,
@@ -705,7 +755,7 @@ class SettingsScreen extends StatelessWidget {
                                 icon: const Icon(Icons.copy_rounded, size: 16),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
-                                tooltip: 'Дублировать',
+                                tooltip: l10n?.duplicate ?? 'Дублировать',
                                 onPressed: () async {
                                   await themeService?.duplicateCustomTheme(custom.id);
                                 },
@@ -715,7 +765,7 @@ class SettingsScreen extends StatelessWidget {
                                 icon: const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
-                                tooltip: 'Удалить',
+                                tooltip: l10n?.delete ?? 'Удалить',
                                 onPressed: () async {
                                   await themeService?.deleteCustomTheme(custom.id);
                                 },
@@ -743,7 +793,7 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 12),
             ElevatedButton.icon(
               icon: const Icon(Icons.add_rounded, size: 18),
-              label: const Text('+ Создать новую тему'),
+              label: Text(l10n?.createThemeBtn ?? '+ Создать новую тему'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: activeTheme.primary,
                 foregroundColor: Colors.white,
@@ -769,6 +819,7 @@ class SettingsScreen extends StatelessWidget {
     BuildContext context,
     ShortcutService? shortcutService,
     CustomThemeModel activeTheme,
+    AppLocalizations? l10n,
   ) {
     final shortcuts = shortcutService?.allDefinitions ?? const [
       ShortcutDefinition(
@@ -814,7 +865,7 @@ class SettingsScreen extends StatelessWidget {
                 Icon(Icons.keyboard_rounded, color: activeTheme.secondary),
                 const SizedBox(width: 8),
                 Text(
-                  'Централизованные горячие клавиши',
+                  l10n?.hotkeysTitle ?? 'Централизованные горячие клавиши',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -831,7 +882,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             const Divider(height: 24),
             Text(
-              'Управляйте звуковым окружением во время игровой сессии не отвлекаясь от книги правил:',
+              l10n?.hotkeysSubtitle ?? 'Управляйте звуковым окружением во время игровой сессии не отвлекаясь от книги правил:',
               style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: 12),
@@ -852,15 +903,15 @@ class SettingsScreen extends StatelessWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('Действие', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
+                      child: Text(l10n?.actionCol ?? 'Действие', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('Описание', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
+                      child: Text(l10n?.descriptionCol ?? 'Описание', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('Клавиша', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
+                      child: Text(l10n?.keyCol ?? 'Клавиша', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
                     ),
                   ],
                 ),

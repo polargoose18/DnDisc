@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/library_track.dart';
 import '../../services/media_library_service.dart';
 import '../../audio/audio_engine_service.dart';
@@ -10,6 +11,8 @@ class LibraryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Consumer2<MediaLibraryService, AudioEngineService>(
       builder: (context, library, audioEngine, _) {
         return Scaffold(
@@ -24,11 +27,11 @@ class LibraryScreen extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         key: const ValueKey('library_search_input'),
-                        decoration: const InputDecoration(
-                          hintText: 'Поиск по названию или тегам (например, Таверна, Бой)...',
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: InputDecoration(
+                          hintText: l10n?.searchPlaceholder ?? 'Поиск по названию или тегам (например, Таверна, Бой)...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: const OutlineInputBorder(),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                         onChanged: (val) => library.setSearchQuery(val),
                       ),
@@ -47,9 +50,9 @@ class LibraryScreen extends StatelessWidget {
                       ),
                       onPressed: () => _handleImport(context, library),
                       icon: const Icon(Icons.file_upload_rounded, color: Colors.white),
-                      label: const Text(
-                        'Импорт файлов',
-                        style: TextStyle(
+                      label: Text(
+                        l10n?.importFilesBtn ?? 'Импорт файлов',
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           fontSize: 14,
@@ -66,7 +69,7 @@ class LibraryScreen extends StatelessWidget {
                   spacing: 8,
                   children: [
                     FilterChip(
-                      label: const Text('Все звуки'),
+                      label: Text(l10n?.allSounds ?? 'Все звуки'),
                       selected: library.activeBusFilter == null,
                       onSelected: (_) => library.setBusFilter(null),
                     ),
@@ -95,20 +98,20 @@ class LibraryScreen extends StatelessWidget {
                                 children: [
                                   const Icon(Icons.library_music_outlined, size: 64, color: Colors.grey),
                                   const SizedBox(height: 12),
-                                  const Text(
-                                    'Медиатека пуста',
-                                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                                  Text(
+                                    l10n?.libraryEmpty ?? 'Медиатека пуста',
+                                    style: const TextStyle(fontSize: 18, color: Colors.grey),
                                   ),
                                   const SizedBox(height: 6),
-                                  const Text(
-                                    'Нажмите "Импорт файлов", чтобы добавить музыку, эмбиент или SFX.',
-                                    style: TextStyle(color: Colors.white54),
+                                  Text(
+                                    l10n?.libraryEmptyHint ?? 'Нажмите "Импорт файлов", чтобы добавить музыку, эмбиент или SFX.',
+                                    style: const TextStyle(color: Colors.white54),
                                   ),
                                   const SizedBox(height: 16),
                                   ElevatedButton.icon(
                                     onPressed: () => _handleImport(context, library),
                                     icon: const Icon(Icons.file_upload_outlined),
-                                    label: const Text('Выбрать файлы (MP3, OGG, WAV, FLAC)'),
+                                    label: Text(l10n?.importFilesBtn ?? 'Импорт файлов'),
                                   ),
                                 ],
                               ),

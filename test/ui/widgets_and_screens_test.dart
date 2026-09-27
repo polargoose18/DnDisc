@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -64,8 +66,20 @@ Widget createTestableWidget(Widget child, {
       if (library != null)
         ChangeNotifierProvider<MediaLibraryService>.value(value: library),
     ],
-    child: MaterialApp(
-      home: child,
+    child: Consumer<SettingsService>(
+      builder: (context, set, _) {
+        return MaterialApp(
+          locale: set.currentLocale ?? const Locale('ru'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: child,
+        );
+      },
     ),
   );
 }

@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -58,8 +60,20 @@ Widget createM3TestableWidget(Widget child, {
       ChangeNotifierProvider<SceneService>.value(value: scn),
       ChangeNotifierProvider<MediaLibraryService>.value(value: lib),
     ],
-    child: MaterialApp(
-      home: child,
+    child: Consumer<SettingsService>(
+      builder: (context, set, _) {
+        return MaterialApp(
+          locale: set.currentLocale ?? const Locale('ru'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: child,
+        );
+      },
     ),
   );
 }
@@ -151,7 +165,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
 
         expect(sceneService.activeSceneId, equals('sc-dragon'));
-        expect(find.text('АКТИВНА'), findsOneWidget);
+        expect(find.text('АКТИВНА'), findsWidgets);
 
         sceneService.dispose();
         library.dispose();
@@ -317,6 +331,62 @@ void main() {
         library.dispose();
         sceneService.dispose();
         settings.dispose();
+      },
+    );
+  });
+
+  group('Language Selection UI Tests', () {
+    testWidgets(
+      'Что проверяем: Выбор языка интерфейса в SettingsScreen и обновление всех локализованных секций экрана. '
+      'Входные данные: Отображение SettingsScreen, смена языка на English ("en") и обратно на Русский ("ru") в SettingsService. '
+      'Ожидаемый результат: Переключение appLanguage в SettingsService и перерисовка UI с локализованными заголовками секций ("Interface Language", "Audio Engine Settings", "Fade Engine", "Auto-ducking music during SFX (Ducking)", "Preset Packs (ZIP Archives)", "App Themes", "Centralized Shortcuts").',
+      (WidgetTester tester) async {
+        final settings = SettingsService();
+        final library = MediaLibraryService(autoLoad: false);
+        final sceneService = SceneService(autoLoad: false);
+
+        await tester.pumpWidget(createM3TestableWidget(
+          const SettingsScreen(),
+          settings: settings,
+          library: library,
+          sceneService: sceneService,
+        ));
+        await tester.pumpAndSettle();
+
+        final dropdownFinder = find.byKey(const ValueKey('language_selector_dropdown'));
+        await tester.scrollUntilVisible(dropdownFinder, 200);
+        await tester.pumpAndSettle();
+
+        expect(dropdownFinder, findsOneWidget);
+        expect(find.text('Язык интерфейса'), findsOneWidget);
+
+        // Переключаем язык на English
+        settings.setAppLanguage('en');
+        await tester.pumpAndSettle();
+
+        expect(find.text('Interface Language'), findsOneWidget);
+        expect(find.text('Audio Engine Settings'), findsOneWidget);
+        expect(find.text('Fade Engine'), findsOneWidget);
+        expect(find.text('Auto-ducking music during SFX (Ducking)'), findsOneWidget);
+        expect(find.text('Preset Packs (ZIP Archives)'), findsOneWidget);
+        expect(find.text('App Themes'), findsOneWidget);
+        expect(find.text('Centralized Shortcuts'), findsOneWidget);
+
+        // Переключаем язык обратно на Русский
+        settings.setAppLanguage('ru');
+        await tester.pumpAndSettle();
+
+        expect(find.text('Язык интерфейса'), findsOneWidget);
+        expect(find.text('Настройки звукового движка'), findsOneWidget);
+        expect(find.text('Плавные переходы (Fade Engine)'), findsOneWidget);
+        expect(find.text('Авто-приглушение музыки при SFX (Ducking)'), findsOneWidget);
+        expect(find.text('Пакеты Пресетов (ZIP Архивы)'), findsOneWidget);
+        expect(find.text('Темы оформления (Themes)'), findsOneWidget);
+        expect(find.text('Централизованные горячие клавиши'), findsOneWidget);
+
+        settings.dispose();
+        library.dispose();
+        sceneService.dispose();
       },
     );
   });

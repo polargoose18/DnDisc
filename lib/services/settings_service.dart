@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'logger_service.dart';
 
 class SettingsService extends ChangeNotifier {
@@ -8,6 +8,7 @@ class SettingsService extends ChangeNotifier {
   int _duckReleaseMs;
   double _duckMultiplier;
   bool _showLogConsoleIcon;
+  String _appLanguage; // 'system', 'ru', 'en'
 
   SettingsService({
     int musicFadeMs = 1500,
@@ -16,12 +17,19 @@ class SettingsService extends ChangeNotifier {
     int duckReleaseMs = 1200,
     double duckMultiplier = 0.4,
     bool showLogConsoleIcon = true,
+    String appLanguage = 'system',
   })  : _musicFadeMs = musicFadeMs,
         _ambientFadeMs = ambientFadeMs,
         _duckAttackMs = duckAttackMs,
         _duckReleaseMs = duckReleaseMs,
         _duckMultiplier = duckMultiplier,
-        _showLogConsoleIcon = showLogConsoleIcon;
+        _showLogConsoleIcon = showLogConsoleIcon,
+        _appLanguage = _normalizeLanguage(appLanguage);
+
+  static String _normalizeLanguage(String lang) {
+    if (lang == 'ru' || lang == 'en') return lang;
+    return 'system';
+  }
 
   int get musicFadeMs => _musicFadeMs;
   int get ambientFadeMs => _ambientFadeMs;
@@ -29,11 +37,24 @@ class SettingsService extends ChangeNotifier {
   int get duckReleaseMs => _duckReleaseMs;
   double get duckMultiplier => _duckMultiplier;
   bool get showLogConsoleIcon => _showLogConsoleIcon;
+  String get appLanguage => _appLanguage;
+
+  Locale? get currentLocale {
+    if (_appLanguage == 'ru') return const Locale('ru');
+    if (_appLanguage == 'en') return const Locale('en');
+    return null;
+  }
 
   Duration get musicFadeDuration => Duration(milliseconds: _musicFadeMs);
   Duration get ambientFadeDuration => Duration(milliseconds: _ambientFadeMs);
   Duration get duckAttackDuration => Duration(milliseconds: _duckAttackMs);
   Duration get duckReleaseDuration => Duration(milliseconds: _duckReleaseMs);
+
+  void setAppLanguage(String lang) {
+    _appLanguage = _normalizeLanguage(lang);
+    LoggerService().info('SettingsService: App language set to $_appLanguage');
+    notifyListeners();
+  }
 
   void setMusicFadeMs(int ms) {
     _musicFadeMs = ms.clamp(0, 10000);
@@ -78,6 +99,7 @@ class SettingsService extends ChangeNotifier {
     _duckReleaseMs = 1200;
     _duckMultiplier = 0.4;
     _showLogConsoleIcon = true;
+    _appLanguage = 'system';
     LoggerService().info('SettingsService: Reset all settings to default values');
     notifyListeners();
   }
@@ -90,6 +112,7 @@ class SettingsService extends ChangeNotifier {
       'duckReleaseMs': _duckReleaseMs,
       'duckMultiplier': _duckMultiplier,
       'showLogConsoleIcon': _showLogConsoleIcon,
+      'appLanguage': _appLanguage,
     };
   }
 
@@ -100,6 +123,7 @@ class SettingsService extends ChangeNotifier {
     if (map.containsKey('duckReleaseMs')) _duckReleaseMs = (map['duckReleaseMs'] as num).toInt().clamp(0, 10000);
     if (map.containsKey('duckMultiplier')) _duckMultiplier = (map['duckMultiplier'] as num).toDouble().clamp(0.0, 1.0);
     if (map.containsKey('showLogConsoleIcon')) _showLogConsoleIcon = map['showLogConsoleIcon'] as bool;
+    if (map.containsKey('appLanguage')) _appLanguage = _normalizeLanguage(map['appLanguage'] as String);
     notifyListeners();
   }
 }

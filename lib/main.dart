@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'audio/audio_engine_service.dart';
 import 'audio/music_bus_controller.dart';
@@ -49,14 +51,32 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
               ChangeNotifierProvider<MediaLibraryService>(create: (_) => MediaLibraryService()),
               ChangeNotifierProvider<SceneService>(create: (_) => SceneService()),
             ],
-            child: Consumer<ThemeService>(
-              builder: (context, themeService, _) {
+            child: Consumer2<ThemeService, SettingsService>(
+              builder: (context, themeService, settingsService, _) {
                 return MaterialApp(
                   title: 'TTRPG Audio Master',
                   debugShowCheckedModeBanner: false,
                   theme: themeService.currentThemeData,
                   darkTheme: themeService.currentThemeData,
                   themeMode: themeService.activeTheme.isDark ? ThemeMode.dark : ThemeMode.light,
+                  locale: settingsService.currentLocale,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  localeResolutionCallback: (locale, supportedLocales) {
+                    if (locale != null) {
+                      for (var supportedLocale in supportedLocales) {
+                        if (supportedLocale.languageCode == locale.languageCode) {
+                          return supportedLocale;
+                        }
+                      }
+                    }
+                    return const Locale('ru');
+                  },
                   home: const MainDashboardScreen(),
                 );
               },
