@@ -1,4 +1,4 @@
-import '../models/custom_theme_model.dart';
+import '../domain/models/custom_theme_model.dart';
 
 class AppThemes {
   static const String deepDarkId = 'preset_deep_dark';

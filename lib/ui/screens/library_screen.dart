@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/library_track.dart';
-import '../../services/media_library_service.dart';
+import '../../domain/models/library_track.dart';
+import '../../ui/view_models/media_library_view_model.dart';
 import '../../audio/audio_engine_service.dart';
 import '../widgets/import_track_dialog.dart';
 
@@ -13,7 +13,7 @@ class LibraryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Consumer2<MediaLibraryService, AudioEngineService>(
+    return Consumer2<MediaLibraryViewModel, AudioEngineService>(
       builder: (context, library, audioEngine, _) {
         return Scaffold(
           body: Padding(
@@ -221,7 +221,7 @@ class LibraryScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _handleImport(BuildContext context, MediaLibraryService library) async {
+  Future<void> _handleImport(BuildContext context, MediaLibraryViewModel library) async {
     final busType = await showDialog<AudioBusType>(
       context: context,
       builder: (ctx) {

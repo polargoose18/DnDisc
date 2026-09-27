@@ -16,8 +16,12 @@ import 'package:ttrpg_audio_player/services/media_library_service.dart';
 import 'package:ttrpg_audio_player/services/settings_service.dart';
 import 'package:ttrpg_audio_player/services/scene_service.dart';
 import 'package:ttrpg_audio_player/services/logger_service.dart';
+import 'package:ttrpg_audio_player/services/theme_service.dart';
+import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
+import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
+import 'package:ttrpg_audio_player/ui/view_models/theme_view_model.dart';
 import 'package:ttrpg_audio_player/db/database_service.dart';
-import 'package:ttrpg_audio_player/models/scene_model.dart';
+import 'package:ttrpg_audio_player/domain/models/scene_model.dart';
 
 import 'package:ttrpg_audio_player/ui/widgets/scene_selector_panel.dart';
 import 'package:ttrpg_audio_player/ui/widgets/create_edit_scene_dialog.dart';
@@ -48,6 +52,7 @@ Widget createM3TestableWidget(Widget child, {
   final set = settings ?? SettingsService();
   final scn = sceneService ?? SceneService(autoLoad: false);
   final lib = library ?? MediaLibraryService(autoLoad: false);
+  final thm = ThemeService(autoLoad: false);
 
   return MultiProvider(
     providers: [
@@ -58,7 +63,11 @@ Widget createM3TestableWidget(Widget child, {
       ChangeNotifierProvider<AmbientBusController>.value(value: eng.ambientBus),
       ChangeNotifierProvider<SfxBusController>.value(value: eng.sfxBus),
       ChangeNotifierProvider<SceneService>.value(value: scn),
+      ChangeNotifierProvider<SceneViewModel>(create: (_) => SceneViewModel(service: scn)),
       ChangeNotifierProvider<MediaLibraryService>.value(value: lib),
+      ChangeNotifierProvider<MediaLibraryViewModel>(create: (_) => MediaLibraryViewModel(service: lib)),
+      ChangeNotifierProvider<ThemeService>.value(value: thm),
+      ChangeNotifierProvider<ThemeViewModel>(create: (_) => ThemeViewModel(service: thm)),
     ],
     child: Consumer<SettingsService>(
       builder: (context, set, _) {

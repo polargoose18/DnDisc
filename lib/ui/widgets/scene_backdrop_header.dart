@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../services/scene_service.dart';
-import '../../services/theme_service.dart';
+import '../../ui/view_models/scene_view_model.dart';
+import '../../ui/view_models/theme_view_model.dart';
 import '../../audio/music_bus_controller.dart';
-import '../../models/audio_track.dart';
+import '../../domain/models/audio_track.dart';
 
 import '../../theme/app_themes.dart';
 
@@ -13,11 +13,11 @@ class SceneBackdropHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sceneService = context.watch<SceneService>();
-    final themeService = context.watch<ThemeService?>();
+    final sceneViewModel = context.watch<SceneViewModel>();
+    final themeViewModel = context.watch<ThemeViewModel?>();
     final musicBus = context.watch<MusicBusController>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
-    final activeScene = sceneService.activeScene;
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
+    final activeScene = sceneViewModel.activeScene;
 
     if (activeScene == null) {
       return Container(

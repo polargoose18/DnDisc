@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ttrpg_audio_player/models/custom_theme_model.dart';
+import 'package:ttrpg_audio_player/domain/models/custom_theme_model.dart';
 import 'package:ttrpg_audio_player/theme/app_themes.dart';
 
 void main() {

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:ttrpg_audio_player/models/custom_theme_model.dart';
+import 'package:ttrpg_audio_player/domain/models/custom_theme_model.dart';
 import 'package:ttrpg_audio_player/services/theme_service.dart';
 import 'package:ttrpg_audio_player/theme/app_themes.dart';
 import 'package:ttrpg_audio_player/db/database_service.dart';

@@ -5,12 +5,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import '../../l10n/app_localizations.dart';
 import '../../services/settings_service.dart';
-import '../../services/theme_service.dart';
 import '../../services/shortcut_service.dart';
 import '../../services/preset_service.dart';
-import '../../services/media_library_service.dart';
-import '../../services/scene_service.dart';
-import '../../models/custom_theme_model.dart';
+import '../../ui/view_models/theme_view_model.dart';
+import '../../ui/view_models/media_library_view_model.dart';
+import '../../ui/view_models/scene_view_model.dart';
+import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 import '../widgets/custom_theme_editor_dialog.dart';
 
@@ -20,11 +20,11 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsService>();
-    final themeService = context.watch<ThemeService?>();
+    final themeViewModel = context.watch<ThemeViewModel?>();
     final shortcutService = context.watch<ShortcutService?>();
-    final mediaLibrary = context.watch<MediaLibraryService>();
-    final sceneService = context.watch<SceneService>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final mediaLibrary = context.watch<MediaLibraryViewModel>();
+    final sceneViewModel = context.watch<SceneViewModel>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
@@ -74,7 +74,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Section 1: Themes & Styling (Presets + Custom Themes)
-              _buildThemesSection(context, themeService, activeTheme, l10n),
+              _buildThemesSection(context, themeViewModel, activeTheme, l10n),
               const SizedBox(height: 16),
 
               // Section 2: Centralized Hotkeys Reference
@@ -284,7 +284,7 @@ class SettingsScreen extends StatelessWidget {
                                   );
 
                                   await mediaLibrary.loadTracks(force: true);
-                                  await sceneService.loadScenes(force: true);
+                                  await sceneViewModel.loadScenes(force: true);
 
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -372,7 +372,7 @@ class SettingsScreen extends StatelessWidget {
                                     exportZipPath: outZipPath,
                                     title: titleController.text.trim(),
                                     description: descController.text.trim(),
-                                    scenes: sceneService.scenes,
+                                    scenes: sceneViewModel.scenes,
                                     tracks: mediaLibrary.tracks,
                                   );
 
@@ -513,7 +513,7 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildThemesSection(
     BuildContext context,
-    ThemeService? themeService,
+    ThemeViewModel? themeService,
     CustomThemeModel activeTheme,
     AppLocalizations? l10n,
   ) {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/scene_model.dart';
-import '../../services/scene_service.dart';
-import '../../services/media_library_service.dart';
-import '../../services/theme_service.dart';
+import '../../domain/models/scene_model.dart';
+import '../../ui/view_models/scene_view_model.dart';
+import '../../ui/view_models/media_library_view_model.dart';
+import '../../ui/view_models/theme_view_model.dart';
 import '../../theme/app_themes.dart';
 import '../../audio/audio_engine_service.dart';
 import 'create_edit_scene_dialog.dart';
@@ -31,15 +31,15 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final sceneService = context.watch<SceneService>();
-    final mediaLibrary = context.watch<MediaLibraryService>();
+    final sceneViewModel = context.watch<SceneViewModel>();
+    final mediaLibrary = context.watch<MediaLibraryViewModel>();
     final audioEngine = context.watch<AudioEngineService>();
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final l10n = AppLocalizations.of(context);
 
-    final allScenes = sceneService.scenes;
-    final activeSceneId = sceneService.activeSceneId;
+    final allScenes = sceneViewModel.scenes;
+    final activeSceneId = sceneViewModel.activeSceneId;
 
     final filteredScenes = _searchQuery.isEmpty
         ? allScenes
@@ -87,7 +87,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                       builder: (_) => const CreateEditSceneDialog(),
                     );
                     if (newScene != null) {
-                      await sceneService.createScene(newScene);
+                      await sceneViewModel.createScene(newScene);
                     }
                   },
                 ),
@@ -154,10 +154,10 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                       scene: scene,
                       isActive: scene.id == activeSceneId,
                       onActivate: () {
-                        sceneService.activateScene(
+                        sceneViewModel.activateScene(
                           scene,
                           audioEngine: audioEngine,
-                          mediaLibrary: mediaLibrary,
+                          mediaLibrary: mediaLibrary.service,
                         );
                       },
                       onEdit: () async {
@@ -166,14 +166,14 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                           builder: (_) => CreateEditSceneDialog(scene: scene),
                         );
                         if (updated != null) {
-                          await sceneService.updateScene(updated);
+                          await sceneViewModel.updateScene(updated);
                         }
                       },
                       onDuplicate: () async {
-                        await sceneService.duplicateScene(scene.id);
+                        await sceneViewModel.duplicateScene(scene.id);
                       },
                       onDelete: () async {
-                        await sceneService.deleteScene(scene.id);
+                        await sceneViewModel.deleteScene(scene.id);
                       },
                     );
                   },
@@ -194,10 +194,10 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                         scene: scene,
                         isActive: scene.id == activeSceneId,
                         onActivate: () {
-                          sceneService.activateScene(
+                          sceneViewModel.activateScene(
                             scene,
                             audioEngine: audioEngine,
-                            mediaLibrary: mediaLibrary,
+                            mediaLibrary: mediaLibrary.service,
                           );
                         },
                         onEdit: () async {
@@ -206,14 +206,14 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                             builder: (_) => CreateEditSceneDialog(scene: scene),
                           );
                           if (updated != null) {
-                            await sceneService.updateScene(updated);
+                            await sceneViewModel.updateScene(updated);
                           }
                         },
                         onDuplicate: () async {
-                          await sceneService.duplicateScene(scene.id);
+                          await sceneViewModel.duplicateScene(scene.id);
                         },
                         onDelete: () async {
-                          await sceneService.deleteScene(scene.id);
+                          await sceneViewModel.deleteScene(scene.id);
                         },
                       ),
                     );

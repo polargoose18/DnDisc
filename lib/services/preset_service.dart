@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:path/path.dart' as p;
 import '../db/database_service.dart';
-import '../models/library_track.dart';
-import '../models/scene_model.dart';
+import '../data/repositories/media_library_repository.dart';
+import '../data/repositories/scene_repository.dart';
+import '../domain/models/library_track.dart';
+import '../domain/models/scene_model.dart';
 import 'logger_service.dart';
 
 class PresetImportResult {
@@ -22,9 +24,15 @@ class PresetImportResult {
 }
 
 class PresetService {
-  final DatabaseService _db;
+  final MediaLibraryRepository _mediaRepo;
+  final SceneRepository _sceneRepo;
 
-  PresetService({DatabaseService? db}) : _db = db ?? DatabaseService();
+  PresetService({
+    DatabaseService? db,
+    MediaLibraryRepository? mediaLibraryRepository,
+    SceneRepository? sceneRepository,
+  })  : _mediaRepo = mediaLibraryRepository ?? SqliteMediaLibraryRepository(db: db),
+        _sceneRepo = sceneRepository ?? SqliteSceneRepository(db: db);
 
   Future<File> exportPreset({
     required String exportZipPath,
@@ -150,7 +158,7 @@ class PresetService {
 
       map['file_path'] = absolutePath;
       final track = LibraryTrack.fromMap(map);
-      await _db.insertTrack(track);
+      await _mediaRepo.insertTrack(track);
       importedTracks.add(track);
     }
 
@@ -159,7 +167,7 @@ class PresetService {
     for (final rawScene in rawScenes) {
       final map = Map<String, dynamic>.from(rawScene as Map);
       final scene = SceneModel.fromMap(map);
-      await _db.insertScene(scene);
+      await _sceneRepo.insertScene(scene);
       importedScenes.add(scene);
     }
 

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../models/audio_track.dart';
+import '../domain/models/audio_track.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
 
@@ -42,6 +42,7 @@ class MusicBusController extends ChangeNotifier {
 
   void setMasterVolume(double volume) {
     _masterVolume = volume.clamp(0.0, 1.0);
+    LoggerService().info('MusicBus: Master volume set to $_masterVolume');
     _applyPlayerVolume();
     notifyListeners();
   }
@@ -267,6 +268,7 @@ class MusicBusController extends ChangeNotifier {
 
   void setVolume(double newVolume) {
     _volume = newVolume.clamp(0.0, 1.0);
+    LoggerService().info('MusicBus: Volume set to $_volume');
     _applyPlayerVolume();
     notifyListeners();
   }

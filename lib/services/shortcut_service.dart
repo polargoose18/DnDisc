@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../audio/audio_engine_service.dart';
-import '../models/audio_track.dart';
+import '../domain/models/audio_track.dart';
 import 'logger_service.dart';
 
 enum AppShortcutAction {

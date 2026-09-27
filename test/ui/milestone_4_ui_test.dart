@@ -11,8 +11,8 @@ import 'package:ttrpg_audio_player/audio/audio_engine_service.dart';
 import 'package:ttrpg_audio_player/audio/music_bus_controller.dart';
 import 'package:ttrpg_audio_player/audio/ambient_bus_controller.dart';
 import 'package:ttrpg_audio_player/audio/sfx_bus_controller.dart';
-import 'package:ttrpg_audio_player/models/audio_track.dart';
-import 'package:ttrpg_audio_player/models/scene_model.dart';
+import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
+import 'package:ttrpg_audio_player/domain/models/scene_model.dart';
 import 'package:ttrpg_audio_player/services/media_library_service.dart';
 import 'package:ttrpg_audio_player/services/scene_service.dart';
 import 'package:ttrpg_audio_player/services/settings_service.dart';
@@ -22,8 +22,11 @@ import 'package:ttrpg_audio_player/services/logger_service.dart';
 import 'package:ttrpg_audio_player/db/database_service.dart';
 import 'package:ttrpg_audio_player/ui/screens/responsive_gm_dashboard.dart';
 import 'package:ttrpg_audio_player/ui/screens/settings_screen.dart';
-import 'package:ttrpg_audio_player/models/ambient_layer.dart';
-import 'package:ttrpg_audio_player/models/sfx_trigger.dart';
+import 'package:ttrpg_audio_player/domain/models/ambient_layer.dart';
+import 'package:ttrpg_audio_player/domain/models/sfx_trigger.dart';
+import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
+import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
+import 'package:ttrpg_audio_player/ui/view_models/theme_view_model.dart';
 import 'package:ttrpg_audio_player/ui/widgets/scene_card.dart';
 import 'package:ttrpg_audio_player/ui/widgets/scene_backdrop_header.dart';
 import 'package:ttrpg_audio_player/ui/widgets/custom_theme_editor_dialog.dart';
@@ -57,19 +60,23 @@ Widget createTestApp({
   final themes = themeService ?? ThemeService();
   final scenes = sceneService ?? SceneService(autoLoad: false);
   final shortcuts = shortcutService ?? ShortcutService(audioEngine: engine);
+  final library = MediaLibraryService(autoLoad: false);
 
   return MultiProvider(
     providers: [
       ChangeNotifierProvider<LoggerService>(create: (_) => LoggerService()),
       ChangeNotifierProvider<SettingsService>.value(value: settings),
       ChangeNotifierProvider<ThemeService>.value(value: themes),
+      ChangeNotifierProvider<ThemeViewModel>(create: (_) => ThemeViewModel(service: themes)),
       ChangeNotifierProvider<AudioEngineService>.value(value: engine),
       ChangeNotifierProvider<MusicBusController>.value(value: engine.musicBus),
       ChangeNotifierProvider<AmbientBusController>.value(value: engine.ambientBus),
       ChangeNotifierProvider<SfxBusController>.value(value: engine.sfxBus),
       ChangeNotifierProvider<ShortcutService>.value(value: shortcuts),
-      ChangeNotifierProvider<MediaLibraryService>(create: (_) => MediaLibraryService(autoLoad: false)),
+      ChangeNotifierProvider<MediaLibraryService>.value(value: library),
+      ChangeNotifierProvider<MediaLibraryViewModel>(create: (_) => MediaLibraryViewModel(service: library)),
       ChangeNotifierProvider<SceneService>.value(value: scenes),
+      ChangeNotifierProvider<SceneViewModel>(create: (_) => SceneViewModel(service: scenes)),
     ],
     child: Consumer<SettingsService>(
       builder: (context, settings, _) {

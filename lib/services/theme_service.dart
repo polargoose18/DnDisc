@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import '../models/custom_theme_model.dart';
+import '../data/repositories/custom_theme_repository.dart';
+import '../domain/models/custom_theme_model.dart';
 import '../theme/app_themes.dart';
 import '../db/database_service.dart';
 import 'logger_service.dart';
@@ -8,13 +9,17 @@ import 'logger_service.dart';
 class ThemeService extends ChangeNotifier {
   String _activeThemeId = AppThemes.deepDarkId;
   final List<CustomThemeModel> _customThemes = [];
-  final DatabaseService? _dbService;
+  final CustomThemeRepository? _repository;
   bool _isLoading = false;
 
-  ThemeService({DatabaseService? dbService, String? initialThemeId, bool autoLoad = false})
-      : _dbService = dbService,
+  ThemeService({
+    DatabaseService? dbService,
+    CustomThemeRepository? repository,
+    String? initialThemeId,
+    bool autoLoad = false,
+  })  : _repository = repository ?? (dbService != null ? SqliteCustomThemeRepository(db: dbService) : null),
         _activeThemeId = initialThemeId ?? AppThemes.deepDarkId {
-    if (autoLoad && _dbService != null) {
+    if (autoLoad && _repository != null) {
       loadThemes();
     }
   }
@@ -43,11 +48,11 @@ class ThemeService extends ChangeNotifier {
   ThemeData get currentThemeData => activeTheme.toThemeData();
 
   Future<void> loadThemes({bool force = false}) async {
-    final db = _dbService;
-    if (db == null) return;
+    final repo = _repository;
+    if (repo == null) return;
     _isLoading = true;
     try {
-      final dbThemes = await db.getAllCustomThemes();
+      final dbThemes = await repo.getAllCustomThemes();
       _customThemes.clear();
       _customThemes.addAll(dbThemes);
       LoggerService().info('ThemeService: Loaded ${_customThemes.length} custom themes');
@@ -68,20 +73,20 @@ class ThemeService extends ChangeNotifier {
 
   Future<void> saveCustomTheme(CustomThemeModel theme) async {
     final existingIndex = _customThemes.indexWhere((t) => t.id == theme.id);
-    final db = _dbService;
+    final repo = _repository;
     if (existingIndex != -1) {
       _customThemes[existingIndex] = theme;
-      if (db != null) {
+      if (repo != null) {
         try {
-          await db.updateCustomTheme(theme);
+          await repo.updateCustomTheme(theme);
         } catch (_) {}
       }
       LoggerService().info('ThemeService: Updated custom theme "${theme.name}" (${theme.id})');
     } else {
       _customThemes.add(theme);
-      if (db != null) {
+      if (repo != null) {
         try {
-          await db.insertCustomTheme(theme);
+          await repo.insertCustomTheme(theme);
         } catch (_) {}
       }
       LoggerService().info('ThemeService: Created new custom theme "${theme.name}" (${theme.id})');
@@ -92,10 +97,10 @@ class ThemeService extends ChangeNotifier {
 
   Future<void> deleteCustomTheme(String id) async {
     _customThemes.removeWhere((t) => t.id == id);
-    final db = _dbService;
-    if (db != null) {
+    final repo = _repository;
+    if (repo != null) {
       try {
-        await db.deleteCustomTheme(id);
+        await repo.deleteCustomTheme(id);
       } catch (_) {}
     }
     LoggerService().info('ThemeService: Deleted custom theme ($id)');

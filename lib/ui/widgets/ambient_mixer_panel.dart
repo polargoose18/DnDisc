@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../../audio/ambient_bus_controller.dart';
-import '../../models/ambient_layer.dart';
-import '../../models/library_track.dart';
-import '../../services/media_library_service.dart';
-import '../../services/theme_service.dart';
+import '../../domain/models/ambient_layer.dart';
+import '../../domain/models/library_track.dart';
+import '../../ui/view_models/media_library_view_model.dart';
+import '../../ui/view_models/theme_view_model.dart';
 import '../../theme/app_themes.dart';
 
 class AmbientMixerPanel extends StatelessWidget {
@@ -14,8 +14,8 @@ class AmbientMixerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
 
     return Consumer<AmbientBusController>(
       builder: (context, ambient, _) {
@@ -240,9 +240,9 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final library = context.watch<MediaLibraryService>();
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final library = context.watch<MediaLibraryViewModel>();
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final ambientTracks = library.tracks.where((t) => t.busType == AudioBusType.ambient).toList();
 
     return AlertDialog(

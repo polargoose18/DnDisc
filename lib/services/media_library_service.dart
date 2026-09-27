@@ -2,15 +2,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as p;
-import '../db/database_service.dart';
-import '../models/library_track.dart';
-import '../models/audio_track.dart';
-import '../models/ambient_layer.dart';
-import '../models/sfx_trigger.dart';
+import '../data/repositories/media_library_repository.dart';
+import '../domain/models/library_track.dart';
+import '../domain/models/audio_track.dart';
+import '../domain/models/ambient_layer.dart';
+import '../domain/models/sfx_trigger.dart';
 import '../audio/audio_engine_service.dart';
 
 class MediaLibraryService extends ChangeNotifier {
-  final DatabaseService _db = DatabaseService();
+  final MediaLibraryRepository _repository;
   final _uuid = const Uuid();
 
   List<LibraryTrack> _tracks = [];
@@ -23,7 +23,8 @@ class MediaLibraryService extends ChangeNotifier {
   AudioBusType? get activeBusFilter => _activeBusFilter;
   String get searchQuery => _searchQuery;
 
-  MediaLibraryService({bool autoLoad = true}) {
+  MediaLibraryService({MediaLibraryRepository? repository, bool autoLoad = true})
+      : _repository = repository ?? SqliteMediaLibraryRepository() {
     if (autoLoad) {
       loadTracks();
     }
@@ -48,7 +49,7 @@ class MediaLibraryService extends ChangeNotifier {
 
     try {
       if (!_isDisposed) {
-        _tracks = await _db.getAllTracks();
+        _tracks = await _repository.getAllTracks();
       }
     } catch (e) {
       debugPrint('Error loading tracks: $e');
@@ -107,7 +108,7 @@ class MediaLibraryService extends ChangeNotifier {
         colorHex: _getDefaultColorForBus(busType),
       );
 
-      await _db.insertTrack(track);
+      await _repository.insertTrack(track);
       importedTracks.add(track);
     }
 
@@ -116,17 +117,17 @@ class MediaLibraryService extends ChangeNotifier {
   }
 
   Future<void> addTrack(LibraryTrack track) async {
-    await _db.insertTrack(track);
+    await _repository.insertTrack(track);
     await loadTracks(force: true);
   }
 
   Future<void> updateTrack(LibraryTrack track) async {
-    await _db.updateTrack(track);
+    await _repository.updateTrack(track);
     await loadTracks(force: true);
   }
 
   Future<void> deleteTrack(String trackId) async {
-    await _db.deleteTrack(trackId);
+    await _repository.deleteTrack(trackId);
     await loadTracks(force: true);
   }
 

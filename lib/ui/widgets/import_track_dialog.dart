@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../models/library_track.dart';
-import '../../models/audio_track.dart';
+import '../../domain/models/library_track.dart';
+import '../../domain/models/audio_track.dart';
 
 class EditTrackDialog extends StatefulWidget {
   final LibraryTrack track;

@@ -72,6 +72,7 @@ class AudioEngineService extends ChangeNotifier {
   void setMasterVolume(double volume) {
     _masterVolume = volume.clamp(0.0, 1.0);
     _isMuted = (_masterVolume == 0.0);
+    LoggerService().info('AudioEngine: Master volume set to $_masterVolume');
     musicBus.setMasterVolume(_masterVolume);
     ambientBus.setMasterVolume(_masterVolume);
     sfxBus.setMasterVolume(_masterVolume);

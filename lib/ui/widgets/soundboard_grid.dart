@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../../audio/sfx_bus_controller.dart';
-import '../../models/sfx_trigger.dart';
-import '../../models/library_track.dart';
-import '../../services/media_library_service.dart';
-import '../../services/theme_service.dart';
+import '../../domain/models/sfx_trigger.dart';
+import '../../domain/models/library_track.dart';
+import '../../ui/view_models/media_library_view_model.dart';
+import '../../ui/view_models/theme_view_model.dart';
 import '../../theme/app_themes.dart';
 
 class SoundboardGrid extends StatelessWidget {
@@ -14,8 +14,8 @@ class SoundboardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
 
     return Consumer<SfxBusController>(
       builder: (context, sfx, _) {
@@ -303,9 +303,9 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final library = context.watch<MediaLibraryService>();
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final library = context.watch<MediaLibraryViewModel>();
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final sfxTracks = library.tracks.where((t) => t.busType == AudioBusType.sfx).toList();
 
     return AlertDialog(

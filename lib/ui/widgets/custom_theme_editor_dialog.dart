@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import '../../models/custom_theme_model.dart';
+import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 
 class CustomThemeEditorDialog extends StatefulWidget {

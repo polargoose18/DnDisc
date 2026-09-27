@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import '../db/database_service.dart';
-import '../models/scene_model.dart';
-import '../models/audio_track.dart';
-import '../models/ambient_layer.dart';
-import '../models/sfx_trigger.dart';
+import '../data/repositories/scene_repository.dart';
+import '../domain/models/scene_model.dart';
+import '../domain/models/audio_track.dart';
+import '../domain/models/ambient_layer.dart';
+import '../domain/models/sfx_trigger.dart';
 import '../audio/audio_engine_service.dart';
 import 'media_library_service.dart';
 import 'logger_service.dart';
 
 class SceneService extends ChangeNotifier {
-  final DatabaseService _db = DatabaseService();
+  final SceneRepository _repository;
 
   List<SceneModel> _scenes = [];
   String? _activeSceneId;
@@ -28,7 +28,8 @@ class SceneService extends ChangeNotifier {
   }
   bool get isLoading => _isLoading;
 
-  SceneService({bool autoLoad = true}) {
+  SceneService({SceneRepository? repository, bool autoLoad = true})
+      : _repository = repository ?? SqliteSceneRepository() {
     if (autoLoad) {
       loadScenes();
     }
@@ -53,7 +54,7 @@ class SceneService extends ChangeNotifier {
 
     try {
       if (!_isDisposed) {
-        _scenes = await _db.getAllScenes();
+        _scenes = await _repository.getAllScenes();
       }
     } catch (e) {
       LoggerService().error('SceneService: Error loading scenes', details: '$e');
@@ -70,7 +71,7 @@ class SceneService extends ChangeNotifier {
     _scenes.add(scene);
     notifyListeners();
     try {
-      await _db.insertScene(scene);
+      await _repository.insertScene(scene);
     } catch (_) {}
     LoggerService().info('SceneService: Created scene "${scene.name}"');
     await loadScenes(force: true);
@@ -85,7 +86,7 @@ class SceneService extends ChangeNotifier {
     }
     notifyListeners();
     try {
-      await _db.updateScene(scene);
+      await _repository.updateScene(scene);
     } catch (_) {}
     LoggerService().info('SceneService: Updated scene "${scene.name}"');
     await loadScenes(force: true);
@@ -98,7 +99,7 @@ class SceneService extends ChangeNotifier {
     _scenes.removeWhere((s) => s.id == sceneId);
     notifyListeners();
     try {
-      await _db.deleteScene(sceneId);
+      await _repository.deleteScene(sceneId);
     } catch (_) {}
     LoggerService().info('SceneService: Deleted scene $sceneId');
     await loadScenes(force: true);

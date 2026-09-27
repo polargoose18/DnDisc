@@ -12,6 +12,9 @@ import 'services/scene_service.dart';
 import 'services/logger_service.dart';
 import 'services/theme_service.dart';
 import 'services/shortcut_service.dart';
+import 'ui/view_models/theme_view_model.dart';
+import 'ui/view_models/media_library_view_model.dart';
+import 'ui/view_models/scene_view_model.dart';
 import 'ui/screens/main_dashboard_screen.dart';
 
 void main() {
@@ -29,6 +32,10 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
         ChangeNotifierProvider<LoggerService>(create: (_) => LoggerService()),
         ChangeNotifierProvider<SettingsService>(create: (_) => SettingsService()),
         ChangeNotifierProvider<ThemeService>(create: (_) => ThemeService()),
+        ChangeNotifierProxyProvider<ThemeService, ThemeViewModel>(
+          create: (context) => ThemeViewModel(service: context.read<ThemeService>()),
+          update: (context, service, viewModel) => viewModel ?? ThemeViewModel(service: service),
+        ),
         ChangeNotifierProxyProvider<SettingsService, AudioEngineService>(
           create: (context) => AudioEngineService(settings: context.read<SettingsService>()),
           update: (context, settings, audioEngine) {
@@ -49,16 +56,24 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
                 create: (_) => ShortcutService(audioEngine: audioEngine),
               ),
               ChangeNotifierProvider<MediaLibraryService>(create: (_) => MediaLibraryService()),
+              ChangeNotifierProxyProvider<MediaLibraryService, MediaLibraryViewModel>(
+                create: (context) => MediaLibraryViewModel(service: context.read<MediaLibraryService>()),
+                update: (context, service, viewModel) => viewModel ?? MediaLibraryViewModel(service: service),
+              ),
               ChangeNotifierProvider<SceneService>(create: (_) => SceneService()),
+              ChangeNotifierProxyProvider<SceneService, SceneViewModel>(
+                create: (context) => SceneViewModel(service: context.read<SceneService>()),
+                update: (context, service, viewModel) => viewModel ?? SceneViewModel(service: service),
+              ),
             ],
-            child: Consumer2<ThemeService, SettingsService>(
-              builder: (context, themeService, settingsService, _) {
+            child: Consumer2<ThemeViewModel, SettingsService>(
+              builder: (context, themeViewModel, settingsService, _) {
                 return MaterialApp(
                   title: 'TTRPG Audio Master',
                   debugShowCheckedModeBanner: false,
-                  theme: themeService.currentThemeData,
-                  darkTheme: themeService.currentThemeData,
-                  themeMode: themeService.activeTheme.isDark ? ThemeMode.dark : ThemeMode.light,
+                  theme: themeViewModel.currentThemeData,
+                  darkTheme: themeViewModel.currentThemeData,
+                  themeMode: themeViewModel.activeTheme.isDark ? ThemeMode.dark : ThemeMode.light,
                   locale: settingsService.currentLocale,
                   localizationsDelegates: const [
                     AppLocalizations.delegate,

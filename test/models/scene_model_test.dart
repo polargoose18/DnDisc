@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ttrpg_audio_player/models/scene_model.dart';
-import 'package:ttrpg_audio_player/models/audio_track.dart';
+import 'package:ttrpg_audio_player/domain/models/scene_model.dart';
+import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
 
 void main() {
   group('SceneModel Unit Tests', () {

@@ -15,10 +15,10 @@ import 'package:ttrpg_audio_player/audio/sfx_bus_controller.dart';
 import 'package:ttrpg_audio_player/services/media_library_service.dart';
 import 'package:ttrpg_audio_player/services/logger_service.dart';
 import 'package:ttrpg_audio_player/db/database_service.dart';
-import 'package:ttrpg_audio_player/models/audio_track.dart';
-import 'package:ttrpg_audio_player/models/ambient_layer.dart';
-import 'package:ttrpg_audio_player/models/sfx_trigger.dart';
-import 'package:ttrpg_audio_player/models/library_track.dart';
+import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
+import 'package:ttrpg_audio_player/domain/models/ambient_layer.dart';
+import 'package:ttrpg_audio_player/domain/models/sfx_trigger.dart';
+import 'package:ttrpg_audio_player/domain/models/library_track.dart';
 
 import 'package:ttrpg_audio_player/ui/widgets/music_player_panel.dart';
 import 'package:ttrpg_audio_player/ui/widgets/ambient_mixer_panel.dart';
@@ -29,6 +29,10 @@ import 'package:ttrpg_audio_player/ui/screens/main_dashboard_screen.dart';
 import 'package:ttrpg_audio_player/ui/screens/library_screen.dart';
 import 'package:ttrpg_audio_player/services/settings_service.dart';
 import 'package:ttrpg_audio_player/services/scene_service.dart';
+import 'package:ttrpg_audio_player/services/theme_service.dart';
+import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
+import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
+import 'package:ttrpg_audio_player/ui/view_models/theme_view_model.dart';
 
 class FakePathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin
@@ -53,6 +57,8 @@ Widget createTestableWidget(Widget child, {
   final log = logger ?? LoggerService();
   final set = settings ?? SettingsService();
   final scn = sceneService ?? SceneService(autoLoad: false);
+  final thm = ThemeService(autoLoad: false);
+  final lib = library ?? MediaLibraryService(autoLoad: false);
 
   return MultiProvider(
     providers: [
@@ -63,8 +69,11 @@ Widget createTestableWidget(Widget child, {
       ChangeNotifierProvider<AmbientBusController>.value(value: eng.ambientBus),
       ChangeNotifierProvider<SfxBusController>.value(value: eng.sfxBus),
       ChangeNotifierProvider<SceneService>.value(value: scn),
-      if (library != null)
-        ChangeNotifierProvider<MediaLibraryService>.value(value: library),
+      ChangeNotifierProvider<SceneViewModel>(create: (_) => SceneViewModel(service: scn)),
+      ChangeNotifierProvider<ThemeService>.value(value: thm),
+      ChangeNotifierProvider<ThemeViewModel>(create: (_) => ThemeViewModel(service: thm)),
+      ChangeNotifierProvider<MediaLibraryService>.value(value: lib),
+      ChangeNotifierProvider<MediaLibraryViewModel>(create: (_) => MediaLibraryViewModel(service: lib)),
     ],
     child: Consumer<SettingsService>(
       builder: (context, set, _) {

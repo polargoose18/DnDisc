@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
-import '../../models/audio_track.dart';
-import '../../models/library_track.dart';
-import '../../models/scene_model.dart';
-import '../../services/media_library_service.dart';
+import '../../domain/models/audio_track.dart';
+import '../../domain/models/library_track.dart';
+import '../../domain/models/scene_model.dart';
+import '../../ui/view_models/media_library_view_model.dart';
 
 class CreateEditSceneDialog extends StatefulWidget {
   final SceneModel? scene;
@@ -195,7 +195,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final library = context.watch<MediaLibraryService>();
+    final library = context.watch<MediaLibraryViewModel>();
     final allMusicTracks = library.tracks.where((t) => t.busType == AudioBusType.music).toList();
     final allAmbientTracks = library.tracks.where((t) => t.busType == AudioBusType.ambient).toList();
     final allSfxTracks = library.tracks.where((t) => t.busType == AudioBusType.sfx).toList();

@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/scene_model.dart';
-import '../../models/audio_track.dart';
-import '../../services/theme_service.dart';
+import '../../domain/models/scene_model.dart';
+import '../../domain/models/audio_track.dart';
+import '../../ui/view_models/theme_view_model.dart';
 
 import '../../theme/app_themes.dart';
 
@@ -28,8 +28,8 @@ class SceneCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final sceneColor = Color(scene.colorHex);
     final l10n = AppLocalizations.of(context);
 

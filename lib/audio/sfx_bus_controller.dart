@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../models/sfx_trigger.dart';
+import '../domain/models/sfx_trigger.dart';
 import '../services/logger_service.dart';
 
 class SfxBusController extends ChangeNotifier {
@@ -134,12 +134,14 @@ class SfxBusController extends ChangeNotifier {
 
   void setVolume(double volume) {
     _volume = volume.clamp(0.0, 1.0);
+    LoggerService().info('SfxBus: Volume set to $_volume');
     _applyPlayerVolume();
     notifyListeners();
   }
 
   void setMasterVolume(double volume) {
     _masterVolume = volume.clamp(0.0, 1.0);
+    LoggerService().info('SfxBus: Master volume set to $_masterVolume');
     _applyPlayerVolume();
     notifyListeners();
   }

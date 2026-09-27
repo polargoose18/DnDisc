@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ttrpg_audio_player/audio/audio_engine_service.dart';
-import 'package:ttrpg_audio_player/models/audio_track.dart';
+import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
 import 'package:ttrpg_audio_player/services/shortcut_service.dart';
 
 void main() {

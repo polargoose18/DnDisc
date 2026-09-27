@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../audio/music_bus_controller.dart';
-import '../../models/audio_track.dart';
-import '../../services/theme_service.dart';
+import '../../domain/models/audio_track.dart';
+import '../../ui/view_models/theme_view_model.dart';
 
 import '../../theme/app_themes.dart';
 
@@ -12,8 +12,8 @@ class MusicPlayerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final l10n = AppLocalizations.of(context);
 
     return Consumer<MusicBusController>(

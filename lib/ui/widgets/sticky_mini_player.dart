@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../audio/music_bus_controller.dart';
 import '../../audio/audio_engine_service.dart';
-import '../../services/theme_service.dart';
+import '../../ui/view_models/theme_view_model.dart';
 
 import '../../theme/app_themes.dart';
 
@@ -13,8 +13,8 @@ class StickyMiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeService = context.watch<ThemeService?>();
-    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final music = context.watch<MusicBusController>();
     final audioEngine = context.watch<AudioEngineService>();
     final track = music.currentTrack;

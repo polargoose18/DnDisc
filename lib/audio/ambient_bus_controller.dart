@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../models/ambient_layer.dart';
+import '../domain/models/ambient_layer.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
 
@@ -84,6 +84,7 @@ class AmbientBusController extends ChangeNotifier {
       final layer = _layers[index];
       final clampedVol = newVolume.clamp(0.0, 1.0);
       _layers[index] = layer.copyWith(volume: clampedVol);
+      LoggerService().info('AmbientBus: Layer "$layerId" volume set to $clampedVol');
 
       final player = _activePlayers[layerId];
       if (player != null) {
@@ -119,6 +120,7 @@ class AmbientBusController extends ChangeNotifier {
 
   void setMasterVolume(double volume) {
     _masterAmbientVolume = volume.clamp(0.0, 1.0);
+    LoggerService().info('AmbientBus: Master volume set to $_masterAmbientVolume');
     for (final layer in _layers) {
       if (layer.isActive) {
         final player = _activePlayers[layer.id];

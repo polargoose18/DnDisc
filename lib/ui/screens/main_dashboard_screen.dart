@@ -3,7 +3,6 @@ import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../audio/audio_engine_service.dart';
 import '../../services/settings_service.dart';
-import '../../services/shortcut_service.dart';
 import '../widgets/logger_console_drawer.dart';
 import 'responsive_gm_dashboard.dart';
 import 'library_screen.dart';

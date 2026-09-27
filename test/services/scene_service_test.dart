@@ -7,11 +7,11 @@ import 'package:ttrpg_audio_player/db/database_service.dart';
 import 'package:ttrpg_audio_player/services/scene_service.dart';
 import 'package:ttrpg_audio_player/services/media_library_service.dart';
 import 'package:ttrpg_audio_player/audio/audio_engine_service.dart';
-import 'package:ttrpg_audio_player/models/scene_model.dart';
-import 'package:ttrpg_audio_player/models/library_track.dart';
-import 'package:ttrpg_audio_player/models/ambient_layer.dart';
-import 'package:ttrpg_audio_player/models/sfx_trigger.dart';
-import 'package:ttrpg_audio_player/models/audio_track.dart';
+import 'package:ttrpg_audio_player/domain/models/scene_model.dart';
+import 'package:ttrpg_audio_player/domain/models/library_track.dart';
+import 'package:ttrpg_audio_player/domain/models/ambient_layer.dart';
+import 'package:ttrpg_audio_player/domain/models/sfx_trigger.dart';
+import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
 
 class FakePathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin
