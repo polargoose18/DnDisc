@@ -240,6 +240,21 @@ void main() {
       expect(callbackFired, isFalse);
     });
 
+    test('Что проверяем: Установка громкости шины SFX (setVolume) и расчет effectiveVolume. '
+        'Входные данные: setVolume(0.7) и setMasterVolume(0.5). '
+        'Ожидаемый результат: rawVolume=0.7, masterVolume=0.5, effectiveVolume=0.35.', () {
+      sfxBus.setVolume(0.7);
+      sfxBus.setMasterVolume(0.5);
+      expect(sfxBus.rawVolume, equals(0.7));
+      expect(sfxBus.masterVolume, equals(0.5));
+      expect(sfxBus.effectiveVolume, closeTo(0.35, 0.001));
+
+      sfxBus.setVolume(-0.2);
+      expect(sfxBus.rawVolume, equals(0.0));
+      sfxBus.setVolume(1.5);
+      expect(sfxBus.rawVolume, equals(1.0));
+    });
+
     test('Что проверяем: Установка общей мастер-громкости SFX (setMasterVolume). '
         'Входные данные: setMasterVolume(0.6). '
         'Ожидаемый результат: masterVolume становится 0.6 с учётом клампинга.', () {

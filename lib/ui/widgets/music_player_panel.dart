@@ -2,77 +2,155 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../audio/music_bus_controller.dart';
 import '../../models/audio_track.dart';
+import '../../services/theme_service.dart';
+
+import '../../theme/app_themes.dart';
 
 class MusicPlayerPanel extends StatelessWidget {
   const MusicPlayerPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeService = context.watch<ThemeService?>();
+    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+
     return Consumer<MusicBusController>(
       builder: (context, music, _) {
         final track = music.currentTrack;
 
         return Card(
-          margin: const EdgeInsets.all(8.0),
+          margin: const EdgeInsets.symmetric(vertical: 6),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Музыкальная дорожка',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.music_note_rounded, color: activeTheme.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Музыкальная дорожка',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: activeTheme.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  track != null ? 'Сейчас играет: ${track.title}' : 'Музыка не воспроизводится',
-                  style: TextStyle(
-                    color: track != null ? Colors.greenAccent : Colors.grey,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: music.isPlaying ? Colors.greenAccent : Colors.grey,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        track != null
+                            ? 'Сейчас играет: ${track.title} ${music.isPlaying ? '' : '(Пауза)'}'
+                            : 'Музыка не воспроизводится',
+                        style: TextStyle(
+                          color: track != null ? activeTheme.textPrimary : activeTheme.textSecondary,
+                          fontWeight: track != null ? FontWeight.w500 : FontWeight.normal,
+                          fontSize: 13,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-                // Intensity Selector Chips
-                const Text('Уровень Интенсивности:', style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 6),
+                // Intensity Selector Chips with Hotkey Badges
+                Row(
+                  children: [
+                    Text(
+                      'Уровень Интенсивности:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: activeTheme.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Wrap(
                   key: const ValueKey('music_intensity_wrap'),
                   spacing: 8.0,
                   runSpacing: 6.0,
-                  children: MusicIntensity.values.map((intensity) {
+                  children: MusicIntensity.values.asMap().entries.map((entry) {
+                    final index = entry.key + 1;
+                    final intensity = entry.value;
                     final isSelected = music.currentIntensity == intensity;
+                    final chipColor = _getIntensityColor(intensity, activeTheme);
+
                     return InkWell(
                       key: ValueKey('chip_${intensity.name}'),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(10),
                       onTap: () => music.setIntensity(intensity),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : const Color(0xFF2C2C3A),
-                          borderRadius: BorderRadius.circular(20),
+                          color: isSelected ? chipColor : chipColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : Colors.transparent,
+                            color: isSelected ? chipColor : chipColor.withValues(alpha: 0.4),
+                            width: isSelected ? 1.5 : 1.0,
                           ),
+                          boxShadow: isSelected
+                              ? [BoxShadow(color: chipColor.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 1)]
+                              : null,
                         ),
-                        child: Text(
-                          intensity.name.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.white70,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                color: isSelected ? Colors.black26 : Colors.white12,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '$index',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : activeTheme.textSecondary,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              intensity.name.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? Colors.white : activeTheme.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
                   }).toList(),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
                 // Playback Controls & Volume Slider
                 Row(
@@ -80,7 +158,9 @@ class MusicPlayerPanel extends StatelessWidget {
                     IconButton(
                       key: const ValueKey('music_play_pause_button'),
                       icon: Icon(music.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill),
-                      iconSize: 40,
+                      iconSize: 42,
+                      color: activeTheme.primary,
+                      tooltip: music.isPlaying ? 'Пауза [Space]' : 'Воспроизведение [Space]',
                       onPressed: () {
                         if (music.isPlaying) {
                           music.pause();
@@ -89,11 +169,18 @@ class MusicPlayerPanel extends StatelessWidget {
                         }
                       },
                     ),
-                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: const Icon(Icons.stop_circle_outlined),
+                      iconSize: 32,
+                      color: activeTheme.textSecondary,
+                      tooltip: 'Остановить музыку',
+                      onPressed: () => music.stop(),
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Row(
                         children: [
-                          const Icon(Icons.volume_down),
+                          Icon(Icons.volume_down, size: 20, color: activeTheme.textSecondary),
                           Expanded(
                             child: Slider(
                               key: const ValueKey('music_volume_slider'),
@@ -101,7 +188,12 @@ class MusicPlayerPanel extends StatelessWidget {
                               onChanged: (val) => music.setVolume(val),
                             ),
                           ),
-                          const Icon(Icons.volume_up),
+                          Text(
+                            '${(music.rawVolume * 100).toInt()}%',
+                            style: TextStyle(fontSize: 12, color: activeTheme.textSecondary),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(Icons.volume_up, size: 20, color: activeTheme.textSecondary),
                         ],
                       ),
                     ),
@@ -113,5 +205,18 @@ class MusicPlayerPanel extends StatelessWidget {
         );
       },
     );
+  }
+
+  Color _getIntensityColor(MusicIntensity intensity, dynamic activeTheme) {
+    switch (intensity) {
+      case MusicIntensity.calm:
+        return activeTheme.secondary;
+      case MusicIntensity.suspense:
+        return const Color(0xFFF59E0B); // Amber
+      case MusicIntensity.battle:
+        return activeTheme.battleIntensity;
+      case MusicIntensity.boss:
+        return activeTheme.bossIntensity;
+    }
   }
 }

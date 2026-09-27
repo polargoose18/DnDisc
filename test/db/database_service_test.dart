@@ -7,6 +7,7 @@ import 'package:ttrpg_audio_player/db/database_service.dart';
 import 'package:ttrpg_audio_player/models/library_track.dart';
 import 'package:ttrpg_audio_player/models/audio_track.dart';
 import 'package:ttrpg_audio_player/models/scene_model.dart';
+import 'package:ttrpg_audio_player/models/custom_theme_model.dart';
 
 class FakePathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin
@@ -154,6 +155,7 @@ void main() {
         musicIntensity: MusicIntensity.calm,
         ambientLayerVolumes: {'leaves': 0.7, 'wind': 0.5},
         soundboardSfxIds: ['sfx-branch'],
+        imagePath: '/covers/forest.jpg',
       );
 
       // 1. Insert
@@ -162,6 +164,7 @@ void main() {
       expect(allScenes.length, equals(1));
       expect(allScenes.first.name, equals('Тайный Лес'));
       expect(allScenes.first.ambientLayerVolumes, equals({'leaves': 0.7, 'wind': 0.5}));
+      expect(allScenes.first.imagePath, equals('/covers/forest.jpg'));
 
       // 2. GetById
       final found = await dbService.getSceneById('scene-db-1');
@@ -178,6 +181,51 @@ void main() {
       await dbService.deleteScene('scene-db-1');
       expect((await dbService.getAllScenes()), isEmpty);
       expect((await dbService.getSceneById('scene-db-1')), isNull);
+    });
+
+    test('Что проверяем: Вставка, чтение, обновление и удаление кастомных тем (Custom Themes CRUD) в DatabaseService. '
+        'Входные данные: CustomThemeModel с полной палитрой цветов. '
+        'Ожидаемый результат: Корректная запись в таблицу custom_themes, поиск по id, обновление и удаление.', () async {
+      const theme = CustomThemeModel(
+        id: 'theme-db-1',
+        name: 'Crimson Abyss',
+        isDark: true,
+        primaryColor: 0xFFE11D48,
+        secondaryColor: 0xFFFB7185,
+        backgroundColor: 0xFF140B0E,
+        surfaceColor: 0xFF221116,
+        cardColor: 0xFF2D161C,
+        accentColor: 0xFFF43F5E,
+        textPrimaryColor: 0xFFFFF1F2,
+        textSecondaryColor: 0xFFFDA4AF,
+        duckingBadgeColor: 0xFFEA580C,
+        battleIntensityColor: 0xFFFF2E63,
+        bossIntensityColor: 0xFF880808,
+      );
+
+      // 1. Insert
+      await dbService.insertCustomTheme(theme);
+      final allThemes = await dbService.getAllCustomThemes();
+      expect(allThemes.length, equals(1));
+      expect(allThemes.first.name, equals('Crimson Abyss'));
+      expect(allThemes.first.primaryColor, equals(0xFFE11D48));
+
+      // 2. GetById
+      final found = await dbService.getCustomThemeById('theme-db-1');
+      expect(found, isNotNull);
+      expect(found!.id, equals('theme-db-1'));
+      expect(found.bossIntensityColor, equals(0xFF880808));
+
+      // 3. Update
+      final updated = theme.copyWith(name: 'Crimson Catacombs');
+      await dbService.updateCustomTheme(updated);
+      final updatedThemes = await dbService.getAllCustomThemes();
+      expect(updatedThemes.first.name, equals('Crimson Catacombs'));
+
+      // 4. Delete
+      await dbService.deleteCustomTheme('theme-db-1');
+      expect((await dbService.getAllCustomThemes()), isEmpty);
+      expect((await dbService.getCustomThemeById('theme-db-1')), isNull);
     });
   });
 }

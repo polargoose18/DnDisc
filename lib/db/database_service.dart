@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../models/library_track.dart';
 import '../models/scene_model.dart';
+import '../models/custom_theme_model.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -34,13 +35,19 @@ class DatabaseService {
 
     return await openDatabase(
       dbPath,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await _createTables(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await _createScenesTable(db);
+        }
+        if (oldVersion < 3) {
+          await _createCustomThemesTable(db);
+          try {
+            await db.execute('ALTER TABLE scenes ADD COLUMN image_path TEXT;');
+          } catch (_) {}
         }
       },
     );
@@ -65,6 +72,7 @@ class DatabaseService {
       )
     ''');
     await _createScenesTable(db);
+    await _createCustomThemesTable(db);
   }
 
   static Future<void> _createScenesTable(Database db) async {
@@ -79,6 +87,29 @@ class DatabaseService {
         music_intensity TEXT,
         ambient_layer_volumes TEXT,
         soundboard_sfx_ids TEXT,
+        image_path TEXT,
+        created_at TEXT NOT NULL
+      )
+    ''');
+  }
+
+  static Future<void> _createCustomThemesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS custom_themes (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        is_dark INTEGER NOT NULL,
+        primary_color INTEGER NOT NULL,
+        secondary_color INTEGER NOT NULL,
+        background_color INTEGER NOT NULL,
+        surface_color INTEGER NOT NULL,
+        card_color INTEGER NOT NULL,
+        accent_color INTEGER NOT NULL,
+        text_primary_color INTEGER NOT NULL,
+        text_secondary_color INTEGER NOT NULL,
+        ducking_badge_color INTEGER NOT NULL,
+        battle_intensity_color INTEGER NOT NULL,
+        boss_intensity_color INTEGER NOT NULL,
         created_at TEXT NOT NULL
       )
     ''');
@@ -212,6 +243,56 @@ class DatabaseService {
     );
     if (maps.isEmpty) return null;
     return SceneModel.fromMap(maps.first);
+  }
+
+  // Custom Theme operations
+  Future<void> insertCustomTheme(CustomThemeModel theme) async {
+    final db = await database;
+    await db.insert(
+      'custom_themes',
+      theme.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> updateCustomTheme(CustomThemeModel theme) async {
+    final db = await database;
+    await db.update(
+      'custom_themes',
+      theme.toMap(),
+      where: 'id = ?',
+      whereArgs: [theme.id],
+    );
+  }
+
+  Future<void> deleteCustomTheme(String id) async {
+    final db = await database;
+    await db.delete(
+      'custom_themes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<CustomThemeModel>> getAllCustomThemes() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'custom_themes',
+      orderBy: 'created_at ASC',
+    );
+    return maps.map((m) => CustomThemeModel.fromMap(m)).toList();
+  }
+
+  Future<CustomThemeModel?> getCustomThemeById(String id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'custom_themes',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (maps.isEmpty) return null;
+    return CustomThemeModel.fromMap(maps.first);
   }
 
   Future<void> close() async {

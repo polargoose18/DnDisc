@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/audio_track.dart';
 import '../../models/library_track.dart';
@@ -19,6 +20,7 @@ class CreateEditSceneDialog extends StatefulWidget {
 class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
   late TextEditingController _nameController;
   late TextEditingController _descController;
+  late TextEditingController _imagePathController;
   late TextEditingController _musicSearchController;
   late TextEditingController _ambientSearchController;
   late TextEditingController _sfxSearchController;
@@ -56,6 +58,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
     final scene = widget.scene;
     _nameController = TextEditingController(text: scene?.name ?? '');
     _descController = TextEditingController(text: scene?.description ?? '');
+    _imagePathController = TextEditingController(text: scene?.imagePath ?? '');
     _musicSearchController = TextEditingController();
     _ambientSearchController = TextEditingController();
     _sfxSearchController = TextEditingController();
@@ -77,6 +80,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
     _sfxDebounce?.cancel();
     _nameController.dispose();
     _descController.dispose();
+    _imagePathController.dispose();
     _musicSearchController.dispose();
     _ambientSearchController.dispose();
     _sfxSearchController.dispose();
@@ -266,6 +270,52 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 2,
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Cover Art / Image
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _imagePathController,
+                            decoration: InputDecoration(
+                              labelText: 'Путь к изображению / обложке сцены',
+                              hintText: 'C:/images/tavern.jpg',
+                              filled: true,
+                              fillColor: const Color(0xFF14141E),
+                              border: const OutlineInputBorder(),
+                              suffixIcon: _imagePathController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear, size: 18),
+                                      onPressed: () => setState(() => _imagePathController.clear()),
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(_selectedColorHex),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                          ),
+                          icon: const Icon(Icons.image_rounded, size: 18),
+                          label: const Text('Обзор'),
+                          onPressed: () async {
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ['jpg', 'jpeg', 'png', 'webp'],
+                            );
+                            if (result != null && result.files.single.path != null) {
+                              setState(() {
+                                _imagePathController.text = result.files.single.path!;
+                              });
+                            }
+                          },
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
 
@@ -561,6 +611,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                       musicIntensity: _selectedIntensity,
                       ambientLayerVolumes: Map.from(_ambientVolumes),
                       soundboardSfxIds: _selectedSfxIds.toList(),
+                      imagePath: _imagePathController.text.trim().isNotEmpty ? _imagePathController.text.trim() : null,
                       createdAt: widget.scene?.createdAt ?? DateTime.now(),
                     );
 

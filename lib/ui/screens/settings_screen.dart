@@ -4,9 +4,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import '../../services/settings_service.dart';
+import '../../services/theme_service.dart';
+import '../../services/shortcut_service.dart';
 import '../../services/preset_service.dart';
 import '../../services/media_library_service.dart';
 import '../../services/scene_service.dart';
+import '../../models/custom_theme_model.dart';
+import '../../theme/app_themes.dart';
+import '../widgets/custom_theme_editor_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -14,41 +19,48 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsService>();
+    final themeService = context.watch<ThemeService?>();
+    final shortcutService = context.watch<ShortcutService?>();
     final mediaLibrary = context.watch<MediaLibraryService>();
     final sceneService = context.watch<SceneService>();
+    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 800),
+          constraints: const BoxConstraints(maxWidth: 860),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Header Card
-              const Card(
+              Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
                       CircleAvatar(
                         radius: 24,
-                        backgroundColor: Colors.deepPurple,
-                        child: Icon(Icons.tune_rounded, color: Colors.white, size: 28),
+                        backgroundColor: activeTheme.primary,
+                        child: const Icon(Icons.tune_rounded, color: Colors.white, size: 28),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Настройки звукового движка',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: activeTheme.textPrimary,
+                              ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
-                              'Плавные переходы, параметры приглушения и управление пресетами',
-                              style: TextStyle(color: Colors.grey, fontSize: 13),
+                              'Темы оформления, горячие клавиши, звуковой движок и управление пресетами',
+                              style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                             ),
                           ],
                         ),
@@ -59,20 +71,32 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Section 1: Fade Engine Settings
+              // Section 1: Themes & Styling (Presets + Custom Themes)
+              _buildThemesSection(context, themeService, activeTheme),
+              const SizedBox(height: 16),
+
+              // Section 2: Centralized Hotkeys Reference
+              _buildHotkeysSection(context, shortcutService, activeTheme),
+              const SizedBox(height: 16),
+
+              // Section 3: Fade Engine Settings
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.graphic_eq_rounded, color: Colors.deepPurpleAccent),
-                          SizedBox(width: 8),
+                          Icon(Icons.graphic_eq_rounded, color: activeTheme.primary),
+                          const SizedBox(width: 8),
                           Text(
                             'Плавные переходы (Fade Engine)',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: activeTheme.textPrimary,
+                            ),
                           ),
                         ],
                       ),
@@ -81,8 +105,8 @@ class SettingsScreen extends StatelessWidget {
                       // Music Fade
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Длительность нарастания/затухания музыки'),
-                        subtitle: Text('${settings.musicFadeMs} мс (${(settings.musicFadeMs / 1000).toStringAsFixed(1)} сек)'),
+                        title: Text('Длительность нарастания/затухания музыки', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${settings.musicFadeMs} мс (${(settings.musicFadeMs / 1000).toStringAsFixed(1)} сек)', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -99,8 +123,8 @@ class SettingsScreen extends StatelessWidget {
                       // Ambient Fade
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Длительность плавного включения/выключения эмбиента'),
-                        subtitle: Text('${settings.ambientFadeMs} мс (${(settings.ambientFadeMs / 1000).toStringAsFixed(1)} сек)'),
+                        title: Text('Длительность плавного включения/выключения эмбиента', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${settings.ambientFadeMs} мс (${(settings.ambientFadeMs / 1000).toStringAsFixed(1)} сек)', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -119,20 +143,24 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Section 2: Ducking Settings
+              // Section 4: Ducking Settings
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.volume_down_rounded, color: Colors.orangeAccent),
-                          SizedBox(width: 8),
+                          Icon(Icons.volume_down_rounded, color: activeTheme.duckingBadge),
+                          const SizedBox(width: 8),
                           Text(
                             'Авто-приглушение музыки при SFX (Ducking)',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: activeTheme.textPrimary,
+                            ),
                           ),
                         ],
                       ),
@@ -141,8 +169,8 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Attack
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Время атаки (Duck Attack Time)'),
-                        subtitle: Text('${settings.duckAttackMs} мс — скорость затухания музыки при ударе SFX'),
+                        title: Text('Время атаки (Duck Attack Time)', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${settings.duckAttackMs} мс — скорость затухания музыки при ударе SFX', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -159,8 +187,8 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Release
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Время восстановления (Duck Release Time)'),
-                        subtitle: Text('${settings.duckReleaseMs} мс — скорость возврата музыки на полную громкость'),
+                        title: Text('Время восстановления (Duck Release Time)', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${settings.duckReleaseMs} мс — скорость возврата музыки на полную громкость', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -177,8 +205,8 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Multiplier
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Глубина приглушения (Ducking Depth)'),
-                        subtitle: Text('${(settings.duckMultiplier * 100).toInt()}% от исходной громкости музыки'),
+                        title: Text('Глубина приглушения (Ducking Depth)', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text('${(settings.duckMultiplier * 100).toInt()}% от исходной громкости музыки', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -197,27 +225,31 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Section 3: Preset Packs Import / Export
+              // Section 5: Preset Packs Import / Export
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.archive_rounded, color: Colors.tealAccent),
-                          SizedBox(width: 8),
+                          Icon(Icons.archive_rounded, color: activeTheme.secondary),
+                          const SizedBox(width: 8),
                           Text(
                             'Пакеты Пресетов (ZIP Архивы)',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: activeTheme.textPrimary,
+                            ),
                           ),
                         ],
                       ),
                       const Divider(height: 24),
-                      const Text(
+                      Text(
                         'Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые пакеты приключений.',
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                        style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                       ),
                       const SizedBox(height: 16),
                       Wrap(
@@ -242,7 +274,7 @@ class SettingsScreen extends StatelessWidget {
                                 try {
                                   final docsDir = await getApplicationDocumentsDirectory();
                                   final audioDir = p.join(docsDir.path, 'imported_audio');
-                                  
+
                                   final presetService = PresetService();
                                   final importResult = await presetService.importPreset(
                                     zipFilePath: result.files.single.path!,
@@ -279,7 +311,7 @@ class SettingsScreen extends StatelessWidget {
                             icon: const Icon(Icons.file_upload_rounded),
                             label: const Text('Экспорт пресета в ZIP'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF3F51B5),
+                              backgroundColor: activeTheme.primary,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
@@ -290,26 +322,34 @@ class SettingsScreen extends StatelessWidget {
                               final confirmed = await showDialog<bool>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  backgroundColor: const Color(0xFF1E1E2C),
-                                  title: const Text('Экспорт пресета'),
+                                  backgroundColor: activeTheme.surface,
+                                  title: Text('Экспорт пресета', style: TextStyle(color: activeTheme.textPrimary)),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       TextField(
                                         controller: titleController,
-                                        decoration: const InputDecoration(labelText: 'Название пака'),
+                                        style: TextStyle(color: activeTheme.textPrimary),
+                                        decoration: InputDecoration(
+                                          labelText: 'Название пака',
+                                          labelStyle: TextStyle(color: activeTheme.textSecondary),
+                                        ),
                                       ),
                                       const SizedBox(height: 12),
                                       TextField(
                                         controller: descController,
-                                        decoration: const InputDecoration(labelText: 'Описание пака'),
+                                        style: TextStyle(color: activeTheme.textPrimary),
+                                        decoration: InputDecoration(
+                                          labelText: 'Описание пака',
+                                          labelStyle: TextStyle(color: activeTheme.textSecondary),
+                                        ),
                                       ),
                                     ],
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.of(ctx).pop(false),
-                                      child: const Text('Отмена'),
+                                      child: Text('Отмена', style: TextStyle(color: activeTheme.textSecondary)),
                                     ),
                                     ElevatedButton(
                                       onPressed: () => Navigator.of(ctx).pop(true),
@@ -361,28 +401,37 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              // Section 4: Interface Options
+              const SizedBox(height: 16),
+
+              // Section 6: Interface Options
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.display_settings_rounded, color: Colors.amberAccent),
-                          SizedBox(width: 8),
+                          Icon(Icons.display_settings_rounded, color: activeTheme.secondary),
+                          const SizedBox(width: 8),
                           Text(
                             'Интерфейс и панель управления',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: activeTheme.textPrimary,
+                            ),
                           ),
                         ],
                       ),
                       const Divider(height: 24),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Отображать иконку консоли логов'),
-                        subtitle: const Text('Показывать кнопку быстрого открытия консоли логов в верхней панели мастера'),
+                        title: Text('Отображать иконку консоли логов', style: TextStyle(color: activeTheme.textPrimary)),
+                        subtitle: Text(
+                          'Показывать кнопку быстрого открытия консоли логов в верхней панели мастера',
+                          style: TextStyle(color: activeTheme.textSecondary),
+                        ),
                         value: settings.showLogConsoleIcon,
                         onChanged: (val) => settings.setShowLogConsoleIcon(val),
                       ),
@@ -392,11 +441,11 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Section 5: Defaults
+              // Section 7: Defaults
               Center(
                 child: TextButton.icon(
-                  icon: const Icon(Icons.restore_rounded, color: Colors.grey),
-                  label: const Text('Сбросить все настройки по умолчанию', style: TextStyle(color: Colors.grey)),
+                  icon: Icon(Icons.restore_rounded, color: activeTheme.textSecondary),
+                  label: Text('Сбросить все настройки по умолчанию', style: TextStyle(color: activeTheme.textSecondary)),
                   onPressed: () {
                     settings.resetToDefaults();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -408,6 +457,450 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 32),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemesSection(
+    BuildContext context,
+    ThemeService? themeService,
+    CustomThemeModel activeTheme,
+  ) {
+    final presets = themeService?.builtInPresets ?? AppThemes.presets;
+    final activeThemeId = themeService?.activeThemeId ?? AppThemes.deepDarkId;
+    final customThemes = themeService?.customThemes ?? [];
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.palette_rounded, color: activeTheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  'Темы оформления (Themes)',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: activeTheme.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+
+            // Subsection 1: Built-in Presets
+            Text(
+              'Встроенные пресеты (5 вариантов)',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: activeTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: presets.map((preset) {
+                final isSelected = activeThemeId == preset.id;
+                return InkWell(
+                  onTap: () => themeService?.selectTheme(preset.id),
+                  borderRadius: BorderRadius.circular(10),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 155,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Color(preset.surfaceColor),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isSelected ? Color(preset.primaryColor) : Colors.white12,
+                        width: isSelected ? 2.5 : 1.0,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: Color(preset.primaryColor).withValues(alpha: 0.4),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Color(preset.primaryColor),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Color(preset.secondaryColor),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Color(preset.duckingBadgeColor),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const Spacer(),
+                            if (isSelected)
+                              Icon(Icons.check_circle_rounded, size: 16, color: Color(preset.primaryColor)),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          preset.name,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Color(preset.textPrimaryColor),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
+
+            // Subsection 2: Visual Divider & Custom Themes Header
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(child: Divider(color: activeTheme.textSecondary.withValues(alpha: 0.2))),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        Icon(Icons.brush_rounded, size: 16, color: activeTheme.secondary),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Пользовательские темы (${customThemes.length})',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: activeTheme.secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: Divider(color: activeTheme.textSecondary.withValues(alpha: 0.2))),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Custom Themes List or Empty State + "+ Create Theme" Button
+            if (customThemes.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: activeTheme.surface,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: activeTheme.textSecondary.withValues(alpha: 0.15)),
+                ),
+                child: Center(
+                  child: Text(
+                    'У вас пока нет кастомных тем. Создайте свою тему с уникальной палитрой цветов!',
+                    style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
+                  ),
+                ),
+              )
+            else
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: customThemes.map((custom) {
+                  final isSelected = activeThemeId == custom.id;
+                  return InkWell(
+                    onTap: () => themeService?.selectTheme(custom.id),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 190,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Color(custom.surfaceColor),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isSelected ? Color(custom.primaryColor) : Colors.white12,
+                          width: isSelected ? 2.5 : 1.0,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: Color(custom.primaryColor).withValues(alpha: 0.4),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: Color(custom.primaryColor),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: Color(custom.secondaryColor),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined, size: 16),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                tooltip: 'Редактировать',
+                                onPressed: () async {
+                                  final edited = await showDialog<CustomThemeModel>(
+                                    context: context,
+                                    builder: (_) => CustomThemeEditorDialog(initialTheme: custom),
+                                  );
+                                  if (edited != null) {
+                                    await themeService?.saveCustomTheme(edited);
+                                  }
+                                },
+                              ),
+                              const SizedBox(width: 6),
+                              IconButton(
+                                icon: const Icon(Icons.copy_rounded, size: 16),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                tooltip: 'Дублировать',
+                                onPressed: () async {
+                                  await themeService?.duplicateCustomTheme(custom.id);
+                                },
+                              ),
+                              const SizedBox(width: 6),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                tooltip: 'Удалить',
+                                onPressed: () async {
+                                  await themeService?.deleteCustomTheme(custom.id);
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            custom.name,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Color(custom.textPrimaryColor),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.add_rounded, size: 18),
+              label: const Text('+ Создать новую тему'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: activeTheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              onPressed: () async {
+                final newTheme = await showDialog<CustomThemeModel>(
+                  context: context,
+                  builder: (_) => const CustomThemeEditorDialog(),
+                );
+                if (newTheme != null) {
+                  await themeService?.saveCustomTheme(newTheme);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHotkeysSection(
+    BuildContext context,
+    ShortcutService? shortcutService,
+    CustomThemeModel activeTheme,
+  ) {
+    final shortcuts = shortcutService?.allDefinitions ?? const [
+      ShortcutDefinition(
+        action: AppShortcutAction.playPauseMusic,
+        title: 'Воспроизведение / Пауза',
+        description: 'Старт или пауза текущего музыкального трека',
+        keyDisplay: 'Space',
+      ),
+      ShortcutDefinition(
+        action: AppShortcutAction.masterMute,
+        title: 'Глушение звука (Mute)',
+        description: 'Быстрое глушение или включение общего звука',
+        keyDisplay: 'M',
+      ),
+      ShortcutDefinition(
+        action: AppShortcutAction.manualDucking,
+        title: 'Ручной Ducking',
+        description: 'Принудительное приглушение музыки на время речи',
+        keyDisplay: 'D',
+      ),
+      ShortcutDefinition(
+        action: AppShortcutAction.panicStopSfx,
+        title: 'Экстренная остановка (Panic Stop)',
+        description: 'Мгновенная остановка всех играющих SFX звуков',
+        keyDisplay: 'Escape',
+      ),
+      ShortcutDefinition(
+        action: AppShortcutAction.toggleFullscreen,
+        title: 'Полноэкранный режим',
+        description: 'Переключение отображения во весь экран',
+        keyDisplay: 'F11',
+      ),
+    ];
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.keyboard_rounded, color: activeTheme.secondary),
+                const SizedBox(width: 8),
+                Text(
+                  'Централизованные горячие клавиши',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: activeTheme.textPrimary,
+                  ),
+                ),
+                const Spacer(),
+                Switch(
+                  value: shortcutService?.isEnabled ?? true,
+                  activeTrackColor: activeTheme.primary,
+                  onChanged: (val) => shortcutService?.setEnabled(val),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            Text(
+              'Управляйте звуковым окружением во время игровой сессии не отвлекаясь от книги правил:',
+              style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+
+            // Hotkeys Table
+            Table(
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(4),
+                2: FlexColumnWidth(2),
+              },
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(
+                    color: activeTheme.surface,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Действие', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Описание', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Клавиша', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
+                    ),
+                  ],
+                ),
+                ...shortcuts.map((sc) {
+                  return TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                        child: Text(sc.title, style: TextStyle(color: activeTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                        child: Text(sc.description, style: TextStyle(color: activeTheme.textSecondary, fontSize: 11)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: activeTheme.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4)),
+                          ),
+                          child: Text(
+                            sc.keyDisplay,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: activeTheme.primary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -1,0 +1,137 @@
+import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+import '../models/custom_theme_model.dart';
+import '../theme/app_themes.dart';
+import '../db/database_service.dart';
+import 'logger_service.dart';
+
+class ThemeService extends ChangeNotifier {
+  String _activeThemeId = AppThemes.deepDarkId;
+  final List<CustomThemeModel> _customThemes = [];
+  final DatabaseService? _dbService;
+  bool _isLoading = false;
+
+  ThemeService({DatabaseService? dbService, String? initialThemeId, bool autoLoad = false})
+      : _dbService = dbService,
+        _activeThemeId = initialThemeId ?? AppThemes.deepDarkId {
+    if (autoLoad && _dbService != null) {
+      loadThemes();
+    }
+  }
+
+  String get activeThemeId => _activeThemeId;
+  List<CustomThemeModel> get builtInPresets => AppThemes.presets;
+  List<CustomThemeModel> get customThemes => List.unmodifiable(_customThemes);
+  bool get isLoading => _isLoading;
+
+  CustomThemeModel get activeTheme {
+    // Check built-in presets first
+    for (final preset in AppThemes.presets) {
+      if (preset.id == _activeThemeId) {
+        return preset;
+      }
+    }
+    // Check custom themes
+    for (final custom in _customThemes) {
+      if (custom.id == _activeThemeId) {
+        return custom;
+      }
+    }
+    return AppThemes.deepDark;
+  }
+
+  ThemeData get currentThemeData => activeTheme.toThemeData();
+
+  Future<void> loadThemes({bool force = false}) async {
+    final db = _dbService;
+    if (db == null) return;
+    _isLoading = true;
+    try {
+      final dbThemes = await db.getAllCustomThemes();
+      _customThemes.clear();
+      _customThemes.addAll(dbThemes);
+      LoggerService().info('ThemeService: Loaded ${_customThemes.length} custom themes');
+    } catch (e) {
+      LoggerService().warning('ThemeService: Could not load custom themes from DB: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void selectTheme(String themeId) {
+    if (_activeThemeId == themeId) return;
+    _activeThemeId = themeId;
+    LoggerService().info('ThemeService: Switched active theme to "$themeId"');
+    notifyListeners();
+  }
+
+  Future<void> saveCustomTheme(CustomThemeModel theme) async {
+    final existingIndex = _customThemes.indexWhere((t) => t.id == theme.id);
+    final db = _dbService;
+    if (existingIndex != -1) {
+      _customThemes[existingIndex] = theme;
+      if (db != null) {
+        try {
+          await db.updateCustomTheme(theme);
+        } catch (_) {}
+      }
+      LoggerService().info('ThemeService: Updated custom theme "${theme.name}" (${theme.id})');
+    } else {
+      _customThemes.add(theme);
+      if (db != null) {
+        try {
+          await db.insertCustomTheme(theme);
+        } catch (_) {}
+      }
+      LoggerService().info('ThemeService: Created new custom theme "${theme.name}" (${theme.id})');
+    }
+    _activeThemeId = theme.id;
+    notifyListeners();
+  }
+
+  Future<void> deleteCustomTheme(String id) async {
+    _customThemes.removeWhere((t) => t.id == id);
+    final db = _dbService;
+    if (db != null) {
+      try {
+        await db.deleteCustomTheme(id);
+      } catch (_) {}
+    }
+    LoggerService().info('ThemeService: Deleted custom theme ($id)');
+    if (_activeThemeId == id) {
+      _activeThemeId = AppThemes.deepDarkId;
+    }
+    notifyListeners();
+  }
+
+  Future<CustomThemeModel?> duplicateCustomTheme(String sourceThemeId, {String? newName}) async {
+    CustomThemeModel? source;
+    for (final p in AppThemes.presets) {
+      if (p.id == sourceThemeId) {
+        source = p;
+        break;
+      }
+    }
+    if (source == null) {
+      for (final c in _customThemes) {
+        if (c.id == sourceThemeId) {
+          source = c;
+          break;
+        }
+      }
+    }
+
+    if (source == null) return null;
+
+    final newTheme = source.copyWith(
+      id: const Uuid().v4(),
+      name: newName ?? '${source.name} (Copy)',
+      isBuiltIn: false,
+      createdAt: DateTime.now(),
+    );
+
+    await saveCustomTheme(newTheme);
+    return newTheme;
+  }
+}

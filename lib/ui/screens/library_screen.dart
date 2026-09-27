@@ -96,7 +96,7 @@ class LibraryScreen extends StatelessWidget {
                                   const Icon(Icons.library_music_outlined, size: 64, color: Colors.grey),
                                   const SizedBox(height: 12),
                                   const Text(
-                                    'Медиабиблиотека пуста',
+                                    'Медиатека пуста',
                                     style: TextStyle(fontSize: 18, color: Colors.grey),
                                   ),
                                   const SizedBox(height: 6),

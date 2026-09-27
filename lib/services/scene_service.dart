@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import '../db/database_service.dart';
 import '../models/scene_model.dart';
 import '../models/audio_track.dart';
@@ -65,13 +66,27 @@ class SceneService extends ChangeNotifier {
   }
 
   Future<void> createScene(SceneModel scene) async {
-    await _db.insertScene(scene);
+    _scenes.removeWhere((s) => s.id == scene.id);
+    _scenes.add(scene);
+    notifyListeners();
+    try {
+      await _db.insertScene(scene);
+    } catch (_) {}
     LoggerService().info('SceneService: Created scene "${scene.name}"');
     await loadScenes(force: true);
   }
 
   Future<void> updateScene(SceneModel scene) async {
-    await _db.updateScene(scene);
+    final idx = _scenes.indexWhere((s) => s.id == scene.id);
+    if (idx != -1) {
+      _scenes[idx] = scene;
+    } else {
+      _scenes.add(scene);
+    }
+    notifyListeners();
+    try {
+      await _db.updateScene(scene);
+    } catch (_) {}
     LoggerService().info('SceneService: Updated scene "${scene.name}"');
     await loadScenes(force: true);
   }
@@ -80,33 +95,59 @@ class SceneService extends ChangeNotifier {
     if (_activeSceneId == sceneId) {
       _activeSceneId = null;
     }
-    await _db.deleteScene(sceneId);
+    _scenes.removeWhere((s) => s.id == sceneId);
+    notifyListeners();
+    try {
+      await _db.deleteScene(sceneId);
+    } catch (_) {}
     LoggerService().info('SceneService: Deleted scene $sceneId');
     await loadScenes(force: true);
   }
 
+  Future<SceneModel?> duplicateScene(String sceneId, {String? newName}) async {
+    final original = _scenes.cast<SceneModel?>().firstWhere(
+      (s) => s?.id == sceneId,
+      orElse: () => null,
+    );
+    if (original == null) return null;
+
+    final duplicated = original.copyWith(
+      id: const Uuid().v4(),
+      name: newName ?? '${original.name} (Копия)',
+      createdAt: DateTime.now(),
+    );
+
+    await createScene(duplicated);
+    return duplicated;
+  }
+
   Future<void> activateScene(
     SceneModel scene, {
-    required AudioEngineService audioEngine,
-    required MediaLibraryService mediaLibrary,
+    AudioEngineService? audioEngine,
+    MediaLibraryService? mediaLibrary,
     Duration? fadeDuration,
   }) async {
     _activeSceneId = scene.id;
+    if (!_scenes.any((s) => s.id == scene.id)) {
+      _scenes.add(scene);
+    }
     notifyListeners();
     LoggerService().info('SceneService: Activating scene "${scene.name}" (ID: ${scene.id})');
+
+    if (audioEngine == null) return;
 
     final musicFade = fadeDuration ?? audioEngine.settings?.musicFadeDuration ?? const Duration(milliseconds: 1500);
     final ambientFade = fadeDuration ?? audioEngine.settings?.ambientFadeDuration ?? const Duration(milliseconds: 1000);
 
-    // 1. Switch Music Track
-    if (scene.musicTrackId != null && scene.musicTrackId!.isNotEmpty) {
+    // 1. Prepare Music Track (load metadata and intensity without auto-starting playback)
+    if (scene.musicTrackId != null && scene.musicTrackId!.isNotEmpty && mediaLibrary != null) {
       final musicTrack = mediaLibrary.tracks.cast<dynamic>().firstWhere(
         (t) => t.id == scene.musicTrackId,
         orElse: () => null,
       );
 
       if (musicTrack != null) {
-        await audioEngine.musicBus.playTrack(
+        await audioEngine.musicBus.prepareTrack(
           AudioTrack(
             id: musicTrack.id,
             title: musicTrack.title,
@@ -116,7 +157,6 @@ class SceneService extends ChangeNotifier {
             loopStartMs: musicTrack.loopStartMs,
             loopEndMs: musicTrack.loopEndMs,
           ),
-          fadeDuration: musicFade,
         );
       } else {
         LoggerService().warning('SceneService: Bound music track not found in library: ${scene.musicTrackId}');
@@ -125,12 +165,14 @@ class SceneService extends ChangeNotifier {
       await audioEngine.musicBus.stop(fadeDuration: musicFade);
     }
 
-    // 2. Adjust Ambient Layers
-    final currentLayers = audioEngine.ambientBus.layers;
+    // 2. Adjust Ambient Layers (preserve persistent layers, load scene layers without auto-start)
+    final currentLayers = List<AmbientLayer>.from(audioEngine.ambientBus.layers);
     for (final layer in currentLayers) {
-      if (!scene.ambientLayerVolumes.containsKey(layer.id) && layer.isActive) {
-        // Fade out layers not in scene
-        await audioEngine.ambientBus.toggleLayer(layer.id, fadeDuration: ambientFade);
+      if (!layer.isPersistent && !scene.ambientLayerVolumes.containsKey(layer.id)) {
+        if (layer.isActive) {
+          await audioEngine.ambientBus.toggleLayer(layer.id, fadeDuration: ambientFade);
+        }
+        await audioEngine.ambientBus.removeLayer(layer.id);
       }
     }
 
@@ -138,17 +180,10 @@ class SceneService extends ChangeNotifier {
       final layerId = entry.key;
       final targetVolume = entry.value;
 
-      final existingIndex = currentLayers.indexWhere((l) => l.id == layerId);
+      final existingIndex = audioEngine.ambientBus.layers.indexWhere((l) => l.id == layerId);
       if (existingIndex != -1) {
-        final existing = currentLayers[existingIndex];
-        if (!existing.isActive) {
-          audioEngine.ambientBus.setLayerVolume(layerId, targetVolume, fadeDuration: Duration.zero);
-          await audioEngine.ambientBus.toggleLayer(layerId, fadeDuration: ambientFade);
-        } else {
-          audioEngine.ambientBus.setLayerVolume(layerId, targetVolume, fadeDuration: ambientFade);
-        }
-      } else {
-        // Find track in library to add as layer
+        audioEngine.ambientBus.setLayerVolume(layerId, targetVolume, fadeDuration: Duration.zero);
+      } else if (mediaLibrary != null) {
         final ambTrack = mediaLibrary.tracks.cast<dynamic>().firstWhere(
           (t) => t.id == layerId,
           orElse: () => null,
@@ -159,31 +194,43 @@ class SceneService extends ChangeNotifier {
             title: ambTrack.title,
             filePath: ambTrack.filePath,
             volume: targetVolume,
-            isActive: true,
+            isActive: false, // Do not start playing immediately
             iconName: ambTrack.iconName,
+            isPersistent: false,
           );
           audioEngine.ambientBus.addLayer(newLayer);
         }
       }
     }
 
-    // 3. Bind Soundboard SFX Triggers
-    for (final sfxId in scene.soundboardSfxIds) {
-      final existingTrigger = audioEngine.sfxBus.triggers.any((t) => t.id == sfxId);
-      if (!existingTrigger) {
-        final sfxTrack = mediaLibrary.tracks.cast<dynamic>().firstWhere(
-          (t) => t.id == sfxId,
-          orElse: () => null,
-        );
-        if (sfxTrack != null) {
-          audioEngine.sfxBus.addTrigger(
-            SfxTrigger(
-              id: sfxTrack.id,
-              title: sfxTrack.title,
-              filePath: sfxTrack.filePath,
-              colorHex: sfxTrack.colorHex,
-            ),
+    // 3. Bind Soundboard SFX Triggers (preserve persistent triggers)
+    if (mediaLibrary != null) {
+      final triggersToRemove = audioEngine.sfxBus.triggers
+          .where((t) => !t.isPersistent && !scene.soundboardSfxIds.contains(t.id))
+          .map((t) => t.id)
+          .toList();
+      for (final id in triggersToRemove) {
+        audioEngine.sfxBus.removeTrigger(id);
+      }
+
+      for (final sfxId in scene.soundboardSfxIds) {
+        final existingTrigger = audioEngine.sfxBus.triggers.any((t) => t.id == sfxId);
+        if (!existingTrigger) {
+          final sfxTrack = mediaLibrary.tracks.cast<dynamic>().firstWhere(
+            (t) => t.id == sfxId,
+            orElse: () => null,
           );
+          if (sfxTrack != null) {
+            audioEngine.sfxBus.addTrigger(
+              SfxTrigger(
+                id: sfxTrack.id,
+                title: sfxTrack.title,
+                filePath: sfxTrack.filePath,
+                colorHex: sfxTrack.colorHex,
+                isPersistent: false,
+              ),
+            );
+          }
         }
       }
     }

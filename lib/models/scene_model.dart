@@ -11,6 +11,7 @@ class SceneModel {
   final MusicIntensity? musicIntensity;
   final Map<String, double> ambientLayerVolumes; // Map of trackId -> volume (0.0 - 1.0)
   final List<String> soundboardSfxIds;
+  final String? imagePath;
   final DateTime createdAt;
 
   SceneModel({
@@ -23,6 +24,7 @@ class SceneModel {
     this.musicIntensity = MusicIntensity.calm,
     this.ambientLayerVolumes = const {},
     this.soundboardSfxIds = const [],
+    this.imagePath,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -36,6 +38,7 @@ class SceneModel {
     MusicIntensity? musicIntensity,
     Map<String, double>? ambientLayerVolumes,
     List<String>? soundboardSfxIds,
+    String? imagePath,
     DateTime? createdAt,
   }) {
     return SceneModel(
@@ -48,6 +51,7 @@ class SceneModel {
       musicIntensity: musicIntensity ?? this.musicIntensity,
       ambientLayerVolumes: ambientLayerVolumes ?? Map.from(this.ambientLayerVolumes),
       soundboardSfxIds: soundboardSfxIds ?? List.from(this.soundboardSfxIds),
+      imagePath: imagePath ?? this.imagePath,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -63,6 +67,7 @@ class SceneModel {
       'music_intensity': musicIntensity?.name,
       'ambient_layer_volumes': jsonEncode(ambientLayerVolumes),
       'soundboard_sfx_ids': jsonEncode(soundboardSfxIds),
+      'image_path': imagePath,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -110,6 +115,7 @@ class SceneModel {
       musicIntensity: parsedIntensity,
       ambientLayerVolumes: parsedAmbients,
       soundboardSfxIds: parsedSfx,
+      imagePath: map['image_path'] as String? ?? map['imagePath'] as String?,
       createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now(),
     );
   }

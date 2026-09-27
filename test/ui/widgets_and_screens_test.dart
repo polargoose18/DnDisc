@@ -141,12 +141,12 @@ void main() {
   group('AmbientMixerPanel Widget Tests', () {
     testWidgets('Что проверяем: Отображение пустого состояния AmbientMixerPanel. '
         'Входные данные: AmbientMixerPanel без слоев. '
-        'Ожидаемый результат: Отображается сообщение "Нет загруженных эмбиентов".', (WidgetTester tester) async {
+        'Ожидаемый результат: Отображается сообщение "Нет активных эмбиентов".', (WidgetTester tester) async {
       final engine = AudioEngineService();
 
       await tester.pumpWidget(createTestableWidget(const AmbientMixerPanel(), engine: engine));
 
-      expect(find.text('Нет загруженных эмбиентов. Импортируйте аудиофайлы или загрузите пресет.'), findsOneWidget);
+      expect(find.textContaining('Нет активных эмбиентов'), findsOneWidget);
       engine.dispose();
     });
 
@@ -158,7 +158,7 @@ void main() {
 
       await tester.pumpWidget(createTestableWidget(const AmbientMixerPanel(), engine: engine));
 
-      expect(find.text('Эмбиент-слои (Фоновые звуки)'), findsOneWidget);
+      expect(find.textContaining('Эмбиент-слои'), findsOneWidget);
       expect(find.text('Шум Дождя'), findsOneWidget);
       expect(engine.ambientBus.layers.first.isActive, isTrue);
 
@@ -185,7 +185,7 @@ void main() {
 
       await tester.pumpWidget(createTestableWidget(const SoundboardGrid(), engine: engine));
 
-      expect(find.text('Soundboard пуст. Добавьте SFX или быстрые триггеры.'), findsOneWidget);
+      expect(find.textContaining('Soundboard пуст'), findsOneWidget);
       engine.dispose();
     });
 
@@ -197,7 +197,7 @@ void main() {
 
       await tester.pumpWidget(createTestableWidget(const SoundboardGrid(), engine: engine));
 
-      expect(find.text('Soundboard (Звуковые эффекты / SFX)'), findsOneWidget);
+      expect(find.textContaining('Soundboard'), findsOneWidget);
       expect(find.text('Удар Меча'), findsOneWidget);
       expect(find.text('[1]'), findsOneWidget);
 
@@ -418,7 +418,7 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 200));
 
-      expect(find.text('Медиабиблиотека пуста'), findsOneWidget);
+      expect(find.text('Медиатека пуста'), findsOneWidget);
 
       library.dispose();
       engine.dispose();

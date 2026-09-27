@@ -10,6 +10,7 @@ import 'package:ttrpg_audio_player/audio/audio_engine_service.dart';
 import 'package:ttrpg_audio_player/models/scene_model.dart';
 import 'package:ttrpg_audio_player/models/library_track.dart';
 import 'package:ttrpg_audio_player/models/ambient_layer.dart';
+import 'package:ttrpg_audio_player/models/sfx_trigger.dart';
 import 'package:ttrpg_audio_player/models/audio_track.dart';
 
 class FakePathProviderPlatform extends Fake
@@ -145,7 +146,9 @@ void main() {
         expect(sceneService.activeSceneId, equals('scene-tavern'));
         expect(sceneService.activeScene?.name, equals('Таверна Веселый Гоблин'));
         expect(audioEngine.musicBus.currentTrack?.id, equals('tr-music-1'));
+        expect(audioEngine.musicBus.isPlaying, isFalse); // Does not auto-play immediately
         expect(audioEngine.ambientBus.layers.length, equals(2));
+        expect(audioEngine.ambientBus.layers.every((l) => !l.isActive), isTrue); // Does not auto-play immediately
         expect(audioEngine.ambientBus.layers.firstWhere((l) => l.id == 'tr-amb-1').volume, equals(0.7));
         expect(audioEngine.ambientBus.layers.firstWhere((l) => l.id == 'tr-amb-2').volume, equals(0.5));
         expect(audioEngine.sfxBus.triggers.any((t) => t.id == 'tr-sfx-1'), isTrue);
@@ -157,25 +160,37 @@ void main() {
     );
 
     test(
-      'Что проверяем: Выключение лишних эмбиент-слоев и остановка музыки при смене сцены. '
-      'Входные данные: Активный эмбиент-слой "Rain" и сцена без этого слоя и без музыки (musicTrackId=null). '
-      'Ожидаемый результат: Слой "Rain" переходит в isActive=false, музыка останавливается (currentTrack=null).',
+      'Что проверяем: Сохранение постоянных (isPersistent) эмбиент-слоев и SFX при смене сцены. '
+      'Входные данные: Постоянный слой "Campfire" и SFX "Dice Roll", смена сцены на пустую. '
+      'Ожидаемый результат: Постоянный слой и SFX триггер сохраняются в шинах, непостоянные удаляются.',
       () async {
         final sceneService = SceneService();
         final mediaLibrary = MediaLibraryService();
         final audioEngine = AudioEngineService();
 
-        // Добавим активный слой дождя в AmbientBus
+        // Добавим постоянный и непостоянный слои в AmbientBus
         audioEngine.ambientBus.addLayer(
-          const AmbientLayer(id: 'rain-old', title: 'Rain', filePath: '/fake/rain.mp3', isActive: true),
+          const AmbientLayer(id: 'camp-persistent', title: 'Campfire', filePath: '/fake/camp.mp3', isPersistent: true),
+        );
+        audioEngine.ambientBus.addLayer(
+          const AmbientLayer(id: 'rain-temp', title: 'Rain', filePath: '/fake/rain.mp3', isPersistent: false),
         );
 
-        // Сцена без музыки и без дождя
+        // Добавим постоянный и непостоянный SFX
+        audioEngine.sfxBus.addTrigger(
+          const SfxTrigger(id: 'dice-persistent', title: 'Dice Roll', filePath: '/fake/dice.wav', isPersistent: true),
+        );
+        audioEngine.sfxBus.addTrigger(
+          const SfxTrigger(id: 'scream-temp', title: 'Scream', filePath: '/fake/scream.wav', isPersistent: false),
+        );
+
+        // Сцена без музыки и звуков
         final quietScene = SceneModel(
           id: 'scene-quiet',
           name: 'Тишина',
           musicTrackId: null,
           ambientLayerVolumes: {},
+          soundboardSfxIds: [],
         );
 
         await sceneService.activateScene(
@@ -185,7 +200,13 @@ void main() {
           fadeDuration: Duration.zero,
         );
 
-        expect(audioEngine.ambientBus.layers.firstWhere((l) => l.id == 'rain-old').isActive, isFalse);
+        // Постоянный эмбиент остался, временный удален
+        expect(audioEngine.ambientBus.layers.any((l) => l.id == 'camp-persistent'), isTrue);
+        expect(audioEngine.ambientBus.layers.any((l) => l.id == 'rain-temp'), isFalse);
+
+        // Постоянный SFX остался, временный удален
+        expect(audioEngine.sfxBus.triggers.any((t) => t.id == 'dice-persistent'), isTrue);
+        expect(audioEngine.sfxBus.triggers.any((t) => t.id == 'scream-temp'), isFalse);
         expect(audioEngine.musicBus.currentTrack, isNull);
 
         mediaLibrary.dispose();

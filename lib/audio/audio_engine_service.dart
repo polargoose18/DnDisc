@@ -14,10 +14,13 @@ class AudioEngineService extends ChangeNotifier {
   SettingsService? _settings;
 
   double _masterVolume = 1.0;
+  double _preMuteVolume = 1.0;
+  bool _isMuted = false;
   final bool _isInitialized = true;
 
   bool get isInitialized => _isInitialized;
   double get masterVolume => _masterVolume;
+  bool get isMuted => _isMuted;
   SettingsService? get settings => _settings;
 
   AudioEngineService({SettingsService? settings}) {
@@ -68,10 +71,34 @@ class AudioEngineService extends ChangeNotifier {
 
   void setMasterVolume(double volume) {
     _masterVolume = volume.clamp(0.0, 1.0);
+    _isMuted = (_masterVolume == 0.0);
     musicBus.setMasterVolume(_masterVolume);
     ambientBus.setMasterVolume(_masterVolume);
     sfxBus.setMasterVolume(_masterVolume);
     notifyListeners();
+  }
+
+  void toggleMute() {
+    if (_isMuted) {
+      _isMuted = false;
+      setMasterVolume(_preMuteVolume > 0 ? _preMuteVolume : 1.0);
+      LoggerService().info('AudioEngine: Unmuted (volume: $_masterVolume)');
+    } else {
+      _preMuteVolume = _masterVolume;
+      _isMuted = true;
+      setMasterVolume(0.0);
+      LoggerService().info('AudioEngine: Master Mute activated');
+    }
+  }
+
+  void panicStopSfx() {
+    LoggerService().info('AudioEngine: Panic stop all SFX requested');
+    sfxBus.stopAll();
+  }
+
+  void triggerManualDuck() {
+    LoggerService().info('AudioEngine: Manual ducking triggered');
+    _handleSfxDucking();
   }
 
   void _handleSfxDucking() {

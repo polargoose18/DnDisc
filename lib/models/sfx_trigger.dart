@@ -5,6 +5,8 @@ class SfxTrigger {
   final double volume;
   final int colorHex;
   final String? hotkey;
+  final bool isLoop;
+  final bool isPersistent;
 
   const SfxTrigger({
     required this.id,
@@ -13,6 +15,8 @@ class SfxTrigger {
     this.volume = 1.0,
     this.colorHex = 0xFF4A90E2, // Default Blue Accent
     this.hotkey,
+    this.isLoop = false,
+    this.isPersistent = false,
   });
 
   SfxTrigger copyWith({
@@ -22,6 +26,8 @@ class SfxTrigger {
     double? volume,
     int? colorHex,
     String? hotkey,
+    bool? isLoop,
+    bool? isPersistent,
   }) {
     return SfxTrigger(
       id: id ?? this.id,
@@ -30,6 +36,8 @@ class SfxTrigger {
       volume: volume ?? this.volume,
       colorHex: colorHex ?? this.colorHex,
       hotkey: hotkey ?? this.hotkey,
+      isLoop: isLoop ?? this.isLoop,
+      isPersistent: isPersistent ?? this.isPersistent,
     );
   }
 }

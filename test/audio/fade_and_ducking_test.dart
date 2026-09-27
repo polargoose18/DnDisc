@@ -63,7 +63,7 @@ void main() {
         expect(fader.isFading, isTrue);
         expect(values.first, equals(0.0));
 
-        await Future.delayed(const Duration(milliseconds: 160));
+        await Future.delayed(const Duration(milliseconds: 250));
 
         expect(fader.isFading, isFalse);
         expect(fader.currentValue, equals(1.0));

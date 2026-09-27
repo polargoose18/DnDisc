@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:uuid/uuid.dart';
 import '../../audio/ambient_bus_controller.dart';
+import '../../models/ambient_layer.dart';
+import '../../models/library_track.dart';
+import '../../services/media_library_service.dart';
+import '../../services/theme_service.dart';
+import '../../theme/app_themes.dart';
 
 class AmbientMixerPanel extends StatelessWidget {
   const AmbientMixerPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeService = context.watch<ThemeService?>();
+    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+
     return Consumer<AmbientBusController>(
       builder: (context, ambient, _) {
         return Card(
-          margin: const EdgeInsets.all(8.0),
+          margin: const EdgeInsets.symmetric(vertical: 6),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -19,62 +29,178 @@ class AmbientMixerPanel extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Expanded(
-                      child: Text(
-                        'Эмбиент-слои (Фоновые звуки)',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(Icons.waves_rounded, color: activeTheme.secondary),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'Эмбиент-слои (Фоновые звуки)',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: activeTheme.textPrimary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    TextButton.icon(
-                      key: const ValueKey('ambient_stop_all_btn'),
-                      onPressed: () => ambient.stopAllLayers(),
-                      icon: const Icon(Icons.stop),
-                      label: const Text('Выключить все'),
+                    Row(
+                      children: [
+                        IconButton(
+                          key: const ValueKey('add_ambient_layer_btn'),
+                          icon: const Icon(Icons.add_rounded, size: 20),
+                          tooltip: 'Добавить слой / Постоянный эмбиент',
+                          color: activeTheme.secondary,
+                          onPressed: () => _showAddAmbientDialog(context, ambient),
+                        ),
+                        if (ambient.layers.isNotEmpty)
+                          OutlinedButton.icon(
+                            key: const ValueKey('ambient_stop_all_btn'),
+                            onPressed: () => ambient.stopAllLayers(),
+                            icon: const Icon(Icons.stop_rounded, size: 16),
+                            label: const Text('Выключить все', style: TextStyle(fontSize: 11)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.redAccent,
+                              side: const BorderSide(color: Colors.redAccent, width: 0.8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              minimumSize: const Size(0, 30),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 if (ambient.layers.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.0),
-                    child: Text(
-                      'Нет загруженных эмбиентов. Импортируйте аудиофайлы или загрузите пресет.',
-                      style: TextStyle(color: Colors.grey),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: activeTheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Нет активных эмбиентов. Нажмите «+» для добавления постоянного фона.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton.icon(
+                            icon: const Icon(Icons.add_circle_outline, size: 16),
+                            label: const Text('Добавить постоянный эмбиент'),
+                            onPressed: () => _showAddAmbientDialog(context, ambient),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 else
                   Column(
                     children: ambient.layers.map((layer) {
-                      return Padding(
+                      return AnimatedContainer(
                         key: ValueKey('ambient_row_${layer.id}'),
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(vertical: 4.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: layer.isActive
+                              ? activeTheme.primary.withValues(alpha: 0.12)
+                              : activeTheme.surface,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: layer.isActive
+                                ? activeTheme.primary.withValues(alpha: 0.5)
+                                : (layer.isPersistent ? Colors.amberAccent.withValues(alpha: 0.4) : Colors.white10),
+                            width: layer.isActive ? 1.5 : 1.0,
+                          ),
+                        ),
                         child: Row(
                           children: [
                             Switch(
                               key: ValueKey('ambient_switch_${layer.id}'),
                               value: layer.isActive,
+                              activeTrackColor: activeTheme.primary,
                               onChanged: (_) => ambient.toggleLayer(layer.id),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              flex: 2,
-                              child: Text(
-                                layer.title,
-                                style: TextStyle(
-                                  fontWeight: layer.isActive ? FontWeight.bold : FontWeight.normal,
-                                ),
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          layer.title,
+                                          style: TextStyle(
+                                            fontWeight: layer.isActive ? FontWeight.bold : FontWeight.normal,
+                                            color: layer.isActive
+                                                ? activeTheme.textPrimary
+                                                : activeTheme.textSecondary,
+                                            fontSize: 13,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (layer.isPersistent) ...[
+                                        const SizedBox(width: 4),
+                                        const Icon(Icons.push_pin_rounded, size: 12, color: Colors.amberAccent),
+                                      ],
+                                    ],
+                                  ),
+                                  Text(
+                                    'Громкость: ${(layer.volume * 100).toInt()}%',
+                                    style: TextStyle(fontSize: 11, color: activeTheme.textSecondary),
+                                  ),
+                                ],
                               ),
                             ),
                             Expanded(
-                              flex: 3,
+                              flex: 4,
                               child: Slider(
                                 key: ValueKey('ambient_slider_${layer.id}'),
                                 value: layer.volume,
-                                onChanged: layer.isActive
-                                    ? (val) => ambient.setLayerVolume(layer.id, val)
-                                    : null,
+                                activeColor: activeTheme.secondary,
+                                onChanged: (val) => ambient.setLayerVolume(layer.id, val),
                               ),
+                            ),
+                            // Persistent Pin Button
+                            IconButton(
+                              icon: Icon(
+                                layer.isPersistent ? Icons.push_pin_rounded : Icons.push_pin_outlined,
+                                size: 18,
+                                color: layer.isPersistent ? Colors.amberAccent : activeTheme.textSecondary,
+                              ),
+                              tooltip: layer.isPersistent
+                                  ? 'Постоянный слой (не сбрасывается при смене сцены)'
+                                  : 'Сделать постоянным слоем',
+                              onPressed: () => ambient.togglePersistent(layer.id),
+                            ),
+                            // Solo / Mute quick action
+                            IconButton(
+                              icon: Icon(
+                                layer.isActive ? Icons.volume_up : Icons.volume_off,
+                                size: 18,
+                                color: layer.isActive ? activeTheme.secondary : activeTheme.textSecondary,
+                              ),
+                              tooltip: layer.isActive ? 'Заглушить слой' : 'Включить слой',
+                              onPressed: () => ambient.toggleLayer(layer.id),
+                            ),
+                            // Remove Layer Button
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded, size: 16),
+                              color: Colors.white38,
+                              tooltip: 'Удалить слой',
+                              onPressed: () => ambient.removeLayer(layer.id),
                             ),
                           ],
                         ),
@@ -86,6 +212,160 @@ class AmbientMixerPanel extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showAddAmbientDialog(BuildContext context, AmbientBusController ambient) {
+    showDialog(
+      context: context,
+      builder: (ctx) => _AddAmbientLayerDialog(ambient: ambient),
+    );
+  }
+}
+
+class _AddAmbientLayerDialog extends StatefulWidget {
+  final AmbientBusController ambient;
+  const _AddAmbientLayerDialog({required this.ambient});
+
+  @override
+  State<_AddAmbientLayerDialog> createState() => _AddAmbientLayerDialogState();
+}
+
+class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
+  LibraryTrack? _selectedTrack;
+  String _customPath = '';
+  String _customTitle = '';
+  double _volume = 0.7;
+  bool _isPersistent = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final library = context.watch<MediaLibraryService>();
+    final themeService = context.watch<ThemeService?>();
+    final activeTheme = themeService?.activeTheme ?? AppThemes.deepDark;
+    final ambientTracks = library.tracks.where((t) => t.busType == AudioBusType.ambient).toList();
+
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.waves_rounded, color: Colors.tealAccent),
+          SizedBox(width: 8),
+          Text('Добавить Эмбиент-слой', style: TextStyle(fontSize: 16)),
+        ],
+      ),
+      content: SizedBox(
+        width: 420,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Выберите трек из медиабиблиотеки:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              const SizedBox(height: 8),
+              if (ambientTracks.isNotEmpty)
+                Container(
+                  constraints: const BoxConstraints(maxHeight: 180),
+                  decoration: BoxDecoration(
+                    color: activeTheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white12),
+                  ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: ambientTracks.length,
+                    itemBuilder: (context, index) {
+                      final track = ambientTracks[index];
+                      final isSelected = _selectedTrack?.id == track.id;
+                      return ListTile(
+                        dense: true,
+                        selected: isSelected,
+                        selectedTileColor: activeTheme.primary.withValues(alpha: 0.2),
+                        leading: Icon(Icons.music_note, color: isSelected ? activeTheme.primary : Colors.white38, size: 18),
+                        title: Text(track.title, style: const TextStyle(fontSize: 13)),
+                        onTap: () {
+                          setState(() {
+                            _selectedTrack = track;
+                            _customPath = track.filePath;
+                            _customTitle = track.title;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.folder_open_rounded, size: 16),
+                label: const Text('Выбрать локальный аудиофайл...'),
+                onPressed: () async {
+                  final result = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a'],
+                  );
+                  if (result != null && result.files.single.path != null) {
+                    final path = result.files.single.path!;
+                    final name = result.files.single.name.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+                    setState(() {
+                      _selectedTrack = null;
+                      _customPath = path;
+                      _customTitle = name;
+                    });
+                  }
+                },
+              ),
+              if (_customTitle.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text('Выбран: $_customTitle', style: TextStyle(color: activeTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+              ],
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  const Text('Громкость:', style: TextStyle(fontSize: 12)),
+                  Expanded(
+                    child: Slider(
+                      value: _volume,
+                      onChanged: (v) => setState(() => _volume = v),
+                    ),
+                  ),
+                  Text('${(_volume * 100).toInt()}%', style: const TextStyle(fontSize: 12)),
+                ],
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Постоянный слой (не сбрасывать при смене сцены)', style: TextStyle(fontSize: 13)),
+                value: _isPersistent,
+                activeTrackColor: activeTheme.primary,
+                onChanged: (v) => setState(() => _isPersistent = v),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Отмена'),
+        ),
+        ElevatedButton(
+          onPressed: _customPath.isEmpty
+              ? null
+              : () {
+                  final layerId = _selectedTrack?.id ?? const Uuid().v4();
+                  widget.ambient.addLayer(
+                    AmbientLayer(
+                      id: layerId,
+                      title: _customTitle.isNotEmpty ? _customTitle : 'Эмбиент',
+                      filePath: _customPath,
+                      volume: _volume,
+                      isPersistent: _isPersistent,
+                      isActive: false,
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+          child: const Text('Добавить слой'),
+        ),
+      ],
     );
   }
 }

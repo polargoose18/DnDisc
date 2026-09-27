@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../audio/audio_engine_service.dart';
 import '../../services/settings_service.dart';
-import '../widgets/scene_selector_panel.dart';
-import '../widgets/music_player_panel.dart';
-import '../widgets/ambient_mixer_panel.dart';
-import '../widgets/soundboard_grid.dart';
+import '../../services/shortcut_service.dart';
 import '../widgets/logger_console_drawer.dart';
+import 'responsive_gm_dashboard.dart';
 import 'library_screen.dart';
 import 'settings_screen.dart';
 
@@ -49,22 +47,55 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
           ],
         ),
         actions: [
+          // Manual Ducking Button
+          Consumer<AudioEngineService>(
+            builder: (context, engine, _) {
+              return IconButton(
+                icon: const Icon(Icons.volume_down_rounded),
+                tooltip: 'Ручной Ducking [D]',
+                onPressed: () => engine.triggerManualDuck(),
+              );
+            },
+          ),
+          // Master Mute & Volume
           Consumer<AudioEngineService>(
             builder: (context, engine, _) {
               return Row(
                 children: [
-                  const Icon(Icons.volume_up),
+                  IconButton(
+                    icon: Icon(engine.isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded),
+                    tooltip: engine.isMuted ? 'Включить звук [M]' : 'Заглушить [M]',
+                    color: engine.isMuted ? Colors.redAccent : null,
+                    onPressed: () => engine.toggleMute(),
+                  ),
                   SizedBox(
-                    width: 100,
+                    width: 140,
                     child: Slider(
                       value: engine.masterVolume,
                       onChanged: (val) => engine.setMasterVolume(val),
                     ),
                   ),
+                  Text(
+                    '${(engine.masterVolume * 100).toInt()}%',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 6),
                 ],
               );
             },
           ),
+          // Fullscreen Toggle
+          Consumer<ShortcutService?>(
+            builder: (context, shortcuts, _) {
+              final isFull = shortcuts?.isFullscreen ?? false;
+              return IconButton(
+                icon: Icon(isFull ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded),
+                tooltip: 'Полноэкранный режим [F11]',
+                onPressed: () => shortcuts?.handleActionDirectly(AppShortcutAction.toggleFullscreen),
+              );
+            },
+          ),
+          // Log Console
           Consumer<SettingsService>(
             builder: (context, settings, _) {
               if (!settings.showLogConsoleIcon) return const SizedBox.shrink();
@@ -83,20 +114,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
       body: TabBarView(
         controller: _tabController,
         children: const [
-          // Tab 1: Live GM Mixer Dashboard with SceneSelector
-          SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(12.0),
-              child: Column(
-                children: [
-                  SceneSelectorPanel(),
-                  MusicPlayerPanel(),
-                  AmbientMixerPanel(),
-                  SoundboardGrid(),
-                ],
-              ),
-            ),
-          ),
+          // Tab 1: Responsive GM Dashboard (Desktop 3-column / Mobile tabbed + MiniPlayer)
+          ResponsiveGmDashboard(),
 
           // Tab 2: Central Media Library
           LibraryScreen(),
