@@ -4,6 +4,8 @@ import '../../l10n/app_localizations.dart';
 import '../../domain/models/library_track.dart';
 import '../../ui/view_models/media_library_view_model.dart';
 import '../../audio/audio_engine_service.dart';
+import 'package:file_picker/file_picker.dart';
+import '../../services/media_package_service.dart';
 import '../widgets/import_track_dialog.dart';
 
 class LibraryScreen extends StatelessWidget {
@@ -58,6 +60,19 @@ class LibraryScreen extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      key: const ValueKey('export_media_package_button'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: library.tracks.isEmpty ? null : () => _handleExportMediaPackage(context, library),
+                      icon: const Icon(Icons.archive_outlined),
+                      label: const Text('Экспорт набора'),
                     ),
                   ],
                 ),
@@ -259,6 +274,75 @@ class LibraryScreen extends StatelessWidget {
         return Icons.graphic_eq_rounded;
       case AudioBusType.sfx:
         return Icons.bolt_rounded;
+    }
+  }
+
+  Future<void> _handleExportMediaPackage(BuildContext context, MediaLibraryViewModel library) async {
+    final titleController = TextEditingController(text: 'Мой Медиа Набор');
+    final descController = TextEditingController(text: 'Коллекция аудиодорожек для TTRPG');
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Экспорт Медиа-набора (.media.zip)'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(labelText: 'Название набора'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: 'Описание набора'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Отмена'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Экспортировать'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final sanitized = titleController.text.trim().replaceAll(RegExp(r'[^\w\s\-]'), '_');
+        final savePath = await FilePicker.platform.saveFile(
+          dialogTitle: 'Сохранить медиа-набор как...',
+          fileName: '${sanitized}.media.zip',
+          type: FileType.custom,
+          allowedExtensions: ['zip', 'media.zip'],
+        );
+
+        if (savePath != null) {
+          final service = MediaPackageService();
+          await service.exportMediaPackage(
+            tracks: library.tracks,
+            exportZipPath: savePath,
+            title: titleController.text.trim(),
+            description: descController.text.trim(),
+          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Медиа-набор "${titleController.text}" успешно экспортирован!')),
+            );
+          }
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Ошибка экспорта медиа-набора: $e')),
+          );
+        }
+      }
     }
   }
 }

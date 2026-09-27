@@ -233,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @duckAttackTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Время атаки (Duck Attack Time)'**
+  /// **'Время атаки'**
   String get duckAttackTitle;
 
   /// No description provided for @duckAttackSubtitle.
@@ -245,7 +245,7 @@ abstract class AppLocalizations {
   /// No description provided for @duckReleaseTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Время восстановления (Duck Release Time)'**
+  /// **'Время восстановления'**
   String get duckReleaseTitle;
 
   /// No description provided for @duckReleaseSubtitle.
@@ -257,7 +257,7 @@ abstract class AppLocalizations {
   /// No description provided for @duckMultiplierTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Глубина приглушения (Ducking Depth)'**
+  /// **'Глубина приглушения'**
   String get duckMultiplierTitle;
 
   /// No description provided for @duckMultiplierSubtitle.

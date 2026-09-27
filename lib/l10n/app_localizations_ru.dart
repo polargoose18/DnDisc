@@ -77,20 +77,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get duckingTitle => 'Авто-приглушение музыки при SFX (Ducking)';
 
   @override
-  String get duckAttackTitle => 'Время атаки (Duck Attack Time)';
+  String get duckAttackTitle => 'Время атаки';
 
   @override
   String get duckAttackSubtitle => 'скорость затухания музыки при ударе SFX';
 
   @override
-  String get duckReleaseTitle => 'Время восстановления (Duck Release Time)';
+  String get duckReleaseTitle => 'Время восстановления';
 
   @override
   String get duckReleaseSubtitle =>
       'скорость возврата музыки на полную громкость';
 
   @override
-  String get duckMultiplierTitle => 'Глубина приглушения (Ducking Depth)';
+  String get duckMultiplierTitle => 'Глубина приглушения';
 
   @override
   String get duckMultiplierSubtitle => 'от исходной громкости музыки';

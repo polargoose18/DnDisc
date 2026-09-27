@@ -268,9 +268,6 @@ void main() {
         expect(find.text('Отображать иконку консоли логов'), findsOneWidget);
         expect(find.text('Плавные переходы (Fade Engine)'), findsOneWidget);
         expect(find.text('Авто-приглушение музыки при SFX (Ducking)'), findsOneWidget);
-        expect(find.text('Пакеты Пресетов (ZIP Архивы)'), findsOneWidget);
-        expect(find.text('Импорт пресета (ZIP)'), findsOneWidget);
-        expect(find.text('Экспорт пресета в ZIP'), findsOneWidget);
 
         // Проверяем переключение иконки логов
         final logSwitch = find.widgetWithText(SwitchListTile, 'Отображать иконку консоли логов');
@@ -348,7 +345,7 @@ void main() {
     testWidgets(
       'Что проверяем: Выбор языка интерфейса в SettingsScreen и обновление всех локализованных секций экрана. '
       'Входные данные: Отображение SettingsScreen, смена языка на English ("en") и обратно на Русский ("ru") в SettingsService. '
-      'Ожидаемый результат: Переключение appLanguage в SettingsService и перерисовка UI с локализованными заголовками секций ("Interface Language", "Audio Engine Settings", "Fade Engine", "Auto-ducking music during SFX (Ducking)", "Preset Packs (ZIP Archives)", "App Themes", "Centralized Shortcuts").',
+      'Ожидаемый результат: Переключение appLanguage в SettingsService и перерисовка UI с локализованными заголовками секций ("Interface Language", "Audio Engine Settings", "Fade Engine", "Auto-ducking music during SFX (Ducking)", "App Themes", "Centralized Shortcuts").',
       (WidgetTester tester) async {
         final settings = SettingsService();
         final library = MediaLibraryService(autoLoad: false);
@@ -377,7 +374,6 @@ void main() {
         expect(find.text('Audio Engine Settings'), findsOneWidget);
         expect(find.text('Fade Engine'), findsOneWidget);
         expect(find.text('Auto-ducking music during SFX (Ducking)'), findsOneWidget);
-        expect(find.text('Preset Packs (ZIP Archives)'), findsOneWidget);
         expect(find.text('App Themes'), findsOneWidget);
         expect(find.text('Centralized Shortcuts'), findsOneWidget);
 
@@ -389,7 +385,6 @@ void main() {
         expect(find.text('Настройки звукового движка'), findsOneWidget);
         expect(find.text('Плавные переходы (Fade Engine)'), findsOneWidget);
         expect(find.text('Авто-приглушение музыки при SFX (Ducking)'), findsOneWidget);
-        expect(find.text('Пакеты Пресетов (ZIP Архивы)'), findsOneWidget);
         expect(find.text('Темы оформления (Themes)'), findsOneWidget);
         expect(find.text('Централизованные горячие клавиши'), findsOneWidget);
 

@@ -15,6 +15,7 @@ import 'services/shortcut_service.dart';
 import 'ui/view_models/theme_view_model.dart';
 import 'ui/view_models/media_library_view_model.dart';
 import 'ui/view_models/scene_view_model.dart';
+import 'ui/view_models/repository_view_model.dart';
 import 'ui/screens/main_dashboard_screen.dart';
 
 void main() {
@@ -65,6 +66,7 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
                 create: (context) => SceneViewModel(service: context.read<SceneService>()),
                 update: (context, service, viewModel) => viewModel ?? SceneViewModel(service: service),
               ),
+              ChangeNotifierProvider<RepositoryViewModel>(create: (_) => RepositoryViewModel()),
             ],
             child: Consumer2<ThemeViewModel, SettingsService>(
               builder: (context, themeViewModel, settingsService, _) {

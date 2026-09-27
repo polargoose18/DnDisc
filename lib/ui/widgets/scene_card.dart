@@ -16,6 +16,7 @@ class SceneCard extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDuplicate;
   final VoidCallback onDelete;
+  final VoidCallback? onExport;
 
   const SceneCard({
     super.key,
@@ -25,6 +26,7 @@ class SceneCard extends StatelessWidget {
     required this.onEdit,
     required this.onDuplicate,
     required this.onDelete,
+    this.onExport,
   });
 
   @override
@@ -154,6 +156,7 @@ class SceneCard extends StatelessWidget {
                         onSelected: (action) {
                           if (action == 'edit') onEdit();
                           if (action == 'duplicate') onDuplicate();
+                          if (action == 'export' && onExport != null) onExport!();
                           if (action == 'delete') onDelete();
                         },
                         itemBuilder: (ctx) => [
@@ -177,6 +180,17 @@ class SceneCard extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (onExport != null)
+                            PopupMenuItem(
+                              value: 'export',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.archive_outlined, size: 16, color: activeTheme.textPrimary),
+                                  const SizedBox(width: 8),
+                                  Text('Экспорт (.scene.zip)', style: TextStyle(color: activeTheme.textPrimary)),
+                                ],
+                              ),
+                            ),
                           PopupMenuItem(
                             value: 'delete',
                             child: Row(

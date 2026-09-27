@@ -7,6 +7,7 @@ import '../widgets/logger_console_drawer.dart';
 import 'responsive_gm_dashboard.dart';
 import 'library_screen.dart';
 import 'settings_screen.dart';
+import 'repository_catalog_screen.dart';
 
 class MainDashboardScreen extends StatefulWidget {
   const MainDashboardScreen({super.key});
@@ -22,7 +23,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -46,6 +47,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
             Tab(icon: const Icon(Icons.dashboard_rounded), text: l10n?.tabGmDashboard ?? 'Панель Мастера'),
             Tab(icon: const Icon(Icons.library_music_rounded), text: l10n?.tabLibrary ?? 'Общая Библиотека'),
             Tab(icon: const Icon(Icons.settings_rounded), text: l10n?.tabSettings ?? 'Настройки'),
+            Tab(icon: const Icon(Icons.grid_view_rounded), text: 'Каталог'),
           ],
         ),
         actions: [
@@ -115,6 +117,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
 
           // Tab 3: Settings & Preset Manager
           SettingsScreen(),
+
+          // Tab 4: Repository Catalog
+          RepositoryCatalogScreen(),
         ],
       ),
     );

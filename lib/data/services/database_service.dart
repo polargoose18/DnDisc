@@ -6,6 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../../domain/models/library_track.dart';
 import '../../domain/models/scene_model.dart';
 import '../../domain/models/custom_theme_model.dart';
+import '../../domain/models/scene_repository_model.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -35,7 +36,7 @@ class DatabaseService {
 
     return await openDatabase(
       dbPath,
-      version: 3,
+      version: 4,
       onConfigure: (db) async {
         await db.execute('PRAGMA journal_mode = WAL;');
         await db.execute('PRAGMA synchronous = NORMAL;');
@@ -56,6 +57,9 @@ class DatabaseService {
           try {
             await db.execute('ALTER TABLE scenes ADD COLUMN image_path TEXT;');
           } catch (_) {}
+        }
+        if (oldVersion < 4) {
+          await _createSceneRepositoriesTable(db);
         }
         await _createIndexes(db);
       },
@@ -88,6 +92,7 @@ class DatabaseService {
     ''');
     await _createScenesTable(db);
     await _createCustomThemesTable(db);
+    await _createSceneRepositoriesTable(db);
   }
 
   static Future<void> _createScenesTable(Database db) async {
@@ -126,6 +131,19 @@ class DatabaseService {
         battle_intensity_color INTEGER NOT NULL,
         boss_intensity_color INTEGER NOT NULL,
         created_at TEXT NOT NULL
+      )
+    ''');
+  }
+
+  static Future<void> _createSceneRepositoriesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS scene_repositories (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        url TEXT NOT NULL,
+        description TEXT,
+        created_at TEXT NOT NULL,
+        last_synced_at TEXT
       )
     ''');
   }
@@ -322,6 +340,56 @@ class DatabaseService {
     );
     if (maps.isEmpty) return null;
     return CustomThemeModel.fromMap(maps.first);
+  }
+
+  // Scene Repository operations
+  Future<void> insertSceneRepository(SceneRepositoryModel repo) async {
+    final db = await database;
+    await db.insert(
+      'scene_repositories',
+      repo.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> updateSceneRepository(SceneRepositoryModel repo) async {
+    final db = await database;
+    await db.update(
+      'scene_repositories',
+      repo.toMap(),
+      where: 'id = ?',
+      whereArgs: [repo.id],
+    );
+  }
+
+  Future<void> deleteSceneRepository(String id) async {
+    final db = await database;
+    await db.delete(
+      'scene_repositories',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<SceneRepositoryModel>> getAllSceneRepositories() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'scene_repositories',
+      orderBy: 'created_at ASC',
+    );
+    return maps.map((m) => SceneRepositoryModel.fromMap(m)).toList();
+  }
+
+  Future<SceneRepositoryModel?> getSceneRepositoryById(String id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'scene_repositories',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (maps.isEmpty) return null;
+    return SceneRepositoryModel.fromMap(maps.first);
   }
 
   Future<void> close() async {

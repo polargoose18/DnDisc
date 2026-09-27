@@ -8,6 +8,8 @@ import '../../ui/view_models/theme_view_model.dart';
 import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 import '../../audio/audio_engine_service.dart';
+import 'package:file_picker/file_picker.dart';
+import '../../services/scene_package_service.dart';
 import 'create_edit_scene_dialog.dart';
 import 'scene_card.dart';
 
@@ -73,6 +75,14 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                   ),
                 ),
                 const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.archive_outlined, size: 18),
+                  tooltip: 'Экспорт пака сцен (.pack.zip)',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: allScenes.isEmpty ? null : () => _exportScenePack(context, allScenes),
+                ),
+                const SizedBox(width: 6),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.add_rounded, size: 14),
                   label: Text(l10n?.createSceneBtn ?? 'Создать сцену', style: const TextStyle(fontSize: 11)),
@@ -177,6 +187,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                       onDelete: () async {
                         await sceneViewModel.deleteScene(scene.id);
                       },
+                      onExport: () => _exportScene(context, scene),
                     );
                   },
                 ),
@@ -217,6 +228,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                         onDelete: () async {
                           await sceneViewModel.deleteScene(scene.id);
                         },
+                        onExport: () => _exportScene(context, scene),
                       ),
                     );
                   },
@@ -226,5 +238,103 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
         ),
       ),
     );
+  }
+
+  Future<void> _exportScene(BuildContext context, SceneModel scene) async {
+    try {
+      final savePath = await FilePicker.platform.saveFile(
+        dialogTitle: 'Сохранить сцену как...',
+        fileName: '${scene.name.replaceAll(RegExp(r'[^\w\s\-]'), '_')}.scene.zip',
+        type: FileType.custom,
+        allowedExtensions: ['zip', 'scene.zip'],
+      );
+      if (savePath != null) {
+        final packageService = ScenePackageService();
+        await packageService.exportSingleScene(
+          scene: scene,
+          exportZipPath: savePath,
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Сцена "${scene.name}" экспортирована!')),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка при экспорте сцены: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _exportScenePack(BuildContext context, List<SceneModel> scenes) async {
+    final titleController = TextEditingController(text: 'Пак Приключений');
+    final descController = TextEditingController(text: 'Комплект атмосферных сцен');
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Экспорт Пака сцен (.pack.zip)'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(labelText: 'Название пака'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: 'Описание пака'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Отмена'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Экспортировать'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final sanitized = titleController.text.trim().replaceAll(RegExp(r'[^\w\s\-]'), '_');
+        final savePath = await FilePicker.platform.saveFile(
+          dialogTitle: 'Сохранить пак сцен как...',
+          fileName: '${sanitized}.pack.zip',
+          type: FileType.custom,
+          allowedExtensions: ['zip', 'pack.zip'],
+        );
+
+        if (savePath != null) {
+          final packageService = ScenePackageService();
+          await packageService.exportPackPackage(
+            scenes: scenes,
+            exportZipPath: savePath,
+            title: titleController.text.trim(),
+            description: descController.text.trim(),
+          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Пак сцен "${titleController.text}" успешно экспортирован!')),
+            );
+          }
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Ошибка при экспорте пака сцен: $e')),
+          );
+        }
+      }
+    }
   }
 }

@@ -6,7 +6,6 @@ import 'package:path/path.dart' as p;
 import '../../l10n/app_localizations.dart';
 import '../../services/settings_service.dart';
 import '../../services/shortcut_service.dart';
-import '../../services/preset_service.dart';
 import '../../ui/view_models/theme_view_model.dart';
 import '../../ui/view_models/media_library_view_model.dart';
 import '../../ui/view_models/scene_view_model.dart';
@@ -171,7 +170,7 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Attack
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.duckAttackTitle ?? 'Время атаки (Duck Attack Time)', style: TextStyle(color: activeTheme.textPrimary)),
+                        title: Text(l10n?.duckAttackTitle ?? 'Время атаки', style: TextStyle(color: activeTheme.textPrimary)),
                         subtitle: Text('${settings.duckAttackMs} ms — ${l10n?.duckAttackSubtitle ?? 'скорость затухания музыки при ударе SFX'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
@@ -189,7 +188,7 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Release
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.duckReleaseTitle ?? 'Время восстановления (Duck Release Time)', style: TextStyle(color: activeTheme.textPrimary)),
+                        title: Text(l10n?.duckReleaseTitle ?? 'Время восстановления', style: TextStyle(color: activeTheme.textPrimary)),
                         subtitle: Text('${settings.duckReleaseMs} ms — ${l10n?.duckReleaseSubtitle ?? 'скорость возврата музыки на полную громкость'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
@@ -207,7 +206,7 @@ class SettingsScreen extends StatelessWidget {
                       // Duck Multiplier
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.duckMultiplierTitle ?? 'Глубина приглушения (Ducking Depth)', style: TextStyle(color: activeTheme.textPrimary)),
+                        title: Text(l10n?.duckMultiplierTitle ?? 'Глубина приглушения', style: TextStyle(color: activeTheme.textPrimary)),
                         subtitle: Text('${(settings.duckMultiplier * 100).toInt()}% ${l10n?.duckMultiplierSubtitle ?? 'от исходной громкости музыки'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
@@ -227,183 +226,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Section 5: Preset Packs Import / Export
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.archive_rounded, color: activeTheme.secondary),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n?.presetPacksTitle ?? 'Пакеты Пресетов (ZIP Архивы)',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: activeTheme.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 24),
-                      Text(
-                        l10n?.presetPacksSubtitle ?? 'Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые пакеты приключений.',
-                        style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-                      ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.file_download_rounded),
-                            label: Text(l10n?.importPresetBtn ?? 'Импорт пресета (ZIP)'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal.shade700,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                            onPressed: () async {
-                              final result = await FilePicker.platform.pickFiles(
-                                type: FileType.custom,
-                                allowedExtensions: ['zip'],
-                              );
 
-                              if (result != null && result.files.single.path != null) {
-                                try {
-                                  final docsDir = await getApplicationDocumentsDirectory();
-                                  final audioDir = p.join(docsDir.path, 'imported_audio');
-
-                                  final presetService = PresetService();
-                                  final importResult = await presetService.importPreset(
-                                    zipFilePath: result.files.single.path!,
-                                    destinationAudioDir: audioDir,
-                                  );
-
-                                  await mediaLibrary.loadTracks(force: true);
-                                  await sceneViewModel.loadScenes(force: true);
-
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: Colors.teal,
-                                        content: Text(
-                                          'Пресет «${importResult.title}» успешно импортирован! Загружено: ${importResult.importedTracks.length} треков, ${importResult.importedScenes.length} сцен.',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: Colors.redAccent,
-                                        content: Text('Ошибка импорта пресета: $e'),
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                            },
-                          ),
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.file_upload_rounded),
-                            label: Text(l10n?.exportPresetBtn ?? 'Экспорт пресета в ZIP'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: activeTheme.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                            onPressed: () async {
-                              final titleController = TextEditingController(text: 'Мой TTRPG Пресет');
-                              final descController = TextEditingController(text: 'Набор сцен и звуков для партии');
-
-                              final confirmed = await showDialog<bool>(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  backgroundColor: activeTheme.surface,
-                                  title: Text('Экспорт пресета', style: TextStyle(color: activeTheme.textPrimary)),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextField(
-                                        controller: titleController,
-                                        style: TextStyle(color: activeTheme.textPrimary),
-                                        decoration: InputDecoration(
-                                          labelText: 'Название пака',
-                                          labelStyle: TextStyle(color: activeTheme.textSecondary),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      TextField(
-                                        controller: descController,
-                                        style: TextStyle(color: activeTheme.textPrimary),
-                                        decoration: InputDecoration(
-                                          labelText: 'Описание пака',
-                                          labelStyle: TextStyle(color: activeTheme.textSecondary),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(false),
-                                      child: Text('Отмена', style: TextStyle(color: activeTheme.textSecondary)),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () => Navigator.of(ctx).pop(true),
-                                      child: const Text('Экспортировать'),
-                                    ),
-                                  ],
-                                ),
-                              );
-
-                              if (confirmed == true) {
-                                try {
-                                  final docsDir = await getApplicationDocumentsDirectory();
-                                  final sanitized = titleController.text.trim().replaceAll(RegExp(r'[^a-zA-Z0-9_\-]'), '_');
-                                  final outZipPath = p.join(docsDir.path, '${sanitized}_preset.zip');
-
-                                  final presetService = PresetService();
-                                  await presetService.exportPreset(
-                                    exportZipPath: outZipPath,
-                                    title: titleController.text.trim(),
-                                    description: descController.text.trim(),
-                                    scenes: sceneViewModel.scenes,
-                                    tracks: mediaLibrary.tracks,
-                                  );
-
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: Colors.green,
-                                        content: Text('Пресет успешно сохранен в файл: $outZipPath'),
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: Colors.redAccent,
-                                        content: Text('Ошибка экспорта: $e'),
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
 
               // Section 6: Language & Interface Options
               Card(
