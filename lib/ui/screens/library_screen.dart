@@ -5,7 +5,7 @@ import '../../domain/models/library_track.dart';
 import '../../ui/view_models/media_library_view_model.dart';
 import '../../audio/audio_engine_service.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../services/media_package_service.dart';
+import '../../data/services/media_package_service.dart';
 import '../widgets/import_track_dialog.dart';
 
 class LibraryScreen extends StatelessWidget {
@@ -317,7 +317,7 @@ class LibraryScreen extends StatelessWidget {
         final sanitized = titleController.text.trim().replaceAll(RegExp(r'[^\w\s\-]'), '_');
         final savePath = await FilePicker.platform.saveFile(
           dialogTitle: 'Сохранить медиа-набор как...',
-          fileName: '${sanitized}.media.zip',
+          fileName: '$sanitized.media.zip',
           type: FileType.custom,
           allowedExtensions: ['zip', 'media.zip'],
         );

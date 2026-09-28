@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ttrpg_audio_player/services/scene_repository_network_service.dart';
+import 'package:ttrpg_audio_player/data/services/scene_repository_network_service.dart';
 import 'package:ttrpg_audio_player/domain/models/scene_repository_model.dart';
 
 void main() {

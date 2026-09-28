@@ -5,9 +5,9 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/data/repositories/media_library_repository.dart';
-import 'package:ttrpg_audio_player/db/database_service.dart';
+import 'package:ttrpg_audio_player/data/services/database_service.dart';
 import 'package:ttrpg_audio_player/domain/models/library_track.dart';
-import 'package:ttrpg_audio_player/services/media_package_service.dart';
+import 'package:ttrpg_audio_player/data/services/media_package_service.dart';
 
 class FakePathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin

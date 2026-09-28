@@ -36,7 +36,7 @@ class DatabaseService {
 
     return await openDatabase(
       dbPath,
-      version: 4,
+      version: 5,
       onConfigure: (db) async {
         await db.execute('PRAGMA journal_mode = WAL;');
         await db.execute('PRAGMA synchronous = NORMAL;');
@@ -60,6 +60,9 @@ class DatabaseService {
         }
         if (oldVersion < 4) {
           await _createSceneRepositoriesTable(db);
+        }
+        if (oldVersion < 5) {
+          await _createAppSettingsTable(db);
         }
         await _createIndexes(db);
       },
@@ -93,6 +96,7 @@ class DatabaseService {
     await _createScenesTable(db);
     await _createCustomThemesTable(db);
     await _createSceneRepositoriesTable(db);
+    await _createAppSettingsTable(db);
   }
 
   static Future<void> _createScenesTable(Database db) async {
@@ -390,6 +394,38 @@ class DatabaseService {
     );
     if (maps.isEmpty) return null;
     return SceneRepositoryModel.fromMap(maps.first);
+  }
+
+  static Future<void> _createAppSettingsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
+  }
+
+  /// Reads a single persisted setting by [key]. Returns null if not set.
+  Future<String?> getSetting(String key) async {
+    final db = await database;
+    final rows = await db.query(
+      'app_settings',
+      where: 'key = ?',
+      whereArgs: [key],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return rows.first['value'] as String;
+  }
+
+  /// Persists [value] under [key] (INSERT OR REPLACE).
+  Future<void> setSetting(String key, String value) async {
+    final db = await database;
+    await db.insert(
+      'app_settings',
+      {'key': key, 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<void> close() async {

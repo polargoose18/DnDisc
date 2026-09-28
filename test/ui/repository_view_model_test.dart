@@ -4,7 +4,6 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/data/repositories/scene_repository_source_repository.dart';
-import 'package:ttrpg_audio_player/data/services/database_service.dart';
 import 'package:ttrpg_audio_player/domain/models/scene_repository_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/repository_view_model.dart';
 

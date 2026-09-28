@@ -6,9 +6,9 @@ import 'package:uuid/uuid.dart';
 import '../../data/repositories/scene_repository_source_repository.dart';
 import '../../domain/models/scene_repository_model.dart';
 import '../../services/logger_service.dart';
-import '../../services/media_package_service.dart';
-import '../../services/scene_package_service.dart';
-import '../../services/scene_repository_network_service.dart';
+import '../../data/services/media_package_service.dart';
+import '../../data/services/scene_package_service.dart';
+import '../../data/services/scene_repository_network_service.dart';
 
 class RepositoryViewModel extends ChangeNotifier {
   final SceneRepositorySourceRepository _sourceRepo;

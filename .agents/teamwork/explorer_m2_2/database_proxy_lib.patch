@@ -1,0 +1,63 @@
+diff --git a/lib/data/repositories/custom_theme_repository.dart b/lib/data/repositories/custom_theme_repository.dart
+--- a/lib/data/repositories/custom_theme_repository.dart
++++ b/lib/data/repositories/custom_theme_repository.dart
+@@ -1,4 +1,4 @@
+ import '../../domain/models/custom_theme_model.dart';
+-import '../../db/database_service.dart';
++import '../services/database_service.dart';
+ 
+ abstract class CustomThemeRepository {
+diff --git a/lib/data/repositories/media_library_repository.dart b/lib/data/repositories/media_library_repository.dart
+--- a/lib/data/repositories/media_library_repository.dart
++++ b/lib/data/repositories/media_library_repository.dart
+@@ -1,4 +1,4 @@
+ import '../../domain/models/library_track.dart';
+-import '../../db/database_service.dart';
++import '../services/database_service.dart';
+ 
+ abstract class MediaLibraryRepository {
+ diff --git a/lib/data/repositories/scene_repository.dart b/lib/data/repositories/scene_repository.dart
+--- a/lib/data/repositories/scene_repository.dart
++++ b/lib/data/repositories/scene_repository.dart
+@@ -1,4 +1,4 @@
+ import '../../domain/models/scene_model.dart';
+-import '../../db/database_service.dart';
++import '../services/database_service.dart';
+ 
+ abstract class SceneRepository {
+diff --git a/lib/services/media_package_service.dart b/lib/services/media_package_service.dart
+--- a/lib/services/media_package_service.dart
++++ b/lib/services/media_package_service.dart
+@@ -5,4 +5,4 @@
+ 
+ import '../data/repositories/media_library_repository.dart';
+-import '../db/database_service.dart';
++import '../data/services/database_service.dart';
+ import '../domain/models/library_track.dart';
+diff --git a/lib/services/scene_package_service.dart b/lib/services/scene_package_service.dart
+--- a/lib/services/scene_package_service.dart
++++ b/lib/services/scene_package_service.dart
+@@ -5,4 +5,4 @@
+ import '../data/repositories/media_library_repository.dart';
+ import '../data/repositories/scene_repository.dart';
+-import '../db/database_service.dart';
++import '../data/services/database_service.dart';
+ import '../domain/models/library_track.dart';
+diff --git a/lib/services/theme_service.dart b/lib/services/theme_service.dart
+--- a/lib/services/theme_service.dart
++++ b/lib/services/theme_service.dart
+@@ -4,4 +4,4 @@
+ import '../domain/models/custom_theme_model.dart';
+ import '../theme/app_themes.dart';
+-import '../db/database_service.dart';
++import '../data/services/database_service.dart';
+ import 'logger_service.dart';
+diff --git a/lib/ui/view_models/theme_view_model.dart b/lib/ui/view_models/theme_view_model.dart
+--- a/lib/ui/view_models/theme_view_model.dart
++++ b/lib/ui/view_models/theme_view_model.dart
+@@ -3,4 +3,4 @@
+ import '../../data/repositories/custom_theme_repository.dart';
+ import '../../domain/models/custom_theme_model.dart';
+-import '../../db/database_service.dart';
++import '../../data/services/database_service.dart';
+ 

@@ -1,5 +1,5 @@
 import '../../domain/models/scene_model.dart';
-import '../../db/database_service.dart';
+import '../services/database_service.dart';
 
 abstract class SceneRepository {
   Future<List<SceneModel>> getAllScenes();

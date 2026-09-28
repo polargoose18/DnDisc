@@ -9,7 +9,7 @@ import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 import '../../audio/audio_engine_service.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../services/scene_package_service.dart';
+import '../../data/services/scene_package_service.dart';
 import 'create_edit_scene_dialog.dart';
 import 'scene_card.dart';
 
@@ -309,7 +309,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
         final sanitized = titleController.text.trim().replaceAll(RegExp(r'[^\w\s\-]'), '_');
         final savePath = await FilePicker.platform.saveFile(
           dialogTitle: 'Сохранить пак сцен как...',
-          fileName: '${sanitized}.pack.zip',
+          fileName: '$sanitized.pack.zip',
           type: FileType.custom,
           allowedExtensions: ['zip', 'pack.zip'],
         );

@@ -72,5 +72,8 @@
   "musicNotPlaying": "Music is not playing",
   "musicTrack": "Music Track",
   "intensityLevel": "Intensity Level",
-  "stopMusic": "Stop music"
+  "stopMusic": "Stop music",
+  "pausedSuffix": "(Paused)",
+  "noAmbientTracksInLibrary": "No ambient tracks in the library.",
+  "noSfxTracksInLibrary": "No SFX tracks in the library."
 }

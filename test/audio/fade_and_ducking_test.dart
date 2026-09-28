@@ -3,8 +3,8 @@ import 'package:ttrpg_audio_player/audio/fade_controller.dart';
 import 'package:ttrpg_audio_player/audio/ducking_controller.dart';
 import 'package:ttrpg_audio_player/audio/music_bus_controller.dart';
 import 'package:ttrpg_audio_player/audio/ambient_bus_controller.dart';
-import 'package:ttrpg_audio_player/models/audio_track.dart';
-import 'package:ttrpg_audio_player/models/ambient_layer.dart';
+import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
+import 'package:ttrpg_audio_player/domain/models/ambient_layer.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../services/theme_service.dart';
+import '../../data/services/theme_service.dart';
 import '../../data/repositories/custom_theme_repository.dart';
 import '../../domain/models/custom_theme_model.dart';
-import '../../db/database_service.dart';
+import '../../data/services/database_service.dart';
 
 /// ThemeViewModel manages presentation state and custom theme interactions in compliance with MVVM architecture.
 class ThemeViewModel extends ChangeNotifier {

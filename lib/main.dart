@@ -6,11 +6,12 @@ import 'audio/audio_engine_service.dart';
 import 'audio/music_bus_controller.dart';
 import 'audio/ambient_bus_controller.dart';
 import 'audio/sfx_bus_controller.dart';
-import 'services/media_library_service.dart';
-import 'services/settings_service.dart';
-import 'services/scene_service.dart';
+import 'data/services/media_library_service.dart';
+import 'data/services/settings_service.dart';
+import 'data/services/scene_service.dart';
+import 'data/services/database_service.dart';
 import 'services/logger_service.dart';
-import 'services/theme_service.dart';
+import 'data/services/theme_service.dart';
 import 'services/shortcut_service.dart';
 import 'ui/view_models/theme_view_model.dart';
 import 'ui/view_models/media_library_view_model.dart';
@@ -32,7 +33,13 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<LoggerService>(create: (_) => LoggerService()),
         ChangeNotifierProvider<SettingsService>(create: (_) => SettingsService()),
-        ChangeNotifierProvider<ThemeService>(create: (_) => ThemeService()),
+        ChangeNotifierProvider<ThemeService>(
+          create: (_) {
+            final svc = ThemeService(dbService: DatabaseService());
+            svc.loadActiveThemeId();
+            return svc;
+          },
+        ),
         ChangeNotifierProxyProvider<ThemeService, ThemeViewModel>(
           create: (context) => ThemeViewModel(service: context.read<ThemeService>()),
           update: (context, service, viewModel) => viewModel ?? ThemeViewModel(service: service),

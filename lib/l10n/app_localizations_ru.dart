@@ -236,4 +236,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get stopMusic => 'Остановить музыку';
+
+  @override
+  String get pausedSuffix => '(Пауза)';
+
+  @override
+  String get noAmbientTracksInLibrary =>
+      'В библиотеке нет треков с типом \"Эмбиент\".';
+
+  @override
+  String get noSfxTracksInLibrary => 'В библиотеке нет SFX-треков.';
 }

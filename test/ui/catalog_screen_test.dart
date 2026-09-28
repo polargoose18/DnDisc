@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/data/repositories/scene_repository_source_repository.dart';
 import 'package:ttrpg_audio_player/domain/models/scene_repository_model.dart';
-import 'package:ttrpg_audio_player/services/scene_repository_network_service.dart';
+import 'package:ttrpg_audio_player/data/services/scene_repository_network_service.dart';
 import 'package:ttrpg_audio_player/ui/screens/repository_catalog_screen.dart';
 import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/repository_view_model.dart';

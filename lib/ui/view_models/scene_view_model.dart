@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import '../../services/scene_service.dart';
+import '../../data/services/scene_service.dart';
 import '../../data/repositories/scene_repository.dart';
 import '../../domain/models/scene_model.dart';
 import '../../audio/audio_engine_service.dart';
-import '../../services/media_library_service.dart';
+import '../../data/services/media_library_service.dart';
 
 /// SceneViewModel manages UI presentation state and scene interactions in compliance with MVVM architecture.
 class SceneViewModel extends ChangeNotifier {

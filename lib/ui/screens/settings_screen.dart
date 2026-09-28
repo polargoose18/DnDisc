@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 import '../../l10n/app_localizations.dart';
-import '../../services/settings_service.dart';
+import '../../data/services/settings_service.dart';
 import '../../services/shortcut_service.dart';
 import '../../ui/view_models/theme_view_model.dart';
-import '../../ui/view_models/media_library_view_model.dart';
-import '../../ui/view_models/scene_view_model.dart';
 import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 import '../widgets/custom_theme_editor_dialog.dart';
@@ -21,8 +16,6 @@ class SettingsScreen extends StatelessWidget {
     final settings = context.watch<SettingsService>();
     final themeViewModel = context.watch<ThemeViewModel?>();
     final shortcutService = context.watch<ShortcutService?>();
-    final mediaLibrary = context.watch<MediaLibraryViewModel>();
-    final sceneViewModel = context.watch<SceneViewModel>();
     final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final l10n = AppLocalizations.of(context);
 

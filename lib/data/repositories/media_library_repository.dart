@@ -1,5 +1,5 @@
 import '../../domain/models/library_track.dart';
-import '../../db/database_service.dart';
+import '../services/database_service.dart';
 
 abstract class MediaLibraryRepository {
   Future<List<LibraryTrack>> getAllTracks();

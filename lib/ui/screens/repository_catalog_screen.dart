@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/scene_repository_model.dart';
-import '../../services/scene_repository_network_service.dart';
+import '../../data/services/scene_repository_network_service.dart';
 import '../view_models/repository_view_model.dart';
 import '../view_models/scene_view_model.dart';
 import '../widgets/scene_repository_details_dialog.dart';
@@ -449,7 +449,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.65),
+                                      color: Colors.black.withValues(alpha: 0.65),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(

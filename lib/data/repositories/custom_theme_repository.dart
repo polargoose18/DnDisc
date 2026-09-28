@@ -1,5 +1,5 @@
 import '../../domain/models/custom_theme_model.dart';
-import '../../db/database_service.dart';
+import '../services/database_service.dart';
 
 abstract class CustomThemeRepository {
   Future<List<CustomThemeModel>> getAllCustomThemes();

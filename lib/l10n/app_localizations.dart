@@ -535,6 +535,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Остановить музыку'**
   String get stopMusic;
+
+  /// No description provided for @pausedSuffix.
+  ///
+  /// In ru, this message translates to:
+  /// **'(Пауза)'**
+  String get pausedSuffix;
+
+  /// No description provided for @noAmbientTracksInLibrary.
+  ///
+  /// In ru, this message translates to:
+  /// **'В библиотеке нет треков с типом \"Эмбиент\".'**
+  String get noAmbientTracksInLibrary;
+
+  /// No description provided for @noSfxTracksInLibrary.
+  ///
+  /// In ru, this message translates to:
+  /// **'В библиотеке нет SFX-треков.'**
+  String get noSfxTracksInLibrary;
 }
 
 class _AppLocalizationsDelegate

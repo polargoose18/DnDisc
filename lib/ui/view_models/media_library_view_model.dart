@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../../services/media_library_service.dart';
+import '../../data/services/media_library_service.dart';
 import '../../data/repositories/media_library_repository.dart';
 import '../../domain/models/library_track.dart';
 import '../../audio/audio_engine_service.dart';

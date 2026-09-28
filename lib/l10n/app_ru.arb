@@ -72,5 +72,8 @@
   "musicNotPlaying": "Музыка не воспроизводится",
   "musicTrack": "Музыкальная дорожка",
   "intensityLevel": "Уровень Интенсивности",
-  "stopMusic": "Остановить музыку"
+  "stopMusic": "Остановить музыку",
+  "pausedSuffix": "(Пауза)",
+  "noAmbientTracksInLibrary": "В библиотеке нет треков с типом \"Эмбиент\".",
+  "noSfxTracksInLibrary": "В библиотеке нет SFX-треков."
 }

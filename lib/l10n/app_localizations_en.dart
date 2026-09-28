@@ -234,4 +234,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stopMusic => 'Stop music';
+
+  @override
+  String get pausedSuffix => '(Paused)';
+
+  @override
+  String get noAmbientTracksInLibrary => 'No ambient tracks in the library.';
+
+  @override
+  String get noSfxTracksInLibrary => 'No SFX tracks in the library.';
 }

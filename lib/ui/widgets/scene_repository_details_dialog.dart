@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/scene_repository_model.dart';
-import '../../services/scene_repository_network_service.dart';
+import '../../data/services/scene_repository_network_service.dart';
 import '../view_models/media_library_view_model.dart';
 import '../view_models/repository_view_model.dart';
 import '../view_models/scene_view_model.dart';
@@ -97,7 +97,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                 color: headerColor,
                 gradient: coverUrl == null
                     ? LinearGradient(
-                        colors: [headerColor.withOpacity(0.8), headerColor],
+                        colors: [headerColor.withValues(alpha: 0.8), headerColor],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
@@ -110,7 +110,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                       child: Image.network(
                         coverUrl,
                         fit: BoxFit.cover,
-                        color: Colors.black.withOpacity(0.55),
+                        color: Colors.black.withValues(alpha: 0.55),
                         colorBlendMode: BlendMode.darken,
                         errorBuilder: (ctx, err, stack) => const SizedBox.shrink(),
                       ),
@@ -155,7 +155,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                         Text(
                           'Репозиторий: ${repo.name}',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                           ),
                         ),
                       ],
@@ -242,7 +242,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                           return ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: CircleAvatar(
-                              backgroundColor: busColor.withOpacity(0.2),
+                              backgroundColor: busColor.withValues(alpha: 0.2),
                               child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
                             ),
                             title: Text(track.title),
@@ -267,7 +267,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                           return ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: CircleAvatar(
-                              backgroundColor: busColor.withOpacity(0.2),
+                              backgroundColor: busColor.withValues(alpha: 0.2),
                               child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
                             ),
                             title: Text(track.title),

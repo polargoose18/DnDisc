@@ -4,7 +4,7 @@ import 'ambient_bus_controller.dart';
 import 'sfx_bus_controller.dart';
 import 'ducking_controller.dart';
 import '../services/logger_service.dart';
-import '../services/settings_service.dart';
+import '../data/services/settings_service.dart';
 
 class AudioEngineService extends ChangeNotifier {
   late final MusicBusController musicBus;

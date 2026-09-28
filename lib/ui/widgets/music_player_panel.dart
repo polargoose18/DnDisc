@@ -63,7 +63,7 @@ class MusicPlayerPanel extends StatelessWidget {
                     Expanded(
                       child: Text(
                         track != null
-                            ? '${l10n?.nowPlaying ?? "Сейчас играет"}: ${track.title} ${music.isPlaying ? '' : '(Пауза)'}'
+                            ? '${l10n?.nowPlaying ?? "Сейчас играет"}: ${track.title} ${music.isPlaying ? '' : (l10n?.pausedSuffix ?? '(Пауза)')}'
                             : (l10n?.musicNotPlaying ?? 'Музыка не воспроизводится'),
                         style: TextStyle(
                           color: track != null ? activeTheme.textPrimary : activeTheme.textSecondary,

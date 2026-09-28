@@ -7,6 +7,7 @@ import '../../domain/models/audio_track.dart';
 import '../../domain/models/library_track.dart';
 import '../../domain/models/scene_model.dart';
 import '../../ui/view_models/media_library_view_model.dart';
+import '../../l10n/app_localizations.dart';
 
 class CreateEditSceneDialog extends StatefulWidget {
   final SceneModel? scene;
@@ -437,7 +438,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                         setState(() => _ambientQuery = '');
                       },
                       child: allAmbientTracks.isEmpty
-                          ? const Text('В библиотеке нет треков с типом "Эмбиент".', style: TextStyle(color: Colors.grey))
+                          ? Text(AppLocalizations.of(context)?.noAmbientTracksInLibrary ?? 'В библиотеке нет треков с типом "Эмбиент".', style: const TextStyle(color: Colors.grey))
                           : Column(
                               children: [
                                 if (filteredAmbient.isEmpty && _ambientQuery.isNotEmpty)
