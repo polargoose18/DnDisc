@@ -22,9 +22,11 @@ void main() {
       musicBus.dispose();
     });
 
-    test('Что проверяем: Начальное состояние MusicBusController. '
-        'Входные данные: Новый экземпляра MusicBusController. '
-        'Ожидаемый результат: currentTrack=null, isPlaying=false, rawVolume=1.0, effectiveVolume=1.0, intensity=calm.', () {
+    test('should initialize with default idle state when constructed', () {
+      // Arrange & Act
+      // Initialized in setUp
+
+      // Assert
       expect(musicBus.currentTrack, isNull);
       expect(musicBus.isPlaying, isFalse);
       expect(musicBus.rawVolume, equals(1.0));
@@ -32,49 +34,56 @@ void main() {
       expect(musicBus.currentIntensity, equals(MusicIntensity.calm));
     });
 
-    test('Что проверяем: Изменение уровня интенсивности (setIntensity). '
-        'Входные данные: setIntensity(MusicIntensity.boss). '
-        'Ожидаемый результат: currentIntensity меняется на boss, вызывается notifyListeners. При повторной установке того же значения слушатели не извещаются.', () {
+    test('should update intensity and notify listeners only when intensity actually changes', () {
+      // Arrange
       int notifyCount = 0;
       musicBus.addListener(() => notifyCount++);
 
+      // Act
       musicBus.setIntensity(MusicIntensity.boss);
 
+      // Assert
       expect(musicBus.currentIntensity, equals(MusicIntensity.boss));
       expect(notifyCount, equals(1));
 
-      // Повторный вызов с той же интенсивностью
+      // Act - repeat call with identical value
       musicBus.setIntensity(MusicIntensity.boss);
+
+      // Assert - no additional notification
       expect(notifyCount, equals(1));
     });
 
-    test('Что проверяем: Установка громкости (setVolume) и валидация диапазонов (clamp). '
-        'Входные данные: setVolume(0.7) и выходящие за рамки значения (-0.5 и 1.5). '
-        'Ожидаемый результат: Значение громкости ограничивается в интервале [0.0, 1.0].', () {
+    test('should clamp raw and effective volume within [0.0, 1.0] when out-of-bounds values are set', () {
+      // Arrange & Act
       musicBus.setVolume(0.7);
+
+      // Assert
       expect(musicBus.rawVolume, equals(0.7));
       expect(musicBus.effectiveVolume, equals(0.7));
 
+      // Act & Assert lower bound
       musicBus.setVolume(-0.5);
       expect(musicBus.rawVolume, equals(0.0));
 
+      // Act & Assert upper bound
       musicBus.setVolume(1.5);
       expect(musicBus.rawVolume, equals(1.0));
     });
 
-    test('Что проверяем: Расчет эффективной громкости при автоприглушении (updateDuckingMultiplier). '
-        'Входные данные: rawVolume=0.8 и multiplier=0.4. '
-        'Ожидаемый результат: effectiveVolume равен 0.8 * 0.4 = 0.32.', () {
+    test('should calculate effective volume correctly when ducking multiplier is updated', () {
+      // Arrange
       musicBus.setVolume(0.8);
+
+      // Act
       musicBus.updateDuckingMultiplier(0.4);
 
+      // Assert
       expect(musicBus.rawVolume, equals(0.8));
       expect(musicBus.effectiveVolume, closeTo(0.32, 0.001));
     });
 
-    test('Что проверяем: Обработка воспроизведения несуществующего локального файла. '
-        'Входные данные: playTrack с несуществующим файлом /non_existent_file.mp3. '
-        'Ожидаемый результат: currentTrack и intensity обновляются, но isPlaying остаётся false из-за отсутствия файла.', () async {
+    test('should update current track metadata but remain paused when playing non-existent file', () async {
+      // Arrange
       const track = AudioTrack(
         id: 'missing-1',
         title: 'Ghost Song',
@@ -82,16 +91,17 @@ void main() {
         intensity: MusicIntensity.suspense,
       );
 
+      // Act
       await musicBus.playTrack(track);
 
+      // Assert
       expect(musicBus.currentTrack, equals(track));
       expect(musicBus.currentIntensity, equals(MusicIntensity.suspense));
       expect(musicBus.isPlaying, isFalse);
     });
 
-    test('Что проверяем: Управление паузой, возобновлением и остановкой. '
-        'Входные данные: Вызовы pause(), resume() и stop() при установленном треке. '
-        'Ожидаемый результат: Состояние isPlaying и currentTrack корректно обновляются.', () async {
+    test('should correctly transition playback state when pause, resume, and stop are invoked', () async {
+      // Arrange
       const track = AudioTrack(
         id: 'dummy',
         title: 'Dummy Track',
@@ -99,21 +109,25 @@ void main() {
       );
       await musicBus.playTrack(track);
 
+      // Act & Assert - Pause
       await musicBus.pause();
       expect(musicBus.isPlaying, isFalse);
 
+      // Act & Assert - Resume
       await musicBus.resume();
       expect(musicBus.isPlaying, isTrue);
 
+      // Act & Assert - Stop
       await musicBus.stop();
       expect(musicBus.isPlaying, isFalse);
       expect(musicBus.currentTrack, isNull);
     });
 
-    test('Что проверяем: Вызов resume() при отсутствии загруженного трека (currentTrack == null). '
-        'Входные данные: Вызов resume() на свежем MusicBusController. '
-        'Ожидаемый результат: isPlaying остаётся false, состояние не изменяется.', () async {
+    test('should remain in idle state when resume is called without an active track', () async {
+      // Arrange & Act
       await musicBus.resume();
+
+      // Assert
       expect(musicBus.isPlaying, isFalse);
       expect(musicBus.currentTrack, isNull);
     });
@@ -130,70 +144,78 @@ void main() {
       ambientBus.dispose();
     });
 
-    test('Что проверяем: Добавление слоев и предотвращение дубликатов по ID. '
-        'Входные данные: Добавление слоя "Rain" дважды с одинаковым ID. '
-        'Ожидаемый результат: В списке layers остаётся ровно один слой.', () {
+    test('should ignore duplicate layer additions when layer ID already exists', () {
+      // Arrange
       const layer = AmbientLayer(id: 'rain-1', title: 'Rain', filePath: '/rain.mp3');
 
+      // Act
       ambientBus.addLayer(layer);
-      expect(ambientBus.layers.length, equals(1));
+      ambientBus.addLayer(layer);
 
-      ambientBus.addLayer(layer);
+      // Assert
       expect(ambientBus.layers.length, equals(1));
     });
 
-    test('Что проверяем: Переключение активности слоя (toggleLayer). '
-        'Входные данные: Слой inactive=false, вызов toggleLayer("rain-1"). '
-        'Ожидаемый результат: Флаг isActive меняется на true, а затем при повторном вызове - обратно на false.', () async {
+    test('should toggle active state of ambient layer when toggleLayer is invoked', () async {
+      // Arrange
       const layer = AmbientLayer(id: 'rain-1', title: 'Rain', filePath: '/rain.mp3', isActive: false);
       ambientBus.addLayer(layer);
 
+      // Act - activate
       await ambientBus.toggleLayer('rain-1');
+
+      // Assert
       expect(ambientBus.layers.firstWhere((l) => l.id == 'rain-1').isActive, isTrue);
 
+      // Act - deactivate
       await ambientBus.toggleLayer('rain-1');
+
+      // Assert
       expect(ambientBus.layers.firstWhere((l) => l.id == 'rain-1').isActive, isFalse);
     });
 
-    test('Что проверяем: Вызов toggleLayer и setLayerVolume для несуществующего layerId. '
-        'Входные данные: toggleLayer("non-existent") и setLayerVolume("non-existent", 0.5). '
-        'Ожидаемый результат: Метод завершается без ошибок, список слоев не изменяется.', () async {
+    test('should handle non-existent layer ID gracefully when toggling or adjusting volume', () async {
+      // Arrange
       const layer = AmbientLayer(id: 'rain-1', title: 'Rain', filePath: '/rain.mp3');
       ambientBus.addLayer(layer);
 
+      // Act
       await ambientBus.toggleLayer('non-existent');
-      expect(ambientBus.layers.first.isActive, isFalse);
-
       ambientBus.setLayerVolume('non-existent', 0.5);
+
+      // Assert
+      expect(ambientBus.layers.first.isActive, isFalse);
       expect(ambientBus.layers.first.volume, equals(0.8));
     });
 
-    test('Что проверяем: Изменение индивидуальной громкости слоя (setLayerVolume). '
-        'Входные данные: setLayerVolume("rain-1", 0.35). '
-        'Ожидаемый результат: Громкость слоя обновилась до 0.35 с клампингом.', () {
+    test('should update and clamp individual layer volume when setLayerVolume is called', () {
+      // Arrange
       const layer = AmbientLayer(id: 'rain-1', title: 'Rain', filePath: '/rain.mp3', volume: 0.8);
       ambientBus.addLayer(layer);
 
+      // Act & Assert valid range
       ambientBus.setLayerVolume('rain-1', 0.35);
       expect(ambientBus.layers.first.volume, equals(0.35));
 
+      // Act & Assert clamped upper bound
       ambientBus.setLayerVolume('rain-1', 1.5);
       expect(ambientBus.layers.first.volume, equals(1.0));
     });
 
-    test('Что проверяем: Установка мастер-громкости эмбиента с ограничением значений (clamp). '
-        'Входные данные: setMasterVolume(-0.5) и setMasterVolume(1.8). '
-        'Ожидаемый результат: masterVolume ограничивается [0.0, 1.0].', () {
+    test('should clamp ambient master volume to [0.0, 1.0] when out-of-range value is supplied', () {
+      // Arrange & Act
       ambientBus.setMasterVolume(-0.5);
+
+      // Assert
       expect(ambientBus.masterVolume, equals(0.0));
 
+      // Act & Assert
       ambientBus.setMasterVolume(1.8);
       expect(ambientBus.masterVolume, equals(1.0));
     });
 
-    test('Что проверяем: Остановка всех активных слоёв (stopAllLayers). '
-        'Входные данные: Три слоя, два из которых активны. Вызов stopAllLayers(). '
-        'Ожидаемый результат: Все слои получают isActive=false.', () async {
+    test('should deactivate all layers when stopAllLayers is called', () async {
+      // Arrange
       const l1 = AmbientLayer(id: 'l1', title: 'Rain', filePath: '/r.mp3', isActive: true);
       const l2 = AmbientLayer(id: 'l2', title: 'Wind', filePath: '/w.mp3', isActive: true);
       const l3 = AmbientLayer(id: 'l3', title: 'Birds', filePath: '/b.mp3', isActive: false);
@@ -202,8 +224,10 @@ void main() {
       ambientBus.addLayer(l2);
       ambientBus.addLayer(l3);
 
+      // Act
       await ambientBus.stopAllLayers();
 
+      // Assert
       expect(ambientBus.layers.every((l) => !l.isActive), isTrue);
     });
   });
@@ -221,46 +245,53 @@ void main() {
       );
     });
 
-    test('Что проверяем: Регистрация триггеров SFX и запуск триггера с вызовом колбэка onSfxTriggered. '
-        'Входные данные: Добавление SfxTrigger("sword-1") и вызов triggerSfx("sword-1"). '
-        'Ожидаемый результат: Триггер добавлен, callbackFired=true.', () async {
+    test('should register trigger and invoke callback when triggerSfx is executed', () async {
+      // Arrange
       const trigger = SfxTrigger(id: 'sword-1', title: 'Sword', filePath: '/sfx/sword.wav');
       sfxBus.addTrigger(trigger);
 
       expect(sfxBus.triggers.length, equals(1));
 
+      // Act
       await sfxBus.triggerSfx('sword-1');
+
+      // Assert
       expect(callbackFired, isTrue);
     });
 
-    test('Что проверяем: Запуск триггера по несуществующему ID в SfxBusController. '
-        'Входные данные: triggerSfx("non-existent-id"). '
-        'Ожидаемый результат: Колбэк onSfxTriggered НЕ вызывается, ошибок не возникает.', () async {
+    test('should not fire trigger callback when trigger ID does not exist', () async {
+      // Arrange & Act
       await sfxBus.triggerSfx('non-existent-id');
+
+      // Assert
       expect(callbackFired, isFalse);
     });
 
-    test('Что проверяем: Установка громкости шины SFX (setVolume) и расчет effectiveVolume. '
-        'Входные данные: setVolume(0.7) и setMasterVolume(0.5). '
-        'Ожидаемый результат: rawVolume=0.7, masterVolume=0.5, effectiveVolume=0.35.', () {
+    test('should calculate effective volume correctly from raw and master volumes', () {
+      // Arrange & Act
       sfxBus.setVolume(0.7);
       sfxBus.setMasterVolume(0.5);
+
+      // Assert
       expect(sfxBus.rawVolume, equals(0.7));
       expect(sfxBus.masterVolume, equals(0.5));
       expect(sfxBus.effectiveVolume, closeTo(0.35, 0.001));
 
+      // Act & Assert clamping
       sfxBus.setVolume(-0.2);
       expect(sfxBus.rawVolume, equals(0.0));
       sfxBus.setVolume(1.5);
       expect(sfxBus.rawVolume, equals(1.0));
     });
 
-    test('Что проверяем: Установка общей мастер-громкости SFX (setMasterVolume). '
-        'Входные данные: setMasterVolume(0.6). '
-        'Ожидаемый результат: masterVolume становится 0.6 с учётом клампинга.', () {
+    test('should clamp master volume to [0.0, 1.0] when setMasterVolume is called', () {
+      // Arrange & Act
       sfxBus.setMasterVolume(0.6);
+
+      // Assert
       expect(sfxBus.masterVolume, equals(0.6));
 
+      // Act & Assert
       sfxBus.setMasterVolume(-0.2);
       expect(sfxBus.masterVolume, equals(0.0));
     });
@@ -280,32 +311,35 @@ void main() {
       duckingController.dispose();
     });
 
-    test('Что проверяем: Срабатывание даккинга и восстановление громкости по таймеру. '
-        'Входные данные: Вызов triggerDuck() с колбэком отслеживания коэффициента. '
-        'Ожидаемый результат: Сразу устанавливается isDucked=true и multiplier=0.4, спустя releaseDuration multiplier сбрасывается на 1.0, isDucked=false.', () async {
+    test('should lower volume multiplier immediately and restore it after release duration', () async {
+      // Arrange
       double currentMultiplier = 1.0;
 
+      // Act
       duckingController.triggerDuck(
         onVolumeUpdate: (m) => currentMultiplier = m,
+        holdDuration: Duration.zero,
       );
 
+      // Assert
       expect(duckingController.isDucked, isTrue);
       expect(currentMultiplier, equals(0.4));
 
-      // Ждем истечения releaseDuration (100ms)
-      await Future.delayed(const Duration(milliseconds: 150));
+      // Wait for releaseDuration (100ms) to complete with buffer
+      await Future.delayed(const Duration(milliseconds: 250));
 
       expect(duckingController.isDucked, isFalse);
       expect(currentMultiplier, equals(1.0));
     });
 
-    test('Что проверяем: Повторный триггер даккинга до истечения первого таймера (ре-триггер). '
-        'Входные данные: Вызовы triggerDuck() дважды с интервалом в 50мс при releaseDuration 100мс. '
-        'Ожидаемый результат: Таймер сбрасывается и даккинг остаётся активным дольше первого интервала.', () async {
+    test('should reset release timer and keep ducking active when triggered repeatedly', () async {
+      // Arrange
       double currentMultiplier = 1.0;
 
+      // Act
       duckingController.triggerDuck(
         onVolumeUpdate: (m) => currentMultiplier = m,
+        holdDuration: Duration.zero,
       );
 
       expect(duckingController.isDucked, isTrue);
@@ -314,12 +348,15 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 50));
       duckingController.triggerDuck(
         onVolumeUpdate: (m) => currentMultiplier = m,
+        holdDuration: Duration.zero,
       );
 
+      // Assert - still ducked after original period
       await Future.delayed(const Duration(milliseconds: 60));
       expect(duckingController.isDucked, isTrue);
 
-      await Future.delayed(const Duration(milliseconds: 80));
+      // Assert - restored after full reset duration
+      await Future.delayed(const Duration(milliseconds: 150));
       expect(duckingController.isDucked, isFalse);
       expect(currentMultiplier, equals(1.0));
     });
@@ -336,9 +373,8 @@ void main() {
       engine.dispose();
     });
 
-    test('Что проверяем: Инициализация фасада AudioEngineService и подконтроллеров. '
-        'Входные данные: Новый объект AudioEngineService. '
-        'Ожидаемый результат: isInitialized=true, masterVolume=1.0, подконтроллеры инициализированы.', () {
+    test('should initialize facade and all underlying sub-controllers', () {
+      // Arrange & Act & Assert
       expect(engine.isInitialized, isTrue);
       expect(engine.masterVolume, equals(1.0));
       expect(engine.musicBus, isNotNull);
@@ -347,25 +383,26 @@ void main() {
       expect(engine.duckingController, isNotNull);
     });
 
-    test('Что проверяем: Автоматическое срабатывание даккинга музыки при триггере SFX через AudioEngineService. '
-        'Входные данные: Добавление SFX триггера и запуск sfxBus.triggerSfx. '
-        'Ожидаемый результат: MusicBus.effectiveVolume уменьшается до 40% (0.4) из-за даккинга.', () async {
+    test('should trigger automatic music ducking when SFX is fired through AudioEngineService', () async {
+      // Arrange
       const trigger = SfxTrigger(id: 'sfx-duck-test', title: 'Roar', filePath: '/roar.mp3');
       engine.sfxBus.addTrigger(trigger);
 
       expect(engine.musicBus.effectiveVolume, equals(1.0));
 
+      // Act
       await engine.sfxBus.triggerSfx('sfx-duck-test');
 
+      // Assert
       expect(engine.duckingController.isDucked, isTrue);
       expect(engine.musicBus.effectiveVolume, equals(0.4));
     });
 
-    test('Что проверяем: Установка мастер-громкости движка (setMasterVolume). '
-        'Входные данные: setMasterVolume(0.5). '
-        'Ожидаемый результат: Громкость musicBus, ambientBus и sfxBus обновляется до 0.5, effectiveVolume музыки уменьшается пропорционально.', () {
+    test('should propagate master volume change to all audio buses', () {
+      // Arrange & Act
       engine.setMasterVolume(0.5);
 
+      // Assert
       expect(engine.masterVolume, equals(0.5));
       expect(engine.musicBus.masterVolume, equals(0.5));
       expect(engine.musicBus.effectiveVolume, equals(0.5));

@@ -42,46 +42,41 @@ void main() {
   });
 
   group('DatabaseService v4 & SqliteSceneRepositorySourceRepository Tests', () {
-    test(
-      'Что проверяем: Создание таблицы scene_repositories и выполнение CRUD операций. '
-      'Входные данные: Объект SceneRepositoryModel с id="repo-1", url="https://gitlab.com/test/repo". '
-      'Ожидаемый результат: Репозиторий сохраняется, извлекается, обновляется и удаляется из SQLite базы версии 4.',
-      () async {
-        final repoSource = SqliteSceneRepositorySourceRepository(db: dbService);
+    test('should perform full CRUD operations on scene_repositories table in SQLite v4 schema', () async {
+      // Arrange
+      final repoSource = SqliteSceneRepositorySourceRepository(db: dbService);
 
-        final initialList = await repoSource.getAllRepositories();
-        expect(initialList, isEmpty);
+      final initialList = await repoSource.getAllRepositories();
+      expect(initialList, isEmpty);
 
-        final model = SceneRepositoryModel(
-          id: 'repo-1',
-          name: 'Fantasy Audio Repo',
-          url: 'https://gitlab.com/test/repo/-/raw/main/repository.json',
-          description: 'Official fantasy audio collection',
-          createdAt: DateTime.now(),
-        );
+      final model = SceneRepositoryModel(
+        id: 'repo-1',
+        name: 'Fantasy Audio Repo',
+        url: 'https://gitlab.com/test/repo/-/raw/main/repository.json',
+        description: 'Official fantasy audio collection',
+        createdAt: DateTime.now(),
+      );
 
-        // Add
-        await repoSource.addRepository(model);
+      // Act & Assert - Add
+      await repoSource.addRepository(model);
+      final fetchedList = await repoSource.getAllRepositories();
+      expect(fetchedList.length, equals(1));
+      expect(fetchedList.first.id, equals('repo-1'));
+      expect(fetchedList.first.name, equals('Fantasy Audio Repo'));
 
-        final fetchedList = await repoSource.getAllRepositories();
-        expect(fetchedList.length, equals(1));
-        expect(fetchedList.first.id, equals('repo-1'));
-        expect(fetchedList.first.name, equals('Fantasy Audio Repo'));
+      // Act & Assert - Update
+      final updatedModel = model.copyWith(name: 'Updated Fantasy Repo', lastSyncedAt: DateTime.now());
+      await repoSource.updateRepository(updatedModel);
 
-        // Update
-        final updatedModel = model.copyWith(name: 'Updated Fantasy Repo', lastSyncedAt: DateTime.now());
-        await repoSource.updateRepository(updatedModel);
+      final singleFetched = await repoSource.getRepositoryById('repo-1');
+      expect(singleFetched, isNotNull);
+      expect(singleFetched!.name, equals('Updated Fantasy Repo'));
+      expect(singleFetched.lastSyncedAt, isNotNull);
 
-        final singleFetched = await repoSource.getRepositoryById('repo-1');
-        expect(singleFetched, isNotNull);
-        expect(singleFetched!.name, equals('Updated Fantasy Repo'));
-        expect(singleFetched.lastSyncedAt, isNotNull);
-
-        // Delete
-        await repoSource.deleteRepository('repo-1');
-        final afterDeleteList = await repoSource.getAllRepositories();
-        expect(afterDeleteList, isEmpty);
-      },
-    );
+      // Act & Assert - Delete
+      await repoSource.deleteRepository('repo-1');
+      final afterDeleteList = await repoSource.getAllRepositories();
+      expect(afterDeleteList, isEmpty);
+    });
   });
 }

@@ -52,141 +52,131 @@ void main() {
   });
 
   group('UI ViewModels Architecture Unit Tests', () {
-    test(
-      'Что проверяем: Инициализация и CRUD операции в SceneViewModel. '
-      'Входные данные: Создание SceneViewModel с инжектированным SqliteSceneRepository и добавление SceneModel. '
-      'Ожидаемый результат: ViewModel сохраняет и возвращает обновлённые сцены, notifyListeners оповещает слушателей.',
-      () async {
-        final repository = SqliteSceneRepository(db: dbService);
-        final viewModel = SceneViewModel(repository: repository, autoLoad: false);
+    test('should perform CRUD operations and notify listeners in SceneViewModel', () async {
+      // Arrange
+      final repository = SqliteSceneRepository(db: dbService);
+      final viewModel = SceneViewModel(repository: repository, autoLoad: false);
 
-        int notifyCount = 0;
-        viewModel.addListener(() => notifyCount++);
+      int notifyCount = 0;
+      viewModel.addListener(() => notifyCount++);
 
-        final newScene = SceneModel(id: 'vm-scene-1', name: 'Forest Encounter');
-        await viewModel.createScene(newScene);
+      // Act & Assert - Create scene
+      final newScene = SceneModel(id: 'vm-scene-1', name: 'Forest Encounter');
+      await viewModel.createScene(newScene);
 
-        expect(notifyCount, greaterThan(0));
-        expect(viewModel.scenes.length, equals(1));
-        expect(viewModel.scenes.first.name, equals('Forest Encounter'));
+      expect(notifyCount, greaterThan(0));
+      expect(viewModel.scenes.length, equals(1));
+      expect(viewModel.scenes.first.name, equals('Forest Encounter'));
 
-        await viewModel.deleteScene('vm-scene-1');
-        expect(viewModel.scenes, isEmpty);
-      },
-    );
+      // Act & Assert - Delete scene
+      await viewModel.deleteScene('vm-scene-1');
+      expect(viewModel.scenes, isEmpty);
+    });
 
-    test(
-      'Что проверяем: Проксирование уведомлений от SceneService в SceneViewModel. '
-      'Входные данные: Инжектирование SceneService в SceneViewModel через конструктор composition DI. '
-      'Ожидаемый результат: Изменение состояния в SceneService вызывает оповещение в SceneViewModel.',
-      () async {
-        final repository = SqliteSceneRepository(db: dbService);
-        final service = SceneService(repository: repository, autoLoad: false);
-        final viewModel = SceneViewModel(service: service);
+    test('should forward notifications from SceneService to SceneViewModel via composition DI', () async {
+      // Arrange
+      final repository = SqliteSceneRepository(db: dbService);
+      final service = SceneService(repository: repository, autoLoad: false);
+      final viewModel = SceneViewModel(service: service);
 
-        int notifyCount = 0;
-        viewModel.addListener(() => notifyCount++);
+      int notifyCount = 0;
+      viewModel.addListener(() => notifyCount++);
 
-        final scene = SceneModel(id: 'vm-scene-comp', name: 'Dungeon Master');
-        await service.createScene(scene);
+      // Act
+      final scene = SceneModel(id: 'vm-scene-comp', name: 'Dungeon Master');
+      await service.createScene(scene);
 
-        expect(notifyCount, greaterThan(0));
-        expect(viewModel.scenes.length, equals(1));
-        expect(viewModel.scenes.first.id, equals('vm-scene-comp'));
-      },
-    );
+      // Assert
+      expect(notifyCount, greaterThan(0));
+      expect(viewModel.scenes.length, equals(1));
+      expect(viewModel.scenes.first.id, equals('vm-scene-comp'));
+    });
 
-    test(
-      'Что проверяем: Фильтрация и управление треками в MediaLibraryViewModel. '
-      'Входные данные: Добавление трека и установка busFilter и searchQuery. '
-      'Ожидаемый результат: MediaLibraryViewModel правильно фильтрует треки в списке.',
-      () async {
-        final repository = SqliteMediaLibraryRepository(db: dbService);
-        final viewModel = MediaLibraryViewModel(repository: repository, autoLoad: false);
+    test('should filter and search tracks appropriately in MediaLibraryViewModel', () async {
+      // Arrange
+      final repository = SqliteMediaLibraryRepository(db: dbService);
+      final viewModel = MediaLibraryViewModel(repository: repository, autoLoad: false);
 
-        final track = LibraryTrack(
-          id: 'vm-track-1',
-          title: 'Battle Drums',
-          filePath: '/music/drums.mp3',
-          busType: AudioBusType.music,
-        );
+      final track = LibraryTrack(
+        id: 'vm-track-1',
+        title: 'Battle Drums',
+        filePath: '/music/drums.mp3',
+        busType: AudioBusType.music,
+      );
 
-        await viewModel.addTrack(track);
-        expect(viewModel.tracks.length, equals(1));
+      // Act & Assert - Add track
+      await viewModel.addTrack(track);
+      expect(viewModel.tracks.length, equals(1));
 
-        viewModel.setBusFilter(AudioBusType.ambient);
-        expect(viewModel.tracks, isEmpty);
+      // Act & Assert - Filter out by different bus
+      viewModel.setBusFilter(AudioBusType.ambient);
+      expect(viewModel.tracks, isEmpty);
 
-        viewModel.setBusFilter(AudioBusType.music);
-        expect(viewModel.tracks.length, equals(1));
+      // Act & Assert - Filter match
+      viewModel.setBusFilter(AudioBusType.music);
+      expect(viewModel.tracks.length, equals(1));
 
-        viewModel.setSearchQuery('NonExistent');
-        expect(viewModel.tracks, isEmpty);
+      // Act & Assert - Search mismatch
+      viewModel.setSearchQuery('NonExistent');
+      expect(viewModel.tracks, isEmpty);
 
-        viewModel.setSearchQuery('drums');
-        expect(viewModel.tracks.length, equals(1));
-      },
-    );
+      // Act & Assert - Search match
+      viewModel.setSearchQuery('drums');
+      expect(viewModel.tracks.length, equals(1));
+    });
 
-    test(
-      'Что проверяем: Внедрение MediaLibraryService в MediaLibraryViewModel через composition. '
-      'Входные данные: Инжектирование существующего MediaLibraryService в MediaLibraryViewModel. '
-      'Ожидаемый результат: MediaLibraryViewModel проксирует вызовы и уведомления от службы.',
-      () async {
-        final repository = SqliteMediaLibraryRepository(db: dbService);
-        final service = MediaLibraryService(repository: repository, autoLoad: false);
-        final viewModel = MediaLibraryViewModel(service: service);
+    test('should proxy service notifications through MediaLibraryViewModel when service is injected', () async {
+      // Arrange
+      final repository = SqliteMediaLibraryRepository(db: dbService);
+      final service = MediaLibraryService(repository: repository, autoLoad: false);
+      final viewModel = MediaLibraryViewModel(service: service);
 
-        int notifyCount = 0;
-        viewModel.addListener(() => notifyCount++);
+      int notifyCount = 0;
+      viewModel.addListener(() => notifyCount++);
 
-        final track = LibraryTrack(
-          id: 'vm-track-comp',
-          title: 'Tavern Lute',
-          filePath: '/music/lute.mp3',
-          busType: AudioBusType.music,
-        );
+      // Act
+      final track = LibraryTrack(
+        id: 'vm-track-comp',
+        title: 'Tavern Lute',
+        filePath: '/music/lute.mp3',
+        busType: AudioBusType.music,
+      );
+      await service.addTrack(track);
 
-        await service.addTrack(track);
+      // Assert
+      expect(notifyCount, greaterThan(0));
+      expect(viewModel.tracks.length, equals(1));
+      expect(viewModel.tracks.first.title, equals('Tavern Lute'));
+    });
 
-        expect(notifyCount, greaterThan(0));
-        expect(viewModel.tracks.length, equals(1));
-        expect(viewModel.tracks.first.title, equals('Tavern Lute'));
-      },
-    );
+    test('should manage and switch active themes in ThemeViewModel', () async {
+      // Arrange
+      final repository = SqliteCustomThemeRepository(db: dbService);
+      final viewModel = ThemeViewModel(repository: repository, autoLoad: false);
 
-    test(
-      'Что проверяем: Управление темами и кастомными темами в ThemeViewModel. '
-      'Входные данные: ThemeViewModel с SqliteCustomThemeRepository и переключение темы. '
-      'Ожидаемый результат: Тема активируется и создаются кастомные цветовые схемы.',
-      () async {
-        final repository = SqliteCustomThemeRepository(db: dbService);
-        final viewModel = ThemeViewModel(repository: repository, autoLoad: false);
+      // Act & Assert - Initial state
+      expect(viewModel.activeTheme, isNotNull);
+      expect(viewModel.currentThemeData, isNotNull);
 
-        expect(viewModel.activeTheme, isNotNull);
-        expect(viewModel.currentThemeData, isNotNull);
+      // Act & Assert - Theme selection
+      viewModel.selectTheme(AppThemes.emeraldForestId);
+      expect(viewModel.activeTheme.id, equals(AppThemes.emeraldForestId));
+    });
 
-        viewModel.selectTheme(AppThemes.emeraldForestId);
-        expect(viewModel.activeTheme.id, equals(AppThemes.emeraldForestId));
-      },
-    );
+    test('should reflect active theme updates when ThemeService is injected into ThemeViewModel', () async {
+      // Arrange
+      final service = ThemeService(initialThemeId: AppThemes.deepDarkId, autoLoad: false);
+      final viewModel = ThemeViewModel(service: service);
 
-    test(
-      'Что проверяем: Инжектирование ThemeService в ThemeViewModel через composition. '
-      'Входные данные: Передача ThemeService в ThemeViewModel и вызов selectTheme. '
-      'Ожидаемый результат: ThemeViewModel получает обновлённое имя и ID активной темы.',
-      () async {
-        final service = ThemeService(initialThemeId: AppThemes.deepDarkId, autoLoad: false);
-        final viewModel = ThemeViewModel(service: service);
+      int notifyCount = 0;
+      viewModel.addListener(() => notifyCount++);
 
-        int notifyCount = 0;
-        viewModel.addListener(() => notifyCount++);
+      // Act
+      service.selectTheme(AppThemes.crimsonDungeonId);
 
-        service.selectTheme(AppThemes.crimsonDungeonId);
-
-        expect(notifyCount, greaterThan(0));
-        expect(viewModel.activeThemeId, equals(AppThemes.crimsonDungeonId));
-      },
-    );
+      // Assert
+      expect(notifyCount, greaterThan(0));
+      expect(viewModel.activeThemeId, equals(AppThemes.crimsonDungeonId));
+    });
   });
 }

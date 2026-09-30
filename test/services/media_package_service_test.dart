@@ -54,59 +54,56 @@ void main() {
   });
 
   group('MediaPackageService Unit & Integration Tests', () {
-    test(
-      'Что проверяем: Экспорт набора медиа в .media.zip и успешный импорт обратно в репозиторий. '
-      'Входные данные: 2 локальных трека (music и sfx) и пути выгрузки. '
-      'Ожидаемый результат: Создаётся файл .media.zip с media.json; при импорте треки регистрируются в базе данных.',
-      () async {
-        final audioFile1 = File(p.join(tempDir.path, 'track1.mp3'));
-        await audioFile1.writeAsString('fake audio content 1');
-        final audioFile2 = File(p.join(tempDir.path, 'track2.wav'));
-        await audioFile2.writeAsString('fake audio content 2');
+    test('should export media package to .media.zip and correctly import tracks into database', () async {
+      // Arrange
+      final audioFile1 = File(p.join(tempDir.path, 'track1.mp3'));
+      await audioFile1.writeAsString('fake audio content 1');
+      final audioFile2 = File(p.join(tempDir.path, 'track2.wav'));
+      await audioFile2.writeAsString('fake audio content 2');
 
-        final track1 = LibraryTrack(
-          id: 'mtrack_1',
-          title: 'Tavern Lute',
-          filePath: audioFile1.path,
-          busType: AudioBusType.music,
-          colorHex: 0xFF9C27B0,
-        );
-        final track2 = LibraryTrack(
-          id: 'mtrack_2',
-          title: 'Sword Clashing',
-          filePath: audioFile2.path,
-          busType: AudioBusType.sfx,
-          colorHex: 0xFFFF9800,
-        );
+      final track1 = LibraryTrack(
+        id: 'mtrack_1',
+        title: 'Tavern Lute',
+        filePath: audioFile1.path,
+        busType: AudioBusType.music,
+        colorHex: 0xFF9C27B0,
+      );
+      final track2 = LibraryTrack(
+        id: 'mtrack_2',
+        title: 'Sword Clashing',
+        filePath: audioFile2.path,
+        busType: AudioBusType.sfx,
+        colorHex: 0xFFFF9800,
+      );
 
-        final exportZipPath = p.join(tempDir.path, 'monsters.media.zip');
+      final exportZipPath = p.join(tempDir.path, 'monsters.media.zip');
 
-        // Export
-        final exportedZip = await mediaPackageService.exportMediaPackage(
-          tracks: [track1, track2],
-          exportZipPath: exportZipPath,
-          title: 'SFX Monsters Set',
-          description: 'Custom media set for D&D',
-        );
+      // Act - Export
+      final exportedZip = await mediaPackageService.exportMediaPackage(
+        tracks: [track1, track2],
+        exportZipPath: exportZipPath,
+        title: 'SFX Monsters Set',
+        description: 'Custom media set for D&D',
+      );
 
-        expect(exportedZip.existsSync(), isTrue);
-        expect(exportedZip.lengthSync(), greaterThan(0));
+      expect(exportedZip.existsSync(), isTrue);
+      expect(exportedZip.lengthSync(), greaterThan(0));
 
-        // Import into new destination
-        final importDestDir = p.join(tempDir.path, 'imported_media');
-        final result = await mediaPackageService.importMediaPackage(
-          zipFilePath: exportZipPath,
-          destinationAudioDir: importDestDir,
-        );
+      // Act - Import into new destination
+      final importDestDir = p.join(tempDir.path, 'imported_media');
+      final result = await mediaPackageService.importMediaPackage(
+        zipFilePath: exportZipPath,
+        destinationAudioDir: importDestDir,
+      );
 
-        expect(result.title, 'SFX Monsters Set');
-        expect(result.importedTracks.length, 2);
+      // Assert
+      expect(result.title, 'SFX Monsters Set');
+      expect(result.importedTracks.length, 2);
 
-        final dbTracks = await mediaRepo.getAllTracks();
-        expect(dbTracks.length, 2);
-        expect(dbTracks.any((t) => t.title == 'Tavern Lute'), isTrue);
-        expect(dbTracks.any((t) => t.title == 'Sword Clashing'), isTrue);
-      },
-    );
+      final dbTracks = await mediaRepo.getAllTracks();
+      expect(dbTracks.length, 2);
+      expect(dbTracks.any((t) => t.title == 'Tavern Lute'), isTrue);
+      expect(dbTracks.any((t) => t.title == 'Sword Clashing'), isTrue);
+    });
   });
 }

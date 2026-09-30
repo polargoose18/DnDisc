@@ -55,226 +55,207 @@ void main() {
       }
     });
 
-    test(
-      'Что проверяем: Полная целостность и сериализация канонических доменных моделей из domain/models. '
-      'Входные данные: Экземпляры AudioTrack, AmbientLayer, SfxTrigger, LibraryTrack, SceneModel, CustomThemeModel, SceneRepositoryModel. '
-      'Ожидаемый результат: Все модели успешно инстанциируются, экспортируют и импортируют Map/JSON без потерь данных и без зависимостей от lib/models/.',
-      () {
-        // 1. AudioTrack
+    test('should ensure integrity and lossless serialization of domain models', () {
+      // Arrange & Act & Assert - 1. AudioTrack
+      const track = AudioTrack(
+        id: 'trk-1',
+        title: 'Epic Battle',
+        filePath: '/audio/battle.mp3',
+        intensity: MusicIntensity.boss,
+        duration: Duration(seconds: 120),
+      );
+      final trackCopy = track.copyWith(title: 'Updated Battle');
+      expect(trackCopy.id, equals('trk-1'));
+      expect(trackCopy.title, equals('Updated Battle'));
+      expect(trackCopy.intensity, equals(MusicIntensity.boss));
+
+      // Arrange & Act & Assert - 2. AmbientLayer
+      const layer = AmbientLayer(
+        id: 'amb-1',
+        title: 'Cave Wind',
+        filePath: '/audio/cave.mp3',
+        volume: 0.6,
+        isActive: false,
+      );
+      final layerCopy = layer.copyWith(isActive: true, volume: 0.9);
+      expect(layerCopy.id, equals('amb-1'));
+      expect(layerCopy.isActive, isTrue);
+      expect(layerCopy.volume, equals(0.9));
+
+      // Arrange & Act & Assert - 3. SfxTrigger
+      const sfx = SfxTrigger(
+        id: 'sfx-1',
+        title: 'Sword Clash',
+        filePath: '/audio/sword.mp3',
+        volume: 0.9,
+        hotkey: 'KeyA',
+      );
+      final sfxCopy = sfx.copyWith(volume: 0.5);
+      expect(sfxCopy.id, equals('sfx-1'));
+      expect(sfxCopy.volume, equals(0.5));
+      expect(sfxCopy.hotkey, equals('KeyA'));
+
+      // Arrange & Act & Assert - 4. LibraryTrack
+      final libTrack = LibraryTrack(
+        id: 'lib-1',
+        title: 'Forest Theme',
+        filePath: '/audio/forest.mp3',
+        busType: AudioBusType.music,
+        tags: const ['nature', 'peaceful'],
+      );
+      final libTrackMap = libTrack.toMap();
+      final restoredLibTrack = LibraryTrack.fromMap(libTrackMap);
+      expect(restoredLibTrack.id, equals('lib-1'));
+      expect(restoredLibTrack.busType, equals(AudioBusType.music));
+      expect(restoredLibTrack.tags, containsAll(['nature', 'peaceful']));
+
+      // Arrange & Act & Assert - 5. SceneModel
+      final scene = SceneModel(
+        id: 'scene-1',
+        name: 'Haunted Castle',
+        description: 'Spooky ruins',
+        ambientLayerVolumes: const {'amb-1': 0.7},
+        soundboardSfxIds: const ['sfx-1'],
+      );
+      final sceneMap = scene.toMap();
+      final restoredScene = SceneModel.fromMap(sceneMap);
+      expect(restoredScene.id, equals('scene-1'));
+      expect(restoredScene.name, equals('Haunted Castle'));
+      expect(restoredScene.ambientLayerVolumes['amb-1'], equals(0.7));
+      expect(restoredScene.soundboardSfxIds, contains('sfx-1'));
+
+      // Arrange & Act & Assert - 6. CustomThemeModel
+      const theme = CustomThemeModel(
+        id: 'thm-1',
+        name: 'Dungeon Master Dark',
+        isDark: true,
+        primaryColor: 0xFF1E1E2E,
+        secondaryColor: 0xFF89B4FA,
+        backgroundColor: 0xFF11111B,
+        surfaceColor: 0xFF181825,
+        cardColor: 0xFF313244,
+        accentColor: 0xFFF5C2E7,
+        textPrimaryColor: 0xFFCDD6F4,
+        textSecondaryColor: 0xFFA6ADC8,
+        duckingBadgeColor: 0xFFFAB387,
+        battleIntensityColor: 0xFFF38BA8,
+        bossIntensityColor: 0xFFCBA6F7,
+      );
+      final themeMap = theme.toMap();
+      final restoredTheme = CustomThemeModel.fromMap(themeMap);
+      expect(restoredTheme.id, equals('thm-1'));
+      expect(restoredTheme.primary, equals(const Color(0xFF1E1E2E)));
+
+      // Arrange & Act & Assert - 7. SceneRepositoryModel
+      final repoSource = SceneRepositoryModel(
+        id: 'repo-1',
+        name: 'Official TTRPG Repo',
+        url: 'https://example.com/manifest.json',
+        description: 'Official repository',
+        createdAt: DateTime.now(),
+      );
+      expect(repoSource.id, equals('repo-1'));
+      expect(repoSource.name, equals('Official TTRPG Repo'));
+    });
+
+    test('should execute basic CRUD database operations cleanly without proxy dependencies', () async {
+      // Arrange & Act & Assert - Track CRUD
+      final track = LibraryTrack(
+        id: 'crud-track-1',
+        title: 'Battle March',
+        filePath: '/test/march.mp3',
+        busType: AudioBusType.music,
+        tags: const ['battle'],
+      );
+      await dbService.insertTrack(track);
+      final tracks = await dbService.getAllTracks();
+      expect(tracks.length, equals(1));
+      expect(tracks.first.title, equals('Battle March'));
+
+      // Arrange & Act & Assert - Scene CRUD
+      final scene = SceneModel(
+        id: 'crud-scene-1',
+        name: 'Tavern Evening',
+        description: 'Lively atmosphere',
+      );
+      await dbService.insertScene(scene);
+      final scenes = await dbService.getAllScenes();
+      expect(scenes.length, equals(1));
+      expect(scenes.first.name, equals('Tavern Evening'));
+
+      // Arrange & Act & Assert - Theme CRUD
+      const theme = CustomThemeModel(
+        id: 'crud-theme-1',
+        name: 'Mystic Purple',
+        isDark: true,
+        primaryColor: 0xFF4A148C,
+        secondaryColor: 0xFF7C4DFF,
+        backgroundColor: 0xFF12005E,
+        surfaceColor: 0xFF1D0047,
+        cardColor: 0xFF2A0845,
+        accentColor: 0xFFBB86FC,
+        textPrimaryColor: 0xFFFFFFFF,
+        textSecondaryColor: 0xFFB0B0C0,
+        duckingBadgeColor: 0xFFFF9800,
+        battleIntensityColor: 0xFFEF4444,
+        bossIntensityColor: 0xFF9333EA,
+      );
+      await dbService.insertCustomTheme(theme);
+      final themes = await dbService.getAllCustomThemes();
+      expect(themes.length, equals(1));
+      expect(themes.first.name, equals('Mystic Purple'));
+    });
+
+    test('should integrate audio controllers smoothly with domain models', () async {
+      // Arrange
+      final musicBus = MusicBusController();
+      final ambientBus = AmbientBusController();
+      final sfxBus = SfxBusController();
+
+      try {
+        // Act & Assert - Music bus with AudioTrack
         const track = AudioTrack(
-          id: 'trk-1',
-          title: 'Epic Battle',
-          filePath: '/audio/battle.mp3',
-          intensity: MusicIntensity.boss,
-          duration: Duration(seconds: 120),
+          id: 'bus-track-1',
+          title: 'Ambient Meadow',
+          filePath: '/non_existent_file.mp3',
+          intensity: MusicIntensity.calm,
         );
-        final trackCopy = track.copyWith(title: 'Updated Battle');
-        expect(trackCopy.id, equals('trk-1'));
-        expect(trackCopy.title, equals('Updated Battle'));
-        expect(trackCopy.intensity, equals(MusicIntensity.boss));
+        await musicBus.playTrack(track);
+        expect(musicBus.isPlaying, isFalse);
+        expect(musicBus.rawVolume, equals(1.0));
 
-        // 2. AmbientLayer
+        // Act & Assert - Ambient bus with AmbientLayer
         const layer = AmbientLayer(
-          id: 'amb-1',
-          title: 'Cave Wind',
-          filePath: '/audio/cave.mp3',
-          volume: 0.6,
-          isActive: false,
+          id: 'bus-layer-1',
+          title: 'Rain',
+          filePath: '/non_existent_rain.mp3',
+          volume: 0.5,
         );
-        final layerCopy = layer.copyWith(isActive: true, volume: 0.9);
-        expect(layerCopy.id, equals('amb-1'));
-        expect(layerCopy.isActive, isTrue);
-        expect(layerCopy.volume, equals(0.9));
+        ambientBus.addLayer(layer);
+        expect(ambientBus.layers.length, equals(1));
+        expect(ambientBus.layers.first.id, equals('bus-layer-1'));
 
-        // 3. SfxTrigger
+        // Act & Assert - Sfx bus with SfxTrigger
         const sfx = SfxTrigger(
-          id: 'sfx-1',
-          title: 'Sword Clash',
-          filePath: '/audio/sword.mp3',
+          id: 'bus-sfx-1',
+          title: 'Thunder',
+          filePath: '/non_existent_thunder.mp3',
           volume: 0.9,
-          hotkey: 'KeyA',
         );
-        final sfxCopy = sfx.copyWith(volume: 0.5);
-        expect(sfxCopy.id, equals('sfx-1'));
-        expect(sfxCopy.volume, equals(0.5));
-        expect(sfxCopy.hotkey, equals('KeyA'));
+        sfxBus.addTrigger(sfx);
+        expect(sfxBus.triggers.length, equals(1));
+        expect(sfxBus.rawVolume, equals(1.0));
+      } finally {
+        musicBus.dispose();
+        ambientBus.dispose();
+        sfxBus.dispose();
+      }
+    });
 
-        // 4. LibraryTrack
-        final libTrack = LibraryTrack(
-          id: 'lib-1',
-          title: 'Forest Theme',
-          filePath: '/audio/forest.mp3',
-          busType: AudioBusType.music,
-          tags: const ['nature', 'peaceful'],
-        );
-        final libTrackMap = libTrack.toMap();
-        final restoredLibTrack = LibraryTrack.fromMap(libTrackMap);
-        expect(restoredLibTrack.id, equals('lib-1'));
-        expect(restoredLibTrack.busType, equals(AudioBusType.music));
-        expect(restoredLibTrack.tags, containsAll(['nature', 'peaceful']));
-
-        // 5. SceneModel
-        final scene = SceneModel(
-          id: 'scene-1',
-          name: 'Haunted Castle',
-          description: 'Spooky ruins',
-          ambientLayerVolumes: const {'amb-1': 0.7},
-          soundboardSfxIds: const ['sfx-1'],
-        );
-        final sceneMap = scene.toMap();
-        final restoredScene = SceneModel.fromMap(sceneMap);
-        expect(restoredScene.id, equals('scene-1'));
-        expect(restoredScene.name, equals('Haunted Castle'));
-        expect(restoredScene.ambientLayerVolumes['amb-1'], equals(0.7));
-        expect(restoredScene.soundboardSfxIds, contains('sfx-1'));
-
-        // 6. CustomThemeModel
-        const theme = CustomThemeModel(
-          id: 'thm-1',
-          name: 'Dungeon Master Dark',
-          isDark: true,
-          primaryColor: 0xFF1E1E2E,
-          secondaryColor: 0xFF89B4FA,
-          backgroundColor: 0xFF11111B,
-          surfaceColor: 0xFF181825,
-          cardColor: 0xFF313244,
-          accentColor: 0xFFF5C2E7,
-          textPrimaryColor: 0xFFCDD6F4,
-          textSecondaryColor: 0xFFA6ADC8,
-          duckingBadgeColor: 0xFFFAB387,
-          battleIntensityColor: 0xFFF38BA8,
-          bossIntensityColor: 0xFFCBA6F7,
-        );
-        final themeMap = theme.toMap();
-        final restoredTheme = CustomThemeModel.fromMap(themeMap);
-        expect(restoredTheme.id, equals('thm-1'));
-        expect(restoredTheme.primary, equals(const Color(0xFF1E1E2E)));
-
-        // 7. SceneRepositoryModel
-        final repoSource = SceneRepositoryModel(
-          id: 'repo-1',
-          name: 'Official TTRPG Repo',
-          url: 'https://example.com/manifest.json',
-          description: 'Official repository',
-          createdAt: DateTime.now(),
-        );
-        expect(repoSource.id, equals('repo-1'));
-        expect(repoSource.name, equals('Official TTRPG Repo'));
-      },
-    );
-
-    test(
-      'Что проверяем: Базовые CRUD операции DatabaseService после удаления legacy lib/db/proxy. '
-      'Входные данные: Экземпляр DatabaseService() с реальной SQLite базой в temp директории. '
-      'Ожидаемый результат: Методы insertTrack, getAllTracks, insertScene, getAllScenes, insertCustomTheme, getAllCustomThemes выполняются без ошибок.',
-      () async {
-        // Track CRUD
-        final track = LibraryTrack(
-          id: 'crud-track-1',
-          title: 'Battle March',
-          filePath: '/test/march.mp3',
-          busType: AudioBusType.music,
-          tags: const ['battle'],
-        );
-        await dbService.insertTrack(track);
-        final tracks = await dbService.getAllTracks();
-        expect(tracks.length, equals(1));
-        expect(tracks.first.title, equals('Battle March'));
-
-        // Scene CRUD
-        final scene = SceneModel(
-          id: 'crud-scene-1',
-          name: 'Tavern Evening',
-          description: 'Lively atmosphere',
-        );
-        await dbService.insertScene(scene);
-        final scenes = await dbService.getAllScenes();
-        expect(scenes.length, equals(1));
-        expect(scenes.first.name, equals('Tavern Evening'));
-
-        // Theme CRUD
-        const theme = CustomThemeModel(
-          id: 'crud-theme-1',
-          name: 'Mystic Purple',
-          isDark: true,
-          primaryColor: 0xFF4A148C,
-          secondaryColor: 0xFF7C4DFF,
-          backgroundColor: 0xFF12005E,
-          surfaceColor: 0xFF1D0047,
-          cardColor: 0xFF2A0845,
-          accentColor: 0xFFBB86FC,
-          textPrimaryColor: 0xFFFFFFFF,
-          textSecondaryColor: 0xFFB0B0C0,
-          duckingBadgeColor: 0xFFFF9800,
-          battleIntensityColor: 0xFFEF4444,
-          bossIntensityColor: 0xFF9333EA,
-        );
-        await dbService.insertCustomTheme(theme);
-        final themes = await dbService.getAllCustomThemes();
-        expect(themes.length, equals(1));
-        expect(themes.first.name, equals('Mystic Purple'));
-      },
-    );
-
-    test(
-      'Что проверяем: Интеграция аудио-контроллеров с моделями AudioTrack, AmbientLayer, SfxTrigger из domain/models. '
-      'Входные данные: MusicBusController, AmbientBusController, SfxBusController с переданными доменными объектами. '
-      'Ожидаемый результат: Контроллеры корректно обновляют состояние шин, громкости и слоёв без исключений.',
-      () async {
-        final musicBus = MusicBusController();
-        final ambientBus = AmbientBusController();
-        final sfxBus = SfxBusController();
-
-        try {
-          // Music bus with AudioTrack
-          const track = AudioTrack(
-            id: 'bus-track-1',
-            title: 'Ambient Meadow',
-            filePath: '/non_existent_file.mp3',
-            intensity: MusicIntensity.calm,
-          );
-          await musicBus.playTrack(track);
-          // File does not exist, so isPlaying remains false per desktop audio rules
-          expect(musicBus.isPlaying, isFalse);
-          expect(musicBus.rawVolume, equals(1.0));
-
-          // Ambient bus with AmbientLayer
-          const layer = AmbientLayer(
-            id: 'bus-layer-1',
-            title: 'Rain',
-            filePath: '/non_existent_rain.mp3',
-            volume: 0.5,
-          );
-          ambientBus.addLayer(layer);
-          expect(ambientBus.layers.length, equals(1));
-          expect(ambientBus.layers.first.id, equals('bus-layer-1'));
-
-          // Sfx bus with SfxTrigger
-          const sfx = SfxTrigger(
-            id: 'bus-sfx-1',
-            title: 'Thunder',
-            filePath: '/non_existent_thunder.mp3',
-            volume: 0.9,
-          );
-          sfxBus.addTrigger(sfx);
-          expect(sfxBus.triggers.length, equals(1));
-          expect(sfxBus.rawVolume, equals(1.0));
-        } finally {
-          musicBus.dispose();
-          ambientBus.dispose();
-          sfxBus.dispose();
-        }
-      },
-    );
-
-    test(
-      'Что проверяем: Полное отсутствие директорий lib/models и lib/db на файловой системе. '
-      'Входные данные: Проверка путей Directory("lib/models") и Directory("lib/db"). '
-      'Ожидаемый результат: Обе директории не существуют (existsSync == false).',
-      () {
-        expect(Directory('lib/models').existsSync(), isFalse);
-        expect(Directory('lib/db').existsSync(), isFalse);
-      },
-    );
+    test('should verify removal of obsolete lib/models and lib/db directories', () {
+      // Arrange & Act & Assert
+      expect(Directory('lib/models').existsSync(), isFalse);
+      expect(Directory('lib/db').existsSync(), isFalse);
+    });
   });
 }

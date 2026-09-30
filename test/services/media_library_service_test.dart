@@ -47,11 +47,9 @@ void main() {
   });
 
   group('MediaLibraryService Unit Tests', () {
-    test('Что проверяем: Начальная загрузка и работа методов добавления/удаления трека. '
-        'Входные данные: addTrack() и deleteTrack(). '
-        'Ожидаемый результат: Список tracks динамически пополняется и уменьшается, генерируются уведомления.', () async {
-      await Future.delayed(const Duration(milliseconds: 50)); // дать завершиться конструктору
-
+    test('should dynamically add and remove tracks from memory and database', () async {
+      // Arrange
+      await Future.delayed(const Duration(milliseconds: 50));
       expect(libraryService.tracks, isEmpty);
 
       final track = LibraryTrack(
@@ -59,21 +57,21 @@ void main() {
         title: 'Tavern Theme',
         filePath: '/music/tavern.mp3',
         busType: AudioBusType.music,
-        tags: const ['Таверна'],
+        tags: const ['Tavern'],
       );
 
+      // Act & Assert - Add track
       await libraryService.addTrack(track);
-
       expect(libraryService.tracks.length, equals(1));
       expect(libraryService.tracks.first.id, equals('t-1'));
 
+      // Act & Assert - Delete track
       await libraryService.deleteTrack('t-1');
       expect(libraryService.tracks, isEmpty);
     });
 
-    test('Что проверяем: Обновление параметров трека через MediaLibraryService (updateTrack). '
-        'Входные данные: Существующий трек c id="t-mod", вызов updateTrack с новым названием "Modified Track". '
-        'Ожидаемый результат: В списке libraryService.tracks название трека обновляется до "Modified Track".', () async {
+    test('should update track metadata and reflect changes in active track list', () async {
+      // Arrange
       final track = LibraryTrack(
         id: 't-mod',
         title: 'Original Track',
@@ -84,16 +82,17 @@ void main() {
       await libraryService.addTrack(track);
       expect(libraryService.tracks.first.title, equals('Original Track'));
 
+      // Act
       final updated = track.copyWith(title: 'Modified Track');
       await libraryService.updateTrack(updated);
 
+      // Assert
       expect(libraryService.tracks.length, equals(1));
       expect(libraryService.tracks.first.title, equals('Modified Track'));
     });
 
-    test('Что проверяем: Фильтрация по аудиошинам (setBusFilter). '
-        'Входные данные: Добавление 3 треков (Music, Ambient, SFX) и установка фильтра setBusFilter(AudioBusType.ambient). '
-        'Ожидаемый результат: Геттер tracks возвращает только 1 амбиент-трек.', () async {
+    test('should filter displayed tracks by bus type when setBusFilter is applied', () async {
+      // Arrange
       final t1 = LibraryTrack(id: '1', title: 'Music', filePath: '/m.mp3', busType: AudioBusType.music);
       final t2 = LibraryTrack(id: '2', title: 'Ambient', filePath: '/a.mp3', busType: AudioBusType.ambient);
       final t3 = LibraryTrack(id: '3', title: 'SFX', filePath: '/s.wav', busType: AudioBusType.sfx);
@@ -101,27 +100,27 @@ void main() {
       await libraryService.addTrack(t1);
       await libraryService.addTrack(t2);
       await libraryService.addTrack(t3);
-
       expect(libraryService.tracks.length, equals(3));
 
+      // Act & Assert - Set filter
       libraryService.setBusFilter(AudioBusType.ambient);
       expect(libraryService.activeBusFilter, equals(AudioBusType.ambient));
       expect(libraryService.tracks.length, equals(1));
       expect(libraryService.tracks.first.id, equals('2'));
 
+      // Act & Assert - Clear filter
       libraryService.setBusFilter(null);
       expect(libraryService.tracks.length, equals(3));
     });
 
-    test('Что проверяем: Фильтрация по поисковому запросу (setSearchQuery) по названию и тегам. '
-        'Входные данные: Трек с названием "Boss Fight" и тегом "Дракон". Поиск "дракон" и "boss". '
-        'Ожидаемый результат: Поиск регистронезависимо находит соответствие по обоим критериям.', () async {
+    test('should filter tracks case-insensitively by title and tags when setSearchQuery is called', () async {
+      // Arrange
       final t1 = LibraryTrack(
         id: 'b1',
         title: 'Boss Fight',
         filePath: '/boss.mp3',
         busType: AudioBusType.music,
-        tags: const ['Дракон', 'Финал'],
+        tags: const ['Dragon', 'Finale'],
       );
       final t2 = LibraryTrack(
         id: 'b2',
@@ -133,20 +132,22 @@ void main() {
       await libraryService.addTrack(t1);
       await libraryService.addTrack(t2);
 
-      libraryService.setSearchQuery('дракон');
+      // Act & Assert - tag search
+      libraryService.setSearchQuery('dragon');
       expect(libraryService.tracks.length, equals(1));
       expect(libraryService.tracks.first.id, equals('b1'));
 
+      // Act & Assert - case-insensitive title search
       libraryService.setSearchQuery('BOSS');
       expect(libraryService.tracks.length, equals(1));
 
+      // Act & Assert - no match
       libraryService.setSearchQuery('non_matching_search');
       expect(libraryService.tracks, isEmpty);
     });
 
-    test('Что проверяем: Маршрутизация трека на соответственные аудио-шины (playTrackToEngine). '
-        'Входные данные: Вызов playTrackToEngine для Music, Ambient и SFX треков в AudioEngineService. '
-        'Ожидаемый результат: MusicBus получает currentTrack, AmbientBus добавляет слой, SfxBus добавляет триггер и активирует даккинг.', () async {
+    test('should route track to appropriate audio bus controller when playTrackToEngine is invoked', () async {
+      // Arrange
       final audioEngine = AudioEngineService();
 
       final musicTrack = LibraryTrack(
@@ -169,18 +170,18 @@ void main() {
         busType: AudioBusType.sfx,
       );
 
-      // Play Music
+      // Act & Assert - Music routing
       libraryService.playTrackToEngine(musicTrack, audioEngine);
       expect(audioEngine.musicBus.currentTrack?.id, equals('m1'));
       expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.battle));
 
-      // Play Ambient
+      // Act & Assert - Ambient routing
       libraryService.playTrackToEngine(ambientTrack, audioEngine);
       expect(audioEngine.ambientBus.layers.length, equals(1));
       expect(audioEngine.ambientBus.layers.first.id, equals('a1'));
       expect(audioEngine.ambientBus.layers.first.isActive, isTrue);
 
-      // Play SFX
+      // Act & Assert - SFX routing
       libraryService.playTrackToEngine(sfxTrack, audioEngine);
       expect(audioEngine.sfxBus.triggers.length, equals(1));
       expect(audioEngine.sfxBus.triggers.first.id, equals('s1'));

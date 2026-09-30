@@ -53,111 +53,106 @@ void main() {
   });
 
   group('Data Repositories Unit Tests', () {
-    test(
-      'Что проверяем: SqliteMediaLibraryRepository вставка, чтение и поиск. '
-      'Входные данные: Вставка LibraryTrack с id="repo-track-1", busType=music. '
-      'Ожидаемый результат: getAllTracks(), getTrackById() и searchTracks() возвращают сохранённый трек.',
-      () async {
-        final track = LibraryTrack(
-          id: 'repo-track-1',
-          title: 'Dungeon March',
-          filePath: '/music/march.mp3',
-          busType: AudioBusType.music,
-          intensity: MusicIntensity.battle,
-          tags: const ['Dungeon'],
-        );
+    test('should insert, query, search, update, and delete tracks via SqliteMediaLibraryRepository', () async {
+      // Arrange
+      final track = LibraryTrack(
+        id: 'repo-track-1',
+        title: 'Dungeon March',
+        filePath: '/music/march.mp3',
+        busType: AudioBusType.music,
+        intensity: MusicIntensity.battle,
+        tags: const ['Dungeon'],
+      );
 
-        await mediaRepo.insertTrack(track);
+      // Act & Assert - Insert & GetAll
+      await mediaRepo.insertTrack(track);
+      final all = await mediaRepo.getAllTracks();
+      expect(all.length, equals(1));
+      expect(all.first.id, equals('repo-track-1'));
 
-        final all = await mediaRepo.getAllTracks();
-        expect(all.length, equals(1));
-        expect(all.first.id, equals('repo-track-1'));
+      // Act & Assert - GetById
+      final fetched = await mediaRepo.getTrackById('repo-track-1');
+      expect(fetched, isNotNull);
+      expect(fetched!.title, equals('Dungeon March'));
 
-        final fetched = await mediaRepo.getTrackById('repo-track-1');
-        expect(fetched, isNotNull);
-        expect(fetched!.title, equals('Dungeon March'));
+      // Act & Assert - Search
+      final search = await mediaRepo.searchTracks('Dungeon');
+      expect(search.length, equals(1));
 
-        final search = await mediaRepo.searchTracks('Dungeon');
-        expect(search.length, equals(1));
+      // Act & Assert - Update
+      final updated = track.copyWith(title: 'Updated March');
+      await mediaRepo.updateTrack(updated);
+      final checkUpdated = await mediaRepo.getTrackById('repo-track-1');
+      expect(checkUpdated!.title, equals('Updated March'));
 
-        final updated = track.copyWith(title: 'Updated March');
-        await mediaRepo.updateTrack(updated);
+      // Act & Assert - Delete
+      await mediaRepo.deleteTrack('repo-track-1');
+      expect(await mediaRepo.getAllTracks(), isEmpty);
+    });
 
-        final checkUpdated = await mediaRepo.getTrackById('repo-track-1');
-        expect(checkUpdated!.title, equals('Updated March'));
+    test('should perform full CRUD lifecycle on SceneModel via SqliteSceneRepository', () async {
+      // Arrange
+      final scene = SceneModel(
+        id: 'repo-scene-1',
+        name: 'Tavern Brawl',
+        description: 'Fun battle scene',
+      );
 
-        await mediaRepo.deleteTrack('repo-track-1');
-        expect(await mediaRepo.getAllTracks(), isEmpty);
-      },
-    );
+      // Act & Assert - Insert & GetAll
+      await sceneRepo.insertScene(scene);
+      final scenes = await sceneRepo.getAllScenes();
+      expect(scenes.length, equals(1));
+      expect(scenes.first.name, equals('Tavern Brawl'));
 
-    test(
-      'Что проверяем: SqliteSceneRepository CRUD операции. '
-      'Входные данные: Cоздание SceneModel id="repo-scene-1". '
-      'Ожидаемый результат: getAllScenes(), updateScene() и deleteScene() успешно манипулируют объектом сцены.',
-      () async {
-        final scene = SceneModel(
-          id: 'repo-scene-1',
-          name: 'Tavern Brawl',
-          description: 'Fun battle scene',
-        );
+      // Act & Assert - GetById
+      final fetched = await sceneRepo.getSceneById('repo-scene-1');
+      expect(fetched, isNotNull);
 
-        await sceneRepo.insertScene(scene);
+      // Act & Assert - Update
+      final updated = scene.copyWith(name: 'Epic Tavern Brawl');
+      await sceneRepo.updateScene(updated);
+      final checkUpdated = await sceneRepo.getSceneById('repo-scene-1');
+      expect(checkUpdated!.name, equals('Epic Tavern Brawl'));
 
-        final scenes = await sceneRepo.getAllScenes();
-        expect(scenes.length, equals(1));
-        expect(scenes.first.name, equals('Tavern Brawl'));
+      // Act & Assert - Delete
+      await sceneRepo.deleteScene('repo-scene-1');
+      expect(await sceneRepo.getAllScenes(), isEmpty);
+    });
 
-        final fetched = await sceneRepo.getSceneById('repo-scene-1');
-        expect(fetched, isNotNull);
+    test('should perform full CRUD lifecycle on CustomThemeModel via SqliteCustomThemeRepository', () async {
+      // Arrange
+      const theme = CustomThemeModel(
+        id: 'repo-theme-1',
+        name: 'Cyberpunk Red',
+        primaryColor: 0xFFFF0055,
+        secondaryColor: 0xFF00FFFF,
+        backgroundColor: 0xFF0A0A10,
+        surfaceColor: 0xFF12121C,
+        cardColor: 0xFF1A1A28,
+        accentColor: 0xFFFF0055,
+        textPrimaryColor: 0xFFFFFFFF,
+        textSecondaryColor: 0xFFA0A0B0,
+      );
 
-        final updated = scene.copyWith(name: 'Epic Tavern Brawl');
-        await sceneRepo.updateScene(updated);
+      // Act & Assert - Insert & GetAll
+      await themeRepo.insertCustomTheme(theme);
+      final themes = await themeRepo.getAllCustomThemes();
+      expect(themes.length, equals(1));
+      expect(themes.first.name, equals('Cyberpunk Red'));
 
-        final checkUpdated = await sceneRepo.getSceneById('repo-scene-1');
-        expect(checkUpdated!.name, equals('Epic Tavern Brawl'));
+      // Act & Assert - GetById
+      final fetched = await themeRepo.getCustomThemeById('repo-theme-1');
+      expect(fetched, isNotNull);
 
-        await sceneRepo.deleteScene('repo-scene-1');
-        expect(await sceneRepo.getAllScenes(), isEmpty);
-      },
-    );
+      // Act & Assert - Update
+      final updated = theme.copyWith(name: 'Cyberpunk Neon Red');
+      await themeRepo.updateCustomTheme(updated);
+      final checkUpdated = await themeRepo.getCustomThemeById('repo-theme-1');
+      expect(checkUpdated!.name, equals('Cyberpunk Neon Red'));
 
-    test(
-      'Что проверяем: SqliteCustomThemeRepository CRUD операции. '
-      'Входные данные: CustomThemeModel id="repo-theme-1". '
-      'Ожидаемый результат: getAllCustomThemes(), getCustomThemeById(), updateCustomTheme() и deleteCustomTheme() работают стабильно.',
-      () async {
-        const theme = CustomThemeModel(
-          id: 'repo-theme-1',
-          name: 'Cyberpunk Red',
-          primaryColor: 0xFFFF0055,
-          secondaryColor: 0xFF00FFFF,
-          backgroundColor: 0xFF0A0A10,
-          surfaceColor: 0xFF12121C,
-          cardColor: 0xFF1A1A28,
-          accentColor: 0xFFFF0055,
-          textPrimaryColor: 0xFFFFFFFF,
-          textSecondaryColor: 0xFFA0A0B0,
-        );
-
-        await themeRepo.insertCustomTheme(theme);
-
-        final themes = await themeRepo.getAllCustomThemes();
-        expect(themes.length, equals(1));
-        expect(themes.first.name, equals('Cyberpunk Red'));
-
-        final fetched = await themeRepo.getCustomThemeById('repo-theme-1');
-        expect(fetched, isNotNull);
-
-        final updated = theme.copyWith(name: 'Cyberpunk Neon Red');
-        await themeRepo.updateCustomTheme(updated);
-
-        final checkUpdated = await themeRepo.getCustomThemeById('repo-theme-1');
-        expect(checkUpdated!.name, equals('Cyberpunk Neon Red'));
-
-        await themeRepo.deleteCustomTheme('repo-theme-1');
-        expect(await themeRepo.getAllCustomThemes(), isEmpty);
-      },
-    );
+      // Act & Assert - Delete
+      await themeRepo.deleteCustomTheme('repo-theme-1');
+      expect(await themeRepo.getAllCustomThemes(), isEmpty);
+    });
   });
 }

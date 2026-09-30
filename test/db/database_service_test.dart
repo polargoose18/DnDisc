@@ -44,33 +44,33 @@ void main() {
   });
 
   group('DatabaseService Integration Tests', () {
-    test('Что проверяем: Инициализация БД SQLite и вставка записи (insertTrack). '
-        'Входные данные: LibraryTrack c id="db-1", busType=music. '
-        'Ожидаемый результат: getAllTracks() возвращает список из 1 записи с идентичными полями.', () async {
+    test('should insert and retrieve library track when inserted into SQLite database', () async {
+      // Arrange
       final track = LibraryTrack(
         id: 'db-1',
         title: 'Epic Adventure',
         filePath: '/music/epic.mp3',
         busType: AudioBusType.music,
         intensity: MusicIntensity.battle,
-        tags: const ['Бой', 'Эпос'],
+        tags: const ['Battle', 'Epic'],
         colorHex: 0xFF9C27B0,
       );
 
+      // Act
       await dbService.insertTrack(track);
-
       final tracks = await dbService.getAllTracks();
+
+      // Assert
       expect(tracks.length, equals(1));
       expect(tracks.first.id, equals('db-1'));
       expect(tracks.first.title, equals('Epic Adventure'));
       expect(tracks.first.busType, equals(AudioBusType.music));
       expect(tracks.first.intensity, equals(MusicIntensity.battle));
-      expect(tracks.first.tags, equals(['Бой', 'Эпос']));
+      expect(tracks.first.tags, equals(['Battle', 'Epic']));
     });
 
-    test('Что проверяем: Фильтрация по шине (getTracksByBus). '
-        'Входные данные: Три трека (music, ambient, sfx). '
-        'Ожидаемый результат: getTracksByBus(ambient) возвращает только амбиент-треки.', () async {
+    test('should filter tracks by bus type when getTracksByBus is queried', () async {
+      // Arrange
       final t1 = LibraryTrack(id: '1', title: 'Music Track', filePath: '/m.mp3', busType: AudioBusType.music);
       final t2 = LibraryTrack(id: '2', title: 'Forest Ambience', filePath: '/a.mp3', busType: AudioBusType.ambient);
       final t3 = LibraryTrack(id: '3', title: 'Sword SFX', filePath: '/s.wav', busType: AudioBusType.sfx);
@@ -79,77 +79,83 @@ void main() {
       await dbService.insertTrack(t2);
       await dbService.insertTrack(t3);
 
+      // Act
       final ambientTracks = await dbService.getTracksByBus(AudioBusType.ambient);
+
+      // Assert
       expect(ambientTracks.length, equals(1));
       expect(ambientTracks.first.title, equals('Forest Ambience'));
     });
 
-    test('Что проверяем: Поиск по названию и тегам (searchTracks). '
-        'Входные данные: Поисковый запрос "Таверна". '
-        'Ожидаемый результат: Находит трек, имеющий "Таверна" в тегах или названии.', () async {
-      final t1 = LibraryTrack(id: 's1', title: 'Таверна Праздник', filePath: '/1.mp3', busType: AudioBusType.music, tags: const ['Пиво']);
-      final t2 = LibraryTrack(id: 's2', title: 'Peaceful Night', filePath: '/2.mp3', busType: AudioBusType.ambient, tags: const ['Таверна', 'Уют']);
-      final t3 = LibraryTrack(id: 's3', title: 'Dungeon Ambience', filePath: '/3.mp3', busType: AudioBusType.ambient, tags: const ['Мрак']);
+    test('should match tracks by title and tags when search query is executed', () async {
+      // Arrange
+      final t1 = LibraryTrack(id: 's1', title: 'Tavern Party', filePath: '/1.mp3', busType: AudioBusType.music, tags: const ['Ale']);
+      final t2 = LibraryTrack(id: 's2', title: 'Peaceful Night', filePath: '/2.mp3', busType: AudioBusType.ambient, tags: const ['Tavern', 'Cozy']);
+      final t3 = LibraryTrack(id: 's3', title: 'Dungeon Ambience', filePath: '/3.mp3', busType: AudioBusType.ambient, tags: const ['Dark']);
 
       await dbService.insertTrack(t1);
       await dbService.insertTrack(t2);
       await dbService.insertTrack(t3);
 
-      final searchResults = await dbService.searchTracks('Таверна');
-      expect(searchResults.length, equals(2)); // t1 (title) & t2 (tags)
+      // Act
+      final searchResults = await dbService.searchTracks('Tavern');
+
+      // Assert
+      expect(searchResults.length, equals(2));
     });
 
-    test('Что проверяем: Поиск с фильтрацией по шине (searchTracks с filterBus). '
-        'Входные данные: Поисковый запрос "Таверна" с фильтром filterBus = AudioBusType.music. '
-        'Ожидаемый результат: Находит только 1 музыкальный трек, амбиент-трек с тем же словом отфильтровывается.', () async {
-      final t1 = LibraryTrack(id: 's1', title: 'Таверна Праздник', filePath: '/1.mp3', busType: AudioBusType.music, tags: const ['Пиво']);
-      final t2 = LibraryTrack(id: 's2', title: 'Peaceful Night', filePath: '/2.mp3', busType: AudioBusType.ambient, tags: const ['Таверна', 'Уют']);
+    test('should apply both keyword and bus filter when searching with filterBus parameter', () async {
+      // Arrange
+      final t1 = LibraryTrack(id: 's1', title: 'Tavern Party', filePath: '/1.mp3', busType: AudioBusType.music, tags: const ['Ale']);
+      final t2 = LibraryTrack(id: 's2', title: 'Peaceful Night', filePath: '/2.mp3', busType: AudioBusType.ambient, tags: const ['Tavern', 'Cozy']);
 
       await dbService.insertTrack(t1);
       await dbService.insertTrack(t2);
 
-      final musicResults = await dbService.searchTracks('Таверна', filterBus: AudioBusType.music);
+      // Act
+      final musicResults = await dbService.searchTracks('Tavern', filterBus: AudioBusType.music);
+      final nonExistentResults = await dbService.searchTracks('NonExistentQuery');
+
+      // Assert
       expect(musicResults.length, equals(1));
       expect(musicResults.first.id, equals('s1'));
-
-      final nonExistentResults = await dbService.searchTracks('НесуществующийЗапрос');
       expect(nonExistentResults, isEmpty);
     });
 
-    test('Что проверяем: Обновление существующего трека (updateTrack). '
-        'Входные данные: Измененный трек с тем же id="db-1" и новым названием "Renamed Track". '
-        'Ожидаемый результат: Запись в БД обновляется без создания дубликатов.', () async {
+    test('should update existing track record in database when updateTrack is called', () async {
+      // Arrange
       final track = LibraryTrack(id: 'u1', title: 'Old Title', filePath: '/old.mp3', busType: AudioBusType.music);
       await dbService.insertTrack(track);
 
+      // Act
       final updated = track.copyWith(title: 'Renamed Track');
       await dbService.updateTrack(updated);
-
       final all = await dbService.getAllTracks();
+
+      // Assert
       expect(all.length, equals(1));
       expect(all.first.title, equals('Renamed Track'));
     });
 
-    test('Что проверяем: Удаление трека по ID (deleteTrack). '
-        'Входные данные: deleteTrack("d1"). '
-        'Ожидаемый результат: Трек удаляется из базы данных.', () async {
+    test('should delete track record by id when deleteTrack is called', () async {
+      // Arrange
       final track = LibraryTrack(id: 'd1', title: 'To Delete', filePath: '/del.mp3', busType: AudioBusType.sfx);
       await dbService.insertTrack(track);
-
       expect((await dbService.getAllTracks()).length, equals(1));
 
+      // Act
       await dbService.deleteTrack('d1');
 
+      // Assert
       expect((await dbService.getAllTracks()), isEmpty);
     });
 
-    test('Что проверяем: Вставка, чтение, обновление и удаление сцен (Scenes CRUD) в DatabaseService. '
-        'Входные данные: SceneModel с музыкой, амбиентами и SFX. '
-        'Ожидаемый результат: Корректное сохранение в SQLite, обновление и удаление.', () async {
+    test('should perform full CRUD operations for SceneModel in SQLite database', () async {
+      // Arrange
       final scene = SceneModel(
         id: 'scene-db-1',
-        name: 'Тайный Лес',
-        description: 'Шорохи листвы и древняя магия',
+        name: 'Mystic Forest',
+        description: 'Rustling leaves and ancient magic',
         colorHex: 0xFF4CAF50,
         musicTrackId: 'm-forest',
         musicIntensity: MusicIntensity.calm,
@@ -158,34 +164,33 @@ void main() {
         imagePath: '/covers/forest.jpg',
       );
 
-      // 1. Insert
+      // Act & Assert - 1. Insert & GetAll
       await dbService.insertScene(scene);
       final allScenes = await dbService.getAllScenes();
       expect(allScenes.length, equals(1));
-      expect(allScenes.first.name, equals('Тайный Лес'));
+      expect(allScenes.first.name, equals('Mystic Forest'));
       expect(allScenes.first.ambientLayerVolumes, equals({'leaves': 0.7, 'wind': 0.5}));
       expect(allScenes.first.imagePath, equals('/covers/forest.jpg'));
 
-      // 2. GetById
+      // Act & Assert - 2. GetById
       final found = await dbService.getSceneById('scene-db-1');
       expect(found, isNotNull);
       expect(found!.id, equals('scene-db-1'));
 
-      // 3. Update
-      final updated = scene.copyWith(name: 'Древний Тайный Лес');
+      // Act & Assert - 3. Update
+      final updated = scene.copyWith(name: 'Ancient Mystic Forest');
       await dbService.updateScene(updated);
       final updatedScenes = await dbService.getAllScenes();
-      expect(updatedScenes.first.name, equals('Древний Тайный Лес'));
+      expect(updatedScenes.first.name, equals('Ancient Mystic Forest'));
 
-      // 4. Delete
+      // Act & Assert - 4. Delete
       await dbService.deleteScene('scene-db-1');
       expect((await dbService.getAllScenes()), isEmpty);
       expect((await dbService.getSceneById('scene-db-1')), isNull);
     });
 
-    test('Что проверяем: Вставка, чтение, обновление и удаление кастомных тем (Custom Themes CRUD) в DatabaseService. '
-        'Входные данные: CustomThemeModel с полной палитрой цветов. '
-        'Ожидаемый результат: Корректная запись в таблицу custom_themes, поиск по id, обновление и удаление.', () async {
+    test('should perform full CRUD operations for CustomThemeModel in SQLite database', () async {
+      // Arrange
       const theme = CustomThemeModel(
         id: 'theme-db-1',
         name: 'Crimson Abyss',
@@ -203,26 +208,26 @@ void main() {
         bossIntensityColor: 0xFF880808,
       );
 
-      // 1. Insert
+      // Act & Assert - 1. Insert & GetAll
       await dbService.insertCustomTheme(theme);
       final allThemes = await dbService.getAllCustomThemes();
       expect(allThemes.length, equals(1));
       expect(allThemes.first.name, equals('Crimson Abyss'));
       expect(allThemes.first.primaryColor, equals(0xFFE11D48));
 
-      // 2. GetById
+      // Act & Assert - 2. GetById
       final found = await dbService.getCustomThemeById('theme-db-1');
       expect(found, isNotNull);
       expect(found!.id, equals('theme-db-1'));
       expect(found.bossIntensityColor, equals(0xFF880808));
 
-      // 3. Update
+      // Act & Assert - 3. Update
       final updated = theme.copyWith(name: 'Crimson Catacombs');
       await dbService.updateCustomTheme(updated);
       final updatedThemes = await dbService.getAllCustomThemes();
       expect(updatedThemes.first.name, equals('Crimson Catacombs'));
 
-      // 4. Delete
+      // Act & Assert - 4. Delete
       await dbService.deleteCustomTheme('theme-db-1');
       expect((await dbService.getAllCustomThemes()), isEmpty);
       expect((await dbService.getCustomThemeById('theme-db-1')), isNull);

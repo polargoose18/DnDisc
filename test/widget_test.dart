@@ -38,12 +38,12 @@ void main() {
     tempDir.delete(recursive: true).ignore();
   });
 
-  testWidgets('Что проверяем: Дымовой тест запуска TtrpgAudioPlayerApp. '
-      'Входные данные: Запуск виджета TtrpgAudioPlayerApp. '
-      'Ожидаемый результат: Приложение монтируется в дереве виджетов и заголовок "TTRPG Audio Master" отображается.', (WidgetTester tester) async {
+  testWidgets('should mount application widget and render title when started', (WidgetTester tester) async {
+    // Arrange & Act
     await tester.pumpWidget(const TtrpgAudioPlayerApp());
     await tester.pump(const Duration(milliseconds: 200));
 
+    // Assert
     expect(find.text('TTRPG Audio Master'), findsOneWidget);
   });
 }

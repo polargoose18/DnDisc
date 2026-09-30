@@ -59,65 +59,62 @@ void main() {
   });
 
   group('ScenePackageService Pack Export & Import Tests', () {
-    test(
-      'Что проверяем: Экспорт пака из 2 сцен в .pack.zip и его импорт в базу данных. '
-      'Входные данные: 2 сцены ("Замок" и "Таверна"), аудиофайлы в медиатеке и целевой путь .pack.zip. '
-      'Ожидаемый результат: Создаётся архив с pack.json; при импорте создаются 2 сцены и связанные треки.',
-      () async {
-        final audioFile = File(p.join(tempDir.path, 'shared_track.mp3'));
-        await audioFile.writeAsString('audio content for pack');
+    test('should export multi-scene pack into .pack.zip and import scenes with tracks into database', () async {
+      // Arrange
+      final audioFile = File(p.join(tempDir.path, 'shared_track.mp3'));
+      await audioFile.writeAsString('audio content for pack');
 
-        final track = LibraryTrack(
-          id: 'ptrack_1',
-          title: 'Curse Theme',
-          filePath: audioFile.path,
-          busType: AudioBusType.music,
-        );
-        await mediaRepo.insertTrack(track);
+      final track = LibraryTrack(
+        id: 'ptrack_1',
+        title: 'Curse Theme',
+        filePath: audioFile.path,
+        busType: AudioBusType.music,
+      );
+      await mediaRepo.insertTrack(track);
 
-        final scene1 = SceneModel(
-          id: 'pscene_1',
-          name: 'Замок Равенлофт',
-          description: 'Готический замок',
-          musicTrackId: 'ptrack_1',
-          colorHex: 0xFFD32F2F,
-        );
-        final scene2 = SceneModel(
-          id: 'pscene_2',
-          name: 'Таверна Деревни',
-          description: 'Уютная таверна',
-          musicTrackId: 'ptrack_1',
-          colorHex: 0xFF795548,
-        );
+      final scene1 = SceneModel(
+        id: 'pscene_1',
+        name: 'Castle Ravenloft',
+        description: 'Gothic vampire castle',
+        musicTrackId: 'ptrack_1',
+        colorHex: 0xFFD32F2F,
+      );
+      final scene2 = SceneModel(
+        id: 'pscene_2',
+        name: 'Village Tavern',
+        description: 'Cozy rustic tavern',
+        musicTrackId: 'ptrack_1',
+        colorHex: 0xFF795548,
+      );
 
-        final exportZipPath = p.join(tempDir.path, 'curse_of_strahd.pack.zip');
+      final exportZipPath = p.join(tempDir.path, 'curse_of_strahd.pack.zip');
 
-        // Export
-        final exportedZip = await packageService.exportPackPackage(
-          scenes: [scene1, scene2],
-          exportZipPath: exportZipPath,
-          title: 'Проклятие Страда',
-          description: 'Полный набор сцен для кампании',
-        );
+      // Act - Export
+      final exportedZip = await packageService.exportPackPackage(
+        scenes: [scene1, scene2],
+        exportZipPath: exportZipPath,
+        title: 'Curse of Strahd',
+        description: 'Complete campaign scene pack',
+      );
 
-        expect(exportedZip.existsSync(), isTrue);
+      expect(exportedZip.existsSync(), isTrue);
 
-        // Import into new destination
-        final importDestDir = p.join(tempDir.path, 'imported_pack');
-        final result = await packageService.importPackPackage(
-          zipFilePath: exportZipPath,
-          destinationAudioDir: importDestDir,
-        );
+      // Act - Import into new destination
+      final importDestDir = p.join(tempDir.path, 'imported_pack');
+      final result = await packageService.importPackPackage(
+        zipFilePath: exportZipPath,
+        destinationAudioDir: importDestDir,
+      );
 
-        expect(result.title, 'Проклятие Страда');
-        expect(result.importedScenes.length, 2);
-        expect(result.importedTracks.length, 1);
+      // Assert
+      expect(result.title, 'Curse of Strahd');
+      expect(result.importedScenes.length, 2);
+      expect(result.importedTracks.length, 1);
 
-        final dbScenes = await sceneRepo.getAllScenes();
-        expect(dbScenes.length, 2);
-        expect(dbScenes.any((s) => s.name == 'Замок Равенлофт'), isTrue);
-        expect(dbScenes.any((s) => s.name == 'Таверна Деревни'), isTrue);
-      },
-    );
+      final dbScenes = await sceneRepo.getAllScenes();
+      expect(dbScenes.length, 2);
+      expect(dbScenes.any((s) => s.name == 'Castle Ravenloft'), isTrue);
+      expect(dbScenes.any((s) => s.name == 'Village Tavern'), isTrue);
+    });
   });
 }

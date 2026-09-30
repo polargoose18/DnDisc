@@ -103,14 +103,9 @@ void main() {
     databaseFactory = databaseFactoryFfi;
   });
 
-  tearDownAll(() async {
-    await DatabaseService().close();
-  });
-
   setUp(() async {
     tempDir = await Directory.systemTemp.createTemp('ttrpg_ui_test_');
     PathProviderPlatform.instance = FakePathProviderPlatform(tempDir.path);
-    LoggerService().clear();
   });
 
   tearDown(() async {
@@ -123,59 +118,57 @@ void main() {
   });
 
   group('MusicPlayerPanel Widget Tests', () {
-    testWidgets('Что проверяем: Отображение состояния воспроизведения и клики по чипам интенсивности. '
-        'Входные данные: MusicPlayerPanel c MusicBusController. Tар по чипу "BOSS". '
-        'Ожидаемый результат: Текст "Музыка не воспроизводится", а после нажатия чипа intensity становится MusicIntensity.boss.', (WidgetTester tester) async {
+    testWidgets('should display playback idle message and update intensity when intensity chip is clicked', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
-
       await tester.pumpWidget(createTestableWidget(const MusicPlayerPanel(), engine: engine));
 
       expect(find.text('Музыкальная дорожка'), findsOneWidget);
       expect(find.text('Музыка не воспроизводится'), findsOneWidget);
 
-      // Нажимаем на чип BOSS
+      // Act
       await tester.tap(find.byKey(const ValueKey('chip_boss')));
       await tester.pump(const Duration(milliseconds: 300));
 
+      // Assert
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.boss));
       engine.dispose();
     });
 
-    testWidgets('Что проверяем: Кнопка воспроизведения/паузы и слайдер громкости в MusicPlayerPanel. '
-        'Входные данные: Нажатие кнопки play/pause и смещение слайдера громкости. '
-        'Ожидаемый результат: Вызывается pause/resume, слайдер меняет rawVolume.', (WidgetTester tester) async {
+    testWidgets('should toggle playback and adjust volume slider in MusicPlayerPanel', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
-
       await tester.pumpWidget(createTestableWidget(const MusicPlayerPanel(), engine: engine));
 
-      // Нажатие кнопки play/pause
+      // Act - Play/Pause tap
       await tester.tap(find.byKey(const ValueKey('music_play_pause_button')));
       await tester.pump(const Duration(milliseconds: 200));
 
-      // Изменение слайдера громкости
+      // Act - Volume Slider Drag
       await tester.drag(find.byKey(const ValueKey('music_volume_slider')), const Offset(-50, 0));
       await tester.pump(const Duration(milliseconds: 200));
 
+      // Assert
       expect(engine.musicBus.rawVolume, lessThan(1.0));
       engine.dispose();
     });
   });
 
   group('AmbientMixerPanel Widget Tests', () {
-    testWidgets('Что проверяем: Отображение пустого состояния AmbientMixerPanel. '
-        'Входные данные: AmbientMixerPanel без слоев. '
-        'Ожидаемый результат: Отображается сообщение "Нет активных эмбиентов".', (WidgetTester tester) async {
+    testWidgets('should display empty placeholder when no ambient layers are present', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
 
+      // Act
       await tester.pumpWidget(createTestableWidget(const AmbientMixerPanel(), engine: engine));
 
+      // Assert
       expect(find.textContaining('Нет активных эмбиентов'), findsOneWidget);
       engine.dispose();
     });
 
-    testWidgets('Что проверяем: Отображение слоев эмбиента, переключение свитчей и кнопки "Выключить все". '
-        'Входные данные: AmbientMixerPanel со слоем "Rain". Переключение Switch и нажатие кнопки stop. '
-        'Ожидаемый результат: Переключатель инвертирует isActive, а кнопка "Выключить все" сбрасывает все слои.', (WidgetTester tester) async {
+    testWidgets('should render ambient layers and toggle active switch and stop all layers', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
       engine.ambientBus.addLayer(const AmbientLayer(id: 'rain-l', title: 'Шум Дождя', filePath: '/rain.mp3', isActive: true));
 
@@ -185,36 +178,35 @@ void main() {
       expect(find.text('Шум Дождя'), findsOneWidget);
       expect(engine.ambientBus.layers.first.isActive, isTrue);
 
-      // Нажимаем на переключатель слоя
+      // Act & Assert - Toggle switch
       await tester.tap(find.byKey(const ValueKey('ambient_switch_rain-l')));
       await tester.pump(const Duration(milliseconds: 300));
-
       expect(engine.ambientBus.layers.first.isActive, isFalse);
 
-      // Нажимаем кнопку "Выключить все"
+      // Act & Assert - Stop all button
       await tester.tap(find.byKey(const ValueKey('ambient_stop_all_btn')));
       await tester.pump(const Duration(milliseconds: 300));
-
       expect(engine.ambientBus.layers.every((l) => !l.isActive), isTrue);
+
       engine.dispose();
     });
   });
 
   group('SoundboardGrid Widget Tests', () {
-    testWidgets('Что проверяем: Отображение пустого состояния SoundboardGrid. '
-        'Входные данные: SoundboardGrid без триггеров. '
-        'Ожидаемый результат: Отображается сообщение "Soundboard пуст".', (WidgetTester tester) async {
+    testWidgets('should render empty state message when soundboard has no triggers', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
 
+      // Act
       await tester.pumpWidget(createTestableWidget(const SoundboardGrid(), engine: engine));
 
+      // Assert
       expect(find.textContaining('Soundboard пуст'), findsOneWidget);
       engine.dispose();
     });
 
-    testWidgets('Что проверяем: Отображение кнопок SFX триггеров и реакция на клик. '
-        'Входные данные: SoundboardGrid c триггером "Удар Меча". Клик по кнопке. '
-        'Ожидаемый результат: Запускается triggerSfx, вызывается даккинг на музыки.', (WidgetTester tester) async {
+    testWidgets('should render SFX buttons and trigger audio ducking when clicked', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
       engine.sfxBus.addTrigger(const SfxTrigger(id: 'sword-trig', title: 'Удар Меча', filePath: '/sword.wav', hotkey: '1'));
 
@@ -224,37 +216,42 @@ void main() {
       expect(find.text('Удар Меча'), findsOneWidget);
       expect(find.text('[1]'), findsOneWidget);
 
+      // Act
       await tester.tap(find.byKey(const ValueKey('sfx_btn_sword-trig')));
       await tester.pump(const Duration(milliseconds: 300));
 
+      // Assert
       expect(engine.duckingController.isDucked, isTrue);
       engine.dispose();
     });
   });
 
   group('LoggerConsoleDrawer Widget Tests', () {
-    testWidgets('Что проверяем: Отображение записей логов и кнопка очистки в LoggerConsoleDrawer. '
-        'Входные данные: LoggerService с 1 логом. Открытие Drawer и нажатие иконки очистки. '
-        'Ожидаемый результат: Запись отображается, после нажатия кнопки очистки консоль показывает "Логи пусты".', (WidgetTester tester) async {
+    testWidgets('should display log entries and clear log history when clear icon is pressed', (WidgetTester tester) async {
+      // Arrange
       final logger = LoggerService();
-      logger.info('Тестовая запись лога');
+      logger.clear();
 
       await tester.pumpWidget(createTestableWidget(const LoggerConsoleDrawer(), logger: logger));
+      logger.info('Test log entry');
+      await tester.pumpAndSettle();
 
+      // Assert
       expect(find.text('Консоль логов и отладки'), findsOneWidget);
-      expect(find.text('Тестовая запись лога'), findsOneWidget);
+      expect(find.textContaining('Test log entry'), findsOneWidget);
 
+      // Act
       await tester.tap(find.byTooltip('Очистить логи'));
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pumpAndSettle();
 
+      // Assert
       expect(find.text('Логи пусты'), findsOneWidget);
     });
   });
 
   group('EditTrackDialog Widget Tests', () {
-    testWidgets('Что проверяем: Редактирование параметров трека в EditTrackDialog. '
-        'Входные данные: EditTrackDialog с исходным треком "Old Name". Ввод нового имени "New Name" и нажатие "Сохранить". '
-        'Ожидаемый результат: Возвращается обновлённый объект LibraryTrack с title="New Name".', (WidgetTester tester) async {
+    testWidgets('should edit track title and return updated LibraryTrack on save', (WidgetTester tester) async {
+      // Arrange
       final track = LibraryTrack(
         id: 'edit-1',
         title: 'Old Name',
@@ -289,20 +286,20 @@ void main() {
 
       expect(find.text('Редактировать аудиозапись'), findsOneWidget);
 
-      // Меняем текстовое поле названия
+      // Act
       await tester.enterText(find.widgetWithText(TextField, 'Old Name'), 'New Name');
       await tester.pump(const Duration(milliseconds: 300));
 
       await tester.tap(find.text('Сохранить'));
       await tester.pump(const Duration(milliseconds: 300));
 
+      // Assert
       expect(resultTrack, isNotNull);
       expect(resultTrack!.title, equals('New Name'));
     });
 
-    testWidgets('Что проверяем: Нажатие кнопки "Отмена" в EditTrackDialog. '
-        'Входные данные: EditTrackDialog и нажатие кнопки "Отмена". '
-        'Ожидаемый результат: Диалог закрывается, результат равен null.', (WidgetTester tester) async {
+    testWidgets('should return null when cancel button is clicked in EditTrackDialog', (WidgetTester tester) async {
+      // Arrange
       final track = LibraryTrack(
         id: 'edit-2',
         title: 'Cancel Test',
@@ -335,17 +332,18 @@ void main() {
       await tester.tap(find.text('Open Dialog'));
       await tester.pump(const Duration(milliseconds: 300));
 
+      // Act
       await tester.tap(find.text('Отмена'));
       await tester.pump(const Duration(milliseconds: 300));
 
+      // Assert
       expect(resultTrack, isNull);
     });
   });
 
   group('MainDashboardScreen Widget Tests', () {
-    testWidgets('Что проверяем: Главный дашборд ГМа, переключение вкладок и открывание консоли логов. '
-        'Входные данные: MainDashboardScreen. Клик по вкладке "Общая Библиотека" и по иконке консоли логов. '
-        'Ожидаемый результат: Переключается активный экран и открывается боковая панель (endDrawer).', (WidgetTester tester) async {
+    testWidgets('should render dashboard tabs and open logger console drawer from header', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
       late final MediaLibraryService library;
       await tester.runAsync(() async {
@@ -366,16 +364,14 @@ void main() {
       expect(find.text('Панель Мастера'), findsOneWidget);
       expect(find.text('Общая Библиотека'), findsOneWidget);
 
-      // Переключаемся на вкладку "Общая Библиотека"
+      // Act & Assert - Switch to Library tab
       await tester.tap(find.text('Общая Библиотека'));
       await tester.pumpAndSettle();
-
       expect(find.byKey(const ValueKey('library_search_input')), findsOneWidget);
 
-      // Открываем консоль логов через иконку
+      // Act & Assert - Open log drawer
       await tester.tap(find.byTooltip('Открыть консоль логов и отладки'));
       await tester.pump(const Duration(milliseconds: 300));
-
       expect(find.text('Консоль логов и отладки'), findsOneWidget);
 
       library.dispose();
@@ -384,9 +380,8 @@ void main() {
   });
 
   group('LibraryScreen Widget Tests', () {
-    testWidgets('Что проверяем: Отображение карточек треков, фильтрация по шинам и отправка трека на шину. '
-        'Входные данные: LibraryScreen с загруженным треком. Проверка кнопки воспроизведения и отправка на шину. '
-        'Ожидаемый результат: Находится карточка трека с кнопкой быстрой отправки, трек корректно передаётся в MusicBusController.', (WidgetTester tester) async {
+    testWidgets('should render track card with quick send button and route audio to MusicBus', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
       late final MediaLibraryService library;
 
@@ -414,16 +409,18 @@ void main() {
       expect(find.text('Tavern Melodies'), findsOneWidget);
       expect(find.byTooltip('Воспроизвести на шине Музыка'), findsOneWidget);
 
+      // Act
       library.playTrackToEngine(track, engine);
+
+      // Assert
       expect(engine.musicBus.currentTrack?.title, equals('Tavern Melodies'));
 
       library.dispose();
       engine.dispose();
     });
 
-    testWidgets('Что проверяем: Отображение экрана пустой библиотеки при отсутствии треков. '
-        'Входные данные: LibraryScreen с пустой библиотекой MediaLibraryService. '
-        'Ожидаемый результат: На экране отображается надпись "Медиабиблиотека пуста".', (WidgetTester tester) async {
+    testWidgets('should display empty placeholder when library contains no tracks', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
       late final MediaLibraryService library;
 
@@ -432,6 +429,7 @@ void main() {
         await library.loadTracks();
       });
 
+      // Act
       await tester.pumpWidget(
         createTestableWidget(
           const LibraryScreen(),
@@ -441,15 +439,15 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 200));
 
+      // Assert
       expect(find.text('Медиатека пуста'), findsOneWidget);
 
       library.dispose();
       engine.dispose();
     });
 
-    testWidgets('Что проверяем: Удаление трека через иконку корзины на карточке LibraryScreen. '
-        'Входные данные: Нажатие кнопки "Удалить из библиотеки". '
-        'Ожидаемый результат: Вызывается deleteTrack, трек удаляется и библиотека становится пустой.', (WidgetTester tester) async {
+    testWidgets('should remove track from library when delete button is pressed', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
       late final MediaLibraryService library;
 
@@ -476,20 +474,21 @@ void main() {
 
       expect(find.text('Delete Me Track'), findsOneWidget);
 
+      // Act
       await tester.runAsync(() async {
         await library.deleteTrack(track.id);
       });
       await tester.pump();
 
+      // Assert
       expect(library.tracks, isEmpty);
 
       library.dispose();
       engine.dispose();
     });
 
-    testWidgets('Что проверяем: Отображение форматированной длительности трека на карточке LibraryScreen. '
-        'Входные данные: Трек с durationMs=141087 (02:21) и трек с durationMs=0 (--:--). '
-        'Ожидаемый результат: На карточках треков отображаются бейджи и текст длительности "02:21" и "--:--".', (WidgetTester tester) async {
+    testWidgets('should render formatted duration badges on track cards', (WidgetTester tester) async {
+      // Arrange
       final engine = AudioEngineService();
       late final MediaLibraryService library;
 
@@ -514,6 +513,7 @@ void main() {
         await library.addTrack(track2);
       });
 
+      // Act
       await tester.pumpWidget(
         createTestableWidget(
           const LibraryScreen(),
@@ -523,6 +523,7 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 200));
 
+      // Assert
       expect(find.byKey(const ValueKey('library_track_duration_track-dur-1')), findsOneWidget);
       expect(find.text('02:21'), findsWidgets);
 

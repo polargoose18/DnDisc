@@ -10,22 +10,22 @@ void main() {
       logger.clear();
     });
 
-    test('Что проверяем: Паттерн Singleton для LoggerService. '
-        'Входные данные: Два вызова LoggerService(). '
-        'Ожидаемый результат: Возвращается один и тот же объект в памяти.', () {
+    test('should maintain singleton instance across multiple instantiations', () {
+      // Arrange & Act
       final logger1 = LoggerService();
       final logger2 = LoggerService();
 
+      // Assert
       expect(identical(logger1, logger2), isTrue);
     });
 
-    test('Что проверяем: Запись лог-сообщений уровня info, warning, error. '
-        'Входные данные: Вызовы info(), warning(), error() с кастомным сообщением и деталями. '
-        'Ожидаемый результат: Список logs содержит 3 записи с правильными уровнями и отформатированным временем.', () {
+    test('should record log entries with appropriate levels and timestamp formatting', () {
+      // Arrange & Act
       logger.info('Info log test', details: 'Details 1');
       logger.warning('Warning log test', details: 'Details 2');
       logger.error('Error log test', details: 'Details 3');
 
+      // Assert
       expect(logger.logs.length, equals(3));
 
       expect(logger.logs[0].level, equals(LogLevel.info));
@@ -40,22 +40,22 @@ void main() {
       expect(logger.logs[2].message, equals('Error log test'));
     });
 
-    test('Что проверяем: Уведомление слушателей (ChangeNotifier) при добавлении лога. '
-        'Входные данные: Подписка на addListener и запись нового лога. '
-        'Ожидаемый результат: Слушатель вызывается ровно один раз.', () {
+    test('should notify listeners when a new log entry is added', () {
+      // Arrange
       int callCount = 0;
       logger.addListener(() {
         callCount++;
       });
 
+      // Act
       logger.info('Test notification');
 
+      // Assert
       expect(callCount, equals(1));
     });
 
-    test('Что проверяем: Очистка списка логов через clear(). '
-        'Входные данные: Список с 2 логами, вызов logger.clear(). '
-        'Ожидаемый результат: Список logs становится пустым, генерируется уведомление.', () {
+    test('should clear all log entries and notify listeners when clear is called', () {
+      // Arrange
       logger.info('Log 1');
       logger.warning('Log 2');
       expect(logger.logs.length, equals(2));
@@ -63,8 +63,10 @@ void main() {
       int notificationCount = 0;
       logger.addListener(() => notificationCount++);
 
+      // Act
       logger.clear();
 
+      // Assert
       expect(logger.logs, isEmpty);
       expect(notificationCount, equals(1));
     });

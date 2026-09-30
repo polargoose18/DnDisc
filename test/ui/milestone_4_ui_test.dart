@@ -131,238 +131,220 @@ void main() {
   });
 
   group('ResponsiveGmDashboard Widget Tests', () {
-    testWidgets(
-      'Что проверяем: Отображение 3-колоночного пульта мастера на Desktop экранах (>= 1000px). '
-      'Входные данные: ResponsiveGmDashboard с размером экрана 1280x900. '
-      'Ожидаемый результат: В дереве виджетов одновременно присутствуют панель сцен, шапка бэкдропа, панель музыки, микшер эмбиента и саундборд.',
-      (tester) async {
-        tester.view.physicalSize = const Size(1280, 900);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets('should render 3-column GM dashboard layout on desktop screens (>= 1000px)', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(1280, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-        await tester.pumpWidget(
-          createTestApp(
-            child: const ResponsiveGmDashboard(),
-            screenSize: const Size(1280, 900),
-          ),
-        );
-        await tester.pumpAndSettle();
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          child: const ResponsiveGmDashboard(),
+          screenSize: const Size(1280, 900),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.textContaining('Сцены'), findsWidgets);
-        expect(find.text('Музыкальная дорожка'), findsOneWidget);
-        expect(find.textContaining('Эмбиент'), findsWidgets);
-        expect(find.textContaining('Soundboard'), findsWidgets);
-      },
-    );
+      // Assert
+      expect(find.textContaining('Сцены'), findsWidgets);
+      expect(find.text('Музыкальная дорожка'), findsOneWidget);
+      expect(find.textContaining('Эмбиент'), findsWidgets);
+      expect(find.textContaining('Soundboard'), findsWidgets);
+    });
 
-    testWidgets(
-      'Что проверяем: Отображение вкладок и прилипающего StickyMiniPlayer на компактных/мобильных экранах (< 1000px). '
-      'Входные данные: ResponsiveGmDashboard с размером экрана 800x900. '
-      'Ожидаемый результат: Отображаются мобильные вкладки (Сцены, Музыка, Эмбиент, SFX) и внизу экрана находится StickyMiniPlayer.',
-      (tester) async {
-        tester.view.physicalSize = const Size(800, 900);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets('should display tabs and StickyMiniPlayer on compact and mobile screens (< 1000px)', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(800, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-        await tester.pumpWidget(
-          createTestApp(
-            child: const ResponsiveGmDashboard(),
-            screenSize: const Size(800, 900),
-          ),
-        );
-        await tester.pumpAndSettle();
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          child: const ResponsiveGmDashboard(),
+          screenSize: const Size(800, 900),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.byType(StickyMiniPlayer), findsOneWidget);
-        expect(find.text('Сцены'), findsWidgets);
-        expect(find.text('Музыка'), findsWidgets);
-        expect(find.text('Эмбиент'), findsWidgets);
-        expect(find.text('SFX'), findsWidgets);
-      },
-    );
+      // Assert
+      expect(find.byType(StickyMiniPlayer), findsOneWidget);
+      expect(find.text('Сцены'), findsWidgets);
+      expect(find.text('Музыка'), findsWidgets);
+      expect(find.text('Эмбиент'), findsWidgets);
+      expect(find.text('SFX'), findsWidgets);
+    });
   });
 
   group('SceneCard Widget Tests', () {
-    testWidgets(
-      'Что проверяем: Отображение карточки сцены в неактивном и активном состоянии. '
-      'Входные данные: SceneCard со сценой "Древняя Таверна", isActive=true и isActive=false. '
-      'Ожидаемый результат: При isActive=true отображается бейдж "АКТИВНА" и кнопка "Активна".',
-      (tester) async {
-        final scene = SceneModel(
-          id: 'sc_card_1',
-          name: 'Древняя Таверна',
-          description: 'Уютный очаг и звон кружек',
-          musicIntensity: MusicIntensity.calm,
-        );
+    testWidgets('should display active badge and trigger activation callback when clicked', (tester) async {
+      // Arrange
+      final scene = SceneModel(
+        id: 'sc_card_1',
+        name: 'Ancient Tavern',
+        description: 'Cozy hearth and clinking mugs',
+        musicIntensity: MusicIntensity.calm,
+      );
 
-        bool activated = false;
+      bool activated = false;
 
-        await tester.pumpWidget(
-          createTestApp(
-            child: SceneCard(
-              scene: scene,
-              isActive: true,
-              onActivate: () => activated = true,
-              onEdit: () {},
-              onDuplicate: () {},
-              onDelete: () {},
-            ),
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          child: SceneCard(
+            scene: scene,
+            isActive: true,
+            onActivate: () => activated = true,
+            onEdit: () {},
+            onDuplicate: () {},
+            onDelete: () {},
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Древняя Таверна'), findsOneWidget);
-        expect(find.text('Уютный очаг и звон кружек'), findsOneWidget);
-        expect(find.text('АКТИВНА'), findsWidgets);
+      // Assert
+      expect(find.text('Ancient Tavern'), findsOneWidget);
+      expect(find.text('Cozy hearth and clinking mugs'), findsOneWidget);
+      expect(find.text('АКТИВНА'), findsWidgets);
 
-        await tester.tap(find.byType(ElevatedButton));
-        expect(activated, isTrue);
-      },
-    );
+      await tester.tap(find.byType(ElevatedButton));
+      expect(activated, isTrue);
+    });
   });
 
   group('SceneBackdropHeader Widget Tests', () {
-    testWidgets(
-      'Что проверяем: Отображение атмосферной шапки SceneBackdropHeader с активной сценой. '
-      'Входные данные: SceneService с активной сценой "Пещера Дракона". '
-      'Ожидаемый результат: Отображается заголовок "Пещера Дракона", бейдж "ТЕКУЩАЯ СЦЕНА" и чипы интенсивности (Calm, Suspense, Battle, Boss).',
-      (tester) async {
-        final sceneService = SceneService(autoLoad: false);
-        final scene = SceneModel(
-          id: 'sc_dragon_cave',
-          name: 'Пещера Дракона',
-          description: 'Жар лавы и глухой рокот чешуи',
-        );
-        await tester.runAsync(() async {
-          await sceneService.createScene(scene);
-          await sceneService.activateScene(scene);
-        });
+    testWidgets('should render active scene header title and intensity chips', (tester) async {
+      // Arrange
+      final sceneService = SceneService(autoLoad: false);
+      final scene = SceneModel(
+        id: 'sc_dragon_cave',
+        name: 'Dragon Cave',
+        description: 'Heat of lava and heavy breathing',
+      );
+      await tester.runAsync(() async {
+        await sceneService.createScene(scene);
+        await sceneService.activateScene(scene);
+      });
 
-        await tester.pumpWidget(
-          createTestApp(
-            sceneService: sceneService,
-            child: const SceneBackdropHeader(),
-          ),
-        );
-        await tester.pumpAndSettle();
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          sceneService: sceneService,
+          child: const SceneBackdropHeader(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Пещера Дракона'), findsOneWidget);
-        expect(find.text('ТЕКУЩАЯ СЦЕНА'), findsOneWidget);
-        expect(find.text('Calm'), findsOneWidget);
-        expect(find.text('Battle'), findsOneWidget);
-      },
-    );
+      // Assert
+      expect(find.text('Dragon Cave'), findsOneWidget);
+      expect(find.text('ТЕКУЩАЯ СЦЕНА'), findsOneWidget);
+      expect(find.text('Calm'), findsOneWidget);
+      expect(find.text('Battle'), findsOneWidget);
+    });
   });
 
   group('CustomThemeEditorDialog Widget Tests', () {
-    testWidgets(
-      'Что проверяем: Открытие диалога редактирования темы, интерактивный предпросмотр и сохранение. '
-      'Входные данные: CustomThemeEditorDialog с дефолтными параметрами. '
-      'Ожидаемый результат: Отображаются предпросмотр темы, кнопки выбора цветов, поле ввода названия и кнопка "Сохранить тему".',
-      (tester) async {
-        await tester.pumpWidget(
-          createTestApp(
-            child: const CustomThemeEditorDialog(),
-          ),
-        );
-        await tester.pumpAndSettle();
+    testWidgets('should render theme editor dialog controls and color customization sections', (tester) async {
+      // Arrange & Act
+      await tester.pumpWidget(
+        createTestApp(
+          child: const CustomThemeEditorDialog(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Создание кастомной темы'), findsOneWidget);
-        expect(find.text('Предпросмотр темы'), findsOneWidget);
-        expect(find.text('Настройка палитры цветов'), findsOneWidget);
-        expect(find.text('Сохранить тему'), findsOneWidget);
-      },
-    );
+      // Assert
+      expect(find.text('Создание кастомной темы'), findsOneWidget);
+      expect(find.text('Предпросмотр темы'), findsOneWidget);
+      expect(find.text('Настройка палитры цветов'), findsOneWidget);
+      expect(find.text('Сохранить тему'), findsOneWidget);
+    });
   });
 
   group('SettingsScreen Milestone 4 Widget Tests', () {
-    testWidgets(
-      'Что проверяем: Отображение разделов тем оформления и горячих клавиш в SettingsScreen. '
-      'Входные данные: SettingsScreen с активным ThemeService и ShortcutService. '
-      'Ожидаемый результат: Отображаются встроенные пресеты (Deep Dark, Clean Light, Emerald Forest и др.), кнопка "+ Создать новую тему" и таблица горячих клавиш.',
-      (tester) async {
-        await tester.pumpWidget(
-          createTestApp(
-            child: const SettingsScreen(),
-          ),
-        );
-        await tester.pumpAndSettle();
+    testWidgets('should render theme presets section and shortcut key bindings table', (tester) async {
+      // Arrange & Act
+      await tester.pumpWidget(
+        createTestApp(
+          child: const SettingsScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Темы оформления (Themes)'), findsOneWidget);
-        expect(find.text('Deep Dark'), findsOneWidget);
-        expect(find.text('Clean Light'), findsOneWidget);
-        expect(find.text('+ Создать новую тему'), findsOneWidget);
-        expect(find.text('Централизованные горячие клавиши'), findsOneWidget);
-        expect(find.text('Space'), findsWidgets);
-      },
-    );
+      // Assert
+      expect(find.text('Темы оформления (Themes)'), findsOneWidget);
+      expect(find.text('Deep Dark'), findsOneWidget);
+      expect(find.text('Clean Light'), findsOneWidget);
+      expect(find.text('+ Создать новую тему'), findsOneWidget);
+      expect(find.text('Централизованные горячие клавиши'), findsOneWidget);
+      expect(find.text('Space'), findsWidgets);
+    });
   });
 
   group('SoundboardGrid and AmbientMixerPanel Widget Tests', () {
-    testWidgets(
-      'Что проверяем: Отображение SFX Soundboard и регулировка громкости без влияния на мастер. '
-      'Входные данные: SoundboardGrid с добавленным SFX триггером "Удар меча". '
-      'Ожидаемый результат: Название "Удар меча" отображается на кнопке, перетаскивание слайдера SFX обновляет sfxBus.rawVolume.',
-      (tester) async {
-        final engine = AudioEngineService();
-        engine.sfxBus.addTrigger(
-          const SfxTrigger(
-            id: 'sfx_sword',
-            title: 'Удар меча',
-            filePath: '/dummy/sword.wav',
-            hotkey: '1',
+    testWidgets('should render SFX soundboard triggers and display hotkey badges', (tester) async {
+      // Arrange
+      final engine = AudioEngineService();
+      engine.sfxBus.addTrigger(
+        const SfxTrigger(
+          id: 'sfx_sword',
+          title: 'Sword Strike',
+          filePath: '/dummy/sword.wav',
+          hotkey: '1',
+        ),
+      );
+
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          audioEngine: engine,
+          child: const SingleChildScrollView(
+            child: SoundboardGrid(),
           ),
-        );
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        await tester.pumpWidget(
-          createTestApp(
-            audioEngine: engine,
-            child: const SingleChildScrollView(
-              child: SoundboardGrid(),
-            ),
+      // Assert
+      expect(find.text('Sword Strike'), findsOneWidget);
+      expect(find.text('[1]'), findsOneWidget);
+      expect(find.text('Panic Stop [Esc]'), findsOneWidget);
+    });
+
+    testWidgets('should allow volume slider interaction on inactive ambient layer', (tester) async {
+      // Arrange
+      final engine = AudioEngineService();
+      engine.ambientBus.addLayer(
+        const AmbientLayer(
+          id: 'amb_rain',
+          title: 'Storm Rain',
+          filePath: '/dummy/rain.mp3',
+          isActive: false,
+          volume: 0.5,
+        ),
+      );
+
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          audioEngine: engine,
+          child: const SingleChildScrollView(
+            child: AmbientMixerPanel(),
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Удар меча'), findsOneWidget);
-        expect(find.text('[1]'), findsOneWidget);
-        expect(find.text('Panic Stop [Esc]'), findsOneWidget);
-      },
-    );
+      // Assert
+      expect(find.text('Storm Rain'), findsOneWidget);
+      expect(find.text('Громкость: 50%'), findsOneWidget);
 
-    testWidgets(
-      'Что проверяем: Регулировка громкости эмбиент-слоя при выключенном состоянии. '
-      'Входные данные: AmbientMixerPanel со слоем isActive=false. '
-      'Ожидаемый результат: Слайдер доступен для взаимодействия и изменяет громкость слоя.',
-      (tester) async {
-        final engine = AudioEngineService();
-        engine.ambientBus.addLayer(
-          const AmbientLayer(
-            id: 'amb_rain',
-            title: 'Грозовой дождь',
-            filePath: '/dummy/rain.mp3',
-            isActive: false,
-            volume: 0.5,
-          ),
-        );
-
-        await tester.pumpWidget(
-          createTestApp(
-            audioEngine: engine,
-            child: const SingleChildScrollView(
-              child: AmbientMixerPanel(),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('Грозовой дождь'), findsOneWidget);
-        expect(find.text('Громкость: 50%'), findsOneWidget);
-
-        final sliderFinder = find.byKey(const ValueKey('ambient_slider_amb_rain'));
-        expect(sliderFinder, findsOneWidget);
-      },
-    );
+      final sliderFinder = find.byKey(const ValueKey('ambient_slider_amb_rain'));
+      expect(sliderFinder, findsOneWidget);
+    });
   });
 }

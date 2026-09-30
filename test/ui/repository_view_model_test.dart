@@ -95,118 +95,112 @@ void main() {
   });
 
   group('RepositoryViewModel Unit Tests', () {
-    test(
-      'Что проверяем: Инициализация и установка поискового запроса setSearchQuery в RepositoryViewModel. '
-      'Входные данные: setSearchQuery("дракон"). '
-      'Ожидаемый результат: searchQuery становится равным "дракон" и вызывается notifyListeners.',
-      () {
-        final fakeSource = FakeSceneRepositorySourceRepository();
-        final vm = RepositoryViewModel(sourceRepository: fakeSource);
+    test('should update search query and notify listeners when setSearchQuery is called', () {
+      // Arrange
+      final fakeSource = FakeSceneRepositorySourceRepository();
+      final vm = RepositoryViewModel(sourceRepository: fakeSource);
 
-        expect(vm.searchQuery, isEmpty);
-        bool notified = false;
-        vm.addListener(() => notified = true);
+      expect(vm.searchQuery, isEmpty);
+      bool notified = false;
+      vm.addListener(() => notified = true);
 
-        vm.setSearchQuery('дракон');
-        expect(vm.searchQuery, equals('дракон'));
-        expect(notified, isTrue);
-      },
-    );
+      // Act
+      vm.setSearchQuery('dragon');
 
-    test(
-      'Что проверяем: Удаление репозитория из ViewModel deleteRepository. '
-      'Входные данные: Добавленный репозиторий с id="repo-del-1". '
-      'Ожидаемый результат: Список repositories пуст после вызова deleteRepository.',
-      () async {
-        final fakeSource = FakeSceneRepositorySourceRepository();
-        final repo = SceneRepositoryModel(
-          id: 'repo-del-1',
-          name: 'To Delete',
-          url: 'https://example.com/repo',
-          createdAt: DateTime.now(),
-        );
-        await fakeSource.addRepository(repo);
+      // Assert
+      expect(vm.searchQuery, equals('dragon'));
+      expect(notified, isTrue);
+    });
 
-        final vm = RepositoryViewModel(sourceRepository: fakeSource);
-        await vm.loadRepositories();
+    test('should delete repository from repository list when deleteRepository is executed', () async {
+      // Arrange
+      final fakeSource = FakeSceneRepositorySourceRepository();
+      final repo = SceneRepositoryModel(
+        id: 'repo-del-1',
+        name: 'To Delete',
+        url: 'https://example.com/repo',
+        createdAt: DateTime.now(),
+      );
+      await fakeSource.addRepository(repo);
 
-        expect(vm.repositories.length, equals(1));
+      final vm = RepositoryViewModel(sourceRepository: fakeSource);
+      await vm.loadRepositories();
+      expect(vm.repositories.length, equals(1));
 
-        await vm.deleteRepository('repo-del-1');
-        expect(vm.repositories, isEmpty);
-      },
-    );
+      // Act
+      await vm.deleteRepository('repo-del-1');
 
-    test(
-      'Что проверяем: Редактирование данных существующего репозитория через updateRepository. '
-      'Входные данные: Исходный репозиторий id="repo-edit-1", вызов updateRepository с новым именем "Updated Name" и URL "https://example.com/new_repo.json". '
-      'Ожидаемый результат: Метод возвращает true, имя и URL репозитория обновляются в списке repositories и в репозитории данных.',
-      () async {
-        final fakeSource = FakeSceneRepositorySourceRepository();
-        final fakeNetwork = FakeSceneRepositoryNetworkService(
-          const SceneRepositoryManifest(
-            name: 'Updated Name',
-            description: 'Updated Description',
-          ),
-        );
-        final initialRepo = SceneRepositoryModel(
-          id: 'repo-edit-1',
-          name: 'Original Name',
-          url: 'https://example.com/old_repo.json',
-          description: 'Original Description',
-          createdAt: DateTime.now(),
-        );
-        await fakeSource.addRepository(initialRepo);
+      // Assert
+      expect(vm.repositories, isEmpty);
+    });
 
-        final vm = RepositoryViewModel(
-          sourceRepository: fakeSource,
-          networkService: fakeNetwork,
-        );
-        await vm.loadRepositories();
-        expect(vm.repositories.first.name, equals('Original Name'));
-
-        final success = await vm.updateRepository(
-          id: 'repo-edit-1',
+    test('should edit and persist updated repository metadata when updateRepository is called', () async {
+      // Arrange
+      final fakeSource = FakeSceneRepositorySourceRepository();
+      final fakeNetwork = FakeSceneRepositoryNetworkService(
+        const SceneRepositoryManifest(
           name: 'Updated Name',
-          url: 'https://example.com/new_repo.json',
           description: 'Updated Description',
-        );
+        ),
+      );
+      final initialRepo = SceneRepositoryModel(
+        id: 'repo-edit-1',
+        name: 'Original Name',
+        url: 'https://example.com/old_repo.json',
+        description: 'Original Description',
+        createdAt: DateTime.now(),
+      );
+      await fakeSource.addRepository(initialRepo);
 
-        expect(success, isTrue);
-        expect(vm.repositories.first.name, equals('Updated Name'));
-        expect(vm.repositories.first.url, equals('https://example.com/new_repo.json'));
-        expect(vm.repositories.first.description, equals('Updated Description'));
+      final vm = RepositoryViewModel(
+        sourceRepository: fakeSource,
+        networkService: fakeNetwork,
+      );
+      await vm.loadRepositories();
+      expect(vm.repositories.first.name, equals('Original Name'));
 
-        final persisted = await fakeSource.getRepositoryById('repo-edit-1');
-        expect(persisted?.name, equals('Updated Name'));
-        expect(persisted?.url, equals('https://example.com/new_repo.json'));
-      },
-    );
+      // Act
+      final success = await vm.updateRepository(
+        id: 'repo-edit-1',
+        name: 'Updated Name',
+        url: 'https://example.com/new_repo.json',
+        description: 'Updated Description',
+      );
 
-    test(
-      'Что проверяем: Определение целевой папки аудиобиблиотеки getEffectiveAudioDirectory в RepositoryViewModel. '
-      'Входные данные: RepositoryViewModel с дефолтным SettingsService, затем с установленным customDownloadDirectory ("D:/CustomFolder"). '
-      'Ожидаемый результат: В первом случае возвращается путь к fallback Documents/audio_library, во втором случае возвращается "D:/CustomFolder".',
-      () async {
-        final fakeSource = FakeSceneRepositorySourceRepository();
-        final settings = SettingsService();
+      // Assert
+      expect(success, isTrue);
+      expect(vm.repositories.first.name, equals('Updated Name'));
+      expect(vm.repositories.first.url, equals('https://example.com/new_repo.json'));
+      expect(vm.repositories.first.description, equals('Updated Description'));
 
-        final vm = RepositoryViewModel(
-          sourceRepository: fakeSource,
-          settingsService: settings,
-        );
+      final persisted = await fakeSource.getRepositoryById('repo-edit-1');
+      expect(persisted?.name, equals('Updated Name'));
+      expect(persisted?.url, equals('https://example.com/new_repo.json'));
+    });
 
-        final defaultDir = await vm.getEffectiveAudioDirectory();
-        expect(defaultDir.endsWith('audio_library'), isTrue);
+    test('should resolve effective audio directory based on settings custom download path', () async {
+      // Arrange
+      final fakeSource = FakeSceneRepositorySourceRepository();
+      final settings = SettingsService();
 
-        settings.setCustomDownloadDirectory('D:/CustomFolder');
-        final customDir = await vm.getEffectiveAudioDirectory();
-        expect(customDir, equals('D:/CustomFolder'));
+      final vm = RepositoryViewModel(
+        sourceRepository: fakeSource,
+        settingsService: settings,
+      );
 
-        settings.resetCustomDownloadDirectory();
-        final resetDir = await vm.getEffectiveAudioDirectory();
-        expect(resetDir.endsWith('audio_library'), isTrue);
-      },
-    );
+      // Act & Assert - default directory
+      final defaultDir = await vm.getEffectiveAudioDirectory();
+      expect(defaultDir.endsWith('audio_library'), isTrue);
+
+      // Act & Assert - custom directory
+      settings.setCustomDownloadDirectory('D:/CustomFolder');
+      final customDir = await vm.getEffectiveAudioDirectory();
+      expect(customDir, equals('D:/CustomFolder'));
+
+      // Act & Assert - reset directory
+      settings.resetCustomDownloadDirectory();
+      final resetDir = await vm.getEffectiveAudioDirectory();
+      expect(resetDir.endsWith('audio_library'), isTrue);
+    });
   });
 }

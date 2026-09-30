@@ -20,140 +20,122 @@ void main() {
       audioEngine.dispose();
     });
 
-    test(
-      'Что проверяем: Действие Space для переключения Play/Pause музыки. '
-      'Входные данные: handleActionDirectly(AppShortcutAction.playPauseMusic). '
-      'Ожидаемый результат: Вызывается resume() или pause() на musicBus, меняя isPlaying.',
-      () async {
-        const track = AudioTrack(id: 'sh_track_1', title: 'Battle Theme', filePath: '/fake/battle.mp3');
-        await audioEngine.musicBus.playTrack(track, fadeDuration: Duration.zero);
-        expect(audioEngine.musicBus.currentTrack, equals(track));
+    test('should toggle music playback state when playPauseMusic shortcut is invoked', () async {
+      // Arrange
+      const track = AudioTrack(id: 'sh_track_1', title: 'Battle Theme', filePath: '/fake/battle.mp3');
+      await audioEngine.musicBus.playTrack(track, fadeDuration: Duration.zero);
+      expect(audioEngine.musicBus.currentTrack, equals(track));
 
-        shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
-        expect(audioEngine.musicBus.isPlaying, isTrue);
+      // Act & Assert - Toggle pause
+      shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
+      expect(audioEngine.musicBus.isPlaying, isTrue);
 
-        shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
-        expect(audioEngine.musicBus.isPlaying, isFalse);
-      },
-    );
+      // Act & Assert - Toggle resume
+      shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
+      expect(audioEngine.musicBus.isPlaying, isFalse);
+    });
 
-    test(
-      'Что проверяем: Переключение интенсивности музыки горячими клавишами 1..4. '
-      'Входные данные: handleActionDirectly(AppShortcutAction.intensityBattle, intensityBoss, intensityCalm). '
-      'Ожидаемый результат: musicBus.currentIntensity меняется на соответствующее значение.',
-      () {
-        shortcutService.handleActionDirectly(AppShortcutAction.intensitySuspense);
-        expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.suspense));
+    test('should switch music intensity when corresponding intensity shortcuts are invoked', () {
+      // Arrange & Act & Assert - Suspense
+      shortcutService.handleActionDirectly(AppShortcutAction.intensitySuspense);
+      expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.suspense));
 
-        shortcutService.handleActionDirectly(AppShortcutAction.intensityBattle);
-        expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.battle));
+      // Arrange & Act & Assert - Battle
+      shortcutService.handleActionDirectly(AppShortcutAction.intensityBattle);
+      expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.battle));
 
-        shortcutService.handleActionDirectly(AppShortcutAction.intensityBoss);
-        expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.boss));
+      // Arrange & Act & Assert - Boss
+      shortcutService.handleActionDirectly(AppShortcutAction.intensityBoss);
+      expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.boss));
 
-        shortcutService.handleActionDirectly(AppShortcutAction.intensityCalm);
-        expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.calm));
-      },
-    );
+      // Arrange & Act & Assert - Calm
+      shortcutService.handleActionDirectly(AppShortcutAction.intensityCalm);
+      expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.calm));
+    });
 
-    test(
-      'Что проверяем: Переключение Master Mute горячей клавишей M. '
-      'Входные данные: handleActionDirectly(AppShortcutAction.masterMute). '
-      'Ожидаемый результат: audioEngine.isMuted переключается в true, громкость 0.0, при повторном нажатии восстанавливается.',
-      () {
-        audioEngine.setMasterVolume(0.8);
-        expect(audioEngine.isMuted, isFalse);
+    test('should toggle master mute and restore previous volume level when masterMute action is triggered', () {
+      // Arrange
+      audioEngine.setMasterVolume(0.8);
+      expect(audioEngine.isMuted, isFalse);
 
-        shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
-        expect(audioEngine.isMuted, isTrue);
-        expect(audioEngine.masterVolume, equals(0.0));
+      // Act & Assert - Mute
+      shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
+      expect(audioEngine.isMuted, isTrue);
+      expect(audioEngine.masterVolume, equals(0.0));
 
-        shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
-        expect(audioEngine.isMuted, isFalse);
-        expect(audioEngine.masterVolume, equals(0.8));
-      },
-    );
+      // Act & Assert - Unmute
+      shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
+      expect(audioEngine.isMuted, isFalse);
+      expect(audioEngine.masterVolume, equals(0.8));
+    });
 
-    test(
-      'Что проверяем: Ручной Ducking клавишей D. '
-      'Входные данные: handleActionDirectly(AppShortcutAction.manualDucking). '
-      'Ожидаемый результат: duckingController.isDucked становится true.',
-      () {
-        expect(audioEngine.duckingController.isDucked, isFalse);
-        shortcutService.handleActionDirectly(AppShortcutAction.manualDucking);
-        expect(audioEngine.duckingController.isDucked, isTrue);
-      },
-    );
+    test('should activate manual ducking when manualDucking action is dispatched', () {
+      // Arrange
+      expect(audioEngine.duckingController.isDucked, isFalse);
 
-    test(
-      'Что проверяем: Экстренная остановка Panic Stop клавишей Escape. '
-      'Входные данные: handleActionDirectly(AppShortcutAction.panicStopSfx). '
-      'Ожидаемый результат: Вызывается audioEngine.panicStopSfx().',
-      () {
-        shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
-        expect(audioEngine.sfxBus.triggers.isEmpty, isTrue);
-      },
-    );
+      // Act
+      shortcutService.handleActionDirectly(AppShortcutAction.manualDucking);
 
-    test(
-      'Что проверяем: Переключение полноэкранного режима F11. '
-      'Входные данные: handleActionDirectly(AppShortcutAction.toggleFullscreen). '
-      'Ожидаемый результат: shortcutService.isFullscreen инвертируется с false в true и обратно.',
-      () {
-        expect(shortcutService.isFullscreen, isFalse);
+      // Assert
+      expect(audioEngine.duckingController.isDucked, isTrue);
+    });
 
-        shortcutService.handleActionDirectly(AppShortcutAction.toggleFullscreen);
-        expect(shortcutService.isFullscreen, isTrue);
+    test('should stop all active sound effects when panicStopSfx action is triggered', () {
+      // Arrange & Act
+      shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
 
-        shortcutService.handleActionDirectly(AppShortcutAction.toggleFullscreen);
-        expect(shortcutService.isFullscreen, isFalse);
-      },
-    );
+      // Assert
+      expect(audioEngine.sfxBus.triggers.isEmpty, isTrue);
+    });
 
-    test(
-      'Что проверяем: Включение и отключение горячих клавиш setEnabled. '
-      'Входные данные: shortcutService.setEnabled(false). '
-      'Ожидаемый результат: isEnabled становится false.',
-      () {
-        shortcutService.setEnabled(false);
-        expect(shortcutService.isEnabled, isFalse);
+    test('should toggle fullscreen state when toggleFullscreen action is triggered', () {
+      // Arrange
+      expect(shortcutService.isFullscreen, isFalse);
 
-        shortcutService.setEnabled(true);
-        expect(shortcutService.isEnabled, isTrue);
-      },
-    );
+      // Act & Assert - enter fullscreen
+      shortcutService.handleActionDirectly(AppShortcutAction.toggleFullscreen);
+      expect(shortcutService.isFullscreen, isTrue);
 
-    test(
-      'Что проверяем: Воспроизведение звуковых эффектов по SFX горячим клавишам sfx1..sfx9. '
-      'Входные данные: SfxTrigger с файлом в sfxBus, вызов handleActionDirectly(AppShortcutAction.sfx1). '
-      'Ожидаемый результат: SFX триггер активируется без ошибок, вызывается onSfxTriggered.',
-      () {
-        bool duckTriggered = false;
-        audioEngine = AudioEngineService();
-        audioEngine.duckingController.triggerDuck(onVolumeUpdate: (_) => duckTriggered = true);
-        expect(duckTriggered, isTrue);
-        shortcutService.attachAudioEngine(audioEngine);
+      // Act & Assert - exit fullscreen
+      shortcutService.handleActionDirectly(AppShortcutAction.toggleFullscreen);
+      expect(shortcutService.isFullscreen, isFalse);
+    });
 
-        shortcutService.handleActionDirectly(AppShortcutAction.sfx1);
-        expect(shortcutService.getDisplayForAction(AppShortcutAction.sfx1), equals('Num 1 / Ctrl+1'));
-        expect(shortcutService.getDisplayForAction(AppShortcutAction.panicStopSfx), equals('Escape'));
-      },
-    );
+    test('should enable or disable shortcut processing when setEnabled is called', () {
+      // Arrange & Act & Assert - Disable
+      shortcutService.setEnabled(false);
+      expect(shortcutService.isEnabled, isFalse);
 
-    test(
-      'Что проверяем: Быстрая последовательность вызовов различных горячих клавиш (Space, 1..4, M, D, Esc). '
-      'Входные данные: Последовательный вызов playPause, intensityBattle, manualDucking, masterMute, panicStopSfx. '
-      'Ожидаемый результат: Система стабильно отрабатывает все вызовы без исключений и зависаний.',
-      () {
-        shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
-        shortcutService.handleActionDirectly(AppShortcutAction.intensityBattle);
-        shortcutService.handleActionDirectly(AppShortcutAction.manualDucking);
-        shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
-        shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
+      // Arrange & Act & Assert - Enable
+      shortcutService.setEnabled(true);
+      expect(shortcutService.isEnabled, isTrue);
+    });
 
-        expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.battle));
-        expect(audioEngine.isMuted, isTrue);
-      },
-    );
+    test('should return correct display key combinations for actions', () {
+      // Arrange
+      bool duckTriggered = false;
+      audioEngine = AudioEngineService();
+      audioEngine.duckingController.triggerDuck(onVolumeUpdate: (_) => duckTriggered = true);
+      expect(duckTriggered, isTrue);
+      shortcutService.attachAudioEngine(audioEngine);
+
+      // Act & Assert
+      shortcutService.handleActionDirectly(AppShortcutAction.sfx1);
+      expect(shortcutService.getDisplayForAction(AppShortcutAction.sfx1), equals('Num 1 / Ctrl+1'));
+      expect(shortcutService.getDisplayForAction(AppShortcutAction.panicStopSfx), equals('Escape'));
+    });
+
+    test('should process rapid consecutive shortcut actions without errors or state inconsistency', () {
+      // Arrange & Act
+      shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
+      shortcutService.handleActionDirectly(AppShortcutAction.intensityBattle);
+      shortcutService.handleActionDirectly(AppShortcutAction.manualDucking);
+      shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
+      shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
+
+      // Assert
+      expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.battle));
+      expect(audioEngine.isMuted, isTrue);
+    });
   });
 }
