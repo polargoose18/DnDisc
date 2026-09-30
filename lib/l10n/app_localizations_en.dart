@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'TTRPG Audio Master';
+  String get appTitle => 'DnDisc';
 
   @override
   String get tabGmDashboard => 'GM Dashboard';
@@ -76,7 +76,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ambientFadeTitle => 'Ambient fade in/out duration';
 
   @override
-  String get duckingTitle => 'Auto-ducking music during SFX (Ducking)';
+  String get duckingTitle => 'Auto-ducking music during SFX';
 
   @override
   String get duckAttackTitle => 'Duck Attack Time';
@@ -97,7 +97,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get duckMultiplierSubtitle => 'of original music volume';
 
   @override
-  String get presetPacksTitle => 'Preset Packs (ZIP Archives)';
+  String get presetPacksTitle => 'Preset Packs (ZIP)';
 
   @override
   String get presetPacksSubtitle =>
@@ -107,7 +107,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importPresetBtn => 'Import Preset (ZIP)';
 
   @override
-  String get exportPresetBtn => 'Export Preset to ZIP';
+  String get exportPresetBtn => 'Export Preset to (ZIP)';
 
   @override
   String get interfaceTitle => 'Interface & Control Panel';
@@ -129,7 +129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themesTitle => 'App Themes';
 
   @override
-  String get builtinThemes => 'Built-in Presets (5 variants)';
+  String get builtinThemes => 'Built-in Presets';
 
   @override
   String get customThemes => 'Custom Themes';
@@ -139,7 +139,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'You don\'t have custom themes yet. Create your own theme with a custom palette!';
 
   @override
-  String get createThemeBtn => '+ Create new theme';
+  String get createThemeBtn => 'Create new theme';
 
   @override
   String get hotkeysTitle => 'Centralized Shortcuts';
@@ -365,7 +365,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Persistent SFX (do not reset on scene change)';
 
   @override
-  String get loopModeCheckbox => 'Loop Mode (Loop)';
+  String get loopModeCheckbox => 'Loop Mode';
 
   @override
   String get addSfxBtn => 'Add SFX';
@@ -619,7 +619,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manageRepositoriesTooltip => 'Manage repositories';
 
   @override
-  String get addRepositoryBtn => '+ Add';
+  String get addRepositoryBtn => 'Add';
 
   @override
   String get searchCatalogPlaceholder => 'Search items in catalog...';
@@ -634,7 +634,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addRepositoryUrlHint =>
-      'Add a link to GitLab, Dropbox or CDN with repository.json manifest';
+      'Add a link to GitLab, Dropbox or Webserver with repository.json manifest';
 
   @override
   String get addRepositoryDialogTitle => 'Add Repository';
@@ -648,8 +648,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get repositoryUrlLabel =>
-      'Repository URL (GitLab / Dropbox / HTTP / JSON)';
+  String get repositoryUrlLabel => 'Repository URL (GitLab / Dropbox / HTTP)';
 
   @override
   String get repositoryNameOptionalLabel => 'Name (optional)';
@@ -734,7 +733,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get removeFromApp => 'Remove from app';
+  String removeFromApp(String type) {
+    return 'Remove $type';
+  }
 
   @override
   String get installing => 'Installing...';
@@ -756,7 +757,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String itemUninstalled(String type, String name) {
-    return '$type \"$name\" successfully removed from app.';
+    return '$type \"$name\" successfully removed.';
   }
 
   @override

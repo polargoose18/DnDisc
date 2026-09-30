@@ -405,7 +405,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
           ElevatedButton.icon(
             onPressed: () => _showAddRepositoryDialog(context),
             icon: const Icon(Icons.add),
-            label: const Text('+ Add'),
+            label: const Text('Add'),
           ),
           const SizedBox(width: 16),
         ],

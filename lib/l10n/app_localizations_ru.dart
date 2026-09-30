@@ -739,7 +739,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get removeFromApp => 'Удалить из приложения';
+  String removeFromApp(String type) {
+    return 'Удалить из приложения';
+  }
 
   @override
   String get installing => 'Установка...';

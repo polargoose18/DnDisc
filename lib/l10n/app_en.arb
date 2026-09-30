@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "TTRPG Audio Master",
+  "appTitle": "DnDisc",
   "tabGmDashboard": "GM Dashboard",
   "tabLibrary": "Media Library",
   "tabSettings": "Settings",
@@ -22,27 +22,27 @@
   "fadeEngineTitle": "Fade Engine",
   "musicFadeTitle": "Music fade in/out duration",
   "ambientFadeTitle": "Ambient fade in/out duration",
-  "duckingTitle": "Auto-ducking music during SFX (Ducking)",
+  "duckingTitle": "Auto-ducking music during SFX",
   "duckAttackTitle": "Duck Attack Time",
   "duckAttackSubtitle": "music fade-down speed when SFX triggers",
   "duckReleaseTitle": "Duck Release Time",
   "duckReleaseSubtitle": "music fade-up speed to full volume",
   "duckMultiplierTitle": "Ducking Depth",
   "duckMultiplierSubtitle": "of original music volume",
-  "presetPacksTitle": "Preset Packs (ZIP Archives)",
+  "presetPacksTitle": "Preset Packs (ZIP)",
   "presetPacksSubtitle": "Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure packs.",
   "importPresetBtn": "Import Preset (ZIP)",
-  "exportPresetBtn": "Export Preset to ZIP",
+  "exportPresetBtn": "Export Preset to (ZIP)",
   "interfaceTitle": "Interface & Control Panel",
   "showLogConsoleTitle": "Show log console icon",
   "showLogConsoleSubtitle": "Show quick toggle button for log console in top header",
   "resetDefaultsBtn": "Reset all settings to defaults",
   "settingsResetToast": "Audio engine settings reset.",
   "themesTitle": "App Themes",
-  "builtinThemes": "Built-in Presets (5 variants)",
+  "builtinThemes": "Built-in Presets",
   "customThemes": "Custom Themes",
   "noCustomThemes": "You don't have custom themes yet. Create your own theme with a custom palette!",
-  "createThemeBtn": "+ Create new theme",
+  "createThemeBtn": "Create new theme",
   "hotkeysTitle": "Centralized Shortcuts",
   "hotkeysSubtitle": "Control soundscape during game session without distraction:",
   "actionCol": "Action",
@@ -114,7 +114,7 @@
   "addSfxDialogTitle": "Add SFX Button",
   "selectSoundFromLibrary": "Select a sound from library:",
   "persistentSfxCheckbox": "Persistent SFX (do not reset on scene change)",
-  "loopModeCheckbox": "Loop Mode (Loop)",
+  "loopModeCheckbox": "Loop Mode",
   "addSfxBtn": "Add SFX",
   "exportScenePackTooltip": "Export Scene Pack (.pack.zip)",
   "searchScenesPlaceholder": "Search scenes...",
@@ -283,7 +283,7 @@
   "catalogTitle": "Catalog",
   "refreshCatalogTooltip": "Refresh catalog",
   "manageRepositoriesTooltip": "Manage repositories",
-  "addRepositoryBtn": "+ Add",
+  "addRepositoryBtn": "Add",
   "searchCatalogPlaceholder": "Search items in catalog...",
   "sourcesBtn": "Sources ({count})",
   "@sourcesBtn": {
@@ -294,7 +294,7 @@
     }
   },
   "noRepositoriesConnected": "No connected repositories",
-  "addRepositoryUrlHint": "Add a link to GitLab, Dropbox or CDN with repository.json manifest",
+  "addRepositoryUrlHint": "Add a link to GitLab, Dropbox or Webserver with repository.json manifest",
   "addRepositoryDialogTitle": "Add Repository",
   "editRepositoryDialogTitle": "Edit Repository",
   "manageRepositoriesTitle": "Manage Repositories ({count})",
@@ -305,7 +305,7 @@
       }
     }
   },
-  "repositoryUrlLabel": "Repository URL (GitLab / Dropbox / HTTP / JSON)",
+  "repositoryUrlLabel": "Repository URL (GitLab / Dropbox / HTTP)",
   "repositoryNameOptionalLabel": "Name (optional)",
   "repositoryNameHint": "Will be extracted from manifest if empty",
   "repositoryDescOptionalLabel": "Description (optional)",
@@ -371,7 +371,14 @@
       }
     }
   },
-  "removeFromApp": "Remove from app",
+  "removeFromApp": "Remove {type}",
+  "@removeFromApp": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
   "installing": "Installing...",
   "installItem": "Install {type}",
   "@installItem": {
@@ -400,7 +407,7 @@
       }
     }
   },
-  "itemUninstalled": "{type} \"{name}\" successfully removed from app.",
+  "itemUninstalled": "{type} \"{name}\" successfully removed.",
   "@itemUninstalled": {
     "placeholders": {
       "type": {

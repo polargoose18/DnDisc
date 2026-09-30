@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'TTRPG Audio Master'**
+  /// **'DnDisc'**
   String get appTitle;
 
   /// No description provided for @tabGmDashboard.
@@ -233,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @duckingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Auto-ducking music during SFX (Ducking)'**
+  /// **'Auto-ducking music during SFX'**
   String get duckingTitle;
 
   /// No description provided for @duckAttackTitle.
@@ -275,7 +275,7 @@ abstract class AppLocalizations {
   /// No description provided for @presetPacksTitle.
   ///
   /// In en, this message translates to:
-  /// **'Preset Packs (ZIP Archives)'**
+  /// **'Preset Packs (ZIP)'**
   String get presetPacksTitle;
 
   /// No description provided for @presetPacksSubtitle.
@@ -293,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @exportPresetBtn.
   ///
   /// In en, this message translates to:
-  /// **'Export Preset to ZIP'**
+  /// **'Export Preset to (ZIP)'**
   String get exportPresetBtn;
 
   /// No description provided for @interfaceTitle.
@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @builtinThemes.
   ///
   /// In en, this message translates to:
-  /// **'Built-in Presets (5 variants)'**
+  /// **'Built-in Presets'**
   String get builtinThemes;
 
   /// No description provided for @customThemes.
@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @createThemeBtn.
   ///
   /// In en, this message translates to:
-  /// **'+ Create new theme'**
+  /// **'Create new theme'**
   String get createThemeBtn;
 
   /// No description provided for @hotkeysTitle.
@@ -785,7 +785,7 @@ abstract class AppLocalizations {
   /// No description provided for @loopModeCheckbox.
   ///
   /// In en, this message translates to:
-  /// **'Loop Mode (Loop)'**
+  /// **'Loop Mode'**
   String get loopModeCheckbox;
 
   /// No description provided for @addSfxBtn.
@@ -1241,7 +1241,7 @@ abstract class AppLocalizations {
   /// No description provided for @addRepositoryBtn.
   ///
   /// In en, this message translates to:
-  /// **'+ Add'**
+  /// **'Add'**
   String get addRepositoryBtn;
 
   /// No description provided for @searchCatalogPlaceholder.
@@ -1265,7 +1265,7 @@ abstract class AppLocalizations {
   /// No description provided for @addRepositoryUrlHint.
   ///
   /// In en, this message translates to:
-  /// **'Add a link to GitLab, Dropbox or CDN with repository.json manifest'**
+  /// **'Add a link to GitLab, Dropbox or Webserver with repository.json manifest'**
   String get addRepositoryUrlHint;
 
   /// No description provided for @addRepositoryDialogTitle.
@@ -1289,7 +1289,7 @@ abstract class AppLocalizations {
   /// No description provided for @repositoryUrlLabel.
   ///
   /// In en, this message translates to:
-  /// **'Repository URL (GitLab / Dropbox / HTTP / JSON)'**
+  /// **'Repository URL (GitLab / Dropbox / HTTP)'**
   String get repositoryUrlLabel;
 
   /// No description provided for @repositoryNameOptionalLabel.
@@ -1433,8 +1433,8 @@ abstract class AppLocalizations {
   /// No description provided for @removeFromApp.
   ///
   /// In en, this message translates to:
-  /// **'Remove from app'**
-  String get removeFromApp;
+  /// **'Remove {type}'**
+  String removeFromApp(String type);
 
   /// No description provided for @installing.
   ///
@@ -1463,7 +1463,7 @@ abstract class AppLocalizations {
   /// No description provided for @itemUninstalled.
   ///
   /// In en, this message translates to:
-  /// **'{type} \"{name}\" successfully removed from app.'**
+  /// **'{type} \"{name}\" successfully removed.'**
   String itemUninstalled(String type, String name);
 
   /// No description provided for @itemUninstallError.
