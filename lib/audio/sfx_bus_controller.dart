@@ -71,15 +71,16 @@ class SfxBusController extends ChangeNotifier {
 
       onSfxTriggered?.call();
 
-      final file = File(trigger.filePath);
+      final file = File(trigger.filePath).absolute;
       if (!file.existsSync()) {
-        LoggerService().warning('SfxBus: File does not exist', details: 'Path: ${trigger.filePath}');
+        LoggerService().warning('SfxBus: File does not exist', details: 'Path: ${file.path}');
         notifyListeners();
         return;
       }
 
+      AudioPlayer? player;
       try {
-        final player = AudioPlayer();
+        player = AudioPlayer();
         await player.setVolume(trigger.volume * effectiveVolume);
         await player.setReleaseMode(trigger.isLoop ? ReleaseMode.loop : ReleaseMode.stop);
 
@@ -92,13 +93,32 @@ class SfxBusController extends ChangeNotifier {
         await player.play(DeviceFileSource(file.path));
 
         if (!trigger.isLoop) {
-          player.onPlayerComplete.listen((_) {
-            _activePlayers.remove(player);
-            player.dispose();
-          });
+          player.onPlayerComplete.listen(
+            (_) {
+              if (player != null) {
+                _activePlayers.remove(player);
+                player.dispose();
+              }
+            },
+            onError: (e) {
+              LoggerService().warning('SfxBus: Error in onPlayerComplete for ${trigger.title}', details: '$e');
+              if (player != null) {
+                _activePlayers.remove(player);
+                player.dispose();
+              }
+            },
+          );
         }
       } catch (e, stack) {
         LoggerService().error('SfxBus: Exception triggering ${trigger.title}', details: '$e\n$stack');
+        if (player != null) {
+          _activePlayers.remove(player);
+          _loopingPlayers.remove(triggerId);
+          try {
+            await player.stop();
+            await player.dispose();
+          } catch (_) {}
+        }
       }
       notifyListeners();
     }

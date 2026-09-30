@@ -4,6 +4,7 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/data/repositories/scene_repository_source_repository.dart';
+import 'package:ttrpg_audio_player/data/services/scene_repository_network_service.dart';
 import 'package:ttrpg_audio_player/domain/models/scene_repository_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/repository_view_model.dart';
 
@@ -57,6 +58,19 @@ class FakeSceneRepositorySourceRepository implements SceneRepositorySourceReposi
     if (idx != -1) {
       _repos[idx] = repository;
     }
+  }
+}
+
+class FakeSceneRepositoryNetworkService extends SceneRepositoryNetworkService {
+  final SceneRepositoryManifest manifest;
+
+  FakeSceneRepositoryNetworkService([
+    this.manifest = const SceneRepositoryManifest(name: 'Fake Repo'),
+  ]);
+
+  @override
+  Future<ManifestFetchResult> fetchManifestWithResolvedUrl(String url) async {
+    return ManifestFetchResult(manifest: manifest, resolvedUrl: url);
   }
 }
 
@@ -119,6 +133,52 @@ void main() {
 
         await vm.deleteRepository('repo-del-1');
         expect(vm.repositories, isEmpty);
+      },
+    );
+
+    test(
+      'Что проверяем: Редактирование данных существующего репозитория через updateRepository. '
+      'Входные данные: Исходный репозиторий id="repo-edit-1", вызов updateRepository с новым именем "Updated Name" и URL "https://example.com/new_repo.json". '
+      'Ожидаемый результат: Метод возвращает true, имя и URL репозитория обновляются в списке repositories и в репозитории данных.',
+      () async {
+        final fakeSource = FakeSceneRepositorySourceRepository();
+        final fakeNetwork = FakeSceneRepositoryNetworkService(
+          const SceneRepositoryManifest(
+            name: 'Updated Name',
+            description: 'Updated Description',
+          ),
+        );
+        final initialRepo = SceneRepositoryModel(
+          id: 'repo-edit-1',
+          name: 'Original Name',
+          url: 'https://example.com/old_repo.json',
+          description: 'Original Description',
+          createdAt: DateTime.now(),
+        );
+        await fakeSource.addRepository(initialRepo);
+
+        final vm = RepositoryViewModel(
+          sourceRepository: fakeSource,
+          networkService: fakeNetwork,
+        );
+        await vm.loadRepositories();
+        expect(vm.repositories.first.name, equals('Original Name'));
+
+        final success = await vm.updateRepository(
+          id: 'repo-edit-1',
+          name: 'Updated Name',
+          url: 'https://example.com/new_repo.json',
+          description: 'Updated Description',
+        );
+
+        expect(success, isTrue);
+        expect(vm.repositories.first.name, equals('Updated Name'));
+        expect(vm.repositories.first.url, equals('https://example.com/new_repo.json'));
+        expect(vm.repositories.first.description, equals('Updated Description'));
+
+        final persisted = await fakeSource.getRepositoryById('repo-edit-1');
+        expect(persisted?.name, equals('Updated Name'));
+        expect(persisted?.url, equals('https://example.com/new_repo.json'));
       },
     );
   });

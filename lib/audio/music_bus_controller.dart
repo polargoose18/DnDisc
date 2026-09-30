@@ -59,9 +59,9 @@ class MusicBusController extends ChangeNotifier {
 
     LoggerService().info('MusicBus: Start playing track "${track.title}"', details: 'Path: ${track.filePath}');
 
-    final file = File(track.filePath);
+    final file = File(track.filePath).absolute;
     if (!file.existsSync()) {
-      LoggerService().warning('MusicBus: Local file does not exist', details: 'Path: ${track.filePath}');
+      LoggerService().warning('MusicBus: Local file does not exist', details: 'Path: ${file.path}');
       _isPlaying = false;
       notifyListeners();
       return;
@@ -105,27 +105,42 @@ class MusicBusController extends ChangeNotifier {
       await _player!.setVolume(effectiveVolume);
       await _player!.setReleaseMode(ReleaseMode.stop);
 
-      _player!.onDurationChanged.listen((d) {
-        _currentTrackDuration = d;
-      });
+      _player!.onDurationChanged.listen(
+        (d) {
+          _currentTrackDuration = d;
+        },
+        onError: (e) {
+          LoggerService().warning('MusicBus: Error in onDurationChanged', details: '$e');
+        },
+      );
 
-      _player!.onPositionChanged.listen((pos) {
-        final total = _currentTrackDuration;
-        if (total != null && total.inMilliseconds > 4000) {
-          final transitionDuration = total.inMilliseconds > 8000
-              ? const Duration(milliseconds: 2000)
-              : const Duration(milliseconds: 1000);
-          if (pos >= total - transitionDuration && !_loopTransitioning && _isPlaying) {
-            _triggerSeamlessLoopTransition(track, transitionDuration);
+      _player!.onPositionChanged.listen(
+        (pos) {
+          final total = _currentTrackDuration;
+          if (total != null && total.inMilliseconds > 4000) {
+            final transitionDuration = total.inMilliseconds > 8000
+                ? const Duration(milliseconds: 2000)
+                : const Duration(milliseconds: 1000);
+            if (pos >= total - transitionDuration && !_loopTransitioning && _isPlaying) {
+              _triggerSeamlessLoopTransition(track, transitionDuration);
+            }
           }
-        }
-      });
+        },
+        onError: (e) {
+          LoggerService().warning('MusicBus: Error in onPositionChanged', details: '$e');
+        },
+      );
 
-      _player!.onPlayerComplete.listen((_) {
-        if (!_loopTransitioning && _isPlaying && _currentTrack?.id == track.id) {
-          _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
-        }
-      });
+      _player!.onPlayerComplete.listen(
+        (_) {
+          if (!_loopTransitioning && _isPlaying && _currentTrack?.id == track.id) {
+            _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
+          }
+        },
+        onError: (e) {
+          LoggerService().warning('MusicBus: Error in onPlayerComplete', details: '$e');
+        },
+      );
 
       LoggerService().info('MusicBus: Invoking AudioPlayer.play for ${file.path}');
       await _player!.play(DeviceFileSource(file.path));
@@ -151,6 +166,11 @@ class MusicBusController extends ChangeNotifier {
     } catch (e, stack) {
       LoggerService().error('MusicBus: Exception during playback', details: '$e\n$stack');
       _isPlaying = false;
+      try {
+        await _player?.stop();
+        await _player?.dispose();
+      } catch (_) {}
+      _player = null;
     }
 
     notifyListeners();
@@ -161,45 +181,61 @@ class MusicBusController extends ChangeNotifier {
     _loopTransitioning = true;
     LoggerService().info('MusicBus: Seamless loop crossfade triggered for "${track.title}" (${transitionDuration.inMilliseconds}ms)');
 
-    final file = File(track.filePath);
+    final file = File(track.filePath).absolute;
     if (!file.existsSync()) {
       _loopTransitioning = false;
       return;
     }
 
+    AudioPlayer? nextPlayer;
     try {
       final oldPlayer = _player;
       _outgoingFadeController.stop();
       _outgoingPlayer?.dispose();
       _outgoingPlayer = oldPlayer;
 
-      final nextPlayer = AudioPlayer();
+      nextPlayer = AudioPlayer();
       _player = nextPlayer;
 
       await nextPlayer.setVolume(0.0);
       await nextPlayer.setReleaseMode(ReleaseMode.stop);
 
-      nextPlayer.onDurationChanged.listen((d) {
-        _currentTrackDuration = d;
-      });
+      nextPlayer.onDurationChanged.listen(
+        (d) {
+          _currentTrackDuration = d;
+        },
+        onError: (e) {
+          LoggerService().warning('MusicBus: Error in loop transition onDurationChanged', details: '$e');
+        },
+      );
 
-      nextPlayer.onPositionChanged.listen((pos) {
-        final total = _currentTrackDuration;
-        if (total != null && total.inMilliseconds > 4000) {
-          final nextTransition = total.inMilliseconds > 8000
-              ? const Duration(milliseconds: 2000)
-              : const Duration(milliseconds: 1000);
-          if (pos >= total - nextTransition && !_loopTransitioning && _isPlaying) {
-            _triggerSeamlessLoopTransition(track, nextTransition);
+      nextPlayer.onPositionChanged.listen(
+        (pos) {
+          final total = _currentTrackDuration;
+          if (total != null && total.inMilliseconds > 4000) {
+            final nextTransition = total.inMilliseconds > 8000
+                ? const Duration(milliseconds: 2000)
+                : const Duration(milliseconds: 1000);
+            if (pos >= total - nextTransition && !_loopTransitioning && _isPlaying) {
+              _triggerSeamlessLoopTransition(track, nextTransition);
+            }
           }
-        }
-      });
+        },
+        onError: (e) {
+          LoggerService().warning('MusicBus: Error in loop transition onPositionChanged', details: '$e');
+        },
+      );
 
-      nextPlayer.onPlayerComplete.listen((_) {
-        if (!_loopTransitioning && _isPlaying && _currentTrack?.id == track.id) {
-          _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
-        }
-      });
+      nextPlayer.onPlayerComplete.listen(
+        (_) {
+          if (!_loopTransitioning && _isPlaying && _currentTrack?.id == track.id) {
+            _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
+          }
+        },
+        onError: (e) {
+          LoggerService().warning('MusicBus: Error in loop transition onPlayerComplete', details: '$e');
+        },
+      );
 
       await nextPlayer.play(DeviceFileSource(file.path));
 
@@ -244,6 +280,10 @@ class MusicBusController extends ChangeNotifier {
       );
     } catch (e, stack) {
       LoggerService().error('MusicBus: Error during seamless loop transition', details: '$e\n$stack');
+      try {
+        await nextPlayer?.stop();
+        await nextPlayer?.dispose();
+      } catch (_) {}
       _loopTransitioning = false;
     }
   }

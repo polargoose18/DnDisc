@@ -189,6 +189,49 @@ class RepositoryViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateRepository({
+    required String id,
+    required String name,
+    required String url,
+    String? description,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final index = _repositories.indexWhere((r) => r.id == id);
+      if (index == -1) {
+        throw Exception('Repository not found');
+      }
+
+      final currentRepo = _repositories[index];
+      final result = await _networkService.fetchManifestWithResolvedUrl(url);
+
+      final updatedRepo = currentRepo.copyWith(
+        name: name.trim().isEmpty ? result.manifest.name : name.trim(),
+        url: result.resolvedUrl,
+        description: description?.trim().isEmpty ?? true ? result.manifest.description : description?.trim(),
+        lastSyncedAt: DateTime.now(),
+      );
+
+      await _sourceRepo.updateRepository(updatedRepo);
+      _repositories[index] = updatedRepo;
+      _manifests[id] = result.manifest;
+
+      LoggerService().info('Successfully updated repository "${updatedRepo.name}" (${result.resolvedUrl})');
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to update repository: $e';
+      LoggerService().error(_errorMessage!);
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> deleteRepository(String repoId) async {
     try {
       await _sourceRepo.deleteRepository(repoId);

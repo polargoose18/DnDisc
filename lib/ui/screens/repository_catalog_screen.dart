@@ -2,9 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/scene_repository_model.dart';
 import '../../data/services/scene_repository_network_service.dart';
+import '../view_models/media_library_view_model.dart';
 import '../view_models/repository_view_model.dart';
 import '../view_models/scene_view_model.dart';
 import '../widgets/scene_repository_details_dialog.dart';
+
+bool isCatalogItemInstalled({
+  required CatalogItem item,
+  required SceneViewModel sceneVm,
+  required MediaLibraryViewModel mediaVm,
+}) {
+  switch (item.type) {
+    case CatalogItemType.scene:
+      return sceneVm.scenes.any(
+        (s) =>
+            s.id == item.id ||
+            s.name.trim().toLowerCase() == item.name.trim().toLowerCase(),
+      );
+
+    case CatalogItemType.media:
+      final tracks = item.mediaItem?.tracks ?? [];
+      if (tracks.isNotEmpty) {
+        return tracks.any(
+          (t) => mediaVm.tracks.any(
+            (mt) =>
+                mt.title.trim().toLowerCase() == t.title.trim().toLowerCase(),
+          ),
+        );
+      }
+      return mediaVm.tracks.any(
+        (mt) =>
+            mt.id == item.id ||
+            mt.title.trim().toLowerCase() == item.name.trim().toLowerCase() ||
+            mt.tags.any((tag) => tag.trim().toLowerCase() == item.name.trim().toLowerCase()),
+      );
+
+    case CatalogItemType.pack:
+      final scenes = item.packItem?.scenes ?? [];
+      if (scenes.isNotEmpty) {
+        return scenes.any(
+          (ps) => sceneVm.scenes.any(
+            (s) =>
+                s.name.trim().toLowerCase() == ps.name.trim().toLowerCase(),
+          ),
+        );
+      }
+      return sceneVm.scenes.any(
+        (s) =>
+            s.id == item.id ||
+            s.name.trim().toLowerCase() == item.name.trim().toLowerCase(),
+      );
+  }
+}
 
 class RepositoryCatalogScreen extends StatefulWidget {
   const RepositoryCatalogScreen({super.key});
@@ -120,6 +169,102 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
     );
   }
 
+  void _showEditRepositoryDialog(BuildContext context, SceneRepositoryModel repo) {
+    final nameController = TextEditingController(text: repo.name);
+    final urlController = TextEditingController(text: repo.url);
+    final descController = TextEditingController(text: repo.description ?? '');
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Редактировать репозиторий'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: urlController,
+                    decoration: const InputDecoration(
+                      labelText: 'URL репозитория (GitLab / Dropbox / HTTP / JSON)',
+                      prefixIcon: Icon(Icons.link),
+                    ),
+                    validator: (val) {
+                      if (val == null || val.trim().isEmpty) {
+                        return 'Введите URL репозитория';
+                      }
+                      if (!val.startsWith('http://') && !val.startsWith('https://')) {
+                        return 'URL должен начинаться с http:// или https://';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Название',
+                      prefixIcon: Icon(Icons.label_outlined),
+                    ),
+                    validator: (val) {
+                      if (val == null || val.trim().isEmpty) {
+                        return 'Введите название репозитория';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: descController,
+                    decoration: const InputDecoration(
+                      labelText: 'Описание (опционально)',
+                      prefixIcon: Icon(Icons.description_outlined),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Отмена'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final vm = context.read<RepositoryViewModel>();
+                  final success = await vm.updateRepository(
+                    id: repo.id,
+                    name: nameController.text,
+                    url: urlController.text,
+                    description: descController.text,
+                  );
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                    if (!success && vm.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(vm.errorMessage!)),
+                      );
+                    } else if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Репозиторий успешно обновлен')),
+                      );
+                    }
+                  }
+                }
+              },
+              child: const Text('Сохранить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showManageRepositoriesModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -145,11 +290,14 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Управление репозиториями (${repos.length})',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                      Expanded(
+                        child: Text(
+                          'Управление репозиториями (${repos.length})',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add_link_rounded),
@@ -200,11 +348,24 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                         ),
                                     ],
                                   ),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                    onPressed: () async {
-                                      await vm.deleteRepository(repo.id);
-                                    },
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit_outlined),
+                                        tooltip: 'Редактировать',
+                                        onPressed: () {
+                                          _showEditRepositoryDialog(context, repo);
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                        tooltip: 'Удалить',
+                                        onPressed: () async {
+                                          await vm.deleteRepository(repo.id);
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );
@@ -365,10 +526,12 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   final repo = entry.repo;
 
                   final sceneVm = context.watch<SceneViewModel>();
-                  final isInstalled = item.type == CatalogItemType.scene &&
-                      sceneVm.scenes.any(
-                        (s) => s.id == item.id || s.name.trim().toLowerCase() == item.name.trim().toLowerCase(),
-                      );
+                  final mediaVm = context.watch<MediaLibraryViewModel>();
+                  final isInstalled = isCatalogItemInstalled(
+                    item: item,
+                    sceneVm: sceneVm,
+                    mediaVm: mediaVm,
+                  );
 
                   final cardColor = item.colorHex != null
                       ? Color(item.colorHex!)

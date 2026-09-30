@@ -5,6 +5,7 @@ import '../../data/services/scene_repository_network_service.dart';
 import '../view_models/media_library_view_model.dart';
 import '../view_models/repository_view_model.dart';
 import '../view_models/scene_view_model.dart';
+import '../screens/repository_catalog_screen.dart';
 
 class SceneRepositoryDetailsDialog extends StatelessWidget {
   final CatalogItem catalogItem;
@@ -65,16 +66,16 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final vm = context.watch<RepositoryViewModel>();
     final sceneVm = context.watch<SceneViewModel>();
-    final mediaVm = context.read<MediaLibraryViewModel>();
+    final mediaVm = context.watch<MediaLibraryViewModel>();
 
     final isDownloading = vm.downloadingSceneIds.contains(catalogItem.id);
     final progress = vm.downloadProgress[catalogItem.id] ?? 0.0;
 
-    final isInstalled = catalogItem.type == CatalogItemType.scene
-        ? sceneVm.scenes.any(
-            (s) => s.id == catalogItem.id || s.name.trim().toLowerCase() == catalogItem.name.trim().toLowerCase(),
-          )
-        : false;
+    final isInstalled = isCatalogItemInstalled(
+      item: catalogItem,
+      sceneVm: sceneVm,
+      mediaVm: mediaVm,
+    );
 
     final headerColor = catalogItem.colorHex != null ? Color(catalogItem.colorHex!) : theme.colorScheme.primary;
 

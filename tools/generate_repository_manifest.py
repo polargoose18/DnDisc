@@ -7,6 +7,7 @@ Automatically scans repository directory structure for:
   - media/*.media.zip
   - packs/*.pack.zip
 Inspects internal ZIP manifests (scene.json, media.json, pack.json), calculates size_bytes,
+reads audio track durations from zip archives or metadata,
 checks covers/ directory for matching cover images, and generates or updates repository.json (Schema v2).
 """
 
@@ -14,7 +15,181 @@ import os
 import sys
 import json
 import zipfile
+import io
+import struct
+import subprocess
+import tempfile
 from pathlib import Path
+
+def extract_audio_duration_ms(audio_bytes, filename="audio.mp3"):
+    """
+    Extracts duration in milliseconds from audio bytes using multiple strategies:
+    1. mutagen (if installed)
+    2. tinytag (if installed)
+    3. wave module (built-in, for WAV)
+    4. pure-python binary parsers (WAV, FLAC, MP3)
+    5. ffprobe (if available on system)
+    """
+    if not audio_bytes:
+        return None
+
+    # 1. Mutagen
+    try:
+        import mutagen
+        audio = mutagen.File(io.BytesIO(audio_bytes))
+        if audio is not None and audio.info and audio.info.length:
+            return int(audio.info.length * 1000)
+    except Exception:
+        pass
+
+    # 2. TinyTag
+    try:
+        from tinytag import TinyTag
+        tag = TinyTag.get(file_obj=io.BytesIO(audio_bytes))
+        if tag and tag.duration:
+            return int(tag.duration * 1000)
+    except Exception:
+        pass
+
+    # 3. Built-in wave
+    try:
+        import wave
+        with wave.open(io.BytesIO(audio_bytes), 'rb') as wf:
+            frames = wf.getnframes()
+            rate = wf.getframerate()
+            if rate > 0 and frames > 0:
+                return int((frames / rate) * 1000)
+    except Exception:
+        pass
+
+    # 4. Pure Python binary parsers
+    # 4a. FLAC
+    try:
+        if audio_bytes.startswith(b'fLaC') and len(audio_bytes) >= 42:
+            if (audio_bytes[4] & 0x7F) == 0:  # STREAMINFO block
+                si = audio_bytes[8:42]
+                sr = (si[10] << 12) | (si[11] << 4) | (si[12] >> 4)
+                total_samples = ((si[13] & 0x0F) << 32) | (si[14] << 24) | (si[15] << 16) | (si[16] << 8) | si[17]
+                if sr > 0 and total_samples > 0:
+                    return int((total_samples / sr) * 1000)
+    except Exception:
+        pass
+
+    # 4b. WAV RIFF
+    try:
+        if audio_bytes.startswith(b'RIFF') and len(audio_bytes) >= 44 and audio_bytes[8:12] == b'WAVE':
+            pos = 12
+            fmt_byte_rate = 0
+            data_len = 0
+            while pos + 8 <= len(audio_bytes):
+                chunk_id = audio_bytes[pos:pos+4]
+                chunk_len = struct.unpack('<I', audio_bytes[pos+4:pos+8])[0]
+                if chunk_id == b'fmt ' and chunk_len >= 16:
+                    _, _, fmt_byte_rate = struct.unpack('<HII', audio_bytes[pos+8:pos+18])
+                elif chunk_id == b'data':
+                    data_len = chunk_len
+                    break
+                pos += 8 + chunk_len
+                if chunk_len % 2 == 1:
+                    pos += 1
+            if fmt_byte_rate > 0 and data_len > 0:
+                return int((data_len / fmt_byte_rate) * 1000)
+    except Exception:
+        pass
+
+    # 4c. MP3 Frame & Xing / VBRI parser
+    try:
+        data = audio_bytes
+        pos = 0
+        if data.startswith(b'ID3') and len(data) >= 10:
+            tag_size = ((data[6] & 0x7F) << 21) | ((data[7] & 0x7F) << 14) | ((data[8] & 0x7F) << 7) | (data[9] & 0x7F)
+            pos = 10 + tag_size
+
+        v1_l3_bitrates = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0]
+        v2_l3_bitrates = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0]
+        v1_samplerates = [44100, 48000, 32000, 0]
+        v2_samplerates = [22050, 24000, 16000, 0]
+        v25_samplerates = [11025, 12000, 8000, 0]
+
+        while pos + 4 <= len(data):
+            if data[pos] == 0xFF and (data[pos+1] & 0xE0) == 0xE0:
+                header = (data[pos] << 24) | (data[pos+1] << 16) | (data[pos+2] << 8) | data[pos+3]
+                version_id = (header >> 19) & 0x3
+                layer = (header >> 17) & 0x3
+                bitrate_idx = (header >> 12) & 0xF
+                sr_idx = (header >> 10) & 0x3
+                channel_mode = (header >> 6) & 0x3
+
+                if layer == 1 and bitrate_idx != 0 and bitrate_idx != 0xF and sr_idx != 3:
+                    if version_id == 3:
+                        sr = v1_samplerates[sr_idx]
+                        br = v1_l3_bitrates[bitrate_idx] * 1000
+                        samples_per_frame = 1152
+                    elif version_id in (0, 2):
+                        sr = v2_samplerates[sr_idx] if version_id == 2 else v25_samplerates[sr_idx]
+                        br = v2_l3_bitrates[bitrate_idx] * 1000
+                        samples_per_frame = 576
+                    else:
+                        pos += 1
+                        continue
+
+                    if sr > 0 and br > 0:
+                        side_info_size = (17 if channel_mode == 3 else 32) if version_id == 3 else (9 if channel_mode == 3 else 17)
+                        xing_offset = pos + 4 + side_info_size
+                        if xing_offset + 12 <= len(data):
+                            tag = data[xing_offset:xing_offset+4]
+                            if tag in (b'Xing', b'Info'):
+                                flags = (data[xing_offset+4] << 24) | (data[xing_offset+5] << 16) | (data[xing_offset+6] << 8) | data[xing_offset+7]
+                                if (flags & 1) and xing_offset + 12 <= len(data):
+                                    frames = (data[xing_offset+8] << 24) | (data[xing_offset+9] << 16) | (data[xing_offset+10] << 8) | data[xing_offset+11]
+                                    if frames > 0:
+                                        return int((frames * samples_per_frame / sr) * 1000)
+
+                        audio_len = len(data) - pos
+                        duration_sec = (audio_len * 8.0) / br
+                        return int(duration_sec * 1000)
+            pos += 1
+    except Exception:
+        pass
+
+    # 5. FFprobe fallback
+    try:
+        ext = Path(filename).suffix or ".mp3"
+        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tf:
+            tf.write(audio_bytes)
+            tf_path = tf.name
+        try:
+            cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", tf_path]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
+            if res.returncode == 0 and res.stdout.strip():
+                dur_sec = float(res.stdout.strip())
+                return int(dur_sec * 1000)
+        finally:
+            if os.path.exists(tf_path):
+                os.remove(tf_path)
+    except Exception:
+        pass
+
+    return None
+
+def find_audio_file_in_zip(zf, track_item):
+    rel_path = track_item.get("file_path") or track_item.get("filePath") or ""
+    if rel_path:
+        norm_rel = rel_path.replace("\\", "/")
+        if norm_rel in zf.namelist():
+            return norm_rel
+        base_name = os.path.basename(norm_rel)
+        for name in zf.namelist():
+            if name.replace("\\", "/").endswith(base_name):
+                return name
+
+    track_id = track_item.get("id") or ""
+    if track_id:
+        for name in zf.namelist():
+            if track_id in name:
+                return name
+
+    return None
 
 def parse_color_hex(color_val):
     if color_val is None:
@@ -81,10 +256,20 @@ def scan_scenes(repo_dir):
 
                     tracks_list = []
                     for t in tracks_data:
+                        dur = t.get("duration_ms") or t.get("durationMs")
+                        if dur is None or dur <= 0:
+                            audio_entry = find_audio_file_in_zip(zf, t)
+                            if audio_entry:
+                                try:
+                                    audio_bytes = zf.read(audio_entry)
+                                    dur = extract_audio_duration_ms(audio_bytes, audio_entry)
+                                except Exception as err:
+                                    print(f"Warning: Could not extract duration for {audio_entry} in {rel_zip_path}: {err}", file=sys.stderr)
+
                         tracks_list.append({
                             "title": t.get("title", "Untitled Track"),
                             "bus_type": t.get("bus_type") or t.get("busType") or "music",
-                            "duration_ms": t.get("duration_ms") or t.get("durationMs")
+                            "duration_ms": dur
                         })
 
                     items.append({
@@ -135,10 +320,20 @@ def scan_media(repo_dir):
 
                     tracks_list = []
                     for t in tracks_data:
+                        dur = t.get("duration_ms") or t.get("durationMs")
+                        if dur is None or dur <= 0:
+                            audio_entry = find_audio_file_in_zip(zf, t)
+                            if audio_entry:
+                                try:
+                                    audio_bytes = zf.read(audio_entry)
+                                    dur = extract_audio_duration_ms(audio_bytes, audio_entry)
+                                except Exception as err:
+                                    print(f"Warning: Could not extract duration for {audio_entry} in {rel_zip_path}: {err}", file=sys.stderr)
+
                         tracks_list.append({
                             "title": t.get("title", "Untitled Track"),
                             "bus_type": t.get("bus_type") or t.get("busType") or "sfx",
-                            "duration_ms": t.get("duration_ms") or t.get("durationMs")
+                            "duration_ms": dur
                         })
 
                     items.append({
