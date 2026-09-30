@@ -53,12 +53,14 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
     Color(0xFFFAEDCD), // Warm text
   ];
 
+  bool _initialized = false;
+
   @override
   void initState() {
     super.initState();
     final base = widget.initialTheme ?? AppThemes.deepDark;
     _nameController = TextEditingController(
-      text: widget.initialTheme != null ? widget.initialTheme!.name : 'New Theme',
+      text: widget.initialTheme != null ? widget.initialTheme!.name : '',
     );
     _isDark = base.isDark;
     _primary = base.primary;
@@ -72,6 +74,18 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
     _duckingBadge = base.duckingBadge;
     _battleIntensity = base.battleIntensity;
     _bossIntensity = base.bossIntensity;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      if (widget.initialTheme == null) {
+        final l10n = AppLocalizations.of(context);
+        _nameController.text = l10n?.newThemeDefaultName ?? 'New Theme';
+      }
+    }
   }
 
   @override
@@ -315,9 +329,9 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                                 Wrap(
                                   spacing: 8,
                                   children: [
-                                    _buildIntensityChip('Calm', _secondary, true),
-                                    _buildIntensityChip('Battle', _battleIntensity, false),
-                                    _buildIntensityChip('Boss', _bossIntensity, false),
+                                    _buildIntensityChip(l10n?.intensityCalm ?? 'Calm', _secondary, true),
+                                    _buildIntensityChip(l10n?.intensityBattle ?? 'Battle', _battleIntensity, false),
+                                    _buildIntensityChip(l10n?.intensityBoss ?? 'Boss', _bossIntensity, false),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
@@ -330,7 +344,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       ),
                                       icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                                      label: const Text('Play', style: TextStyle(fontSize: 12)),
+                                      label: Text(l10n?.play ?? 'Play', style: const TextStyle(fontSize: 12)),
                                       onPressed: () {},
                                     ),
                                     const SizedBox(width: 12),
@@ -364,17 +378,17 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                   spacing: 12,
                   runSpacing: 12,
                   children: [
-                    _buildColorButton('Primary', _primary, (c) => setState(() => _primary = c)),
-                    _buildColorButton('Secondary', _secondary, (c) => setState(() => _secondary = c)),
-                    _buildColorButton('Background', _background, (c) => setState(() => _background = c)),
-                    _buildColorButton('Surface', _surface, (c) => setState(() => _surface = c)),
-                    _buildColorButton('Card', _card, (c) => setState(() => _card = c)),
-                    _buildColorButton('Accent', _accent, (c) => setState(() => _accent = c)),
-                    _buildColorButton('Text Primary', _textPrimary, (c) => setState(() => _textPrimary = c)),
-                    _buildColorButton('Text Secondary', _textSecondary, (c) => setState(() => _textSecondary = c)),
-                    _buildColorButton('Ducking Badge', _duckingBadge, (c) => setState(() => _duckingBadge = c)),
-                    _buildColorButton('Battle Intensity', _battleIntensity, (c) => setState(() => _battleIntensity = c)),
-                    _buildColorButton('Boss Intensity', _bossIntensity, (c) => setState(() => _bossIntensity = c)),
+                    _buildColorButton(l10n?.colorNamePrimary ?? 'Primary', _primary, (c) => setState(() => _primary = c)),
+                    _buildColorButton(l10n?.colorNameSecondary ?? 'Secondary', _secondary, (c) => setState(() => _secondary = c)),
+                    _buildColorButton(l10n?.colorNameBackground ?? 'Background', _background, (c) => setState(() => _background = c)),
+                    _buildColorButton(l10n?.colorNameSurface ?? 'Surface', _surface, (c) => setState(() => _surface = c)),
+                    _buildColorButton(l10n?.colorNameCard ?? 'Card', _card, (c) => setState(() => _card = c)),
+                    _buildColorButton(l10n?.colorNameAccent ?? 'Accent', _accent, (c) => setState(() => _accent = c)),
+                    _buildColorButton(l10n?.colorNameTextPrimary ?? 'Text Primary', _textPrimary, (c) => setState(() => _textPrimary = c)),
+                    _buildColorButton(l10n?.colorNameTextSecondary ?? 'Text Secondary', _textSecondary, (c) => setState(() => _textSecondary = c)),
+                    _buildColorButton(l10n?.colorNameDuckingBadge ?? 'Ducking Badge', _duckingBadge, (c) => setState(() => _duckingBadge = c)),
+                    _buildColorButton(l10n?.colorNameBattleIntensity ?? 'Battle Intensity', _battleIntensity, (c) => setState(() => _battleIntensity = c)),
+                    _buildColorButton(l10n?.colorNameBossIntensity ?? 'Boss Intensity', _bossIntensity, (c) => setState(() => _bossIntensity = c)),
                   ],
                 ),
                 const SizedBox(height: 24),

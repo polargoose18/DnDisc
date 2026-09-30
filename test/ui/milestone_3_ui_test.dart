@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -122,10 +123,12 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
+      final l10n = AppLocalizationsEn();
+
       // Assert
-      expect(find.text('Atmospheric Scenes'), findsOneWidget);
-      expect(find.text('Create Scene'), findsOneWidget);
-      expect(find.textContaining('No scenes created yet'), findsOneWidget);
+      expect(find.text(l10n.scenesTitle), findsOneWidget);
+      expect(find.text(l10n.createSceneBtn), findsOneWidget);
+      expect(find.textContaining(l10n.noScenesHint), findsOneWidget);
 
       sceneService.dispose();
     });
@@ -135,6 +138,7 @@ void main() {
       final sceneService = SceneService(autoLoad: false);
       final library = MediaLibraryService(autoLoad: false);
       final engine = AudioEngineService();
+      final l10n = AppLocalizationsEn();
 
       final scene = SceneModel(
         id: 'sc-dragon',
@@ -159,7 +163,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Dragon Cave'), findsOneWidget);
-      expect(find.text('Enable'), findsOneWidget);
+      expect(find.text(l10n.enableSceneBtn), findsOneWidget);
 
       // Act
       await tester.runAsync(() async {
@@ -170,7 +174,7 @@ void main() {
 
       // Assert
       expect(sceneService.activeSceneId, equals('sc-dragon'));
-      expect(find.text('ACTIVE'), findsWidgets);
+      expect(find.text(l10n.activeBadge), findsWidgets);
 
       sceneService.dispose();
       library.dispose();
@@ -207,20 +211,22 @@ void main() {
       await tester.tap(find.text('Open Scene Dialog'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Create New Scene'), findsOneWidget);
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text(l10n.createSceneTitle), findsOneWidget);
 
       // Act
       await tester.enterText(
-        find.widgetWithText(TextField, 'Scene Name *'),
+        find.widgetWithText(TextField, l10n.sceneNameLabel),
         'Throne Room',
       );
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(TextField, 'Search music by title or tags...'), findsOneWidget);
-      expect(find.widgetWithText(TextField, 'Search ambient by title or tags...'), findsOneWidget);
-      expect(find.widgetWithText(TextField, 'Search SFX by title or tags...'), findsOneWidget);
+      expect(find.widgetWithText(TextField, l10n.searchMusicHint), findsOneWidget);
+      expect(find.widgetWithText(TextField, l10n.searchAmbientHint), findsOneWidget);
+      expect(find.widgetWithText(TextField, l10n.searchSfxHint), findsOneWidget);
 
-      await tester.tap(find.text('Create'));
+      await tester.tap(find.text(l10n.create));
       await tester.pumpAndSettle();
 
       // Assert
@@ -237,6 +243,7 @@ void main() {
       final settings = SettingsService();
       final library = MediaLibraryService(autoLoad: false);
       final sceneService = SceneService(autoLoad: false);
+      final l10n = AppLocalizationsEn();
       await tester.runAsync(() async {
         await library.loadTracks();
         await sceneService.loadScenes();
@@ -252,14 +259,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Audio Engine Settings'), findsOneWidget);
-      expect(find.text('Interface & Control Panel'), findsOneWidget);
-      expect(find.text('Show log console icon'), findsOneWidget);
-      expect(find.text('Fade Engine'), findsOneWidget);
-      expect(find.text('Auto-ducking music during SFX (Ducking)'), findsOneWidget);
+      expect(find.text(l10n.settingsTitle), findsOneWidget);
+      expect(find.text(l10n.interfaceTitle), findsOneWidget);
+      expect(find.text(l10n.showLogConsoleTitle), findsOneWidget);
+      expect(find.text(l10n.fadeEngineTitle), findsOneWidget);
+      expect(find.text(l10n.duckingTitle), findsOneWidget);
 
       // Act & Assert - Toggle log switch
-      final logSwitch = find.widgetWithText(SwitchListTile, 'Show log console icon');
+      final logSwitch = find.widgetWithText(SwitchListTile, l10n.showLogConsoleTitle);
       await tester.scrollUntilVisible(logSwitch, 200);
       expect(logSwitch, findsOneWidget);
       await tester.tap(logSwitch);
@@ -294,10 +301,12 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
+      final l10n = AppLocalizationsEn();
+
       final cardFinder = find.byKey(const ValueKey('catalog_storage_settings_card'));
       await tester.scrollUntilVisible(cardFinder, 200);
       expect(cardFinder, findsOneWidget);
-      expect(find.text('Catalog & Audio File Storage'), findsOneWidget);
+      expect(find.text(l10n.catalogStorageTitle), findsOneWidget);
       expect(find.text('C:/AudioVault'), findsOneWidget);
 
       // Act
@@ -308,7 +317,7 @@ void main() {
 
       // Assert
       expect(settings.customDownloadDirectory, isNull);
-      expect(find.textContaining('Default: Documents/audio_library'), findsOneWidget);
+      expect(find.textContaining(l10n.defaultStoragePath), findsOneWidget);
 
       settings.dispose();
       library.dispose();
@@ -323,6 +332,7 @@ void main() {
       final library = MediaLibraryService(autoLoad: false);
       final sceneService = SceneService(autoLoad: false);
       final settings = SettingsService();
+      final l10n = AppLocalizationsEn();
       await tester.runAsync(() async {
         await library.loadTracks();
         await sceneService.loadScenes();
@@ -337,24 +347,24 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('GM Dashboard'), findsOneWidget);
-      expect(find.text('Media Library'), findsOneWidget);
-      expect(find.text('Settings'), findsOneWidget);
+      expect(find.text(l10n.tabGmDashboard), findsOneWidget);
+      expect(find.text(l10n.tabLibrary), findsOneWidget);
+      expect(find.text(l10n.tabSettings), findsOneWidget);
 
       // Act & Assert - 1. Settings tab
-      await tester.tap(find.text('Settings'));
+      await tester.tap(find.text(l10n.tabSettings));
       await tester.pumpAndSettle();
-      expect(find.text('Audio Engine Settings'), findsOneWidget);
+      expect(find.text(l10n.settingsTitle), findsOneWidget);
 
       // Act & Assert - 2. Library tab
-      await tester.tap(find.text('Media Library'));
+      await tester.tap(find.text(l10n.tabLibrary));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('library_search_input')), findsOneWidget);
 
       // Act & Assert - 3. Dashboard tab
-      await tester.tap(find.text('GM Dashboard'));
+      await tester.tap(find.text(l10n.tabGmDashboard));
       await tester.pumpAndSettle();
-      expect(find.text('Atmospheric Scenes'), findsOneWidget);
+      expect(find.text(l10n.scenesTitle), findsOneWidget);
 
       engine.dispose();
       library.dispose();
@@ -369,6 +379,7 @@ void main() {
       final settings = SettingsService();
       final library = MediaLibraryService(autoLoad: false);
       final sceneService = SceneService(autoLoad: false);
+      final l10n = AppLocalizationsEn();
 
       await tester.pumpWidget(createM3TestableWidget(
         const SettingsScreen(),
@@ -383,19 +394,19 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(dropdownFinder, findsOneWidget);
-      expect(find.text('Interface Language'), findsOneWidget);
+      expect(find.text(l10n.language), findsOneWidget);
 
       // Act - English
       settings.setAppLanguage('en');
       await tester.pumpAndSettle();
 
       // Assert - English titles
-      expect(find.text('Interface Language'), findsOneWidget);
-      expect(find.text('Audio Engine Settings'), findsOneWidget);
-      expect(find.text('Fade Engine'), findsOneWidget);
-      expect(find.text('Auto-ducking music during SFX (Ducking)'), findsOneWidget);
-      expect(find.text('App Themes'), findsOneWidget);
-      expect(find.text('Centralized Shortcuts'), findsOneWidget);
+      expect(find.text(l10n.language), findsOneWidget);
+      expect(find.text(l10n.settingsTitle), findsOneWidget);
+      expect(find.text(l10n.fadeEngineTitle), findsOneWidget);
+      expect(find.text(l10n.duckingTitle), findsOneWidget);
+      expect(find.text(l10n.themesTitle), findsOneWidget);
+      expect(find.text(l10n.hotkeysTitle), findsOneWidget);
 
       // Act - Russian
       settings.setAppLanguage('ru');

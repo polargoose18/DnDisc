@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -97,6 +98,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tempDir;
+  final l10n = AppLocalizationsEn();
 
   setUpAll(() {
     sqfliteFfiInit();
@@ -123,8 +125,8 @@ void main() {
       final engine = AudioEngineService();
       await tester.pumpWidget(createTestableWidget(const MusicPlayerPanel(), engine: engine));
 
-      expect(find.text('Music Track'), findsOneWidget);
-      expect(find.text('Music is not playing'), findsOneWidget);
+      expect(find.text(l10n.musicTrack), findsOneWidget);
+      expect(find.text(l10n.musicNotPlaying), findsOneWidget);
 
       // Act
       await tester.tap(find.byKey(const ValueKey('chip_boss')));
@@ -163,7 +165,7 @@ void main() {
       await tester.pumpWidget(createTestableWidget(const AmbientMixerPanel(), engine: engine));
 
       // Assert
-      expect(find.textContaining('No active ambients'), findsOneWidget);
+      expect(find.textContaining(l10n.noActiveAmbients), findsOneWidget);
       engine.dispose();
     });
 
@@ -174,7 +176,7 @@ void main() {
 
       await tester.pumpWidget(createTestableWidget(const AmbientMixerPanel(), engine: engine));
 
-      expect(find.textContaining('Ambient Layers'), findsOneWidget);
+      expect(find.textContaining(l10n.ambientLayers), findsOneWidget);
       expect(find.text('Rain Ambience'), findsOneWidget);
       expect(engine.ambientBus.layers.first.isActive, isTrue);
 
@@ -201,7 +203,7 @@ void main() {
       await tester.pumpWidget(createTestableWidget(const SoundboardGrid(), engine: engine));
 
       // Assert
-      expect(find.textContaining('Soundboard is empty'), findsOneWidget);
+      expect(find.textContaining(l10n.soundboardEmpty), findsOneWidget);
       engine.dispose();
     });
 
@@ -212,7 +214,7 @@ void main() {
 
       await tester.pumpWidget(createTestableWidget(const SoundboardGrid(), engine: engine));
 
-      expect(find.textContaining('Soundboard'), findsOneWidget);
+      expect(find.textContaining(l10n.soundboardTitle), findsOneWidget);
       expect(find.text('Sword Strike'), findsOneWidget);
       expect(find.text('[1]'), findsOneWidget);
 
@@ -237,15 +239,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Log Console'), findsOneWidget);
+      expect(find.text(l10n.logConsoleTitle), findsOneWidget);
       expect(find.textContaining('Test log entry'), findsOneWidget);
 
       // Act
-      await tester.tap(find.byTooltip('Clear logs'));
+      await tester.tap(find.byTooltip(l10n.clearLogs));
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('No logs'), findsOneWidget);
+      expect(find.text(l10n.noLogs), findsOneWidget);
     });
   });
 
@@ -262,8 +264,8 @@ void main() {
       LibraryTrack? resultTrack;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+        createTestableWidget(
+          Scaffold(
             body: Builder(
               builder: (ctx) {
                 return ElevatedButton(
@@ -284,13 +286,13 @@ void main() {
       await tester.tap(find.text('Open Dialog'));
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.text('Edit Audio Track'), findsOneWidget);
+      expect(find.text(l10n.editTrackTitle), findsOneWidget);
 
       // Act
       await tester.enterText(find.widgetWithText(TextField, 'Old Name'), 'New Name');
       await tester.pump(const Duration(milliseconds: 300));
 
-      await tester.tap(find.text('Save'));
+      await tester.tap(find.text(l10n.save));
       await tester.pump(const Duration(milliseconds: 300));
 
       // Assert
@@ -310,8 +312,8 @@ void main() {
       LibraryTrack? resultTrack = track;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+        createTestableWidget(
+          Scaffold(
             body: Builder(
               builder: (ctx) {
                 return ElevatedButton(
@@ -333,7 +335,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       // Act
-      await tester.tap(find.text('Cancel'));
+      await tester.tap(find.text(l10n.cancel));
       await tester.pump(const Duration(milliseconds: 300));
 
       // Assert
@@ -360,19 +362,19 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 200));
 
-      expect(find.text('TTRPG Audio Master'), findsOneWidget);
-      expect(find.text('GM Dashboard'), findsOneWidget);
-      expect(find.text('Media Library'), findsOneWidget);
+      expect(find.text(l10n.appTitle), findsOneWidget);
+      expect(find.text(l10n.tabGmDashboard), findsOneWidget);
+      expect(find.text(l10n.tabLibrary), findsOneWidget);
 
       // Act & Assert - Switch to Library tab
-      await tester.tap(find.text('Media Library'));
+      await tester.tap(find.text(l10n.tabLibrary));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('library_search_input')), findsOneWidget);
 
       // Act & Assert - Open log drawer
-      await tester.tap(find.byTooltip('Open log and debug console'));
+      await tester.tap(find.byTooltip(l10n.logConsoleTooltip));
       await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text('Log Console'), findsOneWidget);
+      expect(find.text(l10n.logConsoleTitle), findsOneWidget);
 
       library.dispose();
       engine.dispose();
@@ -407,7 +409,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.text('Tavern Melodies'), findsOneWidget);
-      expect(find.byTooltip('Play on Music bus'), findsOneWidget);
+      expect(find.byTooltip(l10n.dispatchToBus(track.busType.getLocalizedName(l10n))), findsOneWidget);
 
       // Act
       library.playTrackToEngine(track, engine);
@@ -440,7 +442,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       // Assert
-      expect(find.text('Media library is empty'), findsOneWidget);
+      expect(find.text(l10n.libraryEmpty), findsOneWidget);
 
       library.dispose();
       engine.dispose();

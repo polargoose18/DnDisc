@@ -4,6 +4,7 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/data/services/database_service.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
 import 'package:ttrpg_audio_player/main.dart';
 
 class FakePathProviderPlatform extends Fake
@@ -44,6 +45,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
 
     // Assert
-    expect(find.text('TTRPG Audio Master'), findsOneWidget);
+    final l10n = AppLocalizationsEn();
+    expect(find.text(l10n.appTitle), findsOneWidget);
   });
 }

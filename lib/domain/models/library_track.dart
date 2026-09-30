@@ -18,6 +18,17 @@ extension AudioBusTypeExtension on AudioBusType {
     }
   }
 
+  String getLocalizedName([dynamic l10n]) {
+    switch (this) {
+      case AudioBusType.music:
+        return l10n?.music ?? 'Music';
+      case AudioBusType.ambient:
+        return l10n?.ambient ?? 'Ambient';
+      case AudioBusType.sfx:
+        return l10n?.sfx ?? 'SFX';
+    }
+  }
+
   String get codeName => name;
 
   static AudioBusType fromCode(String code) {

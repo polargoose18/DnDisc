@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'DnDisc'**
+  /// **'TTRPG Audio Master'**
   String get appTitle;
 
   /// No description provided for @tabGmDashboard.
@@ -233,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @duckingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Auto-ducking music during SFX'**
+  /// **'Auto-ducking music during SFX (Ducking)'**
   String get duckingTitle;
 
   /// No description provided for @duckAttackTitle.
@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @builtinThemes.
   ///
   /// In en, this message translates to:
-  /// **'Built-in Presets'**
+  /// **'Built-in Presets (5 variants)'**
   String get builtinThemes;
 
   /// No description provided for @customThemes.
@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @createThemeBtn.
   ///
   /// In en, this message translates to:
-  /// **'Create new theme'**
+  /// **'+ Create new theme'**
   String get createThemeBtn;
 
   /// No description provided for @hotkeysTitle.
@@ -1663,6 +1663,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Toggle fullscreen display'**
   String get shortcutFullscreenDesc;
+
+  /// No description provided for @deleteFromApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete from application'**
+  String get deleteFromApp;
+
+  /// No description provided for @repositoryNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get repositoryNameLabel;
+
+  /// No description provided for @intensityCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get intensityCalm;
+
+  /// No description provided for @intensitySuspense.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspense'**
+  String get intensitySuspense;
+
+  /// No description provided for @intensityBattle.
+  ///
+  /// In en, this message translates to:
+  /// **'Battle'**
+  String get intensityBattle;
+
+  /// No description provided for @intensityBoss.
+  ///
+  /// In en, this message translates to:
+  /// **'Boss'**
+  String get intensityBoss;
+
+  /// No description provided for @play.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// No description provided for @catalogTypeScene.
+  ///
+  /// In en, this message translates to:
+  /// **'scene'**
+  String get catalogTypeScene;
+
+  /// No description provided for @catalogTypeMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'media package'**
+  String get catalogTypeMedia;
+
+  /// No description provided for @catalogTypePack.
+  ///
+  /// In en, this message translates to:
+  /// **'pack'**
+  String get catalogTypePack;
+
+  /// No description provided for @sceneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scene'**
+  String get sceneTitle;
+
+  /// No description provided for @mediaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get mediaTitle;
+
+  /// No description provided for @packTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack'**
+  String get packTitle;
+
+  /// No description provided for @catalogSceneBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'🎭 Scene'**
+  String get catalogSceneBadge;
+
+  /// No description provided for @catalogMediaBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'🎵 Media'**
+  String get catalogMediaBadge;
+
+  /// No description provided for @catalogPackBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'📦 Pack'**
+  String get catalogPackBadge;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterScenes.
+  ///
+  /// In en, this message translates to:
+  /// **'🎭 Scenes'**
+  String get filterScenes;
+
+  /// No description provided for @filterMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'🎵 Media'**
+  String get filterMedia;
+
+  /// No description provided for @filterPacks.
+  ///
+  /// In en, this message translates to:
+  /// **'📦 Packs'**
+  String get filterPacks;
+
+  /// No description provided for @repoStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenes: {scenes} | Media: {media} | Packs: {packs}'**
+  String repoStats(int scenes, int media, int packs);
+
+  /// No description provided for @addRepositoryTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Add repository'**
+  String get addRepositoryTooltip;
+
+  /// No description provided for @repositoryUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://gitlab.com/user/repo'**
+  String get repositoryUrlHint;
+
+  /// No description provided for @playTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Play [Space]'**
+  String get playTooltip;
+
+  /// No description provided for @pauseTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause [Space]'**
+  String get pauseTooltip;
+
+  /// No description provided for @panicStopTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Panic Stop SFX [Esc]'**
+  String get panicStopTooltip;
+
+  /// No description provided for @loopingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'LOOPING'**
+  String get loopingBadge;
+
+  /// No description provided for @tagsPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags: '**
+  String get tagsPrefix;
+
+  /// No description provided for @colorNamePrimary.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary'**
+  String get colorNamePrimary;
+
+  /// No description provided for @colorNameSecondary.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary'**
+  String get colorNameSecondary;
+
+  /// No description provided for @colorNameBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get colorNameBackground;
+
+  /// No description provided for @colorNameSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface'**
+  String get colorNameSurface;
+
+  /// No description provided for @colorNameCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get colorNameCard;
+
+  /// No description provided for @colorNameAccent.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent'**
+  String get colorNameAccent;
+
+  /// No description provided for @colorNameTextPrimary.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Primary'**
+  String get colorNameTextPrimary;
+
+  /// No description provided for @colorNameTextSecondary.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Secondary'**
+  String get colorNameTextSecondary;
+
+  /// No description provided for @colorNameDuckingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Ducking Badge'**
+  String get colorNameDuckingBadge;
+
+  /// No description provided for @colorNameBattleIntensity.
+  ///
+  /// In en, this message translates to:
+  /// **'Battle Intensity'**
+  String get colorNameBattleIntensity;
+
+  /// No description provided for @colorNameBossIntensity.
+  ///
+  /// In en, this message translates to:
+  /// **'Boss Intensity'**
+  String get colorNameBossIntensity;
 }
 
 class _AppLocalizationsDelegate

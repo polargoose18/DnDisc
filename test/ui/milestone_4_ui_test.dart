@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
+import 'package:ttrpg_audio_player/theme/app_themes.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -109,6 +111,7 @@ void main() {
 
   late Directory tempDir;
   late DatabaseService dbService;
+  final l10n = AppLocalizationsEn();
 
   setUpAll(() {
     sqfliteFfiInit();
@@ -148,10 +151,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.textContaining('Scenes'), findsWidgets);
-      expect(find.text('Music Track'), findsOneWidget);
-      expect(find.textContaining('Ambient'), findsWidgets);
-      expect(find.textContaining('Soundboard'), findsWidgets);
+      expect(find.textContaining(l10n.scenes), findsWidgets);
+      expect(find.text(l10n.musicTrack), findsOneWidget);
+      expect(find.textContaining(l10n.ambient), findsWidgets);
+      expect(find.textContaining(l10n.soundboardTitle), findsWidgets);
     });
 
     testWidgets('should display tabs and StickyMiniPlayer on compact and mobile screens (< 1000px)', (tester) async {
@@ -172,10 +175,10 @@ void main() {
 
       // Assert
       expect(find.byType(StickyMiniPlayer), findsOneWidget);
-      expect(find.text('Scenes'), findsWidgets);
-      expect(find.text('Music'), findsWidgets);
-      expect(find.text('Ambient'), findsWidgets);
-      expect(find.text('SFX'), findsWidgets);
+      expect(find.text(l10n.scenes), findsWidgets);
+      expect(find.text(l10n.music), findsWidgets);
+      expect(find.text(l10n.ambient), findsWidgets);
+      expect(find.text(l10n.sfx), findsWidgets);
     });
   });
 
@@ -209,7 +212,7 @@ void main() {
       // Assert
       expect(find.text('Ancient Tavern'), findsOneWidget);
       expect(find.text('Cozy hearth and clinking mugs'), findsOneWidget);
-      expect(find.text('ACTIVE'), findsWidgets);
+      expect(find.text(l10n.activeBadge), findsWidgets);
 
       await tester.tap(find.byType(ElevatedButton));
       expect(activated, isTrue);
@@ -241,9 +244,9 @@ void main() {
 
       // Assert
       expect(find.text('Dragon Cave'), findsOneWidget);
-      expect(find.text('CURRENT SCENE'), findsOneWidget);
-      expect(find.text('Calm'), findsOneWidget);
-      expect(find.text('Battle'), findsOneWidget);
+      expect(find.text(l10n.currentSceneBadge), findsOneWidget);
+      expect(find.text(l10n.intensityCalm), findsOneWidget);
+      expect(find.text(l10n.intensityBattle), findsOneWidget);
     });
   });
 
@@ -258,10 +261,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Create Custom Theme'), findsOneWidget);
-      expect(find.text('Theme Preview'), findsOneWidget);
-      expect(find.text('Color Palette Settings'), findsOneWidget);
-      expect(find.text('Save Theme'), findsOneWidget);
+      expect(find.text(l10n.createCustomThemeTitle), findsOneWidget);
+      expect(find.text(l10n.themePreviewTitle), findsOneWidget);
+      expect(find.text(l10n.colorPaletteConfig), findsOneWidget);
+      expect(find.text(l10n.saveThemeBtn), findsOneWidget);
     });
   });
 
@@ -276,11 +279,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('App Themes'), findsOneWidget);
-      expect(find.text('Deep Dark'), findsOneWidget);
-      expect(find.text('Clean Light'), findsOneWidget);
-      expect(find.text('+ Create new theme'), findsOneWidget);
-      expect(find.text('Centralized Shortcuts'), findsOneWidget);
+      expect(find.text(l10n.themesTitle), findsOneWidget);
+      expect(find.text(AppThemes.deepDark.name), findsOneWidget);
+      expect(find.text(AppThemes.cleanLight.name), findsOneWidget);
+      expect(find.text(l10n.createThemeBtn), findsOneWidget);
+      expect(find.text(l10n.hotkeysTitle), findsOneWidget);
       expect(find.text('Space'), findsWidgets);
     });
   });
@@ -312,7 +315,7 @@ void main() {
       // Assert
       expect(find.text('Sword Strike'), findsOneWidget);
       expect(find.text('[1]'), findsOneWidget);
-      expect(find.text('Panic Stop [Esc]'), findsOneWidget);
+      expect(find.text(l10n.panicStopBtn), findsOneWidget);
     });
 
     testWidgets('should allow volume slider interaction on inactive ambient layer', (tester) async {
@@ -341,7 +344,7 @@ void main() {
 
       // Assert
       expect(find.text('Storm Rain'), findsOneWidget);
-      expect(find.text('Volume: 50%'), findsOneWidget);
+      expect(find.text('${l10n.volume}: 50%'), findsOneWidget);
 
       final sliderFinder = find.byKey(const ValueKey('ambient_slider_amb_rain'));
       expect(sliderFinder, findsOneWidget);

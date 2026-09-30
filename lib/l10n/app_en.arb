@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "DnDisc",
+  "appTitle": "TTRPG Audio Master",
   "tabGmDashboard": "GM Dashboard",
   "tabLibrary": "Media Library",
   "tabSettings": "Settings",
@@ -22,7 +22,7 @@
   "fadeEngineTitle": "Fade Engine",
   "musicFadeTitle": "Music fade in/out duration",
   "ambientFadeTitle": "Ambient fade in/out duration",
-  "duckingTitle": "Auto-ducking music during SFX",
+  "duckingTitle": "Auto-ducking music during SFX (Ducking)",
   "duckAttackTitle": "Duck Attack Time",
   "duckAttackSubtitle": "music fade-down speed when SFX triggers",
   "duckReleaseTitle": "Duck Release Time",
@@ -39,10 +39,10 @@
   "resetDefaultsBtn": "Reset all settings to defaults",
   "settingsResetToast": "Audio engine settings reset.",
   "themesTitle": "App Themes",
-  "builtinThemes": "Built-in Presets",
+  "builtinThemes": "Built-in Presets (5 variants)",
   "customThemes": "Custom Themes",
   "noCustomThemes": "You don't have custom themes yet. Create your own theme with a custom palette!",
-  "createThemeBtn": "Create new theme",
+  "createThemeBtn": "+ Create new theme",
   "hotkeysTitle": "Centralized Shortcuts",
   "hotkeysSubtitle": "Control soundscape during game session without distraction:",
   "actionCol": "Action",
@@ -495,5 +495,57 @@
   "shortcutPanicStopTitle": "Panic Stop SFX",
   "shortcutPanicStopDesc": "Instantly stop all playing SFX sounds",
   "shortcutFullscreenTitle": "Fullscreen Mode",
-  "shortcutFullscreenDesc": "Toggle fullscreen display"
+  "shortcutFullscreenDesc": "Toggle fullscreen display",
+  "deleteFromApp": "Delete from application",
+  "repositoryNameLabel": "Name",
+  "intensityCalm": "Calm",
+  "intensitySuspense": "Suspense",
+  "intensityBattle": "Battle",
+  "intensityBoss": "Boss",
+  "play": "Play",
+  "catalogTypeScene": "scene",
+  "catalogTypeMedia": "media package",
+  "catalogTypePack": "pack",
+  "sceneTitle": "Scene",
+  "mediaTitle": "Media",
+  "packTitle": "Pack",
+  "catalogSceneBadge": "🎭 Scene",
+  "catalogMediaBadge": "🎵 Media",
+  "catalogPackBadge": "📦 Pack",
+  "filterAll": "All",
+  "filterScenes": "🎭 Scenes",
+  "filterMedia": "🎵 Media",
+  "filterPacks": "📦 Packs",
+  "repoStats": "Scenes: {scenes} | Media: {media} | Packs: {packs}",
+  "@repoStats": {
+    "placeholders": {
+      "scenes": {
+        "type": "int"
+      },
+      "media": {
+        "type": "int"
+      },
+      "packs": {
+        "type": "int"
+      }
+    }
+  },
+  "addRepositoryTooltip": "Add repository",
+  "repositoryUrlHint": "https://gitlab.com/user/repo",
+  "playTooltip": "Play [Space]",
+  "pauseTooltip": "Pause [Space]",
+  "panicStopTooltip": "Panic Stop SFX [Esc]",
+  "loopingBadge": "LOOPING",
+  "tagsPrefix": "Tags: ",
+  "colorNamePrimary": "Primary",
+  "colorNameSecondary": "Secondary",
+  "colorNameBackground": "Background",
+  "colorNameSurface": "Surface",
+  "colorNameCard": "Card",
+  "colorNameAccent": "Accent",
+  "colorNameTextPrimary": "Text Primary",
+  "colorNameTextSecondary": "Text Secondary",
+  "colorNameDuckingBadge": "Ducking Badge",
+  "colorNameBattleIntensity": "Battle Intensity",
+  "colorNameBossIntensity": "Boss Intensity"
 }

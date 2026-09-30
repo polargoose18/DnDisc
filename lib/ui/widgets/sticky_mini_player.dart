@@ -102,7 +102,9 @@ class StickyMiniPlayer extends StatelessWidget {
                 color: activeTheme.primary,
                 size: 32,
               ),
-              tooltip: music.isPlaying ? 'Pause [Space]' : 'Play [Space]',
+              tooltip: music.isPlaying
+                  ? (l10n?.pauseTooltip ?? 'Pause [Space]')
+                  : (l10n?.playTooltip ?? 'Play [Space]'),
               onPressed: () {
                 if (music.isPlaying) {
                   music.pause();
@@ -115,7 +117,7 @@ class StickyMiniPlayer extends StatelessWidget {
             // Panic Stop SFX button
             IconButton(
               icon: const Icon(Icons.dangerous_rounded, color: Colors.redAccent, size: 24),
-              tooltip: 'Panic Stop SFX [Esc]',
+              tooltip: l10n?.panicStopTooltip ?? 'Panic Stop SFX [Esc]',
               onPressed: () => audioEngine.panicStopSfx(),
             ),
 

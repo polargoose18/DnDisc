@@ -5,6 +5,21 @@ enum MusicIntensity {
   boss,
 }
 
+extension MusicIntensityExtension on MusicIntensity {
+  String getLocalizedName([dynamic l10n]) {
+    switch (this) {
+      case MusicIntensity.calm:
+        return l10n?.intensityCalm ?? 'Calm';
+      case MusicIntensity.suspense:
+        return l10n?.intensitySuspense ?? 'Suspense';
+      case MusicIntensity.battle:
+        return l10n?.intensityBattle ?? 'Battle';
+      case MusicIntensity.boss:
+        return l10n?.intensityBoss ?? 'Boss';
+    }
+  }
+}
+
 class AudioTrack {
   final String id;
   final String title;

@@ -14,6 +14,28 @@ enum CatalogItemType {
     }
   }
 
+  String getLocalizedName([dynamic l10n]) {
+    switch (this) {
+      case CatalogItemType.scene:
+        return l10n?.sceneTitle ?? 'Scene';
+      case CatalogItemType.media:
+        return l10n?.mediaTitle ?? 'Media';
+      case CatalogItemType.pack:
+        return l10n?.packTitle ?? 'Pack';
+    }
+  }
+
+  String getLocalizedAccusativeName([dynamic l10n]) {
+    switch (this) {
+      case CatalogItemType.scene:
+        return l10n?.catalogTypeScene ?? 'scene';
+      case CatalogItemType.media:
+        return l10n?.catalogTypeMedia ?? 'media package';
+      case CatalogItemType.pack:
+        return l10n?.catalogTypePack ?? 'pack';
+    }
+  }
+
   String get badgeLabel {
     switch (this) {
       case CatalogItemType.scene:
@@ -22,6 +44,17 @@ enum CatalogItemType {
         return '🎵 Media';
       case CatalogItemType.pack:
         return '📦 Pack';
+    }
+  }
+
+  String getLocalizedBadge([dynamic l10n]) {
+    switch (this) {
+      case CatalogItemType.scene:
+        return l10n?.catalogSceneBadge ?? '🎭 Scene';
+      case CatalogItemType.media:
+        return l10n?.catalogMediaBadge ?? '🎵 Media';
+      case CatalogItemType.pack:
+        return l10n?.catalogPackBadge ?? '📦 Pack';
     }
   }
 }
@@ -42,6 +75,19 @@ enum CatalogCategoryFilter {
         return '🎵 Media';
       case CatalogCategoryFilter.packs:
         return '📦 Packs';
+    }
+  }
+
+  String getLocalizedLabel([dynamic l10n]) {
+    switch (this) {
+      case CatalogCategoryFilter.all:
+        return l10n?.filterAll ?? 'All';
+      case CatalogCategoryFilter.scenes:
+        return l10n?.filterScenes ?? '🎭 Scenes';
+      case CatalogCategoryFilter.media:
+        return l10n?.filterMedia ?? '🎵 Media';
+      case CatalogCategoryFilter.packs:
+        return l10n?.filterPacks ?? '📦 Packs';
     }
   }
 }

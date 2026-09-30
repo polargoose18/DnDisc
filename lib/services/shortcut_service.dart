@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../audio/audio_engine_service.dart';
 import '../domain/models/audio_track.dart';
+import '../l10n/app_localizations.dart';
 import 'logger_service.dart';
 
 enum AppShortcutAction {
@@ -37,6 +38,92 @@ class ShortcutDefinition {
     required this.description,
     required this.keyDisplay,
   });
+}
+
+extension ShortcutDefinitionLocalizationExtension on ShortcutDefinition {
+  String getLocalizedTitle([AppLocalizations? l10n]) {
+    if (l10n == null) return title;
+    switch (action) {
+      case AppShortcutAction.playPauseMusic:
+        return l10n.shortcutPlayPauseTitle;
+      case AppShortcutAction.intensityCalm:
+        return l10n.shortcutIntensityCalmTitle;
+      case AppShortcutAction.intensitySuspense:
+        return l10n.shortcutIntensitySuspenseTitle;
+      case AppShortcutAction.intensityBattle:
+        return l10n.shortcutIntensityBattleTitle;
+      case AppShortcutAction.intensityBoss:
+        return l10n.shortcutIntensityBossTitle;
+      case AppShortcutAction.sfx1:
+        return l10n.shortcutSfxTitle(1);
+      case AppShortcutAction.sfx2:
+        return l10n.shortcutSfxTitle(2);
+      case AppShortcutAction.sfx3:
+        return l10n.shortcutSfxTitle(3);
+      case AppShortcutAction.sfx4:
+        return l10n.shortcutSfxTitle(4);
+      case AppShortcutAction.sfx5:
+        return l10n.shortcutSfxTitle(5);
+      case AppShortcutAction.sfx6:
+        return l10n.shortcutSfxTitle(6);
+      case AppShortcutAction.sfx7:
+        return l10n.shortcutSfxTitle(7);
+      case AppShortcutAction.sfx8:
+        return l10n.shortcutSfxTitle(8);
+      case AppShortcutAction.sfx9:
+        return l10n.shortcutSfxTitle(9);
+      case AppShortcutAction.masterMute:
+        return l10n.shortcutMasterMuteTitle;
+      case AppShortcutAction.manualDucking:
+        return l10n.shortcutManualDuckingTitle;
+      case AppShortcutAction.panicStopSfx:
+        return l10n.shortcutPanicStopTitle;
+      case AppShortcutAction.toggleFullscreen:
+        return l10n.shortcutFullscreenTitle;
+    }
+  }
+
+  String getLocalizedDescription([AppLocalizations? l10n]) {
+    if (l10n == null) return description;
+    switch (action) {
+      case AppShortcutAction.playPauseMusic:
+        return l10n.shortcutPlayPauseDesc;
+      case AppShortcutAction.intensityCalm:
+        return l10n.shortcutIntensityCalmDesc;
+      case AppShortcutAction.intensitySuspense:
+        return l10n.shortcutIntensitySuspenseDesc;
+      case AppShortcutAction.intensityBattle:
+        return l10n.shortcutIntensityBattleDesc;
+      case AppShortcutAction.intensityBoss:
+        return l10n.shortcutIntensityBossDesc;
+      case AppShortcutAction.sfx1:
+        return l10n.shortcutSfxDesc(1);
+      case AppShortcutAction.sfx2:
+        return l10n.shortcutSfxDesc(2);
+      case AppShortcutAction.sfx3:
+        return l10n.shortcutSfxDesc(3);
+      case AppShortcutAction.sfx4:
+        return l10n.shortcutSfxDesc(4);
+      case AppShortcutAction.sfx5:
+        return l10n.shortcutSfxDesc(5);
+      case AppShortcutAction.sfx6:
+        return l10n.shortcutSfxDesc(6);
+      case AppShortcutAction.sfx7:
+        return l10n.shortcutSfxDesc(7);
+      case AppShortcutAction.sfx8:
+        return l10n.shortcutSfxDesc(8);
+      case AppShortcutAction.sfx9:
+        return l10n.shortcutSfxDesc(9);
+      case AppShortcutAction.masterMute:
+        return l10n.shortcutMasterMuteDesc;
+      case AppShortcutAction.manualDucking:
+        return l10n.shortcutManualDuckingDesc;
+      case AppShortcutAction.panicStopSfx:
+        return l10n.shortcutPanicStopDesc;
+      case AppShortcutAction.toggleFullscreen:
+        return l10n.shortcutFullscreenDesc;
+    }
+  }
 }
 
 class ShortcutService extends ChangeNotifier {

@@ -233,9 +233,9 @@ class SoundboardGrid extends StatelessWidget {
                                 ),
                               ),
                               if (isLooping)
-                                const Text(
-                                  'LOOPING',
-                                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.amberAccent),
+                                Text(
+                                  l10n?.loopingBadge ?? 'LOOPING',
+                                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.amberAccent),
                                 ),
                             ],
                           ),

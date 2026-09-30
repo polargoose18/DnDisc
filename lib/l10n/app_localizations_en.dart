@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'DnDisc';
+  String get appTitle => 'TTRPG Audio Master';
 
   @override
   String get tabGmDashboard => 'GM Dashboard';
@@ -76,7 +76,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ambientFadeTitle => 'Ambient fade in/out duration';
 
   @override
-  String get duckingTitle => 'Auto-ducking music during SFX';
+  String get duckingTitle => 'Auto-ducking music during SFX (Ducking)';
 
   @override
   String get duckAttackTitle => 'Duck Attack Time';
@@ -129,7 +129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themesTitle => 'App Themes';
 
   @override
-  String get builtinThemes => 'Built-in Presets';
+  String get builtinThemes => 'Built-in Presets (5 variants)';
 
   @override
   String get customThemes => 'Custom Themes';
@@ -139,7 +139,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'You don\'t have custom themes yet. Create your own theme with a custom palette!';
 
   @override
-  String get createThemeBtn => 'Create new theme';
+  String get createThemeBtn => '+ Create new theme';
 
   @override
   String get hotkeysTitle => 'Centralized Shortcuts';
@@ -872,4 +872,123 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortcutFullscreenDesc => 'Toggle fullscreen display';
+
+  @override
+  String get deleteFromApp => 'Delete from application';
+
+  @override
+  String get repositoryNameLabel => 'Name';
+
+  @override
+  String get intensityCalm => 'Calm';
+
+  @override
+  String get intensitySuspense => 'Suspense';
+
+  @override
+  String get intensityBattle => 'Battle';
+
+  @override
+  String get intensityBoss => 'Boss';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get catalogTypeScene => 'scene';
+
+  @override
+  String get catalogTypeMedia => 'media package';
+
+  @override
+  String get catalogTypePack => 'pack';
+
+  @override
+  String get sceneTitle => 'Scene';
+
+  @override
+  String get mediaTitle => 'Media';
+
+  @override
+  String get packTitle => 'Pack';
+
+  @override
+  String get catalogSceneBadge => '🎭 Scene';
+
+  @override
+  String get catalogMediaBadge => '🎵 Media';
+
+  @override
+  String get catalogPackBadge => '📦 Pack';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterScenes => '🎭 Scenes';
+
+  @override
+  String get filterMedia => '🎵 Media';
+
+  @override
+  String get filterPacks => '📦 Packs';
+
+  @override
+  String repoStats(int scenes, int media, int packs) {
+    return 'Scenes: $scenes | Media: $media | Packs: $packs';
+  }
+
+  @override
+  String get addRepositoryTooltip => 'Add repository';
+
+  @override
+  String get repositoryUrlHint => 'https://gitlab.com/user/repo';
+
+  @override
+  String get playTooltip => 'Play [Space]';
+
+  @override
+  String get pauseTooltip => 'Pause [Space]';
+
+  @override
+  String get panicStopTooltip => 'Panic Stop SFX [Esc]';
+
+  @override
+  String get loopingBadge => 'LOOPING';
+
+  @override
+  String get tagsPrefix => 'Tags: ';
+
+  @override
+  String get colorNamePrimary => 'Primary';
+
+  @override
+  String get colorNameSecondary => 'Secondary';
+
+  @override
+  String get colorNameBackground => 'Background';
+
+  @override
+  String get colorNameSurface => 'Surface';
+
+  @override
+  String get colorNameCard => 'Card';
+
+  @override
+  String get colorNameAccent => 'Accent';
+
+  @override
+  String get colorNameTextPrimary => 'Text Primary';
+
+  @override
+  String get colorNameTextSecondary => 'Text Secondary';
+
+  @override
+  String get colorNameDuckingBadge => 'Ducking Badge';
+
+  @override
+  String get colorNameBattleIntensity => 'Battle Intensity';
+
+  @override
+  String get colorNameBossIntensity => 'Boss Intensity';
 }

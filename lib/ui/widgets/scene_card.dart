@@ -243,7 +243,7 @@ class SceneCard extends StatelessWidget {
                                   Icon(Icons.music_note, size: 12, color: _getIntensityColor(scene.musicIntensity, activeTheme)),
                                   const SizedBox(width: 2),
                                   Text(
-                                    scene.musicIntensity?.name.toUpperCase() ?? 'CALM',
+                                    (scene.musicIntensity?.getLocalizedName(l10n) ?? l10n?.intensityCalm ?? 'Calm').toUpperCase(),
                                     style: TextStyle(
                                       color: _getIntensityColor(scene.musicIntensity, activeTheme),
                                       fontSize: 9,

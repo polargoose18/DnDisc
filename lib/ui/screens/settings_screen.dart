@@ -233,7 +233,7 @@ class SettingsScreen extends StatelessWidget {
                           Icon(Icons.folder_special_rounded, color: activeTheme.primary),
                           const SizedBox(width: 8),
                           Text(
-                            'Catalog & Audio File Storage',
+                            l10n?.catalogStorageTitle ?? 'Catalog & Audio File Storage',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -244,7 +244,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       const Divider(height: 24),
                       Text(
-                        'Folder for downloading and unpacking audio files from online repository catalog:',
+                        l10n?.catalogStorageDesc ?? 'Folder for downloading and unpacking audio files from online repository catalog:',
                         style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                       ),
                       const SizedBox(height: 12),
@@ -275,8 +275,8 @@ class SettingsScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     settings.customDownloadDirectory != null
-                                        ? 'Custom Directory'
-                                        : 'Default Directory',
+                                        ? (l10n?.customDirectory ?? 'Custom Directory')
+                                        : (l10n?.defaultDirectory ?? 'Default Directory'),
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
@@ -287,7 +287,7 @@ class SettingsScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    settings.customDownloadDirectory ?? 'Default: Documents/audio_library',
+                                    settings.customDownloadDirectory ?? (l10n?.defaultStoragePath ?? 'Default: Documents/audio_library'),
                                     key: const ValueKey('download_directory_display_path'),
                                     style: TextStyle(
                                       color: activeTheme.textPrimary,
@@ -305,16 +305,16 @@ class SettingsScreen extends StatelessWidget {
                               IconButton(
                                 key: const ValueKey('reset_download_dir_button'),
                                 icon: const Icon(Icons.restore_rounded, size: 20),
-                                tooltip: 'Reset to default',
+                                tooltip: l10n?.resetDefaultDirTooltip ?? 'Reset to default',
                                 onPressed: () {
                                   settings.resetCustomDownloadDirectory();
-                                  _showNotification(context, 'Download path reset to default.');
+                                  _showNotification(context, l10n?.storagePathReset ?? 'Download path reset to default.');
                                 },
                               ),
                             ElevatedButton.icon(
                               key: const ValueKey('select_download_dir_button'),
                               icon: const Icon(Icons.folder_open_rounded, size: 18),
-                              label: const Text('Choose Folder'),
+                              label: Text(l10n?.chooseFolderBtn ?? 'Choose Folder'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: activeTheme.primary,
                                 foregroundColor: Colors.white,
@@ -322,12 +322,12 @@ class SettingsScreen extends StatelessWidget {
                               ),
                               onPressed: () async {
                                 final selectedDirectory = await FilePicker.platform.getDirectoryPath(
-                                  dialogTitle: 'Select folder to store catalog audio files',
+                                  dialogTitle: l10n?.chooseFolderDialogTitle ?? 'Select folder to store catalog audio files',
                                 );
                                 if (selectedDirectory != null && selectedDirectory.isNotEmpty) {
                                   settings.setCustomDownloadDirectory(selectedDirectory);
                                   if (context.mounted) {
-                                    _showNotification(context, 'Catalog download directory updated: $selectedDirectory');
+                                    _showNotification(context, l10n?.storagePathUpdated(selectedDirectory) ?? 'Catalog download directory updated: $selectedDirectory');
                                   }
                                 }
                               },
@@ -865,11 +865,11 @@ class SettingsScreen extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                        child: Text(sc.title, style: TextStyle(color: activeTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
+                        child: Text(sc.getLocalizedTitle(l10n), style: TextStyle(color: activeTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                        child: Text(sc.description, style: TextStyle(color: activeTheme.textSecondary, fontSize: 11)),
+                        child: Text(sc.getLocalizedDescription(l10n), style: TextStyle(color: activeTheme.textSecondary, fontSize: 11)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),

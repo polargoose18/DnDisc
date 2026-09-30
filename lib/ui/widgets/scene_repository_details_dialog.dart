@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../domain/models/scene_repository_model.dart';
 import '../../data/services/scene_repository_network_service.dart';
 import '../view_models/media_library_view_model.dart';
@@ -29,10 +30,10 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
     return '$minutes:$seconds';
   }
 
-  String _formatSize(int? bytes) {
-    if (bytes == null || bytes <= 0) return 'Size unknown';
+  String _formatSize(int? bytes, AppLocalizations? l10n) {
+    if (bytes == null || bytes <= 0) return l10n?.sizeUnknown ?? 'Size unknown';
     final mb = bytes / (1024 * 1024);
-    return '${mb.toStringAsFixed(1)} MB';
+    return l10n?.sizeMb(mb.toStringAsFixed(1)) ?? '${mb.toStringAsFixed(1)} MB';
   }
 
   IconData _getBusIcon(String busType) {
@@ -61,32 +62,23 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
     }
   }
 
-  String _getTypeDisplayNameInAccusative(CatalogItemType type) {
-    switch (type) {
-      case CatalogItemType.scene:
-        return 'scene';
-      case CatalogItemType.media:
-        return 'media package';
-      case CatalogItemType.pack:
-        return 'pack';
-    }
-  }
-
   Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
     final theme = Theme.of(context);
-    final typeName = _getTypeDisplayNameInAccusative(catalogItem.type);
+    final l10n = AppLocalizations.of(context);
+    final typeName = catalogItem.type.getLocalizedAccusativeName(l10n);
 
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Delete $typeName?'),
+        title: Text(l10n?.deleteItemConfirmTitle(typeName) ?? 'Delete $typeName?'),
         content: Text(
-          'Are you sure you want to delete $typeName "${catalogItem.name}" and associated files from the application?',
+          l10n?.deleteItemConfirmMessage(typeName, catalogItem.name) ??
+              'Are you sure you want to delete $typeName "${catalogItem.name}" and associated files from the application?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n?.cancel ?? 'Cancel'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -94,7 +86,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
               foregroundColor: theme.colorScheme.onError,
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n?.delete ?? 'Delete'),
           ),
         ],
       ),
@@ -104,6 +96,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final vm = context.watch<RepositoryViewModel>();
     final sceneVm = context.watch<SceneViewModel>();
     final mediaVm = context.watch<MediaLibraryViewModel>();
@@ -116,6 +109,9 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
       sceneVm: sceneVm,
       mediaVm: mediaVm,
     );
+
+    final typeName = catalogItem.type.getLocalizedAccusativeName(l10n);
+    final typeDisplayName = catalogItem.type.getLocalizedName(l10n);
 
     final headerColor = catalogItem.colorHex != null ? Color(catalogItem.colorHex!) : theme.colorScheme.primary;
 
@@ -171,7 +167,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                catalogItem.type.badgeLabel,
+                                catalogItem.type.getLocalizedBadge(l10n),
                                 style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -194,7 +190,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          'Repository: ${repo.name}',
+                          l10n?.repositoryLabel(repo.name) ?? 'Repository: ${repo.name}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.white.withValues(alpha: 0.85),
                           ),
@@ -228,27 +224,30 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                       children: [
                         Chip(
                           avatar: const Icon(Icons.folder_zip_outlined, size: 18),
-                          label: Text(_formatSize(catalogItem.sizeBytes)),
+                          label: Text(_formatSize(catalogItem.sizeBytes, l10n)),
                         ),
                         if (catalogItem.type == CatalogItemType.pack) ...[
                           Chip(
                             avatar: const Icon(Icons.style_rounded, size: 18),
-                            label: Text('${catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0} scenes'),
+                            label: Text(
+                              l10n?.scenesCount(catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0) ??
+                                  '${catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0} scenes',
+                            ),
                           ),
                           Chip(
                             avatar: const Icon(Icons.audiotrack, size: 18),
-                            label: Text('${catalogItem.tracksCount} tracks'),
+                            label: Text(l10n?.tracksCount(catalogItem.tracksCount) ?? '${catalogItem.tracksCount} tracks'),
                           ),
                         ] else ...[
                           Chip(
                             avatar: const Icon(Icons.audiotrack, size: 18),
-                            label: Text('${catalogItem.tracksCount} tracks'),
+                            label: Text(l10n?.tracksCount(catalogItem.tracksCount) ?? '${catalogItem.tracksCount} tracks'),
                           ),
                         ],
                         if (isInstalled)
-                          const Chip(
-                            avatar: Icon(Icons.check_circle_rounded, size: 18, color: Colors.tealAccent),
-                            label: Text('Installed', style: TextStyle(color: Colors.tealAccent)),
+                          Chip(
+                            avatar: const Icon(Icons.check_circle_rounded, size: 18, color: Colors.tealAccent),
+                            label: Text(l10n?.installedBadge ?? 'Installed', style: const TextStyle(color: Colors.tealAccent)),
                             backgroundColor: Colors.teal,
                           ),
                       ],
@@ -257,8 +256,10 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       catalogItem.type == CatalogItemType.pack
-                          ? 'Scenes in Pack'
-                          : (catalogItem.type == CatalogItemType.media ? 'Media Package Content' : 'Scene Content'),
+                          ? (l10n?.scenesInPack ?? 'Scenes in Pack')
+                          : (catalogItem.type == CatalogItemType.media
+                              ? (l10n?.mediaSetContent ?? 'Media Package Content')
+                              : (l10n?.sceneContent ?? 'Scene Content')),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -267,9 +268,9 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     const Divider(),
 
                     if (catalogItem.type == CatalogItemType.scene && (catalogItem.sceneItem?.tracks.isEmpty ?? true))
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('Track list is missing from manifest.'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(l10n?.tracksMissingInManifest ?? 'Track list is missing from manifest.'),
                       )
                     else if (catalogItem.type == CatalogItemType.scene)
                       ListView.builder(
@@ -286,15 +287,15 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                               child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
                             ),
                             title: Text(track.title),
-                            subtitle: Text('Channel: ${track.busType.toUpperCase()}'),
+                            subtitle: Text(l10n?.channelLabel(track.busType.toUpperCase()) ?? 'Channel: ${track.busType.toUpperCase()}'),
                             trailing: Text(_formatDuration(track.durationMs)),
                           );
                         },
                       )
                     else if (catalogItem.type == CatalogItemType.media && (catalogItem.mediaItem?.tracks.isEmpty ?? true))
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('Track list is missing from manifest.'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(l10n?.tracksMissingInManifest ?? 'Track list is missing from manifest.'),
                       )
                     else if (catalogItem.type == CatalogItemType.media)
                       ListView.builder(
@@ -311,15 +312,15 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                               child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
                             ),
                             title: Text(track.title),
-                            subtitle: Text('Channel: ${track.busType.toUpperCase()}'),
+                            subtitle: Text(l10n?.channelLabel(track.busType.toUpperCase()) ?? 'Channel: ${track.busType.toUpperCase()}'),
                             trailing: Text(_formatDuration(track.durationMs)),
                           );
                         },
                       )
                     else if (catalogItem.type == CatalogItemType.pack && (catalogItem.packItem?.scenes.isEmpty ?? true))
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('Scene list is missing from manifest.'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(l10n?.scenesMissingInManifest ?? 'Scene list is missing from manifest.'),
                       )
                     else if (catalogItem.type == CatalogItemType.pack)
                       ListView.builder(
@@ -334,7 +335,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                               child: Icon(Icons.theater_comedy_rounded, size: 20),
                             ),
                             title: Text(sceneSummary.name),
-                            subtitle: Text('${sceneSummary.tracksCount ?? 0} tracks'),
+                            subtitle: Text(l10n?.tracksCount(sceneSummary.tracksCount ?? 0) ?? '${sceneSummary.tracksCount ?? 0} tracks'),
                           );
                         },
                       ),
@@ -357,7 +358,8 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     LinearProgressIndicator(value: progress > 0 ? progress : null),
                     const SizedBox(height: 8),
                     Text(
-                      'Downloading and importing... ${(progress * 100).toStringAsFixed(0)}%',
+                      l10n?.downloadingAndImporting((progress * 100).toStringAsFixed(0)) ??
+                          'Downloading and importing... ${(progress * 100).toStringAsFixed(0)}%',
                       style: theme.textTheme.bodySmall,
                     ),
                     const SizedBox(height: 8),
@@ -386,8 +388,10 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                           SnackBar(
                                             content: Text(
                                               success
-                                                  ? '${catalogItem.type.displayName} "${catalogItem.name}" was successfully removed from the application.'
-                                                  : 'Error removing ${catalogItem.type.displayName.toLowerCase()}.',
+                                                  ? (l10n?.itemUninstalled(typeDisplayName, catalogItem.name) ??
+                                                      '$typeDisplayName "${catalogItem.name}" was successfully removed from the application.')
+                                                  : (l10n?.itemUninstallError(typeDisplayName) ??
+                                                      'Error removing ${typeDisplayName.toLowerCase()}.'),
                                             ),
                                           ),
                                         );
@@ -395,7 +399,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                     }
                                   },
                             icon: const Icon(Icons.delete_outline_rounded),
-                            label: const Text('Delete from application'),
+                            label: Text(l10n?.deleteFromApp ?? 'Delete from application'),
                           )
                         : ElevatedButton.icon(
                             onPressed: isDownloading
@@ -414,8 +418,10 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                         SnackBar(
                                           content: Text(
                                             success
-                                                ? '${catalogItem.type.displayName} "${catalogItem.name}" was successfully installed!'
-                                                : 'Error downloading ${catalogItem.type.displayName.toLowerCase()}.',
+                                                ? (l10n?.itemInstalled(typeDisplayName, catalogItem.name) ??
+                                                    '$typeDisplayName "${catalogItem.name}" was successfully installed!')
+                                                : (l10n?.itemInstallError(typeDisplayName) ??
+                                                    'Error downloading ${typeDisplayName.toLowerCase()}.'),
                                           ),
                                         ),
                                       );
@@ -428,8 +434,8 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                             ),
                             label: Text(
                               isDownloading
-                                  ? 'Installing...'
-                                  : 'Install ${_getTypeDisplayNameInAccusative(catalogItem.type)}',
+                                  ? (l10n?.installing ?? 'Installing...')
+                                  : (l10n?.installItem(typeName) ?? 'Install $typeName'),
                             ),
                           ),
                   ),

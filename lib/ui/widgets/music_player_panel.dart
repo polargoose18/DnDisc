@@ -164,7 +164,9 @@ class MusicPlayerPanel extends StatelessWidget {
                       icon: Icon(music.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill),
                       iconSize: 42,
                       color: activeTheme.primary,
-                      tooltip: music.isPlaying ? 'Pause [Space]' : 'Play [Space]',
+                      tooltip: music.isPlaying
+                          ? (l10n?.pauseTooltip ?? 'Pause [Space]')
+                          : (l10n?.playTooltip ?? 'Play [Space]'),
                       onPressed: () {
                         if (music.isPlaying) {
                           music.pause();

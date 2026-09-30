@@ -172,13 +172,13 @@ class SceneBackdropHeader extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _buildIntensityBtn(context, 'Calm', MusicIntensity.calm, musicBus, activeTheme),
+                          _buildIntensityBtn(context, MusicIntensity.calm.getLocalizedName(l10n), MusicIntensity.calm, musicBus, activeTheme),
                           const SizedBox(width: 4),
-                          _buildIntensityBtn(context, 'Suspense', MusicIntensity.suspense, musicBus, activeTheme),
+                          _buildIntensityBtn(context, MusicIntensity.suspense.getLocalizedName(l10n), MusicIntensity.suspense, musicBus, activeTheme),
                           const SizedBox(width: 4),
-                          _buildIntensityBtn(context, 'Battle', MusicIntensity.battle, musicBus, activeTheme),
+                          _buildIntensityBtn(context, MusicIntensity.battle.getLocalizedName(l10n), MusicIntensity.battle, musicBus, activeTheme),
                           const SizedBox(width: 4),
-                          _buildIntensityBtn(context, 'Boss', MusicIntensity.boss, musicBus, activeTheme),
+                          _buildIntensityBtn(context, MusicIntensity.boss.getLocalizedName(l10n), MusicIntensity.boss, musicBus, activeTheme),
                         ],
                       ),
                     ],

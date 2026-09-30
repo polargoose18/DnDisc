@@ -74,7 +74,7 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
               items: AudioBusType.values.map((bus) {
                 return DropdownMenuItem(
                   value: bus,
-                  child: Text(bus.displayName),
+                  child: Text(bus.getLocalizedName(l10n)),
                 );
               }).toList(),
               onChanged: (val) {
@@ -93,7 +93,7 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
                 items: MusicIntensity.values.map((intensity) {
                   return DropdownMenuItem(
                     value: intensity,
-                    child: Text(intensity.name.toUpperCase()),
+                    child: Text(intensity.getLocalizedName(l10n).toUpperCase()),
                   );
                 }).toList(),
                 onChanged: (val) {

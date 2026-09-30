@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../domain/models/scene_repository_model.dart';
 import '../../data/services/scene_repository_network_service.dart';
 import '../view_models/media_library_view_model.dart';
@@ -83,6 +84,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
   }
 
   void _showAddRepositoryDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final nameController = TextEditingController();
     final urlController = TextEditingController();
     final descController = TextEditingController();
@@ -92,7 +94,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Add Repository'),
+          title: Text(l10n?.addRepositoryDialogTitle ?? 'Add Repository'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -101,17 +103,17 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                 children: [
                   TextFormField(
                     controller: urlController,
-                    decoration: const InputDecoration(
-                      labelText: 'Repository URL (GitLab / Dropbox / HTTP / JSON)',
-                      hintText: 'https://gitlab.com/user/repo',
-                      prefixIcon: Icon(Icons.link),
+                    decoration: InputDecoration(
+                      labelText: l10n?.repositoryUrlLabel ?? 'Repository URL (GitLab / Dropbox / HTTP / JSON)',
+                      hintText: l10n?.repositoryUrlHint ?? 'https://gitlab.com/user/repo',
+                      prefixIcon: const Icon(Icons.link),
                     ),
                     validator: (val) {
                       if (val == null || val.trim().isEmpty) {
-                        return 'Please enter repository URL';
+                        return l10n?.enterRepositoryUrl ?? 'Please enter repository URL';
                       }
                       if (!val.startsWith('http://') && !val.startsWith('https://')) {
-                        return 'URL must start with http:// or https://';
+                        return l10n?.urlHttpPrefixValidation ?? 'URL must start with http:// or https://';
                       }
                       return null;
                     },
@@ -119,18 +121,18 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name (optional)',
-                      hintText: 'Extracted from manifest if empty',
-                      prefixIcon: Icon(Icons.label_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n?.repositoryNameOptionalLabel ?? 'Name (optional)',
+                      hintText: l10n?.repositoryNameHint ?? 'Extracted from manifest if empty',
+                      prefixIcon: const Icon(Icons.label_outlined),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: descController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description (optional)',
-                      prefixIcon: Icon(Icons.description_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n?.repositoryDescOptionalLabel ?? 'Description (optional)',
+                      prefixIcon: const Icon(Icons.description_outlined),
                     ),
                   ),
                 ],
@@ -140,7 +142,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n?.cancel ?? 'Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -161,7 +163,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   }
                 }
               },
-              child: const Text('Add'),
+              child: Text(l10n?.addRepositoryBtn ?? 'Add'),
             ),
           ],
         );
@@ -170,6 +172,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
   }
 
   void _showEditRepositoryDialog(BuildContext context, SceneRepositoryModel repo) {
+    final l10n = AppLocalizations.of(context);
     final nameController = TextEditingController(text: repo.name);
     final urlController = TextEditingController(text: repo.url);
     final descController = TextEditingController(text: repo.description ?? '');
@@ -179,7 +182,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit Repository'),
+          title: Text(l10n?.editRepositoryDialogTitle ?? 'Edit Repository'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -188,16 +191,16 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                 children: [
                   TextFormField(
                     controller: urlController,
-                    decoration: const InputDecoration(
-                      labelText: 'Repository URL (GitLab / Dropbox / HTTP / JSON)',
-                      prefixIcon: Icon(Icons.link),
+                    decoration: InputDecoration(
+                      labelText: l10n?.repositoryUrlLabel ?? 'Repository URL (GitLab / Dropbox / HTTP / JSON)',
+                      prefixIcon: const Icon(Icons.link),
                     ),
                     validator: (val) {
                       if (val == null || val.trim().isEmpty) {
-                        return 'Please enter repository URL';
+                        return l10n?.enterRepositoryUrl ?? 'Please enter repository URL';
                       }
                       if (!val.startsWith('http://') && !val.startsWith('https://')) {
-                        return 'URL must start with http:// or https://';
+                        return l10n?.urlHttpPrefixValidation ?? 'URL must start with http:// or https://';
                       }
                       return null;
                     },
@@ -205,13 +208,13 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      prefixIcon: Icon(Icons.label_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n?.repositoryNameLabel ?? 'Name',
+                      prefixIcon: const Icon(Icons.label_outlined),
                     ),
                     validator: (val) {
                       if (val == null || val.trim().isEmpty) {
-                        return 'Please enter repository name';
+                        return l10n?.enterRepositoryName ?? 'Please enter repository name';
                       }
                       return null;
                     },
@@ -219,9 +222,9 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: descController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description (optional)',
-                      prefixIcon: Icon(Icons.description_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n?.repositoryDescOptionalLabel ?? 'Description (optional)',
+                      prefixIcon: const Icon(Icons.description_outlined),
                     ),
                   ),
                 ],
@@ -231,7 +234,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n?.cancel ?? 'Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -251,13 +254,13 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                       );
                     } else if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Repository successfully updated')),
+                        SnackBar(content: Text(l10n?.repositoryUpdated ?? 'Repository successfully updated')),
                       );
                     }
                   }
                 }
               },
-              child: const Text('Save'),
+              child: Text(l10n?.save ?? 'Save'),
             ),
           ],
         );
@@ -266,6 +269,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
   }
 
   void _showManageRepositoriesModal(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -292,7 +296,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Manage Repositories (${repos.length})',
+                          l10n?.manageRepositoriesTitle(repos.length) ?? 'Manage Repositories (${repos.length})',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -301,7 +305,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.add_link_rounded),
-                        tooltip: 'Add repository',
+                        tooltip: l10n?.addRepositoryTooltip ?? 'Add repository',
                         onPressed: () {
                           Navigator.of(context).pop();
                           _showAddRepositoryDialog(context);
@@ -312,8 +316,8 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   const Divider(),
                   Expanded(
                     child: repos.isEmpty
-                        ? const Center(
-                            child: Text('No repositories connected.'),
+                        ? Center(
+                            child: Text(l10n?.noConnectedRepositories ?? 'No repositories connected.'),
                           )
                         : ListView.builder(
                             controller: scrollController,
@@ -340,7 +344,12 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                       ),
                                       if (manifest != null)
                                         Text(
-                                          'Scenes: ${manifest.scenes.length} | Media: ${manifest.media.length} | Packs: ${manifest.packs.length}',
+                                          l10n?.repoStats(
+                                                manifest.scenes.length,
+                                                manifest.media.length,
+                                                manifest.packs.length,
+                                              ) ??
+                                              'Scenes: ${manifest.scenes.length} | Media: ${manifest.media.length} | Packs: ${manifest.packs.length}',
                                           style: TextStyle(
                                             fontSize: 11,
                                             color: Theme.of(context).colorScheme.primary,
@@ -353,14 +362,14 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                     children: [
                                       IconButton(
                                         icon: const Icon(Icons.edit_outlined),
-                                        tooltip: 'Edit',
+                                        tooltip: l10n?.edit ?? 'Edit',
                                         onPressed: () {
                                           _showEditRepositoryDialog(context, repo);
                                         },
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                        tooltip: 'Delete',
+                                        tooltip: l10n?.delete ?? 'Delete',
                                         onPressed: () async {
                                           await vm.deleteRepository(repo.id);
                                         },
@@ -384,28 +393,29 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final vm = context.watch<RepositoryViewModel>();
     final catalogItems = vm.filteredCatalogItems;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Catalog'),
+        title: Text(l10n?.catalogTitle ?? 'Catalog'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Refresh catalog',
+            tooltip: l10n?.refreshCatalogTooltip ?? 'Refresh catalog',
             onPressed: () => vm.loadRepositories(),
           ),
           IconButton(
             icon: const Icon(Icons.settings_input_composite_rounded),
-            tooltip: 'Manage repositories',
+            tooltip: l10n?.manageRepositoriesTooltip ?? 'Manage repositories',
             onPressed: () => _showManageRepositoriesModal(context),
           ),
           const SizedBox(width: 8),
           ElevatedButton.icon(
             onPressed: () => _showAddRepositoryDialog(context),
             icon: const Icon(Icons.add),
-            label: const Text('Add'),
+            label: Text(l10n?.addRepositoryBtn ?? 'Add'),
           ),
           const SizedBox(width: 16),
         ],
@@ -423,7 +433,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                       child: TextField(
                         controller: _searchController,
                         decoration: InputDecoration(
-                          hintText: 'Search items in catalog...',
+                          hintText: l10n?.searchCatalogPlaceholder ?? 'Search items in catalog...',
                           prefixIcon: const Icon(Icons.search),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
@@ -445,7 +455,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                     OutlinedButton.icon(
                       onPressed: () => _showManageRepositoriesModal(context),
                       icon: const Icon(Icons.source),
-                      label: Text('Sources (${vm.repositories.length})'),
+                      label: Text(l10n?.sourcesBtn(vm.repositories.length) ?? 'Sources (${vm.repositories.length})'),
                     ),
                   ],
                 ),
@@ -458,7 +468,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: ChoiceChip(
-                        label: Text(filter.label),
+                        label: Text(filter.getLocalizedLabel(l10n)),
                         selected: isSelected,
                         onSelected: (selected) {
                           if (selected) {
@@ -488,25 +498,25 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                     const Icon(Icons.cloud_off_rounded, size: 64, color: Colors.grey),
                     const SizedBox(height: 16),
                     Text(
-                      'No repositories connected',
+                      l10n?.noRepositoriesConnected ?? 'No repositories connected',
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    const Text('Add a link to GitLab, Dropbox or CDN with repository.json manifest'),
+                    Text(l10n?.addRepositoryUrlHint ?? 'Add a link to GitLab, Dropbox or CDN with repository.json manifest'),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
                       onPressed: () => _showAddRepositoryDialog(context),
                       icon: const Icon(Icons.add),
-                      label: const Text('Add repository'),
+                      label: Text(l10n?.addRepositoryTooltip ?? 'Add repository'),
                     ),
                   ],
                 ),
               ),
             )
           else if (catalogItems.isEmpty)
-            const Expanded(
+            Expanded(
               child: Center(
-                child: Text('No items found matching your query.'),
+                child: Text(l10n?.noCatalogItemsFound ?? 'No items found matching your query.'),
               ),
             )
           else
@@ -616,7 +626,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
-                                      item.type.badgeLabel,
+                                      item.type.getLocalizedBadge(l10n),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
@@ -639,14 +649,14 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                           BoxShadow(color: Colors.black38, blurRadius: 4),
                                         ],
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.check_circle_rounded, size: 12, color: Colors.white),
-                                          SizedBox(width: 4),
+                                          const Icon(Icons.check_circle_rounded, size: 12, color: Colors.white),
+                                          const SizedBox(width: 4),
                                           Text(
-                                            'Installed',
-                                            style: TextStyle(
+                                            l10n?.installedBadge ?? 'Installed',
+                                            style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
@@ -686,7 +696,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    item.description ?? 'No description',
+                                    item.description ?? (l10n?.noDescription ?? 'No description'),
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: Colors.grey[600],
                                     ),
@@ -699,8 +709,9 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                                     children: [
                                       Text(
                                         item.type == CatalogItemType.pack
-                                            ? '${item.packItem?.scenesCount ?? item.packItem?.scenes.length ?? 0} scenes'
-                                            : '${item.tracksCount} tracks',
+                                            ? (l10n?.scenesCount(item.packItem?.scenesCount ?? item.packItem?.scenes.length ?? 0) ??
+                                                '${item.packItem?.scenesCount ?? item.packItem?.scenes.length ?? 0} scenes')
+                                            : (l10n?.tracksCount(item.tracksCount) ?? '${item.tracksCount} tracks'),
                                         style: theme.textTheme.labelSmall,
                                       ),
                                       Icon(

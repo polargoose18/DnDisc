@@ -90,7 +90,7 @@ class LibraryScreen extends StatelessWidget {
                     ),
                     ...AudioBusType.values.map((bus) {
                       return FilterChip(
-                        label: Text(bus.displayName),
+                        label: Text(bus.getLocalizedName(l10n)),
                         selected: library.activeBusFilter == bus,
                         onSelected: (selected) {
                           library.setBusFilter(selected ? bus : null);
@@ -186,7 +186,8 @@ class LibraryScreen extends StatelessWidget {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Bus: ${track.busType.displayName} | Duration: ${_formatDuration(track.durationMs)} | Path: ${track.filePath}',
+                                          l10n?.busInfo(track.busType.getLocalizedName(l10n), _formatDuration(track.durationMs), track.filePath) ??
+                                              'Bus: ${track.busType.displayName} | Duration: ${_formatDuration(track.durationMs)} | Path: ${track.filePath}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(fontSize: 11, color: Colors.white60),
@@ -218,13 +219,14 @@ class LibraryScreen extends StatelessWidget {
                                         // Quick Dispatch Play Button
                                         IconButton(
                                           icon: const Icon(Icons.play_arrow_rounded, color: Colors.greenAccent),
-                                          tooltip: l10n?.dispatchToBus(track.busType.displayName) ?? 'Play on ${track.busType.displayName} bus',
+                                          tooltip: l10n?.dispatchToBus(track.busType.getLocalizedName(l10n)) ?? 'Play on ${track.busType.displayName} bus',
                                           onPressed: () {
                                             library.playTrackToEngine(track, audioEngine);
                                             ScaffoldMessenger.of(context).showSnackBar(
                                               SnackBar(
                                                 content: Text(
-                                                  'Sent to ${track.busType.displayName} bus: "${track.title}"',
+                                                  l10n?.dispatchedToBus(track.busType.getLocalizedName(l10n), track.title) ??
+                                                      'Sent to ${track.busType.displayName} bus: "${track.title}"',
                                                 ),
                                                 duration: const Duration(seconds: 1),
                                               ),
@@ -282,7 +284,7 @@ class LibraryScreen extends StatelessWidget {
                   children: [
                     Icon(_getIconForBus(bus)),
                     const SizedBox(width: 12),
-                    Text(bus.displayName, style: const TextStyle(fontSize: 16)),
+                    Text(bus.getLocalizedName(l10n), style: const TextStyle(fontSize: 16)),
                   ],
                 ),
               ),

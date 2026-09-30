@@ -388,7 +388,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                 child: _buildOptionCard(
                                   isSelected: isSelected,
                                   title: track.title,
-                                  subtitle: track.tags.isNotEmpty ? 'Tags: ${track.tags.join(", ")}' : null,
+                                  subtitle: track.tags.isNotEmpty ? '${l10n?.tagsPrefix ?? "Tags: "}${track.tags.join(", ")}' : null,
                                   leadingIcon: Icons.audiotrack_rounded,
                                   onTap: () => setState(() => _selectedMusicTrackId = track.id),
                                   extraContent: isSelected
@@ -458,7 +458,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                       child: _buildOptionCard(
                                         isSelected: isIncluded,
                                         title: amb.title,
-                                        subtitle: amb.tags.isNotEmpty ? 'Tags: ${amb.tags.join(", ")}' : null,
+                                        subtitle: amb.tags.isNotEmpty ? '${l10n?.tagsPrefix ?? "Tags: "}${amb.tags.join(", ")}' : null,
                                         leadingIcon: Icons.air_rounded,
                                         trailing: Checkbox(
                                           value: isIncluded,
@@ -547,7 +547,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                       child: _buildOptionCard(
                                         isSelected: isSelected,
                                         title: sfx.title,
-                                        subtitle: sfx.tags.isNotEmpty ? 'Tags: ${sfx.tags.join(", ")}' : null,
+                                        subtitle: sfx.tags.isNotEmpty ? '${l10n?.tagsPrefix ?? "Tags: "}${sfx.tags.join(", ")}' : null,
                                         leadingIcon: Icons.campaign_rounded,
                                         trailing: Checkbox(
                                           value: isSelected,

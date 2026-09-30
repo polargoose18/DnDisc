@@ -15,6 +15,8 @@ import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart'
 import 'package:ttrpg_audio_player/ui/view_models/repository_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
 import 'package:ttrpg_audio_player/ui/widgets/scene_repository_details_dialog.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
+import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
 
 class FakeSourceRepo implements SceneRepositorySourceRepository {
   final List<SceneRepositoryModel> repos;
@@ -142,6 +144,8 @@ Widget createCatalogTestableWidget({
       ChangeNotifierProvider<MediaLibraryViewModel>.value(value: mediaLibraryViewModel),
     ],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: child),
     ),
   );
@@ -202,12 +206,14 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
+      final l10n = AppLocalizationsEn();
+
       // Assert - Header and Chips
-      expect(find.text('Catalog'), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, 'All'), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, '🎭 Scenes'), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, '🎵 Media'), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, '📦 Packs'), findsOneWidget);
+      expect(find.text(l10n.tabCatalog), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, l10n.filterAll), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, l10n.filterScenes), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, l10n.filterMedia), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, l10n.filterPacks), findsOneWidget);
 
       // Assert - All category items visible
       expect(find.text('Dragon Lair Scene'), findsOneWidget);
@@ -215,21 +221,21 @@ void main() {
       expect(find.text('Strahd Campaign Pack'), findsOneWidget);
 
       // Act & Assert - Filter Scenes
-      await tester.tap(find.widgetWithText(ChoiceChip, '🎭 Scenes'));
+      await tester.tap(find.widgetWithText(ChoiceChip, l10n.filterScenes));
       await tester.pumpAndSettle();
       expect(find.text('Dragon Lair Scene'), findsOneWidget);
       expect(find.text('Roar Effects Media'), findsNothing);
       expect(find.text('Strahd Campaign Pack'), findsNothing);
 
       // Act & Assert - Filter Media
-      await tester.tap(find.widgetWithText(ChoiceChip, '🎵 Media'));
+      await tester.tap(find.widgetWithText(ChoiceChip, l10n.filterMedia));
       await tester.pumpAndSettle();
       expect(find.text('Dragon Lair Scene'), findsNothing);
       expect(find.text('Roar Effects Media'), findsOneWidget);
       expect(find.text('Strahd Campaign Pack'), findsNothing);
 
       // Act & Assert - Filter Packs
-      await tester.tap(find.widgetWithText(ChoiceChip, '📦 Packs'));
+      await tester.tap(find.widgetWithText(ChoiceChip, l10n.filterPacks));
       await tester.pumpAndSettle();
       expect(find.text('Dragon Lair Scene'), findsNothing);
       expect(find.text('Roar Effects Media'), findsNothing);
@@ -277,7 +283,9 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Installed'), findsNothing);
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text(l10n.installedBadge), findsNothing);
 
       // Act
       await mediaVm.addTrack(
@@ -291,7 +299,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Installed'), findsOneWidget);
+      expect(find.text(l10n.installedBadge), findsOneWidget);
     });
 
     testWidgets('should open edit repository dialog and persist changes through UI', (WidgetTester tester) async {
@@ -327,11 +335,13 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
+      final l10n = AppLocalizationsEn();
+
       // Act & Assert - open manage modal
-      await tester.tap(find.text('Sources (1)'));
+      await tester.tap(find.text(l10n.sourcesBtn(1)));
       await tester.pumpAndSettle();
 
-      expect(find.text('Manage Repositories (1)'), findsOneWidget);
+      expect(find.text(l10n.manageRepositoriesTitle(1)), findsOneWidget);
       expect(find.text('Original Repo Name'), findsOneWidget);
 
       // Act & Assert - edit
@@ -340,12 +350,12 @@ void main() {
       await tester.tap(editButton);
       await tester.pumpAndSettle();
 
-      expect(find.text('Edit Repository'), findsOneWidget);
+      expect(find.text(l10n.editRepositoryDialogTitle), findsOneWidget);
 
-      final nameField = find.widgetWithText(TextFormField, 'Name');
+      final nameField = find.widgetWithText(TextFormField, l10n.repositoryNameLabel);
       await tester.enterText(nameField, 'Edited Repo Name');
 
-      await tester.tap(find.text('Save'));
+      await tester.tap(find.text(l10n.save));
       await tester.pumpAndSettle();
 
       expect(find.text('Edited Repo Name'), findsOneWidget);
@@ -412,23 +422,25 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Installed'), findsOneWidget);
-      expect(find.text('Delete from application'), findsOneWidget);
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text(l10n.installedBadge), findsOneWidget);
+      expect(find.text(l10n.deleteFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text('Delete from application'));
+      await tester.tap(find.text(l10n.deleteFromApp));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete pack?'), findsOneWidget);
-      expect(find.textContaining('Are you sure you want to delete pack "Strahd Pack"'), findsOneWidget);
+      expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypePack)), findsOneWidget);
+      expect(find.textContaining(l10n.deleteItemConfirmMessage(l10n.catalogTypePack, 'Strahd Pack')), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
+      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert
       expect(sceneVm.scenes, isEmpty);
       expect(mediaVm.tracks, isEmpty);
-      expect(find.text('Install pack'), findsOneWidget);
+      expect(find.text(l10n.installItem(l10n.catalogTypePack)), findsOneWidget);
     });
 
     testWidgets('should cancel pack deletion when Cancel button is tapped in confirmation dialog', (WidgetTester tester) async {
@@ -481,19 +493,21 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete from application'), findsOneWidget);
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text(l10n.deleteFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text('Delete from application'));
+      await tester.tap(find.text(l10n.deleteFromApp));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await tester.tap(find.widgetWithText(TextButton, l10n.cancel));
       await tester.pumpAndSettle();
 
       // Assert
       expect(sceneVm.scenes.length, 1);
-      expect(find.text('Delete from application'), findsOneWidget);
-      expect(find.text('Install pack'), findsNothing);
+      expect(find.text(l10n.deleteFromApp), findsOneWidget);
+      expect(find.text(l10n.installItem(l10n.catalogTypePack)), findsNothing);
     });
 
     testWidgets('should remove media package and related tracks when delete action is confirmed', (WidgetTester tester) async {
@@ -551,19 +565,21 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete from application'), findsOneWidget);
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text(l10n.deleteFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text('Delete from application'));
+      await tester.tap(find.text(l10n.deleteFromApp));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete media package?'), findsOneWidget);
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
+      expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypeMedia)), findsOneWidget);
+      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert
       expect(mediaVm.tracks, isEmpty);
-      expect(find.text('Install media package'), findsOneWidget);
+      expect(find.text(l10n.installItem(l10n.catalogTypeMedia)), findsOneWidget);
     });
 
     testWidgets('should remove single scene and associated audio when delete is confirmed', (WidgetTester tester) async {
@@ -629,20 +645,22 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete from application'), findsOneWidget);
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text(l10n.deleteFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text('Delete from application'));
+      await tester.tap(find.text(l10n.deleteFromApp));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete scene?'), findsOneWidget);
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
+      expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypeScene)), findsOneWidget);
+      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert
       expect(sceneVm.scenes, isEmpty);
       expect(mediaVm.tracks, isEmpty);
-      expect(find.text('Install scene'), findsOneWidget);
+      expect(find.text(l10n.installItem(l10n.catalogTypeScene)), findsOneWidget);
     });
 
     testWidgets('should preserve shared tracks in library when deleting pack if another scene uses them', (WidgetTester tester) async {
@@ -715,11 +733,13 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
+      final l10n = AppLocalizationsEn();
+
       // Act
-      await tester.tap(find.text('Delete from application'));
+      await tester.tap(find.text(l10n.deleteFromApp));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
+      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert

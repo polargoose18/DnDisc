@@ -740,7 +740,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String removeFromApp(String type) {
-    return 'Удалить из приложения';
+    return 'Удалить $type';
   }
 
   @override
@@ -885,4 +885,123 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get shortcutFullscreenDesc => 'Переключение отображения во весь экран';
+
+  @override
+  String get deleteFromApp => 'Удалить из приложения';
+
+  @override
+  String get repositoryNameLabel => 'Название';
+
+  @override
+  String get intensityCalm => 'Спокойная';
+
+  @override
+  String get intensitySuspense => 'Напряжение';
+
+  @override
+  String get intensityBattle => 'Битва';
+
+  @override
+  String get intensityBoss => 'Босс';
+
+  @override
+  String get play => 'Воспроизвести';
+
+  @override
+  String get catalogTypeScene => 'сцену';
+
+  @override
+  String get catalogTypeMedia => 'медиа-пакет';
+
+  @override
+  String get catalogTypePack => 'пак';
+
+  @override
+  String get sceneTitle => 'Сцена';
+
+  @override
+  String get mediaTitle => 'Медиа';
+
+  @override
+  String get packTitle => 'Пак';
+
+  @override
+  String get catalogSceneBadge => '🎭 Сцена';
+
+  @override
+  String get catalogMediaBadge => '🎵 Медиа';
+
+  @override
+  String get catalogPackBadge => '📦 Пак';
+
+  @override
+  String get filterAll => 'Все';
+
+  @override
+  String get filterScenes => '🎭 Сцены';
+
+  @override
+  String get filterMedia => '🎵 Медиа';
+
+  @override
+  String get filterPacks => '📦 Паки';
+
+  @override
+  String repoStats(int scenes, int media, int packs) {
+    return 'Сцен: $scenes | Медиа: $media | Паков: $packs';
+  }
+
+  @override
+  String get addRepositoryTooltip => 'Добавить репозиторий';
+
+  @override
+  String get repositoryUrlHint => 'https://gitlab.com/user/repo';
+
+  @override
+  String get playTooltip => 'Воспроизведение [Space]';
+
+  @override
+  String get pauseTooltip => 'Пауза [Space]';
+
+  @override
+  String get panicStopTooltip => 'Экстренная остановка SFX [Esc]';
+
+  @override
+  String get loopingBadge => 'ЦИКЛ';
+
+  @override
+  String get tagsPrefix => 'Теги: ';
+
+  @override
+  String get colorNamePrimary => 'Основной';
+
+  @override
+  String get colorNameSecondary => 'Вторичный';
+
+  @override
+  String get colorNameBackground => 'Фон';
+
+  @override
+  String get colorNameSurface => 'Поверхность';
+
+  @override
+  String get colorNameCard => 'Карточка';
+
+  @override
+  String get colorNameAccent => 'Акцент';
+
+  @override
+  String get colorNameTextPrimary => 'Основной текст';
+
+  @override
+  String get colorNameTextSecondary => 'Вторичный текст';
+
+  @override
+  String get colorNameDuckingBadge => 'Индикатор Ducking';
+
+  @override
+  String get colorNameBattleIntensity => 'Интенсивность боя';
+
+  @override
+  String get colorNameBossIntensity => 'Интенсивность босса';
 }
