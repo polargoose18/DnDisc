@@ -7,6 +7,7 @@ import '../../data/repositories/media_library_repository.dart';
 import 'database_service.dart';
 import '../../domain/models/library_track.dart';
 import '../../services/logger_service.dart';
+import '../../services/audio_duration_helper.dart';
 
 class MediaPackageImportResult {
   final String title;
@@ -187,6 +188,13 @@ class MediaPackageService {
           p.join(destinationAudioDir, baseName);
 
       map['file_path'] = absolutePath;
+      if ((map['duration_ms'] == null || map['duration_ms'] <= 0) &&
+          (map['durationMs'] == null || map['durationMs'] <= 0)) {
+        final extractedDur = await AudioDurationHelper.getDurationMs(absolutePath);
+        if (extractedDur > 0) {
+          map['duration_ms'] = extractedDur;
+        }
+      }
       final track = LibraryTrack.fromMap(map);
       importedTracks.add(track);
     }

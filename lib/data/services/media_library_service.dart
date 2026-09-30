@@ -8,6 +8,7 @@ import '../../domain/models/audio_track.dart';
 import '../../domain/models/ambient_layer.dart';
 import '../../domain/models/sfx_trigger.dart';
 import '../../audio/audio_engine_service.dart';
+import '../../services/audio_duration_helper.dart';
 
 class MediaLibraryService extends ChangeNotifier {
   final MediaLibraryRepository _repository;
@@ -99,6 +100,8 @@ class MediaLibraryService extends ChangeNotifier {
       if (file.path == null) continue;
 
       final title = p.basenameWithoutExtension(file.path!);
+      final durationMs = await AudioDurationHelper.getDurationMs(file.path!);
+
       final track = LibraryTrack(
         id: _uuid.v4(),
         title: title,
@@ -106,6 +109,7 @@ class MediaLibraryService extends ChangeNotifier {
         busType: busType,
         tags: List.from(defaultTags),
         colorHex: _getDefaultColorForBus(busType),
+        durationMs: durationMs,
       );
 
       await _repository.insertTrack(track);
@@ -117,7 +121,14 @@ class MediaLibraryService extends ChangeNotifier {
   }
 
   Future<void> addTrack(LibraryTrack track) async {
-    await _repository.insertTrack(track);
+    var finalTrack = track;
+    if (finalTrack.durationMs <= 0 && finalTrack.filePath.isNotEmpty) {
+      final dur = await AudioDurationHelper.getDurationMs(finalTrack.filePath);
+      if (dur > 0) {
+        finalTrack = finalTrack.copyWith(durationMs: dur);
+      }
+    }
+    await _repository.insertTrack(finalTrack);
     await loadTracks(force: true);
   }
 
