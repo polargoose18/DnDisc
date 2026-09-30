@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../services/logger_service.dart';
+import 'database_service.dart';
 
 class SettingsService extends ChangeNotifier {
+  final DatabaseService? _dbService;
   int _musicFadeMs;
   int _ambientFadeMs;
   int _duckAttackMs;
@@ -9,8 +11,12 @@ class SettingsService extends ChangeNotifier {
   double _duckMultiplier;
   bool _showLogConsoleIcon;
   String _appLanguage; // 'system', 'ru', 'en'
+  String? _customDownloadDirectory;
+
+  static const String _kCustomDownloadDirKey = 'custom_download_directory';
 
   SettingsService({
+    DatabaseService? dbService,
     int musicFadeMs = 1500,
     int ambientFadeMs = 1000,
     int duckAttackMs = 300,
@@ -18,13 +24,23 @@ class SettingsService extends ChangeNotifier {
     double duckMultiplier = 0.4,
     bool showLogConsoleIcon = true,
     String appLanguage = 'system',
-  })  : _musicFadeMs = musicFadeMs,
+    String? customDownloadDirectory,
+    bool autoLoad = false,
+  })  : _dbService = dbService,
+        _musicFadeMs = musicFadeMs,
         _ambientFadeMs = ambientFadeMs,
         _duckAttackMs = duckAttackMs,
         _duckReleaseMs = duckReleaseMs,
         _duckMultiplier = duckMultiplier,
         _showLogConsoleIcon = showLogConsoleIcon,
-        _appLanguage = _normalizeLanguage(appLanguage);
+        _appLanguage = _normalizeLanguage(appLanguage),
+        _customDownloadDirectory = (customDownloadDirectory != null && customDownloadDirectory.trim().isNotEmpty)
+            ? customDownloadDirectory.trim()
+            : null {
+    if (autoLoad && _dbService != null) {
+      loadSettings();
+    }
+  }
 
   static String _normalizeLanguage(String lang) {
     if (lang == 'ru' || lang == 'en') return lang;
@@ -38,6 +54,9 @@ class SettingsService extends ChangeNotifier {
   double get duckMultiplier => _duckMultiplier;
   bool get showLogConsoleIcon => _showLogConsoleIcon;
   String get appLanguage => _appLanguage;
+  String? get customDownloadDirectory => _customDownloadDirectory;
+  String? get catalogDownloadDirectory => _customDownloadDirectory;
+  String? get audioStorageDirectory => _customDownloadDirectory;
 
   Locale? get currentLocale {
     if (_appLanguage == 'ru') return const Locale('ru');
@@ -49,6 +68,22 @@ class SettingsService extends ChangeNotifier {
   Duration get ambientFadeDuration => Duration(milliseconds: _ambientFadeMs);
   Duration get duckAttackDuration => Duration(milliseconds: _duckAttackMs);
   Duration get duckReleaseDuration => Duration(milliseconds: _duckReleaseMs);
+
+  /// Loads persisted settings from the database.
+  Future<void> loadSettings() async {
+    final db = _dbService;
+    if (db == null) return;
+    try {
+      final savedDir = await db.getSetting(_kCustomDownloadDirKey);
+      if (savedDir != null && savedDir.isNotEmpty) {
+        _customDownloadDirectory = savedDir;
+        LoggerService().info('SettingsService: Restored custom download directory: $_customDownloadDirectory');
+        notifyListeners();
+      }
+    } catch (e) {
+      LoggerService().warning('SettingsService: Could not restore settings from DB: $e');
+    }
+  }
 
   void setAppLanguage(String lang) {
     _appLanguage = _normalizeLanguage(lang);
@@ -92,6 +127,28 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCustomDownloadDirectory(String? path) {
+    final trimmed = path?.trim();
+    _customDownloadDirectory = (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+    LoggerService().info('SettingsService: Custom download directory set to ${_customDownloadDirectory ?? "default"}');
+    if (_dbService != null) {
+      if (_customDownloadDirectory != null) {
+        _dbService!.setSetting(_kCustomDownloadDirKey, _customDownloadDirectory!).catchError((e) {
+          LoggerService().warning('SettingsService: Could not persist custom download dir: $e');
+        });
+      } else {
+        _dbService!.setSetting(_kCustomDownloadDirKey, '').catchError((e) {
+          LoggerService().warning('SettingsService: Could not persist custom download dir: $e');
+        });
+      }
+    }
+    notifyListeners();
+  }
+
+  void resetCustomDownloadDirectory() {
+    setCustomDownloadDirectory(null);
+  }
+
   void resetToDefaults() {
     _musicFadeMs = 1500;
     _ambientFadeMs = 1000;
@@ -100,6 +157,10 @@ class SettingsService extends ChangeNotifier {
     _duckMultiplier = 0.4;
     _showLogConsoleIcon = true;
     _appLanguage = 'system';
+    _customDownloadDirectory = null;
+    if (_dbService != null) {
+      _dbService!.setSetting(_kCustomDownloadDirKey, '').catchError((_) {});
+    }
     LoggerService().info('SettingsService: Reset all settings to default values');
     notifyListeners();
   }
@@ -113,6 +174,9 @@ class SettingsService extends ChangeNotifier {
       'duckMultiplier': _duckMultiplier,
       'showLogConsoleIcon': _showLogConsoleIcon,
       'appLanguage': _appLanguage,
+      'customDownloadDirectory': _customDownloadDirectory,
+      'catalogDownloadDirectory': _customDownloadDirectory,
+      'audioStorageDirectory': _customDownloadDirectory,
     };
   }
 
@@ -124,6 +188,16 @@ class SettingsService extends ChangeNotifier {
     if (map.containsKey('duckMultiplier')) _duckMultiplier = (map['duckMultiplier'] as num).toDouble().clamp(0.0, 1.0);
     if (map.containsKey('showLogConsoleIcon')) _showLogConsoleIcon = map['showLogConsoleIcon'] as bool;
     if (map.containsKey('appLanguage')) _appLanguage = _normalizeLanguage(map['appLanguage'] as String);
+    if (map.containsKey('customDownloadDirectory')) {
+      final val = map['customDownloadDirectory'] as String?;
+      _customDownloadDirectory = (val != null && val.trim().isNotEmpty) ? val.trim() : null;
+    } else if (map.containsKey('catalogDownloadDirectory')) {
+      final val = map['catalogDownloadDirectory'] as String?;
+      _customDownloadDirectory = (val != null && val.trim().isNotEmpty) ? val.trim() : null;
+    } else if (map.containsKey('audioStorageDirectory')) {
+      final val = map['audioStorageDirectory'] as String?;
+      _customDownloadDirectory = (val != null && val.trim().isNotEmpty) ? val.trim() : null;
+    }
     notifyListeners();
   }
 }

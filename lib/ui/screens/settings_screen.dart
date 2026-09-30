@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../l10n/app_localizations.dart';
 import '../../data/services/settings_service.dart';
 import '../../services/shortcut_service.dart';
@@ -219,9 +220,126 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-
-
-              // Section 6: Language & Interface Options
+              // Section 5: Catalog & Download Directory Settings
+              Card(
+                key: const ValueKey('catalog_storage_settings_card'),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.folder_special_rounded, color: activeTheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Каталог и хранилище аудиофайлов',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: activeTheme.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 24),
+                      Text(
+                        'Папка для загрузки и распаковки аудиофайлов из онлайн-каталога репозиториев:',
+                        style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: activeTheme.surface,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: activeTheme.textSecondary.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              settings.customDownloadDirectory != null
+                                  ? Icons.folder_open_rounded
+                                  : Icons.folder_shared_rounded,
+                              color: settings.customDownloadDirectory != null
+                                  ? activeTheme.primary
+                                  : activeTheme.textSecondary,
+                              size: 28,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    settings.customDownloadDirectory != null
+                                        ? 'Пользовательская директория'
+                                        : 'Директория по умолчанию',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: settings.customDownloadDirectory != null
+                                          ? activeTheme.primary
+                                          : activeTheme.textSecondary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    settings.customDownloadDirectory ?? 'По умолчанию: Documents/audio_library',
+                                    key: const ValueKey('download_directory_display_path'),
+                                    style: TextStyle(
+                                      color: activeTheme.textPrimary,
+                                      fontSize: 13,
+                                      fontFamily: 'monospace',
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (settings.customDownloadDirectory != null)
+                              IconButton(
+                                key: const ValueKey('reset_download_dir_button'),
+                                icon: const Icon(Icons.restore_rounded, size: 20),
+                                tooltip: 'Сбросить к значению по умолчанию',
+                                onPressed: () {
+                                  settings.resetCustomDownloadDirectory();
+                                  _showNotification(context, 'Путь сохранения сброшен к значению по умолчанию.');
+                                },
+                              ),
+                            ElevatedButton.icon(
+                              key: const ValueKey('select_download_dir_button'),
+                              icon: const Icon(Icons.folder_open_rounded, size: 18),
+                              label: const Text('Выбрать папку'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: activeTheme.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              ),
+                              onPressed: () async {
+                                final selectedDirectory = await FilePicker.platform.getDirectoryPath(
+                                  dialogTitle: 'Выберите папку для сохранения аудиофайлов каталога',
+                                );
+                                if (selectedDirectory != null && selectedDirectory.isNotEmpty) {
+                                  settings.setCustomDownloadDirectory(selectedDirectory);
+                                  if (context.mounted) {
+                                    _showNotification(context, 'Папка сохранения каталога обновлена: $selectedDirectory');
+                                  }
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -313,9 +431,7 @@ class SettingsScreen extends StatelessWidget {
                   label: Text(l10n?.resetDefaultsBtn ?? 'Сбросить все настройки по умолчанию', style: TextStyle(color: activeTheme.textSecondary)),
                   onPressed: () {
                     settings.resetToDefaults();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n?.settingsResetToast ?? 'Настройки звукового движка сброшены.')),
-                    );
+                    _showNotification(context, l10n?.settingsResetToast ?? 'Настройки звукового движка сброшены.');
                   },
                 ),
               ),
@@ -325,6 +441,19 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showNotification(BuildContext context, String message) {
+    try {
+      if (context.mounted && Scaffold.maybeOf(context) != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (_) {}
   }
 
   Widget _buildThemesSection(

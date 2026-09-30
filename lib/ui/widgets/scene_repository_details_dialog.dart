@@ -61,6 +61,46 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
     }
   }
 
+  String _getTypeDisplayNameInAccusative(CatalogItemType type) {
+    switch (type) {
+      case CatalogItemType.scene:
+        return 'сцену';
+      case CatalogItemType.media:
+        return 'медиа-набор';
+      case CatalogItemType.pack:
+        return 'пак';
+    }
+  }
+
+  Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final typeName = _getTypeDisplayNameInAccusative(catalogItem.type);
+
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Удалить $typeName?'),
+        content: Text(
+          'Вы уверены, что хотите удалить $typeName "${catalogItem.name}" и связанные файлы из приложения?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Отмена'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -181,19 +221,20 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                       const SizedBox(height: 16),
                     ],
 
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Chip(
                           avatar: const Icon(Icons.folder_zip_outlined, size: 18),
                           label: Text(_formatSize(catalogItem.sizeBytes)),
                         ),
-                        const SizedBox(width: 8),
                         if (catalogItem.type == CatalogItemType.pack) ...[
                           Chip(
                             avatar: const Icon(Icons.style_rounded, size: 18),
                             label: Text('${catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0} сцен'),
                           ),
-                          const SizedBox(width: 8),
                           Chip(
                             avatar: const Icon(Icons.audiotrack, size: 18),
                             label: Text('${catalogItem.tracksCount} треков'),
@@ -204,14 +245,12 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                             label: Text('${catalogItem.tracksCount} треков'),
                           ),
                         ],
-                        if (isInstalled) ...[
-                          const SizedBox(width: 8),
+                        if (isInstalled)
                           const Chip(
                             avatar: Icon(Icons.check_circle_rounded, size: 18, color: Colors.tealAccent),
                             label: Text('Загружено', style: TextStyle(color: Colors.tealAccent)),
                             backgroundColor: Colors.teal,
                           ),
-                        ],
                       ],
                     ),
 
@@ -304,7 +343,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
               ),
             ),
 
-            // Download Footer
+            // Footer (Install / Delete Actions)
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -326,52 +365,79 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     height: 44,
-                    child: ElevatedButton.icon(
-                      style: isInstalled
-                          ? ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal.shade700,
-                              foregroundColor: Colors.white,
-                            )
-                          : null,
-                      onPressed: isDownloading
-                          ? null
-                          : () async {
-                              final success = await vm.downloadAndInstallCatalogItem(
-                                item: catalogItem,
-                                repo: repo,
-                                onInstalled: () async {
-                                  await sceneVm.loadScenes(force: true);
-                                  await mediaVm.loadTracks(force: true);
-                                },
-                              );
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      success
-                                          ? '${catalogItem.type.displayName} "${catalogItem.name}" успешно установлена!'
-                                          : 'Ошибка при скачивании ${catalogItem.type.displayName.toLowerCase()}.',
-                                    ),
-                                  ),
-                                );
-                                if (success) {
-                                  Navigator.of(context).pop();
-                                }
-                              }
-                            },
-                      icon: Icon(
-                        isDownloading
-                            ? Icons.hourglass_top_rounded
-                            : (isInstalled ? Icons.check_circle_rounded : Icons.download_rounded),
-                      ),
-                      label: Text(
-                        isDownloading
-                            ? 'Установка...'
-                            : (isInstalled
-                                ? 'Загружено (Переустановить)'
-                                : 'Установить ${catalogItem.type.displayName.toLowerCase()}'),
-                      ),
-                    ),
+                    child: isInstalled
+                        ? ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.error,
+                              foregroundColor: theme.colorScheme.onError,
+                            ),
+                            onPressed: isDownloading
+                                ? null
+                                : () async {
+                                    final confirm = await _showDeleteConfirmationDialog(context);
+                                    if (confirm == true) {
+                                      final success = await vm.uninstallCatalogItem(
+                                        item: catalogItem,
+                                        sceneVm: sceneVm,
+                                        mediaVm: mediaVm,
+                                      );
+                                      if (context.mounted) {
+                                        final actionText = catalogItem.type == CatalogItemType.scene
+                                            ? 'успешно удалена'
+                                            : 'успешно удален';
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              success
+                                                  ? '${catalogItem.type.displayName} "${catalogItem.name}" $actionText из приложения.'
+                                                  : 'Ошибка при удалении ${catalogItem.type.displayName.toLowerCase()}.',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                            icon: const Icon(Icons.delete_outline_rounded),
+                            label: const Text('Удалить из приложения'),
+                          )
+                        : ElevatedButton.icon(
+                            onPressed: isDownloading
+                                ? null
+                                : () async {
+                                    final success = await vm.downloadAndInstallCatalogItem(
+                                      item: catalogItem,
+                                      repo: repo,
+                                      onInstalled: () async {
+                                        await sceneVm.loadScenes(force: true);
+                                        await mediaVm.loadTracks(force: true);
+                                      },
+                                    );
+                                    if (context.mounted) {
+                                      final actionText = catalogItem.type == CatalogItemType.scene
+                                          ? 'успешно установлена'
+                                          : 'успешно установлен';
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            success
+                                                ? '${catalogItem.type.displayName} "${catalogItem.name}" $actionText!'
+                                                : 'Ошибка при скачивании ${catalogItem.type.displayName.toLowerCase()}.',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                            icon: Icon(
+                              isDownloading
+                                  ? Icons.hourglass_top_rounded
+                                  : Icons.download_rounded,
+                            ),
+                            label: Text(
+                              isDownloading
+                                  ? 'Установка...'
+                                  : 'Установить ${_getTypeDisplayNameInAccusative(catalogItem.type)}',
+                            ),
+                          ),
                   ),
                 ],
               ),

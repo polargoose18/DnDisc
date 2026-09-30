@@ -6,6 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/data/repositories/scene_repository_source_repository.dart';
 import 'package:ttrpg_audio_player/data/services/scene_repository_network_service.dart';
 import 'package:ttrpg_audio_player/domain/models/scene_repository_model.dart';
+import 'package:ttrpg_audio_player/data/services/settings_service.dart';
 import 'package:ttrpg_audio_player/ui/view_models/repository_view_model.dart';
 
 class FakePathProviderPlatform extends Fake
@@ -179,6 +180,32 @@ void main() {
         final persisted = await fakeSource.getRepositoryById('repo-edit-1');
         expect(persisted?.name, equals('Updated Name'));
         expect(persisted?.url, equals('https://example.com/new_repo.json'));
+      },
+    );
+
+    test(
+      'Что проверяем: Определение целевой папки аудиобиблиотеки getEffectiveAudioDirectory в RepositoryViewModel. '
+      'Входные данные: RepositoryViewModel с дефолтным SettingsService, затем с установленным customDownloadDirectory ("D:/CustomFolder"). '
+      'Ожидаемый результат: В первом случае возвращается путь к fallback Documents/audio_library, во втором случае возвращается "D:/CustomFolder".',
+      () async {
+        final fakeSource = FakeSceneRepositorySourceRepository();
+        final settings = SettingsService();
+
+        final vm = RepositoryViewModel(
+          sourceRepository: fakeSource,
+          settingsService: settings,
+        );
+
+        final defaultDir = await vm.getEffectiveAudioDirectory();
+        expect(defaultDir.endsWith('audio_library'), isTrue);
+
+        settings.setCustomDownloadDirectory('D:/CustomFolder');
+        final customDir = await vm.getEffectiveAudioDirectory();
+        expect(customDir, equals('D:/CustomFolder'));
+
+        settings.resetCustomDownloadDirectory();
+        final resetDir = await vm.getEffectiveAudioDirectory();
+        expect(resetDir.endsWith('audio_library'), isTrue);
       },
     );
   });

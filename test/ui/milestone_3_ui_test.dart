@@ -288,6 +288,48 @@ void main() {
         sceneService.dispose();
       },
     );
+
+    testWidgets(
+      'Что проверяем: Отображение и взаимодействие с секцией каталога и хранилища аудиофайлов в SettingsScreen. '
+      'Входные данные: SettingsScreen с установленной пользовательской директорией customDownloadDirectory="C:/AudioVault". '
+      'Ожидаемый результат: В UI отображается "C:/AudioVault", отображается кнопка сброса, нажатие на кнопку сброса сбрасывает путь в null.',
+      (WidgetTester tester) async {
+        final settings = SettingsService(customDownloadDirectory: 'C:/AudioVault');
+        final library = MediaLibraryService(autoLoad: false);
+        final sceneService = SceneService(autoLoad: false);
+        await tester.runAsync(() async {
+          await library.loadTracks();
+          await sceneService.loadScenes();
+        });
+
+        await tester.pumpWidget(createM3TestableWidget(
+          const SettingsScreen(),
+          settings: settings,
+          library: library,
+          sceneService: sceneService,
+        ));
+        await tester.pumpAndSettle();
+
+        final cardFinder = find.byKey(const ValueKey('catalog_storage_settings_card'));
+        await tester.scrollUntilVisible(cardFinder, 200);
+        expect(cardFinder, findsOneWidget);
+        expect(find.text('Каталог и хранилище аудиофайлов'), findsOneWidget);
+        expect(find.text('C:/AudioVault'), findsOneWidget);
+
+        final resetBtn = find.byKey(const ValueKey('reset_download_dir_button'));
+        expect(resetBtn, findsOneWidget);
+
+        await tester.tap(resetBtn);
+        await tester.pumpAndSettle();
+
+        expect(settings.customDownloadDirectory, isNull);
+        expect(find.textContaining('По умолчанию: Documents/audio_library'), findsOneWidget);
+
+        settings.dispose();
+        library.dispose();
+        sceneService.dispose();
+      },
+    );
   });
 
   group('MainDashboardScreen 3-Tab Integration Tests', () {

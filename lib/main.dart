@@ -32,7 +32,12 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<LoggerService>(create: (_) => LoggerService()),
-        ChangeNotifierProvider<SettingsService>(create: (_) => SettingsService()),
+        ChangeNotifierProvider<SettingsService>(
+          create: (_) {
+            final svc = SettingsService(dbService: DatabaseService(), autoLoad: true);
+            return svc;
+          },
+        ),
         ChangeNotifierProvider<ThemeService>(
           create: (_) {
             final svc = ThemeService(dbService: DatabaseService());
@@ -73,7 +78,13 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
                 create: (context) => SceneViewModel(service: context.read<SceneService>()),
                 update: (context, service, viewModel) => viewModel ?? SceneViewModel(service: service),
               ),
-              ChangeNotifierProvider<RepositoryViewModel>(create: (_) => RepositoryViewModel()),
+              ChangeNotifierProxyProvider<SettingsService, RepositoryViewModel>(
+                create: (context) => RepositoryViewModel(settingsService: context.read<SettingsService>()),
+                update: (context, settings, viewModel) {
+                  viewModel?.attachSettings(settings);
+                  return viewModel ?? RepositoryViewModel(settingsService: settings);
+                },
+              ),
             ],
             child: Consumer2<ThemeViewModel, SettingsService>(
               builder: (context, themeViewModel, settingsService, _) {

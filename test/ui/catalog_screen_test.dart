@@ -14,6 +14,7 @@ import 'package:ttrpg_audio_player/ui/screens/repository_catalog_screen.dart';
 import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/repository_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
+import 'package:ttrpg_audio_player/ui/widgets/scene_repository_details_dialog.dart';
 
 class FakeSourceRepo implements SceneRepositorySourceRepository {
   final List<SceneRepositoryModel> repos;
@@ -141,7 +142,7 @@ Widget createCatalogTestableWidget({
       ChangeNotifierProvider<MediaLibraryViewModel>.value(value: mediaLibraryViewModel),
     ],
     child: MaterialApp(
-      home: child,
+      home: Scaffold(body: child),
     ),
   );
 }
@@ -370,6 +371,404 @@ void main() {
 
         // Verify updated name in the UI
         expect(find.text('Edited Repo Name'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Что проверяем: Удаление загруженного пака через кнопку "Удалить из приложения" в SceneRepositoryDetailsDialog. '
+      'Входные данные: Пак со сценой и связанными треками установлен в SceneViewModel и MediaLibraryViewModel. Пользователь открывает детали пака, нажимает кнопку удаления и подтверждает действие. '
+      'Ожидаемый результат: Отображается диалог подтверждения удаления, после подтверждения сцены и треки пака удаляются, а кнопка переключается на "Установить пак".',
+      (WidgetTester tester) async {
+        final mockRepo = SceneRepositoryModel(
+          id: 'repo_pack_del',
+          name: 'Pack Repo',
+          url: 'https://example.com/repo.json',
+          createdAt: DateTime.now(),
+        );
+
+        const packItem = RepositoryPackItem(
+          id: 'pk_strahd',
+          name: 'Strahd Pack',
+          downloadUrl: 'packs/strahd.pack.zip',
+          scenes: [
+            RepositoryPackSceneSummary(name: 'Castle Ravenloft', tracksCount: 1),
+          ],
+        );
+
+        final catalogItem = CatalogItem.fromPack(packItem);
+
+        const mockManifest = SceneRepositoryManifest(
+          name: 'Pack Repo',
+          packs: [packItem],
+        );
+
+        final repoVm = RepositoryViewModel(
+          sourceRepository: FakeSourceRepo([mockRepo]),
+          networkService: FakeNetworkService(mockManifest),
+        );
+        final sceneService = SceneService(repository: FakeSceneRepo(), autoLoad: false);
+        final sceneVm = SceneViewModel(service: sceneService, autoLoad: false);
+
+        final mediaService = MediaLibraryService(repository: FakeMediaLibraryRepo(), autoLoad: false);
+        final mediaVm = MediaLibraryViewModel(service: mediaService, autoLoad: false);
+
+        final track = LibraryTrack(
+          id: 'trk_organ',
+          title: 'Organ Music',
+          filePath: '/audio/organ.mp3',
+          busType: AudioBusType.music,
+        );
+        await mediaVm.addTrack(track);
+
+        final scene = SceneModel(
+          id: 'sc_ravenloft',
+          name: 'Castle Ravenloft',
+          musicTrackId: 'trk_organ',
+        );
+        await sceneVm.createScene(scene);
+
+        await tester.pumpWidget(createCatalogTestableWidget(
+          child: SceneRepositoryDetailsDialog(
+            item: catalogItem,
+            repo: mockRepo,
+          ),
+          repositoryViewModel: repoVm,
+          sceneViewModel: sceneVm,
+          mediaLibraryViewModel: mediaVm,
+        ));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Загружено'), findsOneWidget);
+        expect(find.text('Удалить из приложения'), findsOneWidget);
+        expect(find.text('Загружено (Переустановить)'), findsNothing);
+
+        await tester.tap(find.text('Удалить из приложения'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Удалить пак?'), findsOneWidget);
+        expect(find.textContaining('Вы уверены, что хотите удалить пак "Strahd Pack"'), findsOneWidget);
+        expect(find.widgetWithText(ElevatedButton, 'Удалить'), findsOneWidget);
+        expect(find.widgetWithText(TextButton, 'Отмена'), findsOneWidget);
+
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Удалить'));
+        await tester.pumpAndSettle();
+
+        expect(sceneVm.scenes, isEmpty);
+        expect(mediaVm.tracks, isEmpty);
+
+        expect(find.text('Удалить из приложения'), findsNothing);
+        expect(find.text('Установить пак'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Что проверяем: Отмена удаления пака в диалоге подтверждения. '
+      'Входные данные: Пользователь открывает детали установленного пака, нажимает "Удалить из приложения" и нажимает "Отмена". '
+      'Ожидаемый результат: Пак и сцены не удаляются, кнопка остаётся "Удалить из приложения".',
+      (WidgetTester tester) async {
+        final mockRepo = SceneRepositoryModel(
+          id: 'repo_cancel_del',
+          name: 'Cancel Repo',
+          url: 'https://example.com/repo.json',
+          createdAt: DateTime.now(),
+        );
+
+        const packItem = RepositoryPackItem(
+          id: 'pk_cancel',
+          name: 'Cancel Pack',
+          downloadUrl: 'packs/cancel.pack.zip',
+          scenes: [
+            RepositoryPackSceneSummary(name: 'Safe Scene', tracksCount: 0),
+          ],
+        );
+
+        final catalogItem = CatalogItem.fromPack(packItem);
+
+        const mockManifest = SceneRepositoryManifest(
+          name: 'Cancel Repo',
+          packs: [packItem],
+        );
+
+        final repoVm = RepositoryViewModel(
+          sourceRepository: FakeSourceRepo([mockRepo]),
+          networkService: FakeNetworkService(mockManifest),
+        );
+        final sceneService = SceneService(repository: FakeSceneRepo(), autoLoad: false);
+        final sceneVm = SceneViewModel(service: sceneService, autoLoad: false);
+
+        final mediaService = MediaLibraryService(repository: FakeMediaLibraryRepo(), autoLoad: false);
+        final mediaVm = MediaLibraryViewModel(service: mediaService, autoLoad: false);
+
+        await sceneVm.createScene(
+          SceneModel(id: 'sc_safe', name: 'Safe Scene'),
+        );
+
+        await tester.pumpWidget(createCatalogTestableWidget(
+          child: SceneRepositoryDetailsDialog(
+            item: catalogItem,
+            repo: mockRepo,
+          ),
+          repositoryViewModel: repoVm,
+          sceneViewModel: sceneVm,
+          mediaLibraryViewModel: mediaVm,
+        ));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Удалить из приложения'), findsOneWidget);
+
+        await tester.tap(find.text('Удалить из приложения'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.widgetWithText(TextButton, 'Отмена'));
+        await tester.pumpAndSettle();
+
+        expect(sceneVm.scenes.length, 1);
+        expect(find.text('Удалить из приложения'), findsOneWidget);
+        expect(find.text('Установить пак'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Что проверяем: Удаление медиа-набора через SceneRepositoryDetailsDialog. '
+      'Входные данные: Медиа-набор с треком установлен в MediaLibraryViewModel. Пользователь нажимает "Удалить из приложения" и подтверждает. '
+      'Ожидаемый результат: Трек удаляется из MediaLibraryViewModel, кнопка возвращается в состояние "Установить медиа".',
+      (WidgetTester tester) async {
+        final mockRepo = SceneRepositoryModel(
+          id: 'repo_media_del',
+          name: 'Media Repo',
+          url: 'https://example.com/repo.json',
+          createdAt: DateTime.now(),
+        );
+
+        const mediaItem = RepositoryMediaItem(
+          id: 'med_swords',
+          name: 'Swords Collection',
+          downloadUrl: 'media/swords.media.zip',
+          tracks: [
+            RepositorySceneTrack(title: 'Iron Sword Strike', busType: 'sfx'),
+          ],
+        );
+
+        final catalogItem = CatalogItem.fromMedia(mediaItem);
+
+        const mockManifest = SceneRepositoryManifest(
+          name: 'Media Repo',
+          media: [mediaItem],
+        );
+
+        final repoVm = RepositoryViewModel(
+          sourceRepository: FakeSourceRepo([mockRepo]),
+          networkService: FakeNetworkService(mockManifest),
+        );
+        final sceneService = SceneService(repository: FakeSceneRepo(), autoLoad: false);
+        final sceneVm = SceneViewModel(service: sceneService, autoLoad: false);
+
+        final mediaService = MediaLibraryService(repository: FakeMediaLibraryRepo(), autoLoad: false);
+        final mediaVm = MediaLibraryViewModel(service: mediaService, autoLoad: false);
+
+        await mediaVm.addTrack(
+          LibraryTrack(
+            id: 'trk_iron',
+            title: 'Iron Sword Strike',
+            filePath: '/audio/iron.mp3',
+            busType: AudioBusType.sfx,
+          ),
+        );
+
+        await tester.pumpWidget(createCatalogTestableWidget(
+          child: SceneRepositoryDetailsDialog(
+            item: catalogItem,
+            repo: mockRepo,
+          ),
+          repositoryViewModel: repoVm,
+          sceneViewModel: sceneVm,
+          mediaLibraryViewModel: mediaVm,
+        ));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Удалить из приложения'), findsOneWidget);
+
+        await tester.tap(find.text('Удалить из приложения'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Удалить медиа-набор?'), findsOneWidget);
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Удалить'));
+        await tester.pumpAndSettle();
+
+        expect(mediaVm.tracks, isEmpty);
+        expect(find.text('Установить медиа-набор'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Что проверяем: Удаление одиночной сцены через SceneRepositoryDetailsDialog. '
+      'Входные данные: Сцена со звуковым сопровождением установлена в SceneViewModel и MediaLibraryViewModel. Пользователь подтверждает удаление. '
+      'Ожидаемый результат: Сцена и трек удаляются, кнопка возвращается в состояние "Установить сцену".',
+      (WidgetTester tester) async {
+        final mockRepo = SceneRepositoryModel(
+          id: 'repo_scene_del',
+          name: 'Scene Repo',
+          url: 'https://example.com/repo.json',
+          createdAt: DateTime.now(),
+        );
+
+        const sceneItem = RepositorySceneItem(
+          id: 'sc_tavern',
+          name: 'Tavern Scene',
+          downloadUrl: 'scenes/tavern.scene.zip',
+          tracks: [
+            RepositorySceneTrack(title: 'Tavern Music', busType: 'music'),
+          ],
+        );
+
+        final catalogItem = CatalogItem.fromScene(sceneItem);
+
+        const mockManifest = SceneRepositoryManifest(
+          name: 'Scene Repo',
+          scenes: [sceneItem],
+        );
+
+        final repoVm = RepositoryViewModel(
+          sourceRepository: FakeSourceRepo([mockRepo]),
+          networkService: FakeNetworkService(mockManifest),
+        );
+        final sceneService = SceneService(repository: FakeSceneRepo(), autoLoad: false);
+        final sceneVm = SceneViewModel(service: sceneService, autoLoad: false);
+
+        final mediaService = MediaLibraryService(repository: FakeMediaLibraryRepo(), autoLoad: false);
+        final mediaVm = MediaLibraryViewModel(service: mediaService, autoLoad: false);
+
+        await mediaVm.addTrack(
+          LibraryTrack(
+            id: 'trk_tavern',
+            title: 'Tavern Music',
+            filePath: '/audio/tavern.mp3',
+            busType: AudioBusType.music,
+          ),
+        );
+
+        await sceneVm.createScene(
+          SceneModel(
+            id: 'sc_tavern',
+            name: 'Tavern Scene',
+            musicTrackId: 'trk_tavern',
+          ),
+        );
+
+        await tester.pumpWidget(createCatalogTestableWidget(
+          child: SceneRepositoryDetailsDialog(
+            item: catalogItem,
+            repo: mockRepo,
+          ),
+          repositoryViewModel: repoVm,
+          sceneViewModel: sceneVm,
+          mediaLibraryViewModel: mediaVm,
+        ));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Удалить из приложения'), findsOneWidget);
+
+        await tester.tap(find.text('Удалить из приложения'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Удалить сцену?'), findsOneWidget);
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Удалить'));
+        await tester.pumpAndSettle();
+
+        expect(sceneVm.scenes, isEmpty);
+        expect(mediaVm.tracks, isEmpty);
+        expect(find.text('Установить сцену'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Что проверяем: Сохранение трека в медиабиблиотеке при удалении пака, если трек используется в другой существующей сцене. '
+      'Входные данные: Пак со сценой A (музыка trk_shared) и независимая сцена B (музыка trk_shared). Пользователь удаляет пак. '
+      'Ожидаемый результат: Сцена пака удаляется, а независимая сцена B и трек trk_shared сохраняются в системе.',
+      (WidgetTester tester) async {
+        final mockRepo = SceneRepositoryModel(
+          id: 'repo_shared_test',
+          name: 'Shared Repo',
+          url: 'https://example.com/repo.json',
+          createdAt: DateTime.now(),
+        );
+
+        const packItem = RepositoryPackItem(
+          id: 'pk_dungeon',
+          name: 'Dungeon Pack',
+          downloadUrl: 'packs/dungeon.pack.zip',
+          scenes: [
+            RepositoryPackSceneSummary(name: 'Dungeon Room 1', tracksCount: 1),
+          ],
+        );
+
+        final catalogItem = CatalogItem.fromPack(packItem);
+
+        const mockManifest = SceneRepositoryManifest(
+          name: 'Shared Repo',
+          packs: [packItem],
+        );
+
+        final repoVm = RepositoryViewModel(
+          sourceRepository: FakeSourceRepo([mockRepo]),
+          networkService: FakeNetworkService(mockManifest),
+        );
+        final sceneService = SceneService(repository: FakeSceneRepo(), autoLoad: false);
+        final sceneVm = SceneViewModel(service: sceneService, autoLoad: false);
+
+        final mediaService = MediaLibraryService(repository: FakeMediaLibraryRepo(), autoLoad: false);
+        final mediaVm = MediaLibraryViewModel(service: mediaService, autoLoad: false);
+
+        final sharedTrack = LibraryTrack(
+          id: 'trk_shared',
+          title: 'Ambient Drip',
+          filePath: '/audio/drip.mp3',
+          busType: AudioBusType.music,
+        );
+        await mediaVm.addTrack(sharedTrack);
+
+        // Pack scene
+        await sceneVm.createScene(
+          SceneModel(
+            id: 'sc_dungeon_1',
+            name: 'Dungeon Room 1',
+            musicTrackId: 'trk_shared',
+          ),
+        );
+
+        // Independent custom scene sharing the same track
+        await sceneVm.createScene(
+          SceneModel(
+            id: 'sc_custom',
+            name: 'My Custom Scene',
+            musicTrackId: 'trk_shared',
+          ),
+        );
+
+        await tester.pumpWidget(createCatalogTestableWidget(
+          child: SceneRepositoryDetailsDialog(
+            item: catalogItem,
+            repo: mockRepo,
+          ),
+          repositoryViewModel: repoVm,
+          sceneViewModel: sceneVm,
+          mediaLibraryViewModel: mediaVm,
+        ));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Удалить из приложения'), findsOneWidget);
+
+        await tester.tap(find.text('Удалить из приложения'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Удалить'));
+        await tester.pumpAndSettle();
+
+        // Pack scene removed, but custom scene and shared track retained
+        expect(sceneVm.scenes.length, 1);
+        expect(sceneVm.scenes.first.id, 'sc_custom');
+        expect(mediaVm.tracks.length, 1);
+        expect(mediaVm.tracks.first.id, 'trk_shared');
       },
     );
   });

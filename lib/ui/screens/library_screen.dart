@@ -148,15 +148,45 @@ class LibraryScreen extends StatelessWidget {
                                         color: Colors.white,
                                       ),
                                     ),
-                                    title: Text(
-                                      track.title,
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    title: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            track.title,
+                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          key: ValueKey('library_track_duration_${track.id}'),
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white12,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.timer_outlined, size: 12, color: Colors.white70),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                _formatDuration(track.durationMs),
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.white70,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     subtitle: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Шина: ${track.busType.displayName} | Путь: ${track.filePath}',
+                                          'Шина: ${track.busType.displayName} | Длительность: ${_formatDuration(track.durationMs)} | Путь: ${track.filePath}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(fontSize: 11, color: Colors.white60),
@@ -264,6 +294,18 @@ class LibraryScreen extends StatelessWidget {
     if (busType != null) {
       await library.importFiles(busType: busType);
     }
+  }
+
+  String _formatDuration(int? durationMs) {
+    if (durationMs == null || durationMs <= 0) return '--:--';
+    final duration = Duration(milliseconds: durationMs);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    if (hours > 0) {
+      return '$hours:$minutes:$seconds';
+    }
+    return '$minutes:$seconds';
   }
 
   IconData _getIconForBus(AudioBusType bus) {

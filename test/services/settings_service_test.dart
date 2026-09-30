@@ -158,6 +158,7 @@ void main() {
           'duckMultiplier': 0.25,
           'showLogConsoleIcon': false,
           'appLanguage': 'en',
+          'customDownloadDirectory': 'D:/MyTtrpgAudio',
         });
 
         expect(newSettings.musicFadeMs, equals(4000));
@@ -168,6 +169,39 @@ void main() {
         expect(newSettings.showLogConsoleIcon, isFalse);
         expect(newSettings.appLanguage, equals('en'));
         expect(newSettings.currentLocale, equals(const Locale('en')));
+        expect(newSettings.customDownloadDirectory, equals('D:/MyTtrpgAudio'));
+      },
+    );
+
+    test(
+      'Что проверяем: Установка, сброс и геттеры для пользовательской директории каталога в SettingsService. '
+      'Входные данные: Вызовы setCustomDownloadDirectory("C:/AudioDir"), resetCustomDownloadDirectory() и resetToDefaults(). '
+      'Ожидаемый результат: customDownloadDirectory, catalogDownloadDirectory и audioStorageDirectory возвращают актуальное значение и сбрасываются в null при сбросе.',
+      () {
+        int notifyCount = 0;
+        settings.addListener(() => notifyCount++);
+
+        expect(settings.customDownloadDirectory, isNull);
+        expect(settings.catalogDownloadDirectory, isNull);
+        expect(settings.audioStorageDirectory, isNull);
+
+        settings.setCustomDownloadDirectory('C:/CustomAudio/Library');
+        expect(settings.customDownloadDirectory, equals('C:/CustomAudio/Library'));
+        expect(settings.catalogDownloadDirectory, equals('C:/CustomAudio/Library'));
+        expect(settings.audioStorageDirectory, equals('C:/CustomAudio/Library'));
+        expect(notifyCount, equals(1));
+
+        settings.resetCustomDownloadDirectory();
+        expect(settings.customDownloadDirectory, isNull);
+        expect(notifyCount, equals(2));
+
+        settings.setCustomDownloadDirectory('  E:/OtherPath  ');
+        expect(settings.customDownloadDirectory, equals('E:/OtherPath'));
+        expect(notifyCount, equals(3));
+
+        settings.resetToDefaults();
+        expect(settings.customDownloadDirectory, isNull);
+        expect(notifyCount, equals(4));
       },
     );
   });

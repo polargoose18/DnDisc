@@ -9,12 +9,16 @@ import '../../services/logger_service.dart';
 import '../../data/services/media_package_service.dart';
 import '../../data/services/scene_package_service.dart';
 import '../../data/services/scene_repository_network_service.dart';
+import '../../data/services/settings_service.dart';
+import 'media_library_view_model.dart';
+import 'scene_view_model.dart';
 
 class RepositoryViewModel extends ChangeNotifier {
   final SceneRepositorySourceRepository _sourceRepo;
   final SceneRepositoryNetworkService _networkService;
   final ScenePackageService _packageService;
   final MediaPackageService _mediaPackageService;
+  SettingsService? _settingsService;
 
   List<SceneRepositoryModel> _repositories = [];
   Map<String, SceneRepositoryManifest> _manifests = {}; // repo.id -> manifest
@@ -31,10 +35,25 @@ class RepositoryViewModel extends ChangeNotifier {
     SceneRepositoryNetworkService? networkService,
     ScenePackageService? packageService,
     MediaPackageService? mediaPackageService,
+    SettingsService? settingsService,
   })  : _sourceRepo = sourceRepository ?? SqliteSceneRepositorySourceRepository(),
         _networkService = networkService ?? SceneRepositoryNetworkService(),
         _packageService = packageService ?? ScenePackageService(),
-        _mediaPackageService = mediaPackageService ?? MediaPackageService();
+        _mediaPackageService = mediaPackageService ?? MediaPackageService(),
+        _settingsService = settingsService;
+
+  void attachSettings(SettingsService settings) {
+    _settingsService = settings;
+  }
+
+  Future<String> getEffectiveAudioDirectory() async {
+    final customPath = _settingsService?.customDownloadDirectory?.trim();
+    if (customPath != null && customPath.isNotEmpty) {
+      return customPath;
+    }
+    final appDocDir = await getApplicationDocumentsDirectory();
+    return p.join(appDocDir.path, 'audio_library');
+  }
 
   List<SceneRepositoryModel> get repositories => List.unmodifiable(_repositories);
   Map<String, SceneRepositoryManifest> get manifests => Map.unmodifiable(_manifests);
@@ -274,8 +293,7 @@ class RepositoryViewModel extends ChangeNotifier {
         },
       );
 
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final audioDir = p.join(appDocDir.path, 'audio_library');
+      final audioDir = await getEffectiveAudioDirectory();
 
       if (item.type == CatalogItemType.scene) {
         await _packageService.importSingleScenePackage(
@@ -326,5 +344,185 @@ class RepositoryViewModel extends ChangeNotifier {
       repo: repo,
       onInstalled: onInstalled,
     );
+  }
+
+  Future<bool> uninstallCatalogItem({
+    required CatalogItem item,
+    required SceneViewModel sceneVm,
+    required MediaLibraryViewModel mediaVm,
+  }) async {
+    try {
+      if (item.type == CatalogItemType.pack) {
+        final packScenes = item.packItem?.scenes ?? [];
+        final matchingScenes = sceneVm.scenes.where((s) {
+          if (s.id == item.id || s.name.trim().toLowerCase() == item.name.trim().toLowerCase()) {
+            return true;
+          }
+          return packScenes.any((ps) => ps.name.trim().toLowerCase() == s.name.trim().toLowerCase());
+        }).toList();
+
+        final otherScenes = sceneVm.scenes.where((s) => !matchingScenes.contains(s)).toList();
+        final protectedTrackIds = <String>{};
+        for (final s in otherScenes) {
+          if (s.musicTrackId != null && s.musicTrackId!.isNotEmpty) {
+            protectedTrackIds.add(s.musicTrackId!);
+          }
+          protectedTrackIds.addAll(s.ambientLayerVolumes.keys);
+          protectedTrackIds.addAll(s.soundboardSfxIds);
+        }
+
+        final trackIdsToDelete = <String>{};
+        for (final scene in matchingScenes) {
+          if (scene.musicTrackId != null && scene.musicTrackId!.isNotEmpty) {
+            trackIdsToDelete.add(scene.musicTrackId!);
+          }
+          trackIdsToDelete.addAll(scene.ambientLayerVolumes.keys);
+          trackIdsToDelete.addAll(scene.soundboardSfxIds);
+
+          if (scene.imagePath != null && scene.imagePath!.isNotEmpty) {
+            try {
+              final imgFile = File(scene.imagePath!);
+              if (imgFile.existsSync()) {
+                await imgFile.delete();
+              }
+            } catch (e) {
+              LoggerService().warning('Could not delete scene image ${scene.imagePath}: $e');
+            }
+          }
+        }
+
+        final tracksToDelete = mediaVm.tracks.where((t) =>
+          trackIdsToDelete.contains(t.id) && !protectedTrackIds.contains(t.id)
+        ).toList();
+
+        for (final track in tracksToDelete) {
+          try {
+            final audioFile = File(track.filePath);
+            if (audioFile.existsSync()) {
+              await audioFile.delete();
+            }
+          } catch (e) {
+            LoggerService().warning('Could not delete audio file ${track.filePath}: $e');
+          }
+          await mediaVm.deleteTrack(track.id);
+        }
+
+        for (final scene in matchingScenes) {
+          await sceneVm.deleteScene(scene.id);
+        }
+
+        await sceneVm.loadScenes(force: true);
+        await mediaVm.loadTracks(force: true);
+      } else if (item.type == CatalogItemType.scene) {
+        final matchingScenes = sceneVm.scenes.where((s) =>
+          s.id == item.id || s.name.trim().toLowerCase() == item.name.trim().toLowerCase(),
+        ).toList();
+
+        final otherScenes = sceneVm.scenes.where((s) => !matchingScenes.contains(s)).toList();
+        final protectedTrackIds = <String>{};
+        for (final s in otherScenes) {
+          if (s.musicTrackId != null && s.musicTrackId!.isNotEmpty) {
+            protectedTrackIds.add(s.musicTrackId!);
+          }
+          protectedTrackIds.addAll(s.ambientLayerVolumes.keys);
+          protectedTrackIds.addAll(s.soundboardSfxIds);
+        }
+
+        final trackIdsToDelete = <String>{};
+        for (final scene in matchingScenes) {
+          if (scene.musicTrackId != null && scene.musicTrackId!.isNotEmpty) {
+            trackIdsToDelete.add(scene.musicTrackId!);
+          }
+          trackIdsToDelete.addAll(scene.ambientLayerVolumes.keys);
+          trackIdsToDelete.addAll(scene.soundboardSfxIds);
+
+          if (scene.imagePath != null && scene.imagePath!.isNotEmpty) {
+            try {
+              final imgFile = File(scene.imagePath!);
+              if (imgFile.existsSync()) {
+                await imgFile.delete();
+              }
+            } catch (e) {
+              LoggerService().warning('Could not delete scene image ${scene.imagePath}: $e');
+            }
+          }
+        }
+
+        final manifestTrackTitles = (item.sceneItem?.tracks ?? [])
+            .map((t) => t.title.trim().toLowerCase())
+            .toSet();
+
+        final tracksToDelete = mediaVm.tracks.where((t) =>
+          (trackIdsToDelete.contains(t.id) ||
+          (manifestTrackTitles.isNotEmpty && manifestTrackTitles.contains(t.title.trim().toLowerCase()))) &&
+          !protectedTrackIds.contains(t.id),
+        ).toList();
+
+        for (final track in tracksToDelete) {
+          try {
+            final audioFile = File(track.filePath);
+            if (audioFile.existsSync()) {
+              await audioFile.delete();
+            }
+          } catch (e) {
+            LoggerService().warning('Could not delete audio file ${track.filePath}: $e');
+          }
+          await mediaVm.deleteTrack(track.id);
+        }
+
+        for (final scene in matchingScenes) {
+          await sceneVm.deleteScene(scene.id);
+        }
+
+        await sceneVm.loadScenes(force: true);
+        await mediaVm.loadTracks(force: true);
+      } else if (item.type == CatalogItemType.media) {
+        final protectedTrackIds = <String>{};
+        for (final s in sceneVm.scenes) {
+          if (s.musicTrackId != null && s.musicTrackId!.isNotEmpty) {
+            protectedTrackIds.add(s.musicTrackId!);
+          }
+          protectedTrackIds.addAll(s.ambientLayerVolumes.keys);
+          protectedTrackIds.addAll(s.soundboardSfxIds);
+        }
+
+        final manifestTrackTitles = (item.mediaItem?.tracks ?? [])
+            .map((t) => t.title.trim().toLowerCase())
+            .toSet();
+
+        final tracksToDelete = mediaVm.tracks.where((t) {
+          if (protectedTrackIds.contains(t.id)) return false;
+          if (manifestTrackTitles.isNotEmpty) {
+            return manifestTrackTitles.contains(t.title.trim().toLowerCase());
+          }
+          return t.id == item.id ||
+              t.title.trim().toLowerCase() == item.name.trim().toLowerCase() ||
+              t.tags.any((tag) => tag.trim().toLowerCase() == item.name.trim().toLowerCase());
+        }).toList();
+
+        for (final track in tracksToDelete) {
+          try {
+            final audioFile = File(track.filePath);
+            if (audioFile.existsSync()) {
+              await audioFile.delete();
+            }
+          } catch (e) {
+            LoggerService().warning('Could not delete audio file ${track.filePath}: $e');
+          }
+          await mediaVm.deleteTrack(track.id);
+        }
+
+        await mediaVm.loadTracks(force: true);
+      }
+
+      LoggerService().info('${item.type.displayName} "${item.name}" deleted from application successfully');
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to delete ${item.type.displayName} "${item.name}": $e';
+      LoggerService().error(_errorMessage!);
+      notifyListeners();
+      return false;
+    }
   }
 }

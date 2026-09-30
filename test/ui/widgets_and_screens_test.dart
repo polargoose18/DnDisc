@@ -486,5 +486,51 @@ void main() {
       library.dispose();
       engine.dispose();
     });
+
+    testWidgets('Что проверяем: Отображение форматированной длительности трека на карточке LibraryScreen. '
+        'Входные данные: Трек с durationMs=141087 (02:21) и трек с durationMs=0 (--:--). '
+        'Ожидаемый результат: На карточках треков отображаются бейджи и текст длительности "02:21" и "--:--".', (WidgetTester tester) async {
+      final engine = AudioEngineService();
+      late final MediaLibraryService library;
+
+      final track1 = LibraryTrack(
+        id: 'track-dur-1',
+        title: 'Epic Battle Theme',
+        filePath: '/battle.mp3',
+        busType: AudioBusType.music,
+        durationMs: 141087,
+      );
+      final track2 = LibraryTrack(
+        id: 'track-dur-2',
+        title: 'Unknown Sound Effect',
+        filePath: '/sfx.mp3',
+        busType: AudioBusType.sfx,
+        durationMs: 0,
+      );
+
+      await tester.runAsync(() async {
+        library = MediaLibraryService();
+        await library.addTrack(track1);
+        await library.addTrack(track2);
+      });
+
+      await tester.pumpWidget(
+        createTestableWidget(
+          const LibraryScreen(),
+          engine: engine,
+          library: library,
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(find.byKey(const ValueKey('library_track_duration_track-dur-1')), findsOneWidget);
+      expect(find.text('02:21'), findsWidgets);
+
+      expect(find.byKey(const ValueKey('library_track_duration_track-dur-2')), findsOneWidget);
+      expect(find.text('--:--'), findsWidgets);
+
+      library.dispose();
+      engine.dispose();
+    });
   });
 }
