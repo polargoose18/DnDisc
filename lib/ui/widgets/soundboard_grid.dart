@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
+import '../../l10n/app_localizations.dart';
 import '../../audio/sfx_bus_controller.dart';
 import '../../domain/models/sfx_trigger.dart';
 import '../../domain/models/library_track.dart';
@@ -18,6 +19,7 @@ class SoundboardGrid extends StatelessWidget {
     final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
       (vm) => vm?.activeTheme ?? AppThemes.deepDark,
     );
+    final l10n = AppLocalizations.of(context);
 
     return Consumer<SfxBusController>(
       builder: (context, sfx, _) {
@@ -39,7 +41,7 @@ class SoundboardGrid extends StatelessWidget {
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              'Soundboard (SFX эффекты)',
+                              l10n?.soundboardTitle ?? 'Soundboard (SFX Effects)',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -56,14 +58,14 @@ class SoundboardGrid extends StatelessWidget {
                         IconButton(
                           key: const ValueKey('add_sfx_trigger_btn'),
                           icon: const Icon(Icons.add_rounded, size: 20),
-                          tooltip: 'Добавить SFX / Постоянную кнопку',
+                          tooltip: l10n?.addSfxTooltip ?? 'Add SFX / Persistent Button',
                           color: activeTheme.accent,
                           onPressed: () => _showAddSfxDialog(context, sfx),
                         ),
                         ElevatedButton.icon(
                           key: const ValueKey('panic_stop_sfx_btn'),
                           icon: const Icon(Icons.dangerous_rounded, size: 16),
-                          label: const Text('Panic Stop [Esc]', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          label: Text(l10n?.panicStopBtn ?? 'Panic Stop [Esc]', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red.shade700,
                             foregroundColor: Colors.white,
@@ -84,7 +86,7 @@ class SoundboardGrid extends StatelessWidget {
                   children: [
                     Icon(Icons.volume_down, size: 16, color: activeTheme.textSecondary),
                     const SizedBox(width: 6),
-                    Text('SFX Громкость: ', style: TextStyle(fontSize: 12, color: activeTheme.textSecondary)),
+                    Text(l10n?.sfxVolume ?? 'SFX Volume: ', style: TextStyle(fontSize: 12, color: activeTheme.textSecondary)),
                     Expanded(
                       child: Slider(
                         value: sfx.rawVolume,
@@ -109,14 +111,14 @@ class SoundboardGrid extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                            'Soundboard пуст. Добавьте SFX или постоянные быстрые кнопки.',
+                            l10n?.soundboardEmpty ?? 'Soundboard is empty. Add SFX or persistent quick buttons.',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                           ),
                           const SizedBox(height: 8),
                           TextButton.icon(
                             icon: const Icon(Icons.add_circle_outline, size: 16),
-                            label: const Text('Добавить постоянный SFX'),
+                            label: Text(l10n?.addPersistentSfx ?? 'Add Persistent SFX'),
                             onPressed: () => _showAddSfxDialog(context, sfx),
                           ),
                         ],
@@ -250,6 +252,7 @@ class SoundboardGrid extends StatelessWidget {
   }
 
   void _showTriggerOptions(BuildContext context, SfxBusController sfx, SfxTrigger trigger) {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       builder: (ctx) => SafeArea(
@@ -258,7 +261,9 @@ class SoundboardGrid extends StatelessWidget {
           children: [
             ListTile(
               leading: Icon(trigger.isPersistent ? Icons.push_pin_rounded : Icons.push_pin_outlined, color: Colors.amberAccent),
-              title: Text(trigger.isPersistent ? 'Снять закрепление (сделать временным)' : 'Закрепить как постоянный SFX'),
+              title: Text(trigger.isPersistent
+                  ? (l10n?.unpinSfx ?? 'Unpin (make temporary)')
+                  : (l10n?.pinSfx ?? 'Pin as persistent SFX')),
               onTap: () {
                 sfx.togglePersistent(trigger.id);
                 Navigator.of(ctx).pop();
@@ -266,7 +271,7 @@ class SoundboardGrid extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              title: const Text('Удалить кнопку SFX', style: TextStyle(color: Colors.redAccent)),
+              title: Text(l10n?.deleteSfxButton ?? 'Delete SFX button', style: const TextStyle(color: Colors.redAccent)),
               onTap: () {
                 sfx.removeTrigger(trigger.id);
                 Navigator.of(ctx).pop();
@@ -310,12 +315,14 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
     final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final sfxTracks = library.tracks.where((t) => t.busType == AudioBusType.sfx).toList();
 
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.campaign_rounded, color: Colors.amberAccent),
-          SizedBox(width: 8),
-          Text('Добавить кнопку SFX', style: TextStyle(fontSize: 16)),
+          const Icon(Icons.campaign_rounded, color: Colors.amberAccent),
+          const SizedBox(width: 8),
+          Text(l10n?.addSfxDialogTitle ?? 'Add SFX Button', style: const TextStyle(fontSize: 16)),
         ],
       ),
       content: SizedBox(
@@ -325,7 +332,7 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Выберите звук из библиотеки:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              Text(l10n?.selectSoundFromLibrary ?? 'Select a sound from library:', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
               const SizedBox(height: 8),
               if (sfxTracks.isNotEmpty)
                 Container(
@@ -361,7 +368,7 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 icon: const Icon(Icons.folder_open_rounded, size: 16),
-                label: const Text('Выбрать локальный аудиофайл...'),
+                label: Text(l10n?.selectLocalAudioFile ?? 'Choose local audio file...'),
                 onPressed: () async {
                   final result = await FilePicker.platform.pickFiles(
                     type: FileType.custom,
@@ -380,12 +387,12 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
               ),
               if (_customTitle.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text('Выбран: $_customTitle', style: TextStyle(color: activeTheme.accent, fontWeight: FontWeight.bold, fontSize: 12)),
+                Text('${l10n?.selected ?? 'Selected: '}$_customTitle', style: TextStyle(color: activeTheme.accent, fontWeight: FontWeight.bold, fontSize: 12)),
               ],
               const SizedBox(height: 14),
               Row(
                 children: [
-                  const Text('Громкость:', style: TextStyle(fontSize: 12)),
+                  Text(l10n != null ? '${l10n.volume}:' : 'Volume:', style: const TextStyle(fontSize: 12)),
                   Expanded(
                     child: Slider(
                       value: _volume,
@@ -397,14 +404,14 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Постоянный SFX (не сбрасывать при смене сцены)', style: TextStyle(fontSize: 13)),
+                title: Text(l10n?.persistentSfxCheckbox ?? 'Persistent SFX (do not reset on scene change)', style: const TextStyle(fontSize: 13)),
                 value: _isPersistent,
                 activeTrackColor: activeTheme.accent,
                 onChanged: (v) => setState(() => _isPersistent = v),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Режим зацикливания (Loop)', style: TextStyle(fontSize: 13)),
+                title: Text(l10n?.loopModeCheckbox ?? 'Loop Mode (Loop)', style: const TextStyle(fontSize: 13)),
                 value: _isLoop,
                 activeTrackColor: activeTheme.accent,
                 onChanged: (v) => setState(() => _isLoop = v),
@@ -416,7 +423,7 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Отмена'),
+          child: Text(l10n?.cancel ?? 'Cancel'),
         ),
         ElevatedButton(
           onPressed: _customPath.isEmpty
@@ -436,7 +443,7 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
                   );
                   Navigator.of(context).pop();
                 },
-          child: const Text('Добавить SFX'),
+          child: Text(l10n?.addSfxBtn ?? 'Add SFX'),
         ),
       ],
     );

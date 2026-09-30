@@ -44,10 +44,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(icon: const Icon(Icons.dashboard_rounded), text: l10n?.tabGmDashboard ?? 'Панель Мастера'),
-            Tab(icon: const Icon(Icons.library_music_rounded), text: l10n?.tabLibrary ?? 'Общая Библиотека'),
-            Tab(icon: const Icon(Icons.settings_rounded), text: l10n?.tabSettings ?? 'Настройки'),
-            const Tab(icon: Icon(Icons.grid_view_rounded), text: 'Каталог'),
+            Tab(icon: const Icon(Icons.dashboard_rounded), text: l10n?.tabGmDashboard ?? 'GM Dashboard'),
+            Tab(icon: const Icon(Icons.library_music_rounded), text: l10n?.tabLibrary ?? 'Media Library'),
+            Tab(icon: const Icon(Icons.settings_rounded), text: l10n?.tabSettings ?? 'Settings'),
+            Tab(icon: const Icon(Icons.grid_view_rounded), text: l10n?.tabCatalog ?? 'Catalog'),
           ],
         ),
         actions: [
@@ -56,7 +56,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
             builder: (context, engine, _) {
               return IconButton(
                 icon: const Icon(Icons.volume_down_rounded),
-                tooltip: l10n?.manualDuckingTooltip ?? 'Ручной Ducking [D]',
+                tooltip: l10n?.manualDuckingTooltip ?? 'Manual Ducking [D]',
                 onPressed: () => engine.triggerManualDuck(),
               );
             },
@@ -69,8 +69,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                   IconButton(
                     icon: Icon(engine.isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded),
                     tooltip: engine.isMuted
-                        ? (l10n?.unmuteTooltip ?? 'Включить звук [M]')
-                        : (l10n?.muteTooltip ?? 'Заглушить [M]'),
+                        ? (l10n?.unmuteTooltip ?? 'Unmute [M]')
+                        : (l10n?.muteTooltip ?? 'Mute [M]'),
                     color: engine.isMuted ? Colors.redAccent : null,
                     onPressed: () => engine.toggleMute(),
                   ),
@@ -96,7 +96,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               if (!settings.showLogConsoleIcon) return const SizedBox.shrink();
               return IconButton(
                 icon: const Icon(Icons.terminal_rounded, color: Colors.amberAccent),
-                tooltip: l10n?.logConsoleTooltip ?? 'Открыть консоль логов и отладки',
+                tooltip: l10n?.logConsoleTooltip ?? 'Open log and debug console',
                 onPressed: () {
                   _scaffoldKey.currentState?.openEndDrawer();
                 },

@@ -592,7 +592,7 @@ def generate_manifest(repo_dir="."):
 
     output = {
         "name": existing_data.get("name", "TTRPG Audio Repository"),
-        "description": existing_data.get("description", "Каталог сцен, медиа-наборов и паков"),
+        "description": existing_data.get("description", "Catalog of scenes, media sets, and packs"),
         "version": existing_data.get("version", "2.0.0"),
         "author": existing_data.get("author", "GameMaster"),
         "scenes": scenes,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../widgets/scene_selector_panel.dart';
 import '../widgets/scene_backdrop_header.dart';
 import '../widgets/music_player_panel.dart';
@@ -31,6 +32,8 @@ class _ResponsiveGmDashboardState extends State<ResponsiveGmDashboard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 1000 || MediaQuery.of(context).size.width >= 1000;
@@ -38,7 +41,7 @@ class _ResponsiveGmDashboardState extends State<ResponsiveGmDashboard>
         if (isDesktop) {
           return _buildDesktop3ColumnLayout();
         } else {
-          return _buildMobileCompactTabbedLayout();
+          return _buildMobileCompactTabbedLayout(l10n);
         }
       },
     );
@@ -84,7 +87,7 @@ class _ResponsiveGmDashboardState extends State<ResponsiveGmDashboard>
     );
   }
 
-  Widget _buildMobileCompactTabbedLayout() {
+  Widget _buildMobileCompactTabbedLayout(AppLocalizations? l10n) {
     return Column(
       children: [
         // Sub-tabs for GM Dashboard in Compact Mode
@@ -94,11 +97,11 @@ class _ResponsiveGmDashboardState extends State<ResponsiveGmDashboard>
             controller: _compactTabController,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
-            tabs: const [
-              Tab(icon: Icon(Icons.theater_comedy_rounded, size: 18), text: 'Сцены'),
-              Tab(icon: Icon(Icons.music_note_rounded, size: 18), text: 'Музыка'),
-              Tab(icon: Icon(Icons.waves_rounded, size: 18), text: 'Эмбиент'),
-              Tab(icon: Icon(Icons.campaign_rounded, size: 18), text: 'SFX'),
+            tabs: [
+              Tab(icon: const Icon(Icons.theater_comedy_rounded, size: 18), text: l10n?.scenes ?? 'Scenes'),
+              Tab(icon: const Icon(Icons.music_note_rounded, size: 18), text: l10n?.music ?? 'Music'),
+              Tab(icon: const Icon(Icons.waves_rounded, size: 18), text: l10n?.ambient ?? 'Ambient'),
+              Tab(icon: const Icon(Icons.campaign_rounded, size: 18), text: l10n?.sfx ?? 'SFX'),
             ],
           ),
         ),

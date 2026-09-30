@@ -82,7 +82,7 @@ Widget createTestApp({
       builder: (context, settings, _) {
         return MaterialApp(
           theme: themes.currentThemeData,
-          locale: settings.currentLocale ?? const Locale('ru'),
+          locale: settings.currentLocale ?? const Locale('en'),
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -148,9 +148,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.textContaining('Сцены'), findsWidgets);
-      expect(find.text('Музыкальная дорожка'), findsOneWidget);
-      expect(find.textContaining('Эмбиент'), findsWidgets);
+      expect(find.textContaining('Scenes'), findsWidgets);
+      expect(find.text('Music Track'), findsOneWidget);
+      expect(find.textContaining('Ambient'), findsWidgets);
       expect(find.textContaining('Soundboard'), findsWidgets);
     });
 
@@ -172,9 +172,9 @@ void main() {
 
       // Assert
       expect(find.byType(StickyMiniPlayer), findsOneWidget);
-      expect(find.text('Сцены'), findsWidgets);
-      expect(find.text('Музыка'), findsWidgets);
-      expect(find.text('Эмбиент'), findsWidgets);
+      expect(find.text('Scenes'), findsWidgets);
+      expect(find.text('Music'), findsWidgets);
+      expect(find.text('Ambient'), findsWidgets);
       expect(find.text('SFX'), findsWidgets);
     });
   });
@@ -209,7 +209,7 @@ void main() {
       // Assert
       expect(find.text('Ancient Tavern'), findsOneWidget);
       expect(find.text('Cozy hearth and clinking mugs'), findsOneWidget);
-      expect(find.text('АКТИВНА'), findsWidgets);
+      expect(find.text('ACTIVE'), findsWidgets);
 
       await tester.tap(find.byType(ElevatedButton));
       expect(activated, isTrue);
@@ -241,7 +241,7 @@ void main() {
 
       // Assert
       expect(find.text('Dragon Cave'), findsOneWidget);
-      expect(find.text('ТЕКУЩАЯ СЦЕНА'), findsOneWidget);
+      expect(find.text('CURRENT SCENE'), findsOneWidget);
       expect(find.text('Calm'), findsOneWidget);
       expect(find.text('Battle'), findsOneWidget);
     });
@@ -258,10 +258,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Создание кастомной темы'), findsOneWidget);
-      expect(find.text('Предпросмотр темы'), findsOneWidget);
-      expect(find.text('Настройка палитры цветов'), findsOneWidget);
-      expect(find.text('Сохранить тему'), findsOneWidget);
+      expect(find.text('Create Custom Theme'), findsOneWidget);
+      expect(find.text('Theme Preview'), findsOneWidget);
+      expect(find.text('Color Palette Settings'), findsOneWidget);
+      expect(find.text('Save Theme'), findsOneWidget);
     });
   });
 
@@ -276,11 +276,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Темы оформления (Themes)'), findsOneWidget);
+      expect(find.text('App Themes'), findsOneWidget);
       expect(find.text('Deep Dark'), findsOneWidget);
       expect(find.text('Clean Light'), findsOneWidget);
-      expect(find.text('+ Создать новую тему'), findsOneWidget);
-      expect(find.text('Централизованные горячие клавиши'), findsOneWidget);
+      expect(find.text('+ Create new theme'), findsOneWidget);
+      expect(find.text('Centralized Shortcuts'), findsOneWidget);
       expect(find.text('Space'), findsWidgets);
     });
   });
@@ -341,7 +341,7 @@ void main() {
 
       // Assert
       expect(find.text('Storm Rain'), findsOneWidget);
-      expect(find.text('Громкость: 50%'), findsOneWidget);
+      expect(find.text('Volume: 50%'), findsOneWidget);
 
       final sliderFinder = find.byKey(const ValueKey('ambient_slider_amb_rain'));
       expect(sliderFinder, findsOneWidget);

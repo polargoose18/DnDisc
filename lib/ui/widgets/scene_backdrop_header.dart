@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../ui/view_models/scene_view_model.dart';
 import '../../ui/view_models/theme_view_model.dart';
 import '../../audio/music_bus_controller.dart';
@@ -18,6 +19,7 @@ class SceneBackdropHeader extends StatelessWidget {
     final musicBus = context.watch<MusicBusController>();
     final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final activeScene = sceneViewModel.activeScene;
+    final l10n = AppLocalizations.of(context);
 
     if (activeScene == null) {
       return Container(
@@ -34,7 +36,7 @@ class SceneBackdropHeader extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Выберите сцену слева для создания игрового окружения',
+                l10n?.selectScenePrompt ?? 'Select a scene on the left to set up the game environment',
                 style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
               ),
             ),
@@ -134,7 +136,7 @@ class SceneBackdropHeader extends StatelessWidget {
                                 border: Border.all(color: activeTheme.primary, width: 0.8),
                               ),
                               child: Text(
-                                'ТЕКУЩАЯ СЦЕНА',
+                                l10n?.currentSceneBadge ?? 'CURRENT SCENE',
                                 style: TextStyle(
                                   color: activeTheme.textPrimary,
                                   fontSize: 10,
@@ -163,7 +165,7 @@ class SceneBackdropHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Интенсивность музыки',
+                        l10n?.musicIntensityLabel ?? 'Music Intensity',
                         style: TextStyle(color: activeTheme.textSecondary, fontSize: 11),
                       ),
                       const SizedBox(height: 4),

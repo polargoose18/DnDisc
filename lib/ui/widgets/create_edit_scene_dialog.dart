@@ -197,6 +197,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
   @override
   Widget build(BuildContext context) {
     final library = context.watch<MediaLibraryViewModel>();
+    final l10n = AppLocalizations.of(context);
     final allMusicTracks = library.tracks.where((t) => t.busType == AudioBusType.music).toList();
     final allAmbientTracks = library.tracks.where((t) => t.busType == AudioBusType.ambient).toList();
     final allSfxTracks = library.tracks.where((t) => t.busType == AudioBusType.sfx).toList();
@@ -231,7 +232,9 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  widget.scene == null ? 'Создание новой сцены' : 'Редактирование сцены',
+                  widget.scene == null
+                      ? (l10n?.createSceneTitle ?? 'Create New Scene')
+                      : (l10n?.editSceneTitle ?? 'Edit Scene'),
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
@@ -250,12 +253,12 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     // Scene Name
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Название сцены *',
-                        hintText: 'например: Таверна «Пьяный Дракон»',
+                      decoration: InputDecoration(
+                        labelText: l10n?.sceneNameLabel ?? 'Scene Name *',
+                        hintText: l10n?.sceneNameHint ?? 'e.g. Tavern "The Drunken Dragon"',
                         filled: true,
-                        fillColor: Color(0xFF14141E),
-                        border: OutlineInputBorder(),
+                        fillColor: const Color(0xFF14141E),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -263,12 +266,12 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     // Scene Description
                     TextField(
                       controller: _descController,
-                      decoration: const InputDecoration(
-                        labelText: 'Описание атмосферы / Заметки мастера',
-                        hintText: 'Теплый камин, звон кружек, тихая лютня...',
+                      decoration: InputDecoration(
+                        labelText: l10n?.sceneDescLabel ?? 'Atmosphere Description / GM Notes',
+                        hintText: l10n?.sceneDescHint ?? 'Warm fireplace, clinking mugs, quiet lute...',
                         filled: true,
-                        fillColor: Color(0xFF14141E),
-                        border: OutlineInputBorder(),
+                        fillColor: const Color(0xFF14141E),
+                        border: const OutlineInputBorder(),
                       ),
                       maxLines: 2,
                     ),
@@ -281,7 +284,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                           child: TextField(
                             controller: _imagePathController,
                             decoration: InputDecoration(
-                              labelText: 'Путь к изображению / обложке сцены',
+                              labelText: l10n?.sceneCoverLabel ?? 'Image / Cover Art Path',
                               hintText: 'C:/images/tavern.jpg',
                               filled: true,
                               fillColor: const Color(0xFF14141E),
@@ -303,7 +306,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                           ),
                           icon: const Icon(Icons.image_rounded, size: 18),
-                          label: const Text('Обзор'),
+                          label: Text(l10n?.browseBtn ?? 'Browse'),
                           onPressed: () async {
                             final result = await FilePicker.platform.pickFiles(
                               type: FileType.custom,
@@ -321,7 +324,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     const SizedBox(height: 16),
 
                     // Color Choice
-                    const Text('Цветовой акцент:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(l10n?.colorAccent ?? 'Color Accent:', style: const TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -348,12 +351,12 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
 
                     // Section 1: Music Channel (Unified layout)
                     _buildChannelContainer(
-                      title: 'Канал Музыки',
+                      title: l10n?.musicChannel ?? 'Music Channel',
                       icon: Icons.music_note_rounded,
-                      badgeText: selectedMusicTrack != null ? selectedMusicTrack.title : 'Без музыки',
+                      badgeText: selectedMusicTrack != null ? selectedMusicTrack.title : (l10n?.noMusic ?? 'No music'),
                       badgeColor: selectedMusicTrack != null ? Color(_selectedColorHex) : Colors.grey,
                       searchController: _musicSearchController,
-                      searchHint: 'Поиск музыки по названию или тегам...',
+                      searchHint: l10n?.searchMusicHint ?? 'Search music by title or tags...',
                       onSearchChanged: (q) => _onMusicSearchChanged(q, allMusicTracks),
                       onSearchSubmitted: (q) => _onMusicSearchSubmitted(q, allMusicTracks),
                       onClearSearch: () {
@@ -366,16 +369,16 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                           // "No Music" option card
                           _buildOptionCard(
                             isSelected: _selectedMusicTrackId == null,
-                            title: 'Без музыки (тишина)',
-                            subtitle: 'При активации сцены фоновая музыка плавно затухает',
+                            title: l10n?.noMusicSilence ?? 'No music (silence)',
+                            subtitle: l10n?.noMusicDesc ?? 'When activating the scene, background music smoothly fades out',
                             leadingIcon: Icons.volume_off_rounded,
                             onTap: () => setState(() => _selectedMusicTrackId = null),
                           ),
                           const SizedBox(height: 6),
                           if (filteredMusic.isEmpty && _musicQuery.isNotEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              child: Text('Ничего не найдено', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Text(l10n?.nothingFound ?? 'Nothing found', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                             )
                           else
                             ...filteredMusic.map((track) {
@@ -385,7 +388,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                 child: _buildOptionCard(
                                   isSelected: isSelected,
                                   title: track.title,
-                                  subtitle: track.tags.isNotEmpty ? 'Теги: ${track.tags.join(", ")}' : null,
+                                  subtitle: track.tags.isNotEmpty ? 'Tags: ${track.tags.join(", ")}' : null,
                                   leadingIcon: Icons.audiotrack_rounded,
                                   onTap: () => setState(() => _selectedMusicTrackId = track.id),
                                   extraContent: isSelected
@@ -393,7 +396,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                           padding: const EdgeInsets.only(top: 8),
                                           child: Row(
                                             children: [
-                                              const Text('Интенсивность:', style: TextStyle(fontSize: 12, color: Colors.white70)),
+                                              Text('${l10n?.musicIntensityLabel ?? "Intensity"}:', style: const TextStyle(fontSize: 12, color: Colors.white70)),
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: Wrap(
@@ -425,12 +428,12 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
 
                     // Section 2: Ambient Channel (Unified layout)
                     _buildChannelContainer(
-                      title: 'Канал Эмбиента',
+                      title: l10n?.ambientChannel ?? 'Ambient Channel',
                       icon: Icons.waves_rounded,
-                      badgeText: '${_ambientVolumes.length} слоев выбрано',
+                      badgeText: l10n?.layersSelected(_ambientVolumes.length) ?? '${_ambientVolumes.length} layers selected',
                       badgeColor: _ambientVolumes.isNotEmpty ? Color(_selectedColorHex) : Colors.grey,
                       searchController: _ambientSearchController,
-                      searchHint: 'Поиск эмбиента по названию или тегам...',
+                      searchHint: l10n?.searchAmbientHint ?? 'Search ambient by title or tags...',
                       onSearchChanged: _onAmbientSearchChanged,
                       onSearchSubmitted: (q) => _onAmbientSearchSubmitted(q, allAmbientTracks),
                       onClearSearch: () {
@@ -438,13 +441,13 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                         setState(() => _ambientQuery = '');
                       },
                       child: allAmbientTracks.isEmpty
-                          ? Text(AppLocalizations.of(context)?.noAmbientTracksInLibrary ?? 'В библиотеке нет треков с типом "Эмбиент".', style: const TextStyle(color: Colors.grey))
+                          ? Text(l10n?.noAmbientTracksInLibrary ?? 'No ambient tracks in the library.', style: const TextStyle(color: Colors.grey))
                           : Column(
                               children: [
                                 if (filteredAmbient.isEmpty && _ambientQuery.isNotEmpty)
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 8),
-                                    child: Text('Ничего не найдено', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: Text(l10n?.nothingFound ?? 'Nothing found', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                                   )
                                 else
                                   ...filteredAmbient.map((amb) {
@@ -455,7 +458,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                       child: _buildOptionCard(
                                         isSelected: isIncluded,
                                         title: amb.title,
-                                        subtitle: amb.tags.isNotEmpty ? 'Теги: ${amb.tags.join(", ")}' : null,
+                                        subtitle: amb.tags.isNotEmpty ? 'Tags: ${amb.tags.join(", ")}' : null,
                                         leadingIcon: Icons.air_rounded,
                                         trailing: Checkbox(
                                           value: isIncluded,
@@ -515,12 +518,12 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
 
                     // Section 3: SFX Channel (Unified layout)
                     _buildChannelContainer(
-                      title: 'Канал SFX (Саундборд)',
+                      title: l10n?.sfxChannel ?? 'SFX Channel (Soundboard)',
                       icon: Icons.flash_on_rounded,
-                      badgeText: '${_selectedSfxIds.length} SFX выбрано',
+                      badgeText: l10n?.sfxSelected(_selectedSfxIds.length) ?? '${_selectedSfxIds.length} SFX selected',
                       badgeColor: _selectedSfxIds.isNotEmpty ? Color(_selectedColorHex) : Colors.grey,
                       searchController: _sfxSearchController,
-                      searchHint: 'Поиск SFX по названию или тегам...',
+                      searchHint: l10n?.searchSfxHint ?? 'Search SFX by title or tags...',
                       onSearchChanged: _onSfxSearchChanged,
                       onSearchSubmitted: (q) => _onSfxSearchSubmitted(q, allSfxTracks),
                       onClearSearch: () {
@@ -528,13 +531,13 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                         setState(() => _sfxQuery = '');
                       },
                       child: allSfxTracks.isEmpty
-                          ? const Text('В библиотеке нет эффектов с типом "SFX".', style: TextStyle(color: Colors.grey))
+                          ? Text(l10n?.noSfxTracksInLibrary ?? 'No SFX tracks in the library.', style: const TextStyle(color: Colors.grey))
                           : Column(
                               children: [
                                 if (filteredSfx.isEmpty && _sfxQuery.isNotEmpty)
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 8),
-                                    child: Text('Ничего не найдено', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: Text(l10n?.nothingFound ?? 'Nothing found', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                                   )
                                 else
                                   ...filteredSfx.map((sfx) {
@@ -544,7 +547,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                       child: _buildOptionCard(
                                         isSelected: isSelected,
                                         title: sfx.title,
-                                        subtitle: sfx.tags.isNotEmpty ? 'Теги: ${sfx.tags.join(", ")}' : null,
+                                        subtitle: sfx.tags.isNotEmpty ? 'Tags: ${sfx.tags.join(", ")}' : null,
                                         leadingIcon: Icons.campaign_rounded,
                                         trailing: Checkbox(
                                           value: isSelected,
@@ -584,12 +587,12 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Отмена'),
+                  child: Text(l10n?.cancel ?? 'Cancel'),
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.check),
-                  label: Text(widget.scene == null ? 'Создать' : 'Сохранить'),
+                  label: Text(widget.scene == null ? (l10n?.create ?? 'Create') : (l10n?.save ?? 'Save')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(_selectedColorHex),
                     foregroundColor: Colors.white,
@@ -598,7 +601,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     final name = _nameController.text.trim();
                     if (name.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Укажите название сцены')),
+                        SnackBar(content: Text(l10n?.specifySceneName ?? 'Please specify scene name')),
                       );
                       return;
                     }

@@ -37,7 +37,7 @@ class MusicPlayerPanel extends StatelessWidget {
                         Icon(Icons.music_note_rounded, color: activeTheme.primary),
                         const SizedBox(width: 8),
                         Text(
-                          l10n?.musicTrack ?? 'Музыкальная дорожка',
+                          l10n?.musicTrack ?? 'Music Track',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
@@ -63,8 +63,8 @@ class MusicPlayerPanel extends StatelessWidget {
                     Expanded(
                       child: Text(
                         track != null
-                            ? '${l10n?.nowPlaying ?? "Сейчас играет"}: ${track.title} ${music.isPlaying ? '' : (l10n?.pausedSuffix ?? '(Пауза)')}'
-                            : (l10n?.musicNotPlaying ?? 'Музыка не воспроизводится'),
+                            ? '${l10n?.nowPlaying ?? "Now playing"}: ${track.title} ${music.isPlaying ? '' : (l10n?.pausedSuffix ?? '(Paused)')}'
+                            : (l10n?.musicNotPlaying ?? 'Music is not playing'),
                         style: TextStyle(
                           color: track != null ? activeTheme.textPrimary : activeTheme.textSecondary,
                           fontWeight: track != null ? FontWeight.w500 : FontWeight.normal,
@@ -82,7 +82,7 @@ class MusicPlayerPanel extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '${l10n?.intensityLevel ?? "Уровень Интенсивности"}:',
+                      '${l10n?.intensityLevel ?? "Intensity Level"}:',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
@@ -164,7 +164,7 @@ class MusicPlayerPanel extends StatelessWidget {
                       icon: Icon(music.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill),
                       iconSize: 42,
                       color: activeTheme.primary,
-                      tooltip: music.isPlaying ? 'Пауза [Space]' : 'Воспроизведение [Space]',
+                      tooltip: music.isPlaying ? 'Pause [Space]' : 'Play [Space]',
                       onPressed: () {
                         if (music.isPlaying) {
                           music.pause();
@@ -177,7 +177,7 @@ class MusicPlayerPanel extends StatelessWidget {
                       icon: const Icon(Icons.stop_circle_outlined),
                       iconSize: 32,
                       color: activeTheme.textSecondary,
-                      tooltip: l10n?.stopMusic ?? 'Остановить музыку',
+                      tooltip: l10n?.stopMusic ?? 'Stop music',
                       onPressed: () => music.stop(),
                     ),
                     const SizedBox(width: 8),

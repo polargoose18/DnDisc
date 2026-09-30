@@ -6,22 +6,22 @@ enum CatalogItemType {
   String get displayName {
     switch (this) {
       case CatalogItemType.scene:
-        return 'Сцена';
+        return 'Scene';
       case CatalogItemType.media:
-        return 'Медиа';
+        return 'Media';
       case CatalogItemType.pack:
-        return 'Пак';
+        return 'Pack';
     }
   }
 
   String get badgeLabel {
     switch (this) {
       case CatalogItemType.scene:
-        return '🎭 Сцена';
+        return '🎭 Scene';
       case CatalogItemType.media:
-        return '🎵 Медиа';
+        return '🎵 Media';
       case CatalogItemType.pack:
-        return '📦 Пак';
+        return '📦 Pack';
     }
   }
 }
@@ -35,13 +35,13 @@ enum CatalogCategoryFilter {
   String get label {
     switch (this) {
       case CatalogCategoryFilter.all:
-        return 'Все';
+        return 'All';
       case CatalogCategoryFilter.scenes:
-        return '🎭 Сцены';
+        return '🎭 Scenes';
       case CatalogCategoryFilter.media:
-        return '🎵 Медиа';
+        return '🎵 Media';
       case CatalogCategoryFilter.packs:
-        return '📦 Паки';
+        return '📦 Packs';
     }
   }
 }

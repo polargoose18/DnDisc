@@ -94,7 +94,7 @@ void main() {
 
     test('should provide 5 built-in theme presets in AppThemes', () {
       // Arrange & Act
-      final presets = AppThemes.presets;
+      const presets = AppThemes.presets;
 
       // Assert
       expect(presets.length, equals(5));

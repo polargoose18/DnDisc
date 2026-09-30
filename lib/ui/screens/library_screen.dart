@@ -30,7 +30,7 @@ class LibraryScreen extends StatelessWidget {
                       child: TextField(
                         key: const ValueKey('library_search_input'),
                         decoration: InputDecoration(
-                          hintText: l10n?.searchPlaceholder ?? 'Поиск по названию или тегам (например, Таверна, Бой)...',
+                          hintText: l10n?.searchPlaceholder ?? 'Search by title or tags (e.g. Tavern, Battle)...',
                           prefixIcon: const Icon(Icons.search),
                           border: const OutlineInputBorder(),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -53,7 +53,7 @@ class LibraryScreen extends StatelessWidget {
                       onPressed: () => _handleImport(context, library),
                       icon: const Icon(Icons.file_upload_rounded, color: Colors.white),
                       label: Text(
-                        l10n?.importFilesBtn ?? 'Импорт файлов',
+                        l10n?.importFilesBtn ?? 'Import Files',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -72,7 +72,7 @@ class LibraryScreen extends StatelessWidget {
                       ),
                       onPressed: library.tracks.isEmpty ? null : () => _handleExportMediaPackage(context, library),
                       icon: const Icon(Icons.archive_outlined),
-                      label: const Text('Экспорт набора'),
+                      label: Text(l10n?.exportMediaPackageBtn ?? 'Export Set'),
                     ),
                   ],
                 ),
@@ -84,7 +84,7 @@ class LibraryScreen extends StatelessWidget {
                   spacing: 8,
                   children: [
                     FilterChip(
-                      label: Text(l10n?.allSounds ?? 'Все звуки'),
+                      label: Text(l10n?.allSounds ?? 'All Sounds'),
                       selected: library.activeBusFilter == null,
                       onSelected: (_) => library.setBusFilter(null),
                     ),
@@ -114,19 +114,19 @@ class LibraryScreen extends StatelessWidget {
                                   const Icon(Icons.library_music_outlined, size: 64, color: Colors.grey),
                                   const SizedBox(height: 12),
                                   Text(
-                                    l10n?.libraryEmpty ?? 'Медиатека пуста',
+                                    l10n?.libraryEmpty ?? 'Media library is empty',
                                     style: const TextStyle(fontSize: 18, color: Colors.grey),
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    l10n?.libraryEmptyHint ?? 'Нажмите "Импорт файлов", чтобы добавить музыку, эмбиент или SFX.',
+                                    l10n?.libraryEmptyHint ?? 'Click "Import Files" to add music, ambient or SFX.',
                                     style: const TextStyle(color: Colors.white54),
                                   ),
                                   const SizedBox(height: 16),
                                   ElevatedButton.icon(
                                     onPressed: () => _handleImport(context, library),
                                     icon: const Icon(Icons.file_upload_outlined),
-                                    label: Text(l10n?.importFilesBtn ?? 'Импорт файлов'),
+                                    label: Text(l10n?.importFilesBtn ?? 'Import Files'),
                                   ),
                                 ],
                               ),
@@ -186,7 +186,7 @@ class LibraryScreen extends StatelessWidget {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Шина: ${track.busType.displayName} | Длительность: ${_formatDuration(track.durationMs)} | Путь: ${track.filePath}',
+                                          'Bus: ${track.busType.displayName} | Duration: ${_formatDuration(track.durationMs)} | Path: ${track.filePath}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(fontSize: 11, color: Colors.white60),
@@ -218,13 +218,13 @@ class LibraryScreen extends StatelessWidget {
                                         // Quick Dispatch Play Button
                                         IconButton(
                                           icon: const Icon(Icons.play_arrow_rounded, color: Colors.greenAccent),
-                                          tooltip: 'Воспроизвести на шине ${track.busType.displayName}',
+                                          tooltip: l10n?.dispatchToBus(track.busType.displayName) ?? 'Play on ${track.busType.displayName} bus',
                                           onPressed: () {
                                             library.playTrackToEngine(track, audioEngine);
                                             ScaffoldMessenger.of(context).showSnackBar(
                                               SnackBar(
                                                 content: Text(
-                                                  'Отправлено на шину ${track.busType.displayName}: "${track.title}"',
+                                                  'Sent to ${track.busType.displayName} bus: "${track.title}"',
                                                 ),
                                                 duration: const Duration(seconds: 1),
                                               ),
@@ -234,7 +234,7 @@ class LibraryScreen extends StatelessWidget {
                                         // Edit metadata button
                                         IconButton(
                                           icon: const Icon(Icons.edit_outlined),
-                                          tooltip: 'Редактировать',
+                                          tooltip: l10n?.edit ?? 'Edit',
                                           onPressed: () async {
                                             final updated = await showDialog<LibraryTrack>(
                                               context: context,
@@ -248,7 +248,7 @@ class LibraryScreen extends StatelessWidget {
                                         // Delete button
                                         IconButton(
                                           icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                          tooltip: 'Удалить из библиотеки',
+                                          tooltip: l10n?.delete ?? 'Delete',
                                           onPressed: () => library.deleteTrack(track.id),
                                         ),
                                       ],
@@ -267,11 +267,12 @@ class LibraryScreen extends StatelessWidget {
   }
 
   Future<void> _handleImport(BuildContext context, MediaLibraryViewModel library) async {
+    final l10n = AppLocalizations.of(context);
     final busType = await showDialog<AudioBusType>(
       context: context,
       builder: (ctx) {
         return SimpleDialog(
-          title: const Text('Выберите целевую шину для импортируемых файлов'),
+          title: Text(l10n?.selectBusForImport ?? 'Select target audio bus for imported files'),
           children: AudioBusType.values.map((bus) {
             return SimpleDialogOption(
               onPressed: () => Navigator.of(ctx).pop(bus),
@@ -320,35 +321,36 @@ class LibraryScreen extends StatelessWidget {
   }
 
   Future<void> _handleExportMediaPackage(BuildContext context, MediaLibraryViewModel library) async {
-    final titleController = TextEditingController(text: 'Мой Медиа Набор');
-    final descController = TextEditingController(text: 'Коллекция аудиодорожек для TTRPG');
+    final l10n = AppLocalizations.of(context);
+    final titleController = TextEditingController(text: l10n?.defaultMediaPackageName ?? 'My Media Package');
+    final descController = TextEditingController(text: l10n?.defaultMediaPackageDesc ?? 'TTRPG Audio tracks collection');
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Экспорт Медиа-набора (.media.zip)'),
+        title: Text(l10n?.exportMediaPackageTitle ?? 'Export Media Package (.media.zip)'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(labelText: 'Название набора'),
+              decoration: InputDecoration(labelText: l10n?.mediaPackageNameLabel ?? 'Package Name'),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: descController,
-              decoration: const InputDecoration(labelText: 'Описание набора'),
+              decoration: InputDecoration(labelText: l10n?.mediaPackageDescLabel ?? 'Package Description'),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Отмена'),
+            child: Text(l10n?.cancel ?? 'Cancel'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Экспортировать'),
+            child: Text(l10n?.export ?? 'Export'),
           ),
         ],
       ),
@@ -358,7 +360,7 @@ class LibraryScreen extends StatelessWidget {
       try {
         final sanitized = titleController.text.trim().replaceAll(RegExp(r'[^\w\s\-]'), '_');
         final savePath = await FilePicker.platform.saveFile(
-          dialogTitle: 'Сохранить медиа-набор как...',
+          dialogTitle: l10n?.saveMediaPackageAs ?? 'Save media package as...',
           fileName: '$sanitized.media.zip',
           type: FileType.custom,
           allowedExtensions: ['zip', 'media.zip'],
@@ -374,14 +376,14 @@ class LibraryScreen extends StatelessWidget {
           );
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Медиа-набор "${titleController.text}" успешно экспортирован!')),
+              SnackBar(content: Text(l10n?.mediaPackageExported(titleController.text) ?? 'Media package "${titleController.text}" successfully exported!')),
             );
           }
         }
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка экспорта медиа-набора: $e')),
+            SnackBar(content: Text(l10n?.mediaPackageExportError(e.toString()) ?? 'Error exporting media package: $e')),
           );
         }
       }

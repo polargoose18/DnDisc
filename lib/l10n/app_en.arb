@@ -4,6 +4,7 @@
   "tabGmDashboard": "GM Dashboard",
   "tabLibrary": "Media Library",
   "tabSettings": "Settings",
+  "tabCatalog": "Catalog",
   "manualDuckingTooltip": "Manual Ducking [D]",
   "muteTooltip": "Mute [M]",
   "unmuteTooltip": "Unmute [M]",
@@ -14,7 +15,7 @@
   "noLogs": "No logs",
   "language": "Interface Language",
   "languageSystem": "System",
-  "languageRussian": "Русский",
+  "languageRussian": "Russian",
   "languageEnglish": "English",
   "settingsTitle": "Audio Engine Settings",
   "settingsSubtitle": "Themes, shortcuts, audio engine and preset management",
@@ -59,7 +60,8 @@
   "allSounds": "All Sounds",
   "music": "Music",
   "ambient": "Ambient",
-  "sfx": "SFX Effect",
+  "sfx": "SFX",
+  "scenes": "Scenes",
   "searchPlaceholder": "Search by title or tags (e.g., Tavern, Battle)...",
   "cancel": "Cancel",
   "save": "Save",
@@ -75,5 +77,416 @@
   "stopMusic": "Stop music",
   "pausedSuffix": "(Paused)",
   "noAmbientTracksInLibrary": "No ambient tracks in the library.",
-  "noSfxTracksInLibrary": "No SFX tracks in the library."
+  "noSfxTracksInLibrary": "No SFX tracks in the library.",
+  "playPause": "Play / Pause",
+  "playing": "Playing",
+  "paused": "Paused",
+  "noMusic": "No music",
+  "noMusicSilence": "No music (silence)",
+  "noMusicDesc": "When activating the scene, background music smoothly fades out",
+  "nothingFound": "Nothing found",
+  "ambientLayers": "Ambient Layers (Background Sounds)",
+  "addAmbientTooltip": "Add Layer / Persistent Ambient",
+  "stopAll": "Stop All",
+  "noActiveAmbients": "No active ambients. Click \"+\" to add a persistent background sound.",
+  "addPersistentAmbient": "Add Persistent Ambient",
+  "volume": "Volume",
+  "persistentLayerTooltip": "Persistent layer (not reset when switching scenes)",
+  "makePersistentTooltip": "Make persistent layer",
+  "muteLayerTooltip": "Mute layer",
+  "unmuteLayerTooltip": "Unmute layer",
+  "removeLayerTooltip": "Remove layer",
+  "addAmbientDialogTitle": "Add Ambient Layer",
+  "selectTrackFromLibrary": "Select a track from the media library:",
+  "selectLocalAudioFile": "Choose local audio file...",
+  "selected": "Selected: ",
+  "persistentLayerCheckbox": "Persistent layer (do not reset on scene change)",
+  "addLayerBtn": "Add Layer",
+  "soundboardTitle": "Soundboard (SFX Effects)",
+  "addSfxTooltip": "Add SFX / Persistent Button",
+  "panicStopBtn": "Panic Stop [Esc]",
+  "sfxVolume": "SFX Volume: ",
+  "soundboardEmpty": "Soundboard is empty. Add SFX or persistent quick buttons.",
+  "addPersistentSfx": "Add Persistent SFX",
+  "unpinSfx": "Unpin (make temporary)",
+  "pinSfx": "Pin as persistent SFX",
+  "deleteSfxButton": "Delete SFX button",
+  "addSfxDialogTitle": "Add SFX Button",
+  "selectSoundFromLibrary": "Select a sound from library:",
+  "persistentSfxCheckbox": "Persistent SFX (do not reset on scene change)",
+  "loopModeCheckbox": "Loop Mode (Loop)",
+  "addSfxBtn": "Add SFX",
+  "exportScenePackTooltip": "Export Scene Pack (.pack.zip)",
+  "searchScenesPlaceholder": "Search scenes...",
+  "noScenesMatching": "No scenes found matching your search.",
+  "saveSceneAs": "Save scene as...",
+  "sceneExported": "Scene \"{name}\" exported!",
+  "@sceneExported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sceneExportError": "Error exporting scene: {error}",
+  "@sceneExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportScenePackTitle": "Export Scene Pack (.pack.zip)",
+  "packTitleLabel": "Pack Name",
+  "packDescLabel": "Pack Description",
+  "defaultPackTitle": "Adventure Pack",
+  "defaultPackDesc": "Atmospheric scenes collection",
+  "savePackAs": "Save scene pack as...",
+  "packExported": "Scene pack \"{name}\" successfully exported!",
+  "@packExported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "packExportError": "Error exporting scene pack: {error}",
+  "@packExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportSceneMenu": "Export (.scene.zip)",
+  "currentSceneBadge": "CURRENT SCENE",
+  "selectScenePrompt": "Select a scene on the left to set up the game environment",
+  "musicIntensityLabel": "Music Intensity",
+  "createSceneTitle": "Create New Scene",
+  "editSceneTitle": "Edit Scene",
+  "sceneNameLabel": "Scene Name *",
+  "sceneNameHint": "e.g. Tavern \"The Drunken Dragon\"",
+  "sceneDescLabel": "Atmosphere Description / GM Notes",
+  "sceneDescHint": "Warm fireplace, clinking mugs, quiet lute...",
+  "sceneCoverLabel": "Image / Cover Art Path",
+  "browseBtn": "Browse",
+  "colorAccent": "Color Accent:",
+  "musicChannel": "Music Channel",
+  "ambientChannel": "Ambient Channel",
+  "sfxChannel": "SFX Channel (Soundboard)",
+  "searchMusicHint": "Search music by title or tags...",
+  "searchAmbientHint": "Search ambient by title or tags...",
+  "searchSfxHint": "Search SFX by title or tags...",
+  "layersSelected": "{count} layers selected",
+  "@layersSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sfxSelected": "{count} SFX selected",
+  "@sfxSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "specifySceneName": "Please specify scene name",
+  "createCustomThemeTitle": "Create Custom Theme",
+  "editCustomThemeTitle": "Edit Theme",
+  "themeNameLabel": "Theme Name",
+  "themeNameRequired": "Please specify theme name",
+  "baseOnPreset": "Base on Preset",
+  "baseOnPresetTooltip": "Use preset as template",
+  "themePreviewTitle": "Theme Preview",
+  "duckingActive": "Ducking Active",
+  "cardExampleTitle": "Sample Card",
+  "cardExampleDesc": "Scene or track description in the selected color palette.",
+  "colorPaletteConfig": "Color Palette Settings",
+  "colorPickTitle": "Color Choice: {title}",
+  "@colorPickTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "saveThemeBtn": "Save Theme",
+  "newThemeDefaultName": "New Theme",
+  "editTrackTitle": "Edit Audio Track",
+  "trackTitleLabel": "Track Title",
+  "targetAudioBus": "Target Audio Bus:",
+  "musicIntensitySetting": "Music Intensity Level:",
+  "tagsLabel": "Tags (comma separated)",
+  "tagsHint": "Tavern, Battle, Forest, Magic",
+  "colorLabel": "Color Badge:",
+  "exportMediaPackageBtn": "Export Set",
+  "selectBusForImport": "Select target audio bus for imported files",
+  "exportMediaPackageTitle": "Export Media Package (.media.zip)",
+  "mediaPackageNameLabel": "Package Name",
+  "mediaPackageDescLabel": "Package Description",
+  "defaultMediaPackageName": "My Media Package",
+  "defaultMediaPackageDesc": "TTRPG Audio tracks collection",
+  "saveMediaPackageAs": "Save media package as...",
+  "mediaPackageExported": "Media package \"{name}\" successfully exported!",
+  "@mediaPackageExported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mediaPackageExportError": "Error exporting media package: {error}",
+  "@mediaPackageExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dispatchToBus": "Play on {bus} bus",
+  "@dispatchToBus": {
+    "placeholders": {
+      "bus": {
+        "type": "String"
+      }
+    }
+  },
+  "dispatchedToBus": "Sent to {bus} bus: \"{title}\"",
+  "@dispatchedToBus": {
+    "placeholders": {
+      "bus": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteFromLibrary": "Delete from library",
+  "busInfo": "Bus: {bus} | Duration: {duration} | Path: {path}",
+  "@busInfo": {
+    "placeholders": {
+      "bus": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogTitle": "Catalog",
+  "refreshCatalogTooltip": "Refresh catalog",
+  "manageRepositoriesTooltip": "Manage repositories",
+  "addRepositoryBtn": "+ Add",
+  "searchCatalogPlaceholder": "Search items in catalog...",
+  "sourcesBtn": "Sources ({count})",
+  "@sourcesBtn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noRepositoriesConnected": "No connected repositories",
+  "addRepositoryUrlHint": "Add a link to GitLab, Dropbox or CDN with repository.json manifest",
+  "addRepositoryDialogTitle": "Add Repository",
+  "editRepositoryDialogTitle": "Edit Repository",
+  "manageRepositoriesTitle": "Manage Repositories ({count})",
+  "@manageRepositoriesTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repositoryUrlLabel": "Repository URL (GitLab / Dropbox / HTTP / JSON)",
+  "repositoryNameOptionalLabel": "Name (optional)",
+  "repositoryNameHint": "Will be extracted from manifest if empty",
+  "repositoryDescOptionalLabel": "Description (optional)",
+  "enterRepositoryUrl": "Please enter repository URL",
+  "urlHttpPrefixValidation": "URL must start with http:// or https://",
+  "enterRepositoryName": "Please enter repository name",
+  "repositoryUpdated": "Repository updated successfully",
+  "noConnectedRepositories": "No connected repositories.",
+  "noCatalogItemsFound": "No items found matching your query.",
+  "installedBadge": "Installed",
+  "noDescription": "No description",
+  "scenesCount": "{count} scenes",
+  "@scenesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tracksCount": "{count} tracks",
+  "@tracksCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sizeUnknown": "Size unknown",
+  "sizeMb": "{size} MB",
+  "@sizeMb": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "repositoryLabel": "Repository: {name}",
+  "@repositoryLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scenesInPack": "Scenes in Pack",
+  "mediaSetContent": "Media Set Content",
+  "sceneContent": "Scene Content",
+  "tracksMissingInManifest": "Track list is missing in manifest.",
+  "scenesMissingInManifest": "Scene list is missing in manifest.",
+  "channelLabel": "Channel: {channel}",
+  "@channelLabel": {
+    "placeholders": {
+      "channel": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadingAndImporting": "Downloading and importing... {percent}%",
+  "@downloadingAndImporting": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "removeFromApp": "Remove from app",
+  "installing": "Installing...",
+  "installItem": "Install {type}",
+  "@installItem": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteItemConfirmTitle": "Delete {name}?",
+  "@deleteItemConfirmTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteItemConfirmMessage": "Are you sure you want to delete {type} \"{name}\" and associated files from the application?",
+  "@deleteItemConfirmMessage": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemUninstalled": "{type} \"{name}\" successfully removed from app.",
+  "@itemUninstalled": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemUninstallError": "Error removing {type}.",
+  "@itemUninstallError": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "itemInstalled": "{type} \"{name}\" successfully installed!",
+  "@itemInstalled": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemInstallError": "Error downloading {type}.",
+  "@itemInstallError": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogStorageTitle": "Catalog & Audio File Storage",
+  "catalogStorageDesc": "Folder for downloading and extracting audio files from online repository catalog:",
+  "customDirectory": "Custom Directory",
+  "defaultDirectory": "Default Directory",
+  "defaultStoragePath": "Default: Documents/audio_library",
+  "resetDefaultDirTooltip": "Reset to default value",
+  "chooseFolderBtn": "Choose folder",
+  "chooseFolderDialogTitle": "Choose folder for catalog audio storage",
+  "storagePathReset": "Storage path reset to default.",
+  "storagePathUpdated": "Catalog storage folder updated: {path}",
+  "@storagePathUpdated": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutPlayPauseTitle": "Play / Pause",
+  "shortcutPlayPauseDesc": "Start or pause current music track",
+  "shortcutIntensityCalmTitle": "Intensity: Calm",
+  "shortcutIntensityCalmDesc": "Switch music mode to Calm",
+  "shortcutIntensitySuspenseTitle": "Intensity: Suspense",
+  "shortcutIntensitySuspenseDesc": "Switch music mode to Suspense",
+  "shortcutIntensityBattleTitle": "Intensity: Battle",
+  "shortcutIntensityBattleDesc": "Switch music mode to Battle",
+  "shortcutIntensityBossTitle": "Intensity: Boss",
+  "shortcutIntensityBossDesc": "Switch music mode to Boss",
+  "shortcutSfxTitle": "SFX Slot {index}",
+  "@shortcutSfxTitle": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "shortcutSfxDesc": "Trigger sound effect {index}",
+  "@shortcutSfxDesc": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "shortcutMasterMuteTitle": "Mute Audio",
+  "shortcutMasterMuteDesc": "Quick mute or unmute master audio",
+  "shortcutManualDuckingTitle": "Manual Ducking",
+  "shortcutManualDuckingDesc": "Duck music during speech",
+  "shortcutPanicStopTitle": "Panic Stop SFX",
+  "shortcutPanicStopDesc": "Instantly stop all playing SFX sounds",
+  "shortcutFullscreenTitle": "Fullscreen Mode",
+  "shortcutFullscreenDesc": "Toggle fullscreen display"
 }

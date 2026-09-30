@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../../l10n/app_localizations.dart';
 import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 
@@ -57,7 +58,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
     super.initState();
     final base = widget.initialTheme ?? AppThemes.deepDark;
     _nameController = TextEditingController(
-      text: widget.initialTheme != null ? widget.initialTheme!.name : 'Новая тема',
+      text: widget.initialTheme != null ? widget.initialTheme!.name : 'New Theme',
     );
     _isDark = base.isDark;
     _primary = base.primary;
@@ -97,12 +98,13 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
   }
 
   void _pickColor(String title, Color currentColor, ValueChanged<Color> onSelected) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E28),
-          title: Text('Выбор цвета: $title', style: const TextStyle(color: Colors.white, fontSize: 16)),
+          title: Text(l10n?.colorPickTitle(title) ?? 'Color Choice: $title', style: const TextStyle(color: Colors.white, fontSize: 16)),
           content: SizedBox(
             width: 320,
             child: Wrap(
@@ -137,7 +139,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Отмена'),
+              child: Text(l10n?.cancel ?? 'Cancel'),
             ),
           ],
         );
@@ -147,6 +149,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       backgroundColor: _surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -170,7 +173,9 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        widget.initialTheme == null ? 'Создание кастомной темы' : 'Редактирование темы',
+                        widget.initialTheme == null
+                            ? (l10n?.createCustomThemeTitle ?? 'Create Custom Theme')
+                            : (l10n?.editCustomThemeTitle ?? 'Edit Theme'),
                         style: TextStyle(color: _textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -191,7 +196,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                         controller: _nameController,
                         style: TextStyle(color: _textPrimary),
                         decoration: InputDecoration(
-                          labelText: 'Название темы',
+                          labelText: l10n?.themeNameLabel ?? 'Theme Name',
                           labelStyle: TextStyle(color: _textSecondary),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: _textSecondary.withValues(alpha: 0.3)),
@@ -200,14 +205,14 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                             borderSide: BorderSide(color: _primary),
                           ),
                         ),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Укажите название темы' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? (l10n?.themeNameRequired ?? 'Please specify theme name') : null,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       flex: 2,
                       child: PopupMenuButton<CustomThemeModel>(
-                        tooltip: 'Взять за основу пресет',
+                        tooltip: l10n?.baseOnPresetTooltip ?? 'Use preset as template',
                         onSelected: _applyPresetTemplate,
                         itemBuilder: (ctx) => AppThemes.presets.map((preset) {
                           return PopupMenuItem(
@@ -237,7 +242,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Взять основу', style: TextStyle(color: _textPrimary, fontSize: 13)),
+                              Text(l10n?.baseOnPreset ?? 'Base on Preset', style: TextStyle(color: _textPrimary, fontSize: 13)),
                               Icon(Icons.arrow_drop_down, color: _textSecondary),
                             ],
                           ),
@@ -263,7 +268,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Предпросмотр темы',
+                            l10n?.themePreviewTitle ?? 'Theme Preview',
                             style: TextStyle(color: _textSecondary, fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                           Container(
@@ -278,7 +283,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                               children: [
                                 Icon(Icons.volume_down, size: 14, color: _duckingBadge),
                                 const SizedBox(width: 4),
-                                Text('Ducking Active', style: TextStyle(color: _duckingBadge, fontSize: 11, fontWeight: FontWeight.bold)),
+                                Text(l10n?.duckingActive ?? 'Ducking Active', style: TextStyle(color: _duckingBadge, fontSize: 11, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -286,72 +291,72 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                       ),
                       const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: _card,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(color: _primary.withValues(alpha: 0.15), blurRadius: 6, spreadRadius: 1),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _nameController.text.isEmpty ? 'Пример карточки' : _nameController.text,
-                              style: TextStyle(color: _textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Текст описания сцены или трека в выбранной палитре цветов.',
-                              style: TextStyle(color: _textSecondary, fontSize: 12),
-                            ),
-                            const SizedBox(height: 10),
-                            Wrap(
-                              spacing: 8,
-                              children: [
-                                _buildIntensityChip('Спокойствие', _secondary, true),
-                                _buildIntensityChip('Битва', _battleIntensity, false),
-                                _buildIntensityChip('Босс', _bossIntensity, false),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: _card,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(color: _primary.withValues(alpha: 0.15), blurRadius: 6, spreadRadius: 1),
                               ],
                             ),
-                            const SizedBox(height: 10),
-                            Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: _primary,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  ),
-                                  icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                                  label: const Text('Play', style: TextStyle(fontSize: 12)),
-                                  onPressed: () {},
+                                Text(
+                                  _nameController.text.isEmpty ? (l10n?.cardExampleTitle ?? 'Sample Card') : _nameController.text,
+                                  style: TextStyle(color: _textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: SliderTheme(
-                                    data: SliderThemeData(
-                                      activeTrackColor: _primary,
-                                      thumbColor: _primary,
-                                      inactiveTrackColor: _primary.withValues(alpha: 0.2),
+                                const SizedBox(height: 6),
+                                Text(
+                                  l10n?.cardExampleDesc ?? 'Scene or track description in the selected color palette.',
+                                  style: TextStyle(color: _textSecondary, fontSize: 12),
+                                ),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 8,
+                                  children: [
+                                    _buildIntensityChip('Calm', _secondary, true),
+                                    _buildIntensityChip('Battle', _battleIntensity, false),
+                                    _buildIntensityChip('Boss', _bossIntensity, false),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: _primary,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      ),
+                                      icon: const Icon(Icons.play_arrow_rounded, size: 16),
+                                      label: const Text('Play', style: TextStyle(fontSize: 12)),
+                                      onPressed: () {},
                                     ),
-                                    child: Slider(value: 0.65, onChanged: (_) {}),
-                                  ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: SliderTheme(
+                                        data: SliderThemeData(
+                                          activeTrackColor: _primary,
+                                          thumbColor: _primary,
+                                          inactiveTrackColor: _primary.withValues(alpha: 0.2),
+                                        ),
+                                        child: Slider(value: 0.65, onChanged: (_) {}),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
                 const SizedBox(height: 20),
 
                 // Color Configuration Grid
                 Text(
-                  'Настройка палитры цветов',
+                  l10n?.colorPaletteConfig ?? 'Color Palette Settings',
                   style: TextStyle(color: _textPrimary, fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
@@ -359,12 +364,12 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                   spacing: 12,
                   runSpacing: 12,
                   children: [
-                    _buildColorButton('Primary (Основной)', _primary, (c) => setState(() => _primary = c)),
-                    _buildColorButton('Secondary (Вторичный)', _secondary, (c) => setState(() => _secondary = c)),
-                    _buildColorButton('Background (Фон)', _background, (c) => setState(() => _background = c)),
-                    _buildColorButton('Surface (Панели)', _surface, (c) => setState(() => _surface = c)),
-                    _buildColorButton('Card (Карточки)', _card, (c) => setState(() => _card = c)),
-                    _buildColorButton('Accent (Акцент)', _accent, (c) => setState(() => _accent = c)),
+                    _buildColorButton('Primary', _primary, (c) => setState(() => _primary = c)),
+                    _buildColorButton('Secondary', _secondary, (c) => setState(() => _secondary = c)),
+                    _buildColorButton('Background', _background, (c) => setState(() => _background = c)),
+                    _buildColorButton('Surface', _surface, (c) => setState(() => _surface = c)),
+                    _buildColorButton('Card', _card, (c) => setState(() => _card = c)),
+                    _buildColorButton('Accent', _accent, (c) => setState(() => _accent = c)),
                     _buildColorButton('Text Primary', _textPrimary, (c) => setState(() => _textPrimary = c)),
                     _buildColorButton('Text Secondary', _textSecondary, (c) => setState(() => _textSecondary = c)),
                     _buildColorButton('Ducking Badge', _duckingBadge, (c) => setState(() => _duckingBadge = c)),
@@ -380,7 +385,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Отмена', style: TextStyle(color: _textSecondary)),
+                      child: Text(l10n?.cancel ?? 'Cancel', style: TextStyle(color: _textSecondary)),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton.icon(
@@ -390,7 +395,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                       icon: const Icon(Icons.check_rounded),
-                      label: const Text('Сохранить тему'),
+                      label: Text(l10n?.saveThemeBtn ?? 'Save Theme'),
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
                           final newTheme = CustomThemeModel(

@@ -17,12 +17,12 @@ class LoggerConsoleDrawer extends StatelessWidget {
           child: Column(
             children: [
               AppBar(
-                title: Text(l10n?.logConsoleTitle ?? 'Консоль логов и отладки'),
+                title: Text(l10n?.logConsoleTitle ?? 'Log Console'),
                 automaticallyImplyLeading: false,
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
-                    tooltip: l10n?.clearLogs ?? 'Очистить логи',
+                    tooltip: l10n?.clearLogs ?? 'Clear logs',
                     onPressed: () => logger.clear(),
                   ),
                   IconButton(
@@ -33,7 +33,7 @@ class LoggerConsoleDrawer extends StatelessWidget {
               ),
               Expanded(
                 child: logger.logs.isEmpty
-                    ? Center(child: Text(l10n?.noLogs ?? 'Логи пусты', style: const TextStyle(color: Colors.grey)))
+                    ? Center(child: Text(l10n?.noLogs ?? 'No logs', style: const TextStyle(color: Colors.grey)))
                     : ListView.builder(
                         padding: const EdgeInsets.all(8),
                         itemCount: logger.logs.length,

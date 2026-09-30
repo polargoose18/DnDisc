@@ -140,7 +140,7 @@ class SceneCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            l10n?.activeBadge ?? 'АКТИВНА',
+                            l10n?.activeBadge ?? 'ACTIVE',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
@@ -166,7 +166,7 @@ class SceneCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.edit_outlined, size: 16, color: activeTheme.textPrimary),
                                 const SizedBox(width: 8),
-                                Text(l10n?.edit ?? 'Редактировать', style: TextStyle(color: activeTheme.textPrimary)),
+                                Text(l10n?.edit ?? 'Edit', style: TextStyle(color: activeTheme.textPrimary)),
                               ],
                             ),
                           ),
@@ -176,7 +176,7 @@ class SceneCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.copy_rounded, size: 16, color: activeTheme.textPrimary),
                                 const SizedBox(width: 8),
-                                Text(l10n?.duplicate ?? 'Дублировать', style: TextStyle(color: activeTheme.textPrimary)),
+                                Text(l10n?.duplicate ?? 'Duplicate', style: TextStyle(color: activeTheme.textPrimary)),
                               ],
                             ),
                           ),
@@ -187,7 +187,7 @@ class SceneCard extends StatelessWidget {
                                 children: [
                                   Icon(Icons.archive_outlined, size: 16, color: activeTheme.textPrimary),
                                   const SizedBox(width: 8),
-                                  Text('Экспорт (.scene.zip)', style: TextStyle(color: activeTheme.textPrimary)),
+                                  Text(l10n?.exportSceneMenu ?? 'Export (.scene.zip)', style: TextStyle(color: activeTheme.textPrimary)),
                                 ],
                               ),
                             ),
@@ -197,7 +197,7 @@ class SceneCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
                                 const SizedBox(width: 8),
-                                Text(l10n?.delete ?? 'Удалить', style: const TextStyle(color: Colors.redAccent)),
+                                Text(l10n?.delete ?? 'Delete', style: const TextStyle(color: Colors.redAccent)),
                               ],
                             ),
                           ),
@@ -267,7 +267,7 @@ class SceneCard extends StatelessWidget {
                                   const Icon(Icons.waves, size: 12, color: Colors.tealAccent),
                                   const SizedBox(width: 2),
                                   Text(
-                                    '${scene.ambientLayerVolumes.length} ${l10n?.ambient ?? "эмбиент"}',
+                                    '${scene.ambientLayerVolumes.length} ${l10n?.ambient ?? "ambient"}',
                                     style: const TextStyle(
                                       color: Colors.tealAccent,
                                       fontSize: 9,
@@ -288,7 +288,7 @@ class SceneCard extends StatelessWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         icon: Icon(isActive ? Icons.volume_up_rounded : Icons.play_arrow_rounded, size: 14),
-                        label: Text(isActive ? (l10n?.activeBadge ?? 'АКТИВНА') : (l10n?.enableSceneBtn ?? 'Включить'), style: const TextStyle(fontSize: 11)),
+                        label: Text(isActive ? (l10n?.activeBadge ?? 'ACTIVE') : (l10n?.enableSceneBtn ?? 'Enable'), style: const TextStyle(fontSize: 11)),
                         onPressed: onActivate,
                       ),
                     ],

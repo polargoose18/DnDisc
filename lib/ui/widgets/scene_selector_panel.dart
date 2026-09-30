@@ -65,7 +65,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    l10n?.scenesTitle ?? 'Атмосферные Сцены',
+                    l10n?.scenesTitle ?? 'Atmospheric Scenes',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -77,7 +77,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 const SizedBox(width: 4),
                 IconButton(
                   icon: const Icon(Icons.archive_outlined, size: 18),
-                  tooltip: 'Экспорт пака сцен (.pack.zip)',
+                  tooltip: l10n?.exportScenePackTooltip ?? 'Export Scene Pack (.pack.zip)',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   onPressed: allScenes.isEmpty ? null : () => _exportScenePack(context, allScenes),
@@ -85,7 +85,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 const SizedBox(width: 6),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.add_rounded, size: 14),
-                  label: Text(l10n?.createSceneBtn ?? 'Создать сцену', style: const TextStyle(fontSize: 11)),
+                  label: Text(l10n?.createSceneBtn ?? 'Create Scene', style: const TextStyle(fontSize: 11)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: activeTheme.primary,
                     foregroundColor: Colors.white,
@@ -111,7 +111,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 controller: _searchController,
                 style: TextStyle(color: activeTheme.textPrimary, fontSize: 13),
                 decoration: InputDecoration(
-                  hintText: l10n?.searchPlaceholder ?? 'Поиск сцен...',
+                  hintText: l10n?.searchScenesPlaceholder ?? 'Search scenes...',
                   hintStyle: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                   prefixIcon: Icon(Icons.search, size: 18, color: activeTheme.textSecondary),
                   suffixIcon: _searchQuery.isNotEmpty
@@ -148,8 +148,8 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 child: Center(
                   child: Text(
                     allScenes.isEmpty
-                        ? (l10n?.noScenesHint ?? 'Сцены пока не созданы.\nНажмите «Новая сцена» для добавления.')
-                        : 'Сцен по запросу не найдено.',
+                        ? (l10n?.noScenesHint ?? 'No scenes created yet. Click "Create Scene" to combine music and ambients.')
+                        : (l10n?.noScenesMatching ?? 'No scenes found matching your search.'),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                   ),
@@ -241,9 +241,10 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
   }
 
   Future<void> _exportScene(BuildContext context, SceneModel scene) async {
+    final l10n = AppLocalizations.of(context);
     try {
       final savePath = await FilePicker.platform.saveFile(
-        dialogTitle: 'Сохранить сцену как...',
+        dialogTitle: l10n?.saveSceneAs ?? 'Save scene as...',
         fileName: '${scene.name.replaceAll(RegExp(r'[^\w\s\-]'), '_')}.scene.zip',
         type: FileType.custom,
         allowedExtensions: ['zip', 'scene.zip'],
@@ -256,49 +257,50 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
         );
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Сцена "${scene.name}" экспортирована!')),
+            SnackBar(content: Text(l10n?.sceneExported(scene.name) ?? 'Scene "${scene.name}" exported!')),
           );
         }
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка при экспорте сцены: $e')),
+          SnackBar(content: Text(l10n?.sceneExportError(e.toString()) ?? 'Error exporting scene: $e')),
         );
       }
     }
   }
 
   Future<void> _exportScenePack(BuildContext context, List<SceneModel> scenes) async {
-    final titleController = TextEditingController(text: 'Пак Приключений');
-    final descController = TextEditingController(text: 'Комплект атмосферных сцен');
+    final l10n = AppLocalizations.of(context);
+    final titleController = TextEditingController(text: l10n?.defaultPackTitle ?? 'Adventure Pack');
+    final descController = TextEditingController(text: l10n?.defaultPackDesc ?? 'Atmospheric scenes collection');
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Экспорт Пака сцен (.pack.zip)'),
+        title: Text(l10n?.exportScenePackTitle ?? 'Export Scene Pack (.pack.zip)'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(labelText: 'Название пака'),
+              decoration: InputDecoration(labelText: l10n?.packTitleLabel ?? 'Pack Name'),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: descController,
-              decoration: const InputDecoration(labelText: 'Описание пака'),
+              decoration: InputDecoration(labelText: l10n?.packDescLabel ?? 'Pack Description'),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Отмена'),
+            child: Text(l10n?.cancel ?? 'Cancel'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Экспортировать'),
+            child: Text(l10n?.export ?? 'Export'),
           ),
         ],
       ),
@@ -308,7 +310,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
       try {
         final sanitized = titleController.text.trim().replaceAll(RegExp(r'[^\w\s\-]'), '_');
         final savePath = await FilePicker.platform.saveFile(
-          dialogTitle: 'Сохранить пак сцен как...',
+          dialogTitle: l10n?.savePackAs ?? 'Save scene pack as...',
           fileName: '$sanitized.pack.zip',
           type: FileType.custom,
           allowedExtensions: ['zip', 'pack.zip'],
@@ -324,14 +326,14 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
           );
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Пак сцен "${titleController.text}" успешно экспортирован!')),
+              SnackBar(content: Text(l10n?.packExported(titleController.text) ?? 'Scene pack "${titleController.text}" successfully exported!')),
             );
           }
         }
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка при экспорте пака сцен: $e')),
+            SnackBar(content: Text(l10n?.packExportError(e.toString()) ?? 'Error exporting scene pack: $e')),
           );
         }
       }

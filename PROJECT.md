@@ -43,7 +43,7 @@ TTRPG Audio Master is a desktop-first Flutter application structured around a la
 | 11 | Localization Generation Pipeline | Execute `flutter gen-l10n` to regenerate `AppLocalizations` | M4 | ORIGINAL_REQUEST §R4, Survey Explorer 3 |
 | 12 | UI Hardcoded Literals Replacement | Replace all hardcoded Russian literals across screens, dialogs, widgets with `AppLocalizations.of(context)` | M4 | ORIGINAL_REQUEST §R4, Survey Explorer 3 |
 | 13 | Desktop Audio Rules Compliance | Ensure direct CLI logging with `HH:mm:ss.SSS`, non-blocking audio, `existsSync` checks, and ChangeNotifier proxying | M5 | ORIGINAL_REQUEST §R5, Survey Explorer 3 |
-| 14 | Three-Part Test Specification Standards | Ensure all tests adhere to ("Что проверяем", "Входные данные", "Ожидаемый результат") | M5 | ORIGINAL_REQUEST §R5, Survey Explorer 3 |
+| 14 | Test Specification Standards (AAA Pattern) | Ensure all tests adhere to AAA pattern ('should <result> when <condition>') in English | M5 | ORIGINAL_REQUEST §R5, Survey Explorer 3 |
 | 15 | Theme Persistence Verification Tests | Add unit/widget tests for theme selection persistence across app restarts | M5 | ORIGINAL_REQUEST §Acceptance, Survey Explorer 3 |
 | 16 | Complete Localization Verification Tests | Add unit/widget tests for dynamic language switching across UI components | M5 | ORIGINAL_REQUEST §Acceptance, Survey Explorer 3 |
 | 17 | Final Project Verification | Full run of `flutter analyze` (0 issues) and `flutter test` (145+ tests passing, 0 failures) | M5 | ORIGINAL_REQUEST §Acceptance |

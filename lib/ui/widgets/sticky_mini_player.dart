@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../audio/music_bus_controller.dart';
 import '../../audio/audio_engine_service.dart';
 import '../../ui/view_models/theme_view_model.dart';
@@ -17,6 +18,7 @@ class StickyMiniPlayer extends StatelessWidget {
     final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final music = context.watch<MusicBusController>();
     final audioEngine = context.watch<AudioEngineService>();
+    final l10n = AppLocalizations.of(context);
     final track = music.currentTrack;
 
     return Container(
@@ -67,7 +69,7 @@ class StickyMiniPlayer extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          track != null ? track.title : 'Без музыки',
+                          track != null ? track.title : (l10n?.noMusic ?? 'No music'),
                           style: TextStyle(
                             color: activeTheme.textPrimary,
                             fontWeight: FontWeight.bold,
@@ -77,7 +79,9 @@ class StickyMiniPlayer extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          music.isPlaying ? 'Воспроизведение' : 'На паузе',
+                          music.isPlaying
+                              ? (l10n?.playing ?? 'Playing')
+                              : (l10n?.paused ?? 'Paused'),
                           style: TextStyle(
                             color: music.isPlaying ? Colors.greenAccent : activeTheme.textSecondary,
                             fontSize: 11,
@@ -98,7 +102,7 @@ class StickyMiniPlayer extends StatelessWidget {
                 color: activeTheme.primary,
                 size: 32,
               ),
-              tooltip: music.isPlaying ? 'Пауза [Space]' : 'Воспроизведение [Space]',
+              tooltip: music.isPlaying ? 'Pause [Space]' : 'Play [Space]',
               onPressed: () {
                 if (music.isPlaying) {
                   music.pause();

@@ -128,9 +128,9 @@ void main() {
   group('LibraryTrack & AudioBusType Extension Tests', () {
     test('should return correct display names and parsed enum values when extension methods are called', () {
       // Arrange & Act & Assert
-      expect(AudioBusType.music.displayName, equals('Музыка'));
-      expect(AudioBusType.ambient.displayName, equals('Эмбиент'));
-      expect(AudioBusType.sfx.displayName, equals('SFX Эффект'));
+      expect(AudioBusType.music.displayName, equals('Music'));
+      expect(AudioBusType.ambient.displayName, equals('Ambient'));
+      expect(AudioBusType.sfx.displayName, equals('SFX Effect'));
 
       expect(AudioBusType.music.codeName, equals('music'));
       expect(AudioBusTypeExtension.fromCode('ambient'), equals(AudioBusType.ambient));

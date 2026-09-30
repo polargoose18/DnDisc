@@ -114,7 +114,7 @@ class SceneService extends ChangeNotifier {
 
     final duplicated = original.copyWith(
       id: const Uuid().v4(),
-      name: newName ?? '${original.name} (Копия)',
+      name: newName ?? '${original.name} (Copy)',
       createdAt: DateTime.now(),
     );
 

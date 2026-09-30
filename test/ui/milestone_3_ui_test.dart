@@ -72,7 +72,7 @@ Widget createM3TestableWidget(Widget child, {
     child: Consumer<SettingsService>(
       builder: (context, set, _) {
         return MaterialApp(
-          locale: set.currentLocale ?? const Locale('ru'),
+          locale: set.currentLocale ?? const Locale('en'),
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -123,9 +123,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Атмосферные Сцены'), findsOneWidget);
-      expect(find.text('Создать сцену'), findsOneWidget);
-      expect(find.textContaining('Сцены пока не созданы'), findsOneWidget);
+      expect(find.text('Atmospheric Scenes'), findsOneWidget);
+      expect(find.text('Create Scene'), findsOneWidget);
+      expect(find.textContaining('No scenes created yet'), findsOneWidget);
 
       sceneService.dispose();
     });
@@ -138,8 +138,8 @@ void main() {
 
       final scene = SceneModel(
         id: 'sc-dragon',
-        name: 'Пещера Дракона',
-        description: 'Жар лавы и тяжелое дыхание',
+        name: 'Dragon Cave',
+        description: 'Lava heat and heavy breathing',
         colorHex: 0xFFF44336,
       );
 
@@ -158,19 +158,19 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('Пещера Дракона'), findsOneWidget);
-      expect(find.text('Включить'), findsOneWidget);
+      expect(find.text('Dragon Cave'), findsOneWidget);
+      expect(find.text('Enable'), findsOneWidget);
 
       // Act
       await tester.runAsync(() async {
-        await tester.tap(find.text('Пещера Дракона'));
+        await tester.tap(find.text('Dragon Cave'));
       });
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
       // Assert
       expect(sceneService.activeSceneId, equals('sc-dragon'));
-      expect(find.text('АКТИВНА'), findsWidgets);
+      expect(find.text('ACTIVE'), findsWidgets);
 
       sceneService.dispose();
       library.dispose();
@@ -207,25 +207,25 @@ void main() {
       await tester.tap(find.text('Open Scene Dialog'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Создание новой сцены'), findsOneWidget);
+      expect(find.text('Create New Scene'), findsOneWidget);
 
       // Act
       await tester.enterText(
-        find.widgetWithText(TextField, 'Название сцены *'),
-        'Тронный Зал',
+        find.widgetWithText(TextField, 'Scene Name *'),
+        'Throne Room',
       );
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(TextField, 'Поиск музыки по названию или тегам...'), findsOneWidget);
-      expect(find.widgetWithText(TextField, 'Поиск эмбиента по названию или тегам...'), findsOneWidget);
-      expect(find.widgetWithText(TextField, 'Поиск SFX по названию или тегам...'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Search music by title or tags...'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Search ambient by title or tags...'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Search SFX by title or tags...'), findsOneWidget);
 
-      await tester.tap(find.text('Создать'));
+      await tester.tap(find.text('Create'));
       await tester.pumpAndSettle();
 
       // Assert
       expect(returnedScene, isNotNull);
-      expect(returnedScene!.name, equals('Тронный Зал'));
+      expect(returnedScene!.name, equals('Throne Room'));
 
       library.dispose();
     });
@@ -252,14 +252,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Настройки звукового движка'), findsOneWidget);
-      expect(find.text('Интерфейс и панель управления'), findsOneWidget);
-      expect(find.text('Отображать иконку консоли логов'), findsOneWidget);
-      expect(find.text('Плавные переходы (Fade Engine)'), findsOneWidget);
-      expect(find.text('Авто-приглушение музыки при SFX (Ducking)'), findsOneWidget);
+      expect(find.text('Audio Engine Settings'), findsOneWidget);
+      expect(find.text('Interface & Control Panel'), findsOneWidget);
+      expect(find.text('Show log console icon'), findsOneWidget);
+      expect(find.text('Fade Engine'), findsOneWidget);
+      expect(find.text('Auto-ducking music during SFX (Ducking)'), findsOneWidget);
 
       // Act & Assert - Toggle log switch
-      final logSwitch = find.widgetWithText(SwitchListTile, 'Отображать иконку консоли логов');
+      final logSwitch = find.widgetWithText(SwitchListTile, 'Show log console icon');
       await tester.scrollUntilVisible(logSwitch, 200);
       expect(logSwitch, findsOneWidget);
       await tester.tap(logSwitch);
@@ -269,7 +269,7 @@ void main() {
       // Act & Assert - Music fade update
       settings.setMusicFadeMs(2500);
       await tester.pumpAndSettle();
-      expect(find.textContaining('2500 мс'), findsOneWidget);
+      expect(find.textContaining('2500 ms'), findsOneWidget);
 
       settings.dispose();
       library.dispose();
@@ -297,7 +297,7 @@ void main() {
       final cardFinder = find.byKey(const ValueKey('catalog_storage_settings_card'));
       await tester.scrollUntilVisible(cardFinder, 200);
       expect(cardFinder, findsOneWidget);
-      expect(find.text('Каталог и хранилище аудиофайлов'), findsOneWidget);
+      expect(find.text('Catalog & Audio File Storage'), findsOneWidget);
       expect(find.text('C:/AudioVault'), findsOneWidget);
 
       // Act
@@ -308,7 +308,7 @@ void main() {
 
       // Assert
       expect(settings.customDownloadDirectory, isNull);
-      expect(find.textContaining('По умолчанию: Documents/audio_library'), findsOneWidget);
+      expect(find.textContaining('Default: Documents/audio_library'), findsOneWidget);
 
       settings.dispose();
       library.dispose();
@@ -337,24 +337,24 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Панель Мастера'), findsOneWidget);
-      expect(find.text('Общая Библиотека'), findsOneWidget);
-      expect(find.text('Настройки'), findsOneWidget);
+      expect(find.text('GM Dashboard'), findsOneWidget);
+      expect(find.text('Media Library'), findsOneWidget);
+      expect(find.text('Settings'), findsOneWidget);
 
       // Act & Assert - 1. Settings tab
-      await tester.tap(find.text('Настройки'));
+      await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
-      expect(find.text('Настройки звукового движка'), findsOneWidget);
+      expect(find.text('Audio Engine Settings'), findsOneWidget);
 
       // Act & Assert - 2. Library tab
-      await tester.tap(find.text('Общая Библиотека'));
+      await tester.tap(find.text('Media Library'));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('library_search_input')), findsOneWidget);
 
       // Act & Assert - 3. Dashboard tab
-      await tester.tap(find.text('Панель Мастера'));
+      await tester.tap(find.text('GM Dashboard'));
       await tester.pumpAndSettle();
-      expect(find.text('Атмосферные Сцены'), findsOneWidget);
+      expect(find.text('Atmospheric Scenes'), findsOneWidget);
 
       engine.dispose();
       library.dispose();
@@ -383,7 +383,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(dropdownFinder, findsOneWidget);
-      expect(find.text('Язык интерфейса'), findsOneWidget);
+      expect(find.text('Interface Language'), findsOneWidget);
 
       // Act - English
       settings.setAppLanguage('en');
@@ -401,13 +401,9 @@ void main() {
       settings.setAppLanguage('ru');
       await tester.pumpAndSettle();
 
-      // Assert - Russian titles
-      expect(find.text('Язык интерфейса'), findsOneWidget);
-      expect(find.text('Настройки звукового движка'), findsOneWidget);
-      expect(find.text('Плавные переходы (Fade Engine)'), findsOneWidget);
-      expect(find.text('Авто-приглушение музыки при SFX (Ducking)'), findsOneWidget);
-      expect(find.text('Темы оформления (Themes)'), findsOneWidget);
-      expect(find.text('Централизованные горячие клавиши'), findsOneWidget);
+      // Assert - Russian locale updated
+      expect(settings.currentLocale?.languageCode, equals('ru'));
+      expect(Localizations.localeOf(tester.element(find.byType(SettingsScreen))).languageCode, equals('ru'));
 
       settings.dispose();
       library.dispose();

@@ -1,57 +1,57 @@
-# Руководство по созданию собственного репозитория для DnDisc
+# Custom Repository Guide for DnDisc
 
-**DnDisc** поддерживает подключение внешних удалённых репозиториев сцен, наборов медиафайлов и пакетов приключений (на базе GitLab, Dropbox, CDN, Amazon S3 или любых обычных веб-серверов).
+**DnDisc** supports connecting external remote repositories of scenes, media sets, and adventure packs (hosted on GitLab, Dropbox, CDN, Amazon S3, or standard web servers).
 
-Это позволяет мастерам настольных ролевых игр (GM) делить готовыми наборами атмосферных сцен, звуковыми эффектами и музыкой со своим сообществом или хранить личную коллекцию в облаке.
-
----
-
-## 📑 Оглавление
-1. [Категории контента: Сцены, Медиа, Паки](#1-категории-контента-сцены-медиа-паки)
-2. [Поддерживаемые сервисы и URL](#2-поддерживаемые-сервисы-и-url)
-3. [Быстрый способ: Графический экспорт из приложения](#3-быстрый-способ-графический-экспорт-из-приложения)
-4. [Автоматическая сборка через `generate_repository_manifest.py`](#4-автоматическая-сборка-через-generate_repository_manifestpy)
-5. [Спецификация файла `repository.json` (v2) для ручной сборки](#5-спецификация-файла-repositoryjson-v2-для-ручной-сборки)
-6. [Структуры скачиваемых архивов (`.scene.zip`, `.media.zip`, `.pack.zip`)](#6-структуры-скачиваемых-архивов)
-7. [Пошаговое создание репозитория на GitLab](#7-пошаговое-создание-репозитория-на-gitlab)
+This allows Game Masters (GMs) in tabletop RPGs to share curated atmospheric scenes, sound effects, and music with their gaming group or maintain a personal collection in the cloud.
 
 ---
 
-## 1. Категории контента: Сцены, Медиа, Паки
-
-В приложении **DnDisc** каталог поддерживает 3 фундаментальные категории контента:
-
-* 🎭 **Сцены (`scenes`)**: Одиночные сцены со сфокусированным набором музыки, слоев амбиента и саундборда (`.scene.zip`).
-* 🎵 **Наборы Медиа (`media`)**: Самостоятельные подборки музыкальных треков, эмбиентов или звуковых эффектов для саундборда (`.media.zip`), которые импортируются прямо в общую библиотеку.
-* 📦 **Паки сцен (`packs`)**: Комплексные наборы из нескольких сцен и всех их аудиофайлов (`.pack.zip`).
-
----
-
-## 2. Поддерживаемые сервисы и URL
-
-Приложение автоматически умеет работать со следующими типами ссылок:
-
-* **GitLab-репозиторий**: Вставьте обычную ссылку на веб-страницу репозитория (например, `https://gitlab.com/username/my-dnd-scenes`). Приложение автоматически преобразует её в прямой доступ к манифесту (`gitlab.com/.../-/raw/main/repository.json`).
-* **Dropbox**: Поддерживаются ссылки общего доступа Dropbox (с автоматическим преобразованием в прямой поток скачивания `dl=1`).
-* **Прямой URL манифеста**: Прямая ссылка на файл `repository.json` на любом HTTPS/HTTP сервере или в самостоятельно размещённом экземпляре GitLab.
+## 📑 Table of Contents
+1. [Content Categories: Scenes, Media, Packs](#1-content-categories-scenes-media-packs)
+2. [Supported Services and URLs](#2-supported-services-and-urls)
+3. [Quick Workflow: Graphical Export from the App](#3-quick-workflow-graphical-export-from-the-app)
+4. [Automated Build via `generate_repository_manifest.py`](#4-automated-build-via-generate_repository_manifestpy)
+5. [Specification for `repository.json` (v2) for Manual Assembly](#5-specification-for-repositoryjson-v2-for-manual-assembly)
+6. [Download Archive Structures (`.scene.zip`, `.media.zip`, `.pack.zip`)](#6-download-archive-structures)
+7. [Step-by-Step Repository Setup on GitLab](#7-step-by-step-repository-setup-on-gitlab)
 
 ---
 
-## 3. Быстрый способ: Графический экспорт из приложения
+## 1. Content Categories: Scenes, Media, Packs
 
-Вам **не нужно писать JSON-файлы вручную**. Вы можете сформировать архивы контента прямо в UI приложения:
+In **DnDisc**, the catalog supports 3 fundamental content categories:
 
-1. **Экспорт Сцены**: В меню карточки сцены нажмите `...` ➔ **«Экспорт (.scene.zip)»**.
-2. **Экспорт Набора Медиа**: На экране Библиотеки выделите треки и нажмите **«Экспорт медиа-набора (.media.zip)»**.
-3. **Экспорт Пака сцен**: На панели сцен выделите несколько сцен и нажмите **«Экспорт пака сцен (.pack.zip)»**.
-
-Сформированные файлы уже содержат все внутренние манифесты (`scene.json`, `media.json`, `pack.json`).
+* 🎭 **Scenes (`scenes`)**: Standalone scenes with focused sets of music, ambient layers, and soundboard triggers (`.scene.zip`).
+* 🎵 **Media Sets (`media`)**: Standalone collections of music tracks, ambient loops, or SFX soundboard triggers (`.media.zip`) imported directly into the global library.
+* 📦 **Scene Packs (`packs`)**: Comprehensive packages combining multiple scenes and all their associated audio files (`.pack.zip`).
 
 ---
 
-## 4. Автоматическая сборка через `generate_repository_manifest.py`
+## 2. Supported Services and URLs
 
-Для сборки итогового манифеста `repository.json` используйте скрипт `generate_repository_manifest.py`:
+The app natively handles the following URL formats:
+
+* **GitLab Repository**: Paste a standard GitLab repository URL (e.g., `https://gitlab.com/username/my-dnd-scenes`). The app automatically transforms it to direct manifest access (`gitlab.com/.../-/raw/main/repository.json`).
+* **Dropbox**: Public Dropbox sharing links are supported (automatically converted to direct streaming download via `dl=1`).
+* **Direct Manifest URL**: Direct link to a `repository.json` file on any HTTPS/HTTP web server or self-hosted GitLab instance.
+
+---
+
+## 3. Quick Workflow: Graphical Export from the App
+
+You **do not need to write JSON files manually**. You can create content archives directly within the app UI:
+
+1. **Export Scene**: Open the scene card menu `...` ➔ **"Export (.scene.zip)"**.
+2. **Export Media Set**: On the Media Library screen, select tracks and click **"Export Media Package (.media.zip)"**.
+3. **Export Scene Pack**: On the scenes panel, select multiple scenes and click **"Export Scene Pack (.pack.zip)"**.
+
+Generated zip files already contain internal manifests (`scene.json`, `media.json`, `pack.json`).
+
+---
+
+## 4. Automated Build via `generate_repository_manifest.py`
+
+To compile the final `repository.json` manifest, use the `generate_repository_manifest.py` script:
 
 ```text
 my-dnd-audio-repo/
@@ -59,30 +59,30 @@ my-dnd-audio-repo/
 ├── scenes/       # *.scene.zip
 ├── media/        # *.media.zip
 ├── packs/        # *.pack.zip
-└── covers/       # Обложки *.jpg
+└── covers/       # Cover images *.jpg
 ```
 
-Запуск команды `python generate_repository_manifest.py` за 1 секунду сканирует архивы, читает их внутренние манифесты и генерирует готовый `repository.json`.
+Running `python generate_repository_manifest.py` scans archives, inspects internal manifests, and generates `repository.json` in seconds.
 
 ---
 
-## 5. Спецификация файла `repository.json` (v2) для ручной сборки
+## 5. Specification for `repository.json` (v2) for Manual Assembly
 
-Файл `repository.json` должен находиться в корне репозитория и быть закодирован в **UTF-8**.
+The `repository.json` file must reside at the root of the repository and be encoded in **UTF-8**.
 
-### 📋 Полный пример `repository.json`
+### 📋 Complete `repository.json` Example
 
 ```json
 {
   "name": "D&D Fantasy Audio Treasury",
-  "description": "Коллекция сцен, медиа-наборов и паков приключений",
+  "description": "Collection of scenes, media sets, and adventure packs",
   "version": "2.0.0",
   "author": "GameMaster3000",
   "scenes": [
     {
       "id": "scene_dragon_lair",
-      "name": "Логово Дракона",
-      "description": "Пещера с рыком красного дракона",
+      "name": "Dragon's Lair",
+      "description": "Cave echoing with the roar of a red dragon",
       "download_url": "scenes/dragon_lair.scene.zip",
       "cover_url": "covers/scene_dragon_lair.jpg",
       "color_hex": "0xFF673AB7",
@@ -98,8 +98,8 @@ my-dnd-audio-repo/
   "media": [
     {
       "id": "media_monsters_sfx",
-      "name": "Набор SFX Рыки Монстров",
-      "description": "15 разовых звуковых эффектов для саундборда",
+      "name": "Monster Roars SFX Set",
+      "description": "15 one-shot sound effects for the soundboard",
       "download_url": "media/monsters_sfx.media.zip",
       "cover_url": "covers/media_monsters_sfx.jpg",
       "color_hex": "0xFFFF9800",
@@ -113,8 +113,8 @@ my-dnd-audio-repo/
   "packs": [
     {
       "id": "pack_curse_of_strahd",
-      "name": "Пак приключений: Проклятие Страда",
-      "description": "Набор из 8 сцен для кампании",
+      "name": "Adventure Pack: Curse of Strahd",
+      "description": "Campaign bundle with 8 scenes",
       "download_url": "packs/curse_of_strahd.pack.zip",
       "cover_url": "covers/pack_curse_of_strahd.jpg",
       "color_hex": "0xFFD32F2F",
@@ -122,8 +122,8 @@ my-dnd-audio-repo/
       "tracks_count": 32,
       "size_bytes": 145000000,
       "scenes": [
-        { "name": "Замок Равенлофт" },
-        { "name": "Деревня Баровия" }
+        { "name": "Castle Ravenloft" },
+        { "name": "Village of Barovia" }
       ]
     }
   ]
@@ -132,85 +132,85 @@ my-dnd-audio-repo/
 
 ---
 
-### 📐 Схема и обязательность полей
+### 📐 Schema & Field Specifications
 
-#### Таблица 5.1. Корневой объект `repository.json`
+#### Table 5.1. Root Object `repository.json`
 
-| Поле | Тип | Обязательное | Значение по умолчанию | Описание |
+| Field | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `name` | `string` | **Да** | `"Untitled Repository"` | Отображаемое название репозитория |
-| `description` | `string` | Нет | `""` | Подробное описание репозитория |
-| `version` | `string` | Нет | `"1.0"` | Версия пака (например, `"2.0.0"`) |
-| `author` | `string` | Нет | `""` | Имя или никнейм автора |
-| `scenes` | `array` | Нет | `[]` | Массив элементов категории «Сцены» |
-| `media` | `array` | Нет | `[]` | Массив элементов категории «Медиа» |
-| `packs` | `array` | Нет | `[]` | Массив элементов категории «Паки» |
+| `name` | `string` | **Yes** | `"Untitled Repository"` | Display name of repository |
+| `description` | `string` | No | `""` | Detailed description of repository |
+| `version` | `string` | No | `"1.0"` | Pack version string (e.g. `"2.0.0"`) |
+| `author` | `string` | No | `""` | Name or nickname of author |
+| `scenes` | `array` | No | `[]` | Array of scene category items |
+| `media` | `array` | No | `[]` | Array of media category items |
+| `packs` | `array` | No | `[]` | Array of pack category items |
 
 ---
 
-#### Таблица 5.2. Объект элемента в `scenes` (Сцены)
+#### Table 5.2. Item Object in `scenes`
 
-| Поле | Тип | Обязательное | Описание |
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `id` | `string` | **Да** | Уникальный ID сцены (UUID или уникальная строка) |
-| `name` | `string` | **Да** | Название сцены |
-| `description` | `string` | Нет | Подробное описание сцены |
-| `download_url` / `downloadUrl` | `string` | **Да** | Ссылка на `.scene.zip` (относительный путь `scenes/name.scene.zip` или полная `https://...`) |
-| `cover_url` / `coverUrl` | `string` | Нет | Ссылка на изображение обложки (`covers/name.jpg` или `https://...`) |
-| `color_hex` / `colorHex` | `string` / `int` | Нет | Цвет карточки: `"0xFF673AB7"`, `"#673AB7"` или число `4285040567` |
-| `tracks_count` | `int` | Нет | Количество аудиодорожек в сцене |
-| `size_bytes` | `int` | Нет | Размер `.scene.zip` файла в байтах |
-| `tracks` | `array` | Нет | Массив объектов предпросмотра треков (см. Таблицу 5.5) |
+| `id` | `string` | **Yes** | Unique scene ID (UUID or unique string) |
+| `name` | `string` | **Yes** | Scene name |
+| `description` | `string` | No | Scene description |
+| `download_url` / `downloadUrl` | `string` | **Yes** | Link to `.scene.zip` (relative path `scenes/name.scene.zip` or full `https://...`) |
+| `cover_url` / `coverUrl` | `string` | No | Link to cover image (`covers/name.jpg` or `https://...`) |
+| `color_hex` / `colorHex` | `string` / `int` | No | Card color: `"0xFF673AB7"`, `"#673AB7"`, or integer `4285040567` |
+| `tracks_count` | `int` | No | Number of audio tracks in scene |
+| `size_bytes` | `int` | No | Size of `.scene.zip` in bytes |
+| `tracks` | `array` | No | Array of track preview objects (see Table 5.5) |
 
 ---
 
-#### Таблица 5.3. Объект элемента в `media` (Наборы Медиа)
+#### Table 5.3. Item Object in `media`
 
-| Поле | Тип | Обязательное | Описание |
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `id` | `string` | **Да** | Уникальный ID набора медиа |
-| `name` | `string` | **Да** | Название набора треков / эффектов |
-| `description` | `string` | Нет | Описание состава набора медиа |
-| `download_url` / `downloadUrl` | `string` | **Да** | Ссылка на `.media.zip` (например `media/monsters.media.zip`) |
-| `cover_url` / `coverUrl` | `string` | Нет | Ссылка на обложку набора |
-| `color_hex` / `colorHex` | `string` / `int` | Нет | Цвет карточки набора (по умолчанию оранжевый) |
-| `tracks_count` | `int` | Нет | Общее количество треков в наборе |
-| `size_bytes` | `int` | Нет | Размер `.media.zip` файла в байтах |
-| `tracks` | `array` | Нет | Массив объектов предпросмотра треков (см. Таблицу 5.5) |
+| `id` | `string` | **Yes** | Unique media set ID |
+| `name` | `string` | **Yes** | Name of track / effect set |
+| `description` | `string` | No | Description of media set |
+| `download_url` / `downloadUrl` | `string` | **Yes** | Link to `.media.zip` (e.g. `media/monsters.media.zip`) |
+| `cover_url` / `coverUrl` | `string` | No | Link to set cover image |
+| `color_hex` / `colorHex` | `string` / `int` | No | Card accent color (default orange) |
+| `tracks_count` | `int` | No | Total tracks in media set |
+| `size_bytes` | `int` | No | Size of `.media.zip` in bytes |
+| `tracks` | `array` | No | Array of track preview objects (see Table 5.5) |
 
 ---
 
-#### Таблица 5.4. Объект элемента в `packs` (Паки сцен)
+#### Table 5.4. Item Object in `packs`
 
-| Поле | Тип | Обязательное | Описание |
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `id` | `string` | **Да** | Уникальный ID пака сцен |
-| `name` | `string` | **Да** | Название пакета приключений |
-| `description` | `string` | Нет | Подробное описание сюжетной кампании/пака |
-| `download_url` / `downloadUrl` | `string` | **Да** | Ссылка на `.pack.zip` (например `packs/strahd.pack.zip`) |
-| `cover_url` / `coverUrl` | `string` | Нет | Ссылка на обложку пака |
-| `color_hex` / `colorHex` | `string` / `int` | Нет | Цвет карточки пака (по умолчанию красный) |
-| `scenes_count` | `int` | Нет | Количество включенных в пак сцен |
-| `tracks_count` | `int` | Нет | Суммарное количество треков во всех сценах пака |
-| `size_bytes` | `int` | Нет | Размер `.pack.zip` файла в байтах |
-| `scenes` | `array` | Нет | Список предпросмотра названий сцен `[ { "name": "Название сцены" } ]` |
-| `tracks` | `array` | Нет | Массив объектов предпросмотра треков (см. Таблицу 5.5) |
+| `id` | `string` | **Yes** | Unique scene pack ID |
+| `name` | `string` | **Yes** | Adventure pack name |
+| `description` | `string` | No | Adventure / campaign description |
+| `download_url` / `downloadUrl` | `string` | **Yes** | Link to `.pack.zip` (e.g. `packs/strahd.pack.zip`) |
+| `cover_url` / `coverUrl` | `string` | No | Link to pack cover image |
+| `color_hex` / `colorHex` | `string` / `int` | No | Card accent color (default red) |
+| `scenes_count` | `int` | No | Number of included scenes |
+| `tracks_count` | `int` | No | Total tracks across all scenes |
+| `size_bytes` | `int` | No | Size of `.pack.zip` in bytes |
+| `scenes` | `array` | No | Preview list of scene names `[ { "name": "Scene Name" } ]` |
+| `tracks` | `array` | No | Array of track preview objects (see Table 5.5) |
 
 ---
 
-#### Таблица 5.5. Элемент трека в массиве `tracks` (предпросмотр)
+#### Table 5.5. Track Preview Object in `tracks`
 
-| Поле | Тип | Обязательное | Допустимые значения | Описание |
+| Field | Type | Required | Allowed Values | Description |
 |---|---|---|---|---|
-| `title` | `string` | **Да** | Любая строка | Название аудиозаписи |
-| `bus_type` | `string` | **Да** | `"music"`, `"ambient"`, `"sfx"` | Канал воспроизведения |
-| `duration_ms` | `int` | Нет | Целое число `>= 0` | Длительность трека в миллисекундах |
+| `title` | `string` | **Yes** | Any string | Track title |
+| `bus_type` | `string` | **Yes** | `"music"`, `"ambient"`, `"sfx"` | Target audio bus |
+| `duration_ms` | `int` | No | Integer `>= 0` | Track duration in milliseconds |
 
 ---
 
-## 6. Структуры скачиваемых архивов
+## 6. Download Archive Structures
 
-### A. Архив Сцены (`.scene.zip`)
+### A. Scene Archive (`.scene.zip`)
 ```text
 dragon_lair.scene.zip
 ├── scene.json
@@ -218,14 +218,14 @@ dragon_lair.scene.zip
 └── images/
 ```
 
-### B. Архив Набора Медиа (`.media.zip`)
+### B. Media Set Archive (`.media.zip`)
 ```text
 monsters_sfx.media.zip
 ├── media.json
 └── audio/
 ```
 
-### C. Архив Пака сцен (`.pack.zip`)
+### C. Scene Pack Archive (`.pack.zip`)
 ```text
 curse_of_strahd.pack.zip
 ├── pack.json
@@ -235,10 +235,10 @@ curse_of_strahd.pack.zip
 
 ---
 
-## 7. Пошаговое создание репозитория на GitLab
+## 7. Step-by-Step Repository Setup on GitLab
 
-1. **Создайте публичный репозиторий на GitLab**.
-2. Скопируйте скрипт `tools/generate_repository_manifest.py` в корень репозитория.
-3. Разместите файлы архивов в папках `scenes/`, `media/` и `packs/`.
-4. Запустите `python generate_repository_manifest.py`.
-5. Сделайте `git push` и скопируйте ссылку на репозиторий в приложение **DnDisc**!
+1. **Create a public GitLab repository**.
+2. Copy `tools/generate_repository_manifest.py` to the repository root.
+3. Place archive files into `scenes/`, `media/`, and `packs/` directories.
+4. Run `python generate_repository_manifest.py`.
+5. Run `git push` and paste the repository URL into **DnDisc**!

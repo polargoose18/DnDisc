@@ -21,6 +21,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabSettings => 'Settings';
 
   @override
+  String get tabCatalog => 'Catalog';
+
+  @override
   String get manualDuckingTooltip => 'Manual Ducking [D]';
 
   @override
@@ -51,7 +54,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSystem => 'System';
 
   @override
-  String get languageRussian => 'Русский';
+  String get languageRussian => 'Russian';
 
   @override
   String get languageEnglish => 'English';
@@ -193,7 +196,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ambient => 'Ambient';
 
   @override
-  String get sfx => 'SFX Effect';
+  String get sfx => 'SFX';
+
+  @override
+  String get scenes => 'Scenes';
 
   @override
   String get searchPlaceholder =>
@@ -243,4 +249,626 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noSfxTracksInLibrary => 'No SFX tracks in the library.';
+
+  @override
+  String get playPause => 'Play / Pause';
+
+  @override
+  String get playing => 'Playing';
+
+  @override
+  String get paused => 'Paused';
+
+  @override
+  String get noMusic => 'No music';
+
+  @override
+  String get noMusicSilence => 'No music (silence)';
+
+  @override
+  String get noMusicDesc =>
+      'When activating the scene, background music smoothly fades out';
+
+  @override
+  String get nothingFound => 'Nothing found';
+
+  @override
+  String get ambientLayers => 'Ambient Layers (Background Sounds)';
+
+  @override
+  String get addAmbientTooltip => 'Add Layer / Persistent Ambient';
+
+  @override
+  String get stopAll => 'Stop All';
+
+  @override
+  String get noActiveAmbients =>
+      'No active ambients. Click \"+\" to add a persistent background sound.';
+
+  @override
+  String get addPersistentAmbient => 'Add Persistent Ambient';
+
+  @override
+  String get volume => 'Volume';
+
+  @override
+  String get persistentLayerTooltip =>
+      'Persistent layer (not reset when switching scenes)';
+
+  @override
+  String get makePersistentTooltip => 'Make persistent layer';
+
+  @override
+  String get muteLayerTooltip => 'Mute layer';
+
+  @override
+  String get unmuteLayerTooltip => 'Unmute layer';
+
+  @override
+  String get removeLayerTooltip => 'Remove layer';
+
+  @override
+  String get addAmbientDialogTitle => 'Add Ambient Layer';
+
+  @override
+  String get selectTrackFromLibrary => 'Select a track from the media library:';
+
+  @override
+  String get selectLocalAudioFile => 'Choose local audio file...';
+
+  @override
+  String get selected => 'Selected: ';
+
+  @override
+  String get persistentLayerCheckbox =>
+      'Persistent layer (do not reset on scene change)';
+
+  @override
+  String get addLayerBtn => 'Add Layer';
+
+  @override
+  String get soundboardTitle => 'Soundboard (SFX Effects)';
+
+  @override
+  String get addSfxTooltip => 'Add SFX / Persistent Button';
+
+  @override
+  String get panicStopBtn => 'Panic Stop [Esc]';
+
+  @override
+  String get sfxVolume => 'SFX Volume: ';
+
+  @override
+  String get soundboardEmpty =>
+      'Soundboard is empty. Add SFX or persistent quick buttons.';
+
+  @override
+  String get addPersistentSfx => 'Add Persistent SFX';
+
+  @override
+  String get unpinSfx => 'Unpin (make temporary)';
+
+  @override
+  String get pinSfx => 'Pin as persistent SFX';
+
+  @override
+  String get deleteSfxButton => 'Delete SFX button';
+
+  @override
+  String get addSfxDialogTitle => 'Add SFX Button';
+
+  @override
+  String get selectSoundFromLibrary => 'Select a sound from library:';
+
+  @override
+  String get persistentSfxCheckbox =>
+      'Persistent SFX (do not reset on scene change)';
+
+  @override
+  String get loopModeCheckbox => 'Loop Mode (Loop)';
+
+  @override
+  String get addSfxBtn => 'Add SFX';
+
+  @override
+  String get exportScenePackTooltip => 'Export Scene Pack (.pack.zip)';
+
+  @override
+  String get searchScenesPlaceholder => 'Search scenes...';
+
+  @override
+  String get noScenesMatching => 'No scenes found matching your search.';
+
+  @override
+  String get saveSceneAs => 'Save scene as...';
+
+  @override
+  String sceneExported(String name) {
+    return 'Scene \"$name\" exported!';
+  }
+
+  @override
+  String sceneExportError(String error) {
+    return 'Error exporting scene: $error';
+  }
+
+  @override
+  String get exportScenePackTitle => 'Export Scene Pack (.pack.zip)';
+
+  @override
+  String get packTitleLabel => 'Pack Name';
+
+  @override
+  String get packDescLabel => 'Pack Description';
+
+  @override
+  String get defaultPackTitle => 'Adventure Pack';
+
+  @override
+  String get defaultPackDesc => 'Atmospheric scenes collection';
+
+  @override
+  String get savePackAs => 'Save scene pack as...';
+
+  @override
+  String packExported(String name) {
+    return 'Scene pack \"$name\" successfully exported!';
+  }
+
+  @override
+  String packExportError(String error) {
+    return 'Error exporting scene pack: $error';
+  }
+
+  @override
+  String get exportSceneMenu => 'Export (.scene.zip)';
+
+  @override
+  String get currentSceneBadge => 'CURRENT SCENE';
+
+  @override
+  String get selectScenePrompt =>
+      'Select a scene on the left to set up the game environment';
+
+  @override
+  String get musicIntensityLabel => 'Music Intensity';
+
+  @override
+  String get createSceneTitle => 'Create New Scene';
+
+  @override
+  String get editSceneTitle => 'Edit Scene';
+
+  @override
+  String get sceneNameLabel => 'Scene Name *';
+
+  @override
+  String get sceneNameHint => 'e.g. Tavern \"The Drunken Dragon\"';
+
+  @override
+  String get sceneDescLabel => 'Atmosphere Description / GM Notes';
+
+  @override
+  String get sceneDescHint => 'Warm fireplace, clinking mugs, quiet lute...';
+
+  @override
+  String get sceneCoverLabel => 'Image / Cover Art Path';
+
+  @override
+  String get browseBtn => 'Browse';
+
+  @override
+  String get colorAccent => 'Color Accent:';
+
+  @override
+  String get musicChannel => 'Music Channel';
+
+  @override
+  String get ambientChannel => 'Ambient Channel';
+
+  @override
+  String get sfxChannel => 'SFX Channel (Soundboard)';
+
+  @override
+  String get searchMusicHint => 'Search music by title or tags...';
+
+  @override
+  String get searchAmbientHint => 'Search ambient by title or tags...';
+
+  @override
+  String get searchSfxHint => 'Search SFX by title or tags...';
+
+  @override
+  String layersSelected(int count) {
+    return '$count layers selected';
+  }
+
+  @override
+  String sfxSelected(int count) {
+    return '$count SFX selected';
+  }
+
+  @override
+  String get specifySceneName => 'Please specify scene name';
+
+  @override
+  String get createCustomThemeTitle => 'Create Custom Theme';
+
+  @override
+  String get editCustomThemeTitle => 'Edit Theme';
+
+  @override
+  String get themeNameLabel => 'Theme Name';
+
+  @override
+  String get themeNameRequired => 'Please specify theme name';
+
+  @override
+  String get baseOnPreset => 'Base on Preset';
+
+  @override
+  String get baseOnPresetTooltip => 'Use preset as template';
+
+  @override
+  String get themePreviewTitle => 'Theme Preview';
+
+  @override
+  String get duckingActive => 'Ducking Active';
+
+  @override
+  String get cardExampleTitle => 'Sample Card';
+
+  @override
+  String get cardExampleDesc =>
+      'Scene or track description in the selected color palette.';
+
+  @override
+  String get colorPaletteConfig => 'Color Palette Settings';
+
+  @override
+  String colorPickTitle(String title) {
+    return 'Color Choice: $title';
+  }
+
+  @override
+  String get saveThemeBtn => 'Save Theme';
+
+  @override
+  String get newThemeDefaultName => 'New Theme';
+
+  @override
+  String get editTrackTitle => 'Edit Audio Track';
+
+  @override
+  String get trackTitleLabel => 'Track Title';
+
+  @override
+  String get targetAudioBus => 'Target Audio Bus:';
+
+  @override
+  String get musicIntensitySetting => 'Music Intensity Level:';
+
+  @override
+  String get tagsLabel => 'Tags (comma separated)';
+
+  @override
+  String get tagsHint => 'Tavern, Battle, Forest, Magic';
+
+  @override
+  String get colorLabel => 'Color Badge:';
+
+  @override
+  String get exportMediaPackageBtn => 'Export Set';
+
+  @override
+  String get selectBusForImport => 'Select target audio bus for imported files';
+
+  @override
+  String get exportMediaPackageTitle => 'Export Media Package (.media.zip)';
+
+  @override
+  String get mediaPackageNameLabel => 'Package Name';
+
+  @override
+  String get mediaPackageDescLabel => 'Package Description';
+
+  @override
+  String get defaultMediaPackageName => 'My Media Package';
+
+  @override
+  String get defaultMediaPackageDesc => 'TTRPG Audio tracks collection';
+
+  @override
+  String get saveMediaPackageAs => 'Save media package as...';
+
+  @override
+  String mediaPackageExported(String name) {
+    return 'Media package \"$name\" successfully exported!';
+  }
+
+  @override
+  String mediaPackageExportError(String error) {
+    return 'Error exporting media package: $error';
+  }
+
+  @override
+  String dispatchToBus(String bus) {
+    return 'Play on $bus bus';
+  }
+
+  @override
+  String dispatchedToBus(String bus, String title) {
+    return 'Sent to $bus bus: \"$title\"';
+  }
+
+  @override
+  String get deleteFromLibrary => 'Delete from library';
+
+  @override
+  String busInfo(String bus, String duration, String path) {
+    return 'Bus: $bus | Duration: $duration | Path: $path';
+  }
+
+  @override
+  String get catalogTitle => 'Catalog';
+
+  @override
+  String get refreshCatalogTooltip => 'Refresh catalog';
+
+  @override
+  String get manageRepositoriesTooltip => 'Manage repositories';
+
+  @override
+  String get addRepositoryBtn => '+ Add';
+
+  @override
+  String get searchCatalogPlaceholder => 'Search items in catalog...';
+
+  @override
+  String sourcesBtn(int count) {
+    return 'Sources ($count)';
+  }
+
+  @override
+  String get noRepositoriesConnected => 'No connected repositories';
+
+  @override
+  String get addRepositoryUrlHint =>
+      'Add a link to GitLab, Dropbox or CDN with repository.json manifest';
+
+  @override
+  String get addRepositoryDialogTitle => 'Add Repository';
+
+  @override
+  String get editRepositoryDialogTitle => 'Edit Repository';
+
+  @override
+  String manageRepositoriesTitle(int count) {
+    return 'Manage Repositories ($count)';
+  }
+
+  @override
+  String get repositoryUrlLabel =>
+      'Repository URL (GitLab / Dropbox / HTTP / JSON)';
+
+  @override
+  String get repositoryNameOptionalLabel => 'Name (optional)';
+
+  @override
+  String get repositoryNameHint => 'Will be extracted from manifest if empty';
+
+  @override
+  String get repositoryDescOptionalLabel => 'Description (optional)';
+
+  @override
+  String get enterRepositoryUrl => 'Please enter repository URL';
+
+  @override
+  String get urlHttpPrefixValidation =>
+      'URL must start with http:// or https://';
+
+  @override
+  String get enterRepositoryName => 'Please enter repository name';
+
+  @override
+  String get repositoryUpdated => 'Repository updated successfully';
+
+  @override
+  String get noConnectedRepositories => 'No connected repositories.';
+
+  @override
+  String get noCatalogItemsFound => 'No items found matching your query.';
+
+  @override
+  String get installedBadge => 'Installed';
+
+  @override
+  String get noDescription => 'No description';
+
+  @override
+  String scenesCount(int count) {
+    return '$count scenes';
+  }
+
+  @override
+  String tracksCount(int count) {
+    return '$count tracks';
+  }
+
+  @override
+  String get sizeUnknown => 'Size unknown';
+
+  @override
+  String sizeMb(String size) {
+    return '$size MB';
+  }
+
+  @override
+  String repositoryLabel(String name) {
+    return 'Repository: $name';
+  }
+
+  @override
+  String get scenesInPack => 'Scenes in Pack';
+
+  @override
+  String get mediaSetContent => 'Media Set Content';
+
+  @override
+  String get sceneContent => 'Scene Content';
+
+  @override
+  String get tracksMissingInManifest => 'Track list is missing in manifest.';
+
+  @override
+  String get scenesMissingInManifest => 'Scene list is missing in manifest.';
+
+  @override
+  String channelLabel(String channel) {
+    return 'Channel: $channel';
+  }
+
+  @override
+  String downloadingAndImporting(String percent) {
+    return 'Downloading and importing... $percent%';
+  }
+
+  @override
+  String get removeFromApp => 'Remove from app';
+
+  @override
+  String get installing => 'Installing...';
+
+  @override
+  String installItem(String type) {
+    return 'Install $type';
+  }
+
+  @override
+  String deleteItemConfirmTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String deleteItemConfirmMessage(String type, String name) {
+    return 'Are you sure you want to delete $type \"$name\" and associated files from the application?';
+  }
+
+  @override
+  String itemUninstalled(String type, String name) {
+    return '$type \"$name\" successfully removed from app.';
+  }
+
+  @override
+  String itemUninstallError(String type) {
+    return 'Error removing $type.';
+  }
+
+  @override
+  String itemInstalled(String type, String name) {
+    return '$type \"$name\" successfully installed!';
+  }
+
+  @override
+  String itemInstallError(String type) {
+    return 'Error downloading $type.';
+  }
+
+  @override
+  String get catalogStorageTitle => 'Catalog & Audio File Storage';
+
+  @override
+  String get catalogStorageDesc =>
+      'Folder for downloading and extracting audio files from online repository catalog:';
+
+  @override
+  String get customDirectory => 'Custom Directory';
+
+  @override
+  String get defaultDirectory => 'Default Directory';
+
+  @override
+  String get defaultStoragePath => 'Default: Documents/audio_library';
+
+  @override
+  String get resetDefaultDirTooltip => 'Reset to default value';
+
+  @override
+  String get chooseFolderBtn => 'Choose folder';
+
+  @override
+  String get chooseFolderDialogTitle =>
+      'Choose folder for catalog audio storage';
+
+  @override
+  String get storagePathReset => 'Storage path reset to default.';
+
+  @override
+  String storagePathUpdated(String path) {
+    return 'Catalog storage folder updated: $path';
+  }
+
+  @override
+  String get shortcutPlayPauseTitle => 'Play / Pause';
+
+  @override
+  String get shortcutPlayPauseDesc => 'Start or pause current music track';
+
+  @override
+  String get shortcutIntensityCalmTitle => 'Intensity: Calm';
+
+  @override
+  String get shortcutIntensityCalmDesc => 'Switch music mode to Calm';
+
+  @override
+  String get shortcutIntensitySuspenseTitle => 'Intensity: Suspense';
+
+  @override
+  String get shortcutIntensitySuspenseDesc => 'Switch music mode to Suspense';
+
+  @override
+  String get shortcutIntensityBattleTitle => 'Intensity: Battle';
+
+  @override
+  String get shortcutIntensityBattleDesc => 'Switch music mode to Battle';
+
+  @override
+  String get shortcutIntensityBossTitle => 'Intensity: Boss';
+
+  @override
+  String get shortcutIntensityBossDesc => 'Switch music mode to Boss';
+
+  @override
+  String shortcutSfxTitle(int index) {
+    return 'SFX Slot $index';
+  }
+
+  @override
+  String shortcutSfxDesc(int index) {
+    return 'Trigger sound effect $index';
+  }
+
+  @override
+  String get shortcutMasterMuteTitle => 'Mute Audio';
+
+  @override
+  String get shortcutMasterMuteDesc => 'Quick mute or unmute master audio';
+
+  @override
+  String get shortcutManualDuckingTitle => 'Manual Ducking';
+
+  @override
+  String get shortcutManualDuckingDesc => 'Duck music during speech';
+
+  @override
+  String get shortcutPanicStopTitle => 'Panic Stop SFX';
+
+  @override
+  String get shortcutPanicStopDesc => 'Instantly stop all playing SFX sounds';
+
+  @override
+  String get shortcutFullscreenTitle => 'Fullscreen Mode';
+
+  @override
+  String get shortcutFullscreenDesc => 'Toggle fullscreen display';
 }

@@ -10,11 +10,11 @@ extension AudioBusTypeExtension on AudioBusType {
   String get displayName {
     switch (this) {
       case AudioBusType.music:
-        return 'Музыка';
+        return 'Music';
       case AudioBusType.ambient:
-        return 'Эмбиент';
+        return 'Ambient';
       case AudioBusType.sfx:
-        return 'SFX Эффект';
+        return 'SFX Effect';
     }
   }
 

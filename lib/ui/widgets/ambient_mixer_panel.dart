@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
+import '../../l10n/app_localizations.dart';
 import '../../audio/ambient_bus_controller.dart';
 import '../../domain/models/ambient_layer.dart';
 import '../../domain/models/library_track.dart';
@@ -18,6 +19,7 @@ class AmbientMixerPanel extends StatelessWidget {
     final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
       (vm) => vm?.activeTheme ?? AppThemes.deepDark,
     );
+    final l10n = AppLocalizations.of(context);
 
     return Consumer<AmbientBusController>(
       builder: (context, ambient, _) {
@@ -38,7 +40,7 @@ class AmbientMixerPanel extends StatelessWidget {
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              'Эмбиент-слои (Фоновые звуки)',
+                              l10n?.ambientLayers ?? 'Ambient Layers (Background Sounds)',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -55,7 +57,7 @@ class AmbientMixerPanel extends StatelessWidget {
                         IconButton(
                           key: const ValueKey('add_ambient_layer_btn'),
                           icon: const Icon(Icons.add_rounded, size: 20),
-                          tooltip: 'Добавить слой / Постоянный эмбиент',
+                          tooltip: l10n?.addAmbientTooltip ?? 'Add Layer / Persistent Ambient',
                           color: activeTheme.secondary,
                           onPressed: () => _showAddAmbientDialog(context, ambient),
                         ),
@@ -64,7 +66,7 @@ class AmbientMixerPanel extends StatelessWidget {
                             key: const ValueKey('ambient_stop_all_btn'),
                             onPressed: () => ambient.stopAllLayers(),
                             icon: const Icon(Icons.stop_rounded, size: 16),
-                            label: const Text('Выключить все', style: TextStyle(fontSize: 11)),
+                            label: Text(l10n?.stopAll ?? 'Stop All', style: const TextStyle(fontSize: 11)),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.redAccent,
                               side: const BorderSide(color: Colors.redAccent, width: 0.8),
@@ -89,14 +91,14 @@ class AmbientMixerPanel extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                            'Нет активных эмбиентов. Нажмите «+» для добавления постоянного фона.',
+                            l10n?.noActiveAmbients ?? 'No active ambients. Click "+" to add a persistent background sound.',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                           ),
                           const SizedBox(height: 8),
                           TextButton.icon(
                             icon: const Icon(Icons.add_circle_outline, size: 16),
-                            label: const Text('Добавить постоянный эмбиент'),
+                            label: Text(l10n?.addPersistentAmbient ?? 'Add Persistent Ambient'),
                             onPressed: () => _showAddAmbientDialog(context, ambient),
                           ),
                         ],
@@ -160,7 +162,7 @@ class AmbientMixerPanel extends StatelessWidget {
                                     ],
                                   ),
                                   Text(
-                                    'Громкость: ${(layer.volume * 100).toInt()}%',
+                                    '${l10n?.volume ?? "Volume"}: ${(layer.volume * 100).toInt()}%',
                                     style: TextStyle(fontSize: 11, color: activeTheme.textSecondary),
                                   ),
                                 ],
@@ -183,8 +185,8 @@ class AmbientMixerPanel extends StatelessWidget {
                                 color: layer.isPersistent ? Colors.amberAccent : activeTheme.textSecondary,
                               ),
                               tooltip: layer.isPersistent
-                                  ? 'Постоянный слой (не сбрасывается при смене сцены)'
-                                  : 'Сделать постоянным слоем',
+                                  ? (l10n?.persistentLayerTooltip ?? 'Persistent layer (not reset when switching scenes)')
+                                  : (l10n?.makePersistentTooltip ?? 'Make persistent layer'),
                               onPressed: () => ambient.togglePersistent(layer.id),
                             ),
                             // Solo / Mute quick action
@@ -194,14 +196,16 @@ class AmbientMixerPanel extends StatelessWidget {
                                 size: 18,
                                 color: layer.isActive ? activeTheme.secondary : activeTheme.textSecondary,
                               ),
-                              tooltip: layer.isActive ? 'Заглушить слой' : 'Включить слой',
+                              tooltip: layer.isActive
+                                  ? (l10n?.muteLayerTooltip ?? 'Mute layer')
+                                  : (l10n?.unmuteLayerTooltip ?? 'Unmute layer'),
                               onPressed: () => ambient.toggleLayer(layer.id),
                             ),
                             // Remove Layer Button
                             IconButton(
                               icon: const Icon(Icons.close_rounded, size: 16),
                               color: Colors.white38,
-                              tooltip: 'Удалить слой',
+                              tooltip: l10n?.removeLayerTooltip ?? 'Remove layer',
                               onPressed: () => ambient.removeLayer(layer.id),
                             ),
                           ],
@@ -247,12 +251,14 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
     final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
     final ambientTracks = library.tracks.where((t) => t.busType == AudioBusType.ambient).toList();
 
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.waves_rounded, color: Colors.tealAccent),
-          SizedBox(width: 8),
-          Text('Добавить Эмбиент-слой', style: TextStyle(fontSize: 16)),
+          const Icon(Icons.waves_rounded, color: Colors.tealAccent),
+          const SizedBox(width: 8),
+          Text(l10n?.addAmbientDialogTitle ?? 'Add Ambient Layer', style: const TextStyle(fontSize: 16)),
         ],
       ),
       content: SizedBox(
@@ -262,7 +268,7 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Выберите трек из медиабиблиотеки:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              Text(l10n?.selectTrackFromLibrary ?? 'Select a track from the media library:', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
               const SizedBox(height: 8),
               if (ambientTracks.isNotEmpty)
                 Container(
@@ -298,7 +304,7 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 icon: const Icon(Icons.folder_open_rounded, size: 16),
-                label: const Text('Выбрать локальный аудиофайл...'),
+                label: Text(l10n?.selectLocalAudioFile ?? 'Choose local audio file...'),
                 onPressed: () async {
                   final result = await FilePicker.platform.pickFiles(
                     type: FileType.custom,
@@ -317,12 +323,12 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
               ),
               if (_customTitle.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text('Выбран: $_customTitle', style: TextStyle(color: activeTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+                Text('${l10n?.selected ?? "Selected: "}$_customTitle', style: TextStyle(color: activeTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
               ],
               const SizedBox(height: 14),
               Row(
                 children: [
-                  const Text('Громкость:', style: TextStyle(fontSize: 12)),
+                  Text('${l10n?.volume ?? "Volume"}:', style: const TextStyle(fontSize: 12)),
                   Expanded(
                     child: Slider(
                       value: _volume,
@@ -334,7 +340,7 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Постоянный слой (не сбрасывать при смене сцены)', style: TextStyle(fontSize: 13)),
+                title: Text(l10n?.persistentLayerCheckbox ?? 'Persistent layer (do not reset on scene change)', style: const TextStyle(fontSize: 13)),
                 value: _isPersistent,
                 activeTrackColor: activeTheme.primary,
                 onChanged: (v) => setState(() => _isPersistent = v),
@@ -346,7 +352,7 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Отмена'),
+          child: Text(l10n?.cancel ?? 'Cancel'),
         ),
         ElevatedButton(
           onPressed: _customPath.isEmpty
@@ -356,7 +362,7 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
                   widget.ambient.addLayer(
                     AmbientLayer(
                       id: layerId,
-                      title: _customTitle.isNotEmpty ? _customTitle : 'Эмбиент',
+                      title: _customTitle.isNotEmpty ? _customTitle : (l10n?.ambient ?? 'Ambient'),
                       filePath: _customPath,
                       volume: _volume,
                       isPersistent: _isPersistent,
@@ -365,7 +371,7 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
                   );
                   Navigator.of(context).pop();
                 },
-          child: const Text('Добавить слой'),
+          child: Text(l10n?.addLayerBtn ?? 'Add Layer'),
         ),
       ],
     );

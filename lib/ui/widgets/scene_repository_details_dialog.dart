@@ -30,9 +30,9 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
   }
 
   String _formatSize(int? bytes) {
-    if (bytes == null || bytes <= 0) return 'Размер неизвестен';
+    if (bytes == null || bytes <= 0) return 'Size unknown';
     final mb = bytes / (1024 * 1024);
-    return '${mb.toStringAsFixed(1)} МБ';
+    return '${mb.toStringAsFixed(1)} MB';
   }
 
   IconData _getBusIcon(String busType) {
@@ -64,11 +64,11 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
   String _getTypeDisplayNameInAccusative(CatalogItemType type) {
     switch (type) {
       case CatalogItemType.scene:
-        return 'сцену';
+        return 'scene';
       case CatalogItemType.media:
-        return 'медиа-набор';
+        return 'media package';
       case CatalogItemType.pack:
-        return 'пак';
+        return 'pack';
     }
   }
 
@@ -79,14 +79,14 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Удалить $typeName?'),
+        title: Text('Delete $typeName?'),
         content: Text(
-          'Вы уверены, что хотите удалить $typeName "${catalogItem.name}" и связанные файлы из приложения?',
+          'Are you sure you want to delete $typeName "${catalogItem.name}" and associated files from the application?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Отмена'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -94,7 +94,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
               foregroundColor: theme.colorScheme.onError,
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Удалить'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -194,7 +194,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          'Репозиторий: ${repo.name}',
+                          'Repository: ${repo.name}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.white.withValues(alpha: 0.85),
                           ),
@@ -233,22 +233,22 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                         if (catalogItem.type == CatalogItemType.pack) ...[
                           Chip(
                             avatar: const Icon(Icons.style_rounded, size: 18),
-                            label: Text('${catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0} сцен'),
+                            label: Text('${catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0} scenes'),
                           ),
                           Chip(
                             avatar: const Icon(Icons.audiotrack, size: 18),
-                            label: Text('${catalogItem.tracksCount} треков'),
+                            label: Text('${catalogItem.tracksCount} tracks'),
                           ),
                         ] else ...[
                           Chip(
                             avatar: const Icon(Icons.audiotrack, size: 18),
-                            label: Text('${catalogItem.tracksCount} треков'),
+                            label: Text('${catalogItem.tracksCount} tracks'),
                           ),
                         ],
                         if (isInstalled)
                           const Chip(
                             avatar: Icon(Icons.check_circle_rounded, size: 18, color: Colors.tealAccent),
-                            label: Text('Загружено', style: TextStyle(color: Colors.tealAccent)),
+                            label: Text('Installed', style: TextStyle(color: Colors.tealAccent)),
                             backgroundColor: Colors.teal,
                           ),
                       ],
@@ -257,8 +257,8 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       catalogItem.type == CatalogItemType.pack
-                          ? 'Сцены в паке'
-                          : (catalogItem.type == CatalogItemType.media ? 'Состав медиа-набора' : 'Состав сцены'),
+                          ? 'Scenes in Pack'
+                          : (catalogItem.type == CatalogItemType.media ? 'Media Package Content' : 'Scene Content'),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -269,7 +269,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     if (catalogItem.type == CatalogItemType.scene && (catalogItem.sceneItem?.tracks.isEmpty ?? true))
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('Список треков отсутствует в манифесте.'),
+                        child: Text('Track list is missing from manifest.'),
                       )
                     else if (catalogItem.type == CatalogItemType.scene)
                       ListView.builder(
@@ -286,7 +286,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                               child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
                             ),
                             title: Text(track.title),
-                            subtitle: Text('Канал: ${track.busType.toUpperCase()}'),
+                            subtitle: Text('Channel: ${track.busType.toUpperCase()}'),
                             trailing: Text(_formatDuration(track.durationMs)),
                           );
                         },
@@ -294,7 +294,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     else if (catalogItem.type == CatalogItemType.media && (catalogItem.mediaItem?.tracks.isEmpty ?? true))
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('Список треков отсутствует в манифесте.'),
+                        child: Text('Track list is missing from manifest.'),
                       )
                     else if (catalogItem.type == CatalogItemType.media)
                       ListView.builder(
@@ -311,7 +311,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                               child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
                             ),
                             title: Text(track.title),
-                            subtitle: Text('Канал: ${track.busType.toUpperCase()}'),
+                            subtitle: Text('Channel: ${track.busType.toUpperCase()}'),
                             trailing: Text(_formatDuration(track.durationMs)),
                           );
                         },
@@ -319,7 +319,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     else if (catalogItem.type == CatalogItemType.pack && (catalogItem.packItem?.scenes.isEmpty ?? true))
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('Список сцен отсутствует в манифесте.'),
+                        child: Text('Scene list is missing from manifest.'),
                       )
                     else if (catalogItem.type == CatalogItemType.pack)
                       ListView.builder(
@@ -334,7 +334,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                               child: Icon(Icons.theater_comedy_rounded, size: 20),
                             ),
                             title: Text(sceneSummary.name),
-                            subtitle: Text('${sceneSummary.tracksCount ?? 0} треков'),
+                            subtitle: Text('${sceneSummary.tracksCount ?? 0} tracks'),
                           );
                         },
                       ),
@@ -357,7 +357,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                     LinearProgressIndicator(value: progress > 0 ? progress : null),
                     const SizedBox(height: 8),
                     Text(
-                      'Скачивание и импорт... ${(progress * 100).toStringAsFixed(0)}%',
+                      'Downloading and importing... ${(progress * 100).toStringAsFixed(0)}%',
                       style: theme.textTheme.bodySmall,
                     ),
                     const SizedBox(height: 8),
@@ -382,15 +382,12 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                         mediaVm: mediaVm,
                                       );
                                       if (context.mounted) {
-                                        final actionText = catalogItem.type == CatalogItemType.scene
-                                            ? 'успешно удалена'
-                                            : 'успешно удален';
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               success
-                                                  ? '${catalogItem.type.displayName} "${catalogItem.name}" $actionText из приложения.'
-                                                  : 'Ошибка при удалении ${catalogItem.type.displayName.toLowerCase()}.',
+                                                  ? '${catalogItem.type.displayName} "${catalogItem.name}" was successfully removed from the application.'
+                                                  : 'Error removing ${catalogItem.type.displayName.toLowerCase()}.',
                                             ),
                                           ),
                                         );
@@ -398,7 +395,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                     }
                                   },
                             icon: const Icon(Icons.delete_outline_rounded),
-                            label: const Text('Удалить из приложения'),
+                            label: const Text('Delete from application'),
                           )
                         : ElevatedButton.icon(
                             onPressed: isDownloading
@@ -413,15 +410,12 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                       },
                                     );
                                     if (context.mounted) {
-                                      final actionText = catalogItem.type == CatalogItemType.scene
-                                          ? 'успешно установлена'
-                                          : 'успешно установлен';
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             success
-                                                ? '${catalogItem.type.displayName} "${catalogItem.name}" $actionText!'
-                                                : 'Ошибка при скачивании ${catalogItem.type.displayName.toLowerCase()}.',
+                                                ? '${catalogItem.type.displayName} "${catalogItem.name}" was successfully installed!'
+                                                : 'Error downloading ${catalogItem.type.displayName.toLowerCase()}.',
                                           ),
                                         ),
                                       );
@@ -434,8 +428,8 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                             ),
                             label: Text(
                               isDownloading
-                                  ? 'Установка...'
-                                  : 'Установить ${_getTypeDisplayNameInAccusative(catalogItem.type)}',
+                                  ? 'Installing...'
+                                  : 'Install ${_getTypeDisplayNameInAccusative(catalogItem.type)}',
                             ),
                           ),
                   ),

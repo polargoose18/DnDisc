@@ -78,7 +78,7 @@ Widget createTestableWidget(Widget child, {
     child: Consumer<SettingsService>(
       builder: (context, set, _) {
         return MaterialApp(
-          locale: set.currentLocale ?? const Locale('ru'),
+          locale: set.currentLocale ?? const Locale('en'),
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -123,8 +123,8 @@ void main() {
       final engine = AudioEngineService();
       await tester.pumpWidget(createTestableWidget(const MusicPlayerPanel(), engine: engine));
 
-      expect(find.text('Музыкальная дорожка'), findsOneWidget);
-      expect(find.text('Музыка не воспроизводится'), findsOneWidget);
+      expect(find.text('Music Track'), findsOneWidget);
+      expect(find.text('Music is not playing'), findsOneWidget);
 
       // Act
       await tester.tap(find.byKey(const ValueKey('chip_boss')));
@@ -163,19 +163,19 @@ void main() {
       await tester.pumpWidget(createTestableWidget(const AmbientMixerPanel(), engine: engine));
 
       // Assert
-      expect(find.textContaining('Нет активных эмбиентов'), findsOneWidget);
+      expect(find.textContaining('No active ambients'), findsOneWidget);
       engine.dispose();
     });
 
     testWidgets('should render ambient layers and toggle active switch and stop all layers', (WidgetTester tester) async {
       // Arrange
       final engine = AudioEngineService();
-      engine.ambientBus.addLayer(const AmbientLayer(id: 'rain-l', title: 'Шум Дождя', filePath: '/rain.mp3', isActive: true));
+      engine.ambientBus.addLayer(const AmbientLayer(id: 'rain-l', title: 'Rain Ambience', filePath: '/rain.mp3', isActive: true));
 
       await tester.pumpWidget(createTestableWidget(const AmbientMixerPanel(), engine: engine));
 
-      expect(find.textContaining('Эмбиент-слои'), findsOneWidget);
-      expect(find.text('Шум Дождя'), findsOneWidget);
+      expect(find.textContaining('Ambient Layers'), findsOneWidget);
+      expect(find.text('Rain Ambience'), findsOneWidget);
       expect(engine.ambientBus.layers.first.isActive, isTrue);
 
       // Act & Assert - Toggle switch
@@ -201,19 +201,19 @@ void main() {
       await tester.pumpWidget(createTestableWidget(const SoundboardGrid(), engine: engine));
 
       // Assert
-      expect(find.textContaining('Soundboard пуст'), findsOneWidget);
+      expect(find.textContaining('Soundboard is empty'), findsOneWidget);
       engine.dispose();
     });
 
     testWidgets('should render SFX buttons and trigger audio ducking when clicked', (WidgetTester tester) async {
       // Arrange
       final engine = AudioEngineService();
-      engine.sfxBus.addTrigger(const SfxTrigger(id: 'sword-trig', title: 'Удар Меча', filePath: '/sword.wav', hotkey: '1'));
+      engine.sfxBus.addTrigger(const SfxTrigger(id: 'sword-trig', title: 'Sword Strike', filePath: '/sword.wav', hotkey: '1'));
 
       await tester.pumpWidget(createTestableWidget(const SoundboardGrid(), engine: engine));
 
       expect(find.textContaining('Soundboard'), findsOneWidget);
-      expect(find.text('Удар Меча'), findsOneWidget);
+      expect(find.text('Sword Strike'), findsOneWidget);
       expect(find.text('[1]'), findsOneWidget);
 
       // Act
@@ -237,15 +237,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Консоль логов и отладки'), findsOneWidget);
+      expect(find.text('Log Console'), findsOneWidget);
       expect(find.textContaining('Test log entry'), findsOneWidget);
 
       // Act
-      await tester.tap(find.byTooltip('Очистить логи'));
+      await tester.tap(find.byTooltip('Clear logs'));
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Логи пусты'), findsOneWidget);
+      expect(find.text('No logs'), findsOneWidget);
     });
   });
 
@@ -284,13 +284,13 @@ void main() {
       await tester.tap(find.text('Open Dialog'));
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.text('Редактировать аудиозапись'), findsOneWidget);
+      expect(find.text('Edit Audio Track'), findsOneWidget);
 
       // Act
       await tester.enterText(find.widgetWithText(TextField, 'Old Name'), 'New Name');
       await tester.pump(const Duration(milliseconds: 300));
 
-      await tester.tap(find.text('Сохранить'));
+      await tester.tap(find.text('Save'));
       await tester.pump(const Duration(milliseconds: 300));
 
       // Assert
@@ -333,7 +333,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       // Act
-      await tester.tap(find.text('Отмена'));
+      await tester.tap(find.text('Cancel'));
       await tester.pump(const Duration(milliseconds: 300));
 
       // Assert
@@ -361,18 +361,18 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.text('TTRPG Audio Master'), findsOneWidget);
-      expect(find.text('Панель Мастера'), findsOneWidget);
-      expect(find.text('Общая Библиотека'), findsOneWidget);
+      expect(find.text('GM Dashboard'), findsOneWidget);
+      expect(find.text('Media Library'), findsOneWidget);
 
       // Act & Assert - Switch to Library tab
-      await tester.tap(find.text('Общая Библиотека'));
+      await tester.tap(find.text('Media Library'));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('library_search_input')), findsOneWidget);
 
       // Act & Assert - Open log drawer
-      await tester.tap(find.byTooltip('Открыть консоль логов и отладки'));
+      await tester.tap(find.byTooltip('Open log and debug console'));
       await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text('Консоль логов и отладки'), findsOneWidget);
+      expect(find.text('Log Console'), findsOneWidget);
 
       library.dispose();
       engine.dispose();
@@ -407,7 +407,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.text('Tavern Melodies'), findsOneWidget);
-      expect(find.byTooltip('Воспроизвести на шине Музыка'), findsOneWidget);
+      expect(find.byTooltip('Play on Music bus'), findsOneWidget);
 
       // Act
       library.playTrackToEngine(track, engine);
@@ -440,7 +440,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       // Assert
-      expect(find.text('Медиатека пуста'), findsOneWidget);
+      expect(find.text('Media library is empty'), findsOneWidget);
 
       library.dispose();
       engine.dispose();

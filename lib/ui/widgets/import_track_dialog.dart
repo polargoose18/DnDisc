@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../domain/models/library_track.dart';
 import '../../domain/models/audio_track.dart';
 
@@ -48,8 +49,10 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: const Text('Редактировать аудиозапись'),
+      title: Text(l10n?.editTrackTitle ?? 'Edit Audio Track'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -57,13 +60,13 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Название трека',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n?.trackTitleLabel ?? 'Track Title',
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Целевая аудио-шина:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n?.targetAudioBus ?? 'Target Audio Bus:', style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             DropdownButtonFormField<AudioBusType>(
               initialValue: _selectedBus,
@@ -82,7 +85,7 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
             ),
             if (_selectedBus == AudioBusType.music) ...[
               const SizedBox(height: 16),
-              const Text('Уровень Интенсивности Музыки:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(l10n?.musicIntensitySetting ?? 'Music Intensity Level:', style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
               DropdownButtonFormField<MusicIntensity>(
                 initialValue: _selectedIntensity,
@@ -103,14 +106,14 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
             const SizedBox(height: 16),
             TextField(
               controller: _tagsController,
-              decoration: const InputDecoration(
-                labelText: 'Теги (через запятую)',
-                hintText: 'Таверна, Бой, Лес, Магия',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n?.tagsLabel ?? 'Tags (comma separated)',
+                hintText: l10n?.tagsHint ?? 'Tavern, Battle, Forest, Magic',
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Цветовая метка:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n?.colorLabel ?? 'Color Badge:', style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -139,7 +142,7 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Отмена'),
+          child: Text(l10n?.cancel ?? 'Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -159,7 +162,7 @@ class _EditTrackDialogState extends State<EditTrackDialog> {
 
             Navigator.of(context).pop(updated);
           },
-          child: const Text('Сохранить'),
+          child: Text(l10n?.save ?? 'Save'),
         ),
       ],
     );
