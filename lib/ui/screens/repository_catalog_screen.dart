@@ -53,8 +53,8 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                   TextFormField(
                     controller: urlController,
                     decoration: const InputDecoration(
-                      labelText: 'URL репозитория (GitHub / HTTP / JSON)',
-                      hintText: 'https://github.com/user/repo',
+                      labelText: 'URL репозитория (GitLab / Dropbox / HTTP / JSON)',
+                      hintText: 'https://gitlab.com/user/repo',
                       prefixIcon: Icon(Icons.link),
                     ),
                     validator: (val) {
@@ -331,7 +331,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    const Text('Добавьте ссылку на GitHub или CDN с манифестом repository.json'),
+                    const Text('Добавьте ссылку на GitLab, Dropbox или CDN с манифестом repository.json'),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
                       onPressed: () => _showAddRepositoryDialog(context),

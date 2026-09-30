@@ -44,7 +44,7 @@ void main() {
   group('DatabaseService v4 & SqliteSceneRepositorySourceRepository Tests', () {
     test(
       'Что проверяем: Создание таблицы scene_repositories и выполнение CRUD операций. '
-      'Входные данные: Объект SceneRepositoryModel с id="repo-1", url="https://github.com/test/repo". '
+      'Входные данные: Объект SceneRepositoryModel с id="repo-1", url="https://gitlab.com/test/repo". '
       'Ожидаемый результат: Репозиторий сохраняется, извлекается, обновляется и удаляется из SQLite базы версии 4.',
       () async {
         final repoSource = SqliteSceneRepositorySourceRepository(db: dbService);
@@ -55,7 +55,7 @@ void main() {
         final model = SceneRepositoryModel(
           id: 'repo-1',
           name: 'Fantasy Audio Repo',
-          url: 'https://raw.githubusercontent.com/test/repo/main/repository.json',
+          url: 'https://gitlab.com/test/repo/-/raw/main/repository.json',
           description: 'Official fantasy audio collection',
           createdAt: DateTime.now(),
         );

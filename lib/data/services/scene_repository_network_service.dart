@@ -19,34 +19,104 @@ class SceneRepositoryNetworkService {
   SceneRepositoryNetworkService({HttpClient? client})
       : _client = client ?? HttpClient();
 
+  static bool _isDropboxUrl(String url) {
+    try {
+      final uri = Uri.tryParse(Uri.encodeFull(url.trim()));
+      if (uri == null) return false;
+      final host = uri.host.toLowerCase();
+      return host == 'dropbox.com' ||
+          host.endsWith('.dropbox.com') ||
+          host == 'dropboxusercontent.com' ||
+          host.endsWith('.dropboxusercontent.com');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static String _normalizeDropboxUrl(String url) {
+    try {
+      final trimmed = url.trim();
+      final uri = Uri.tryParse(Uri.encodeFull(trimmed));
+      if (uri == null) return url;
+      final host = uri.host.toLowerCase();
+      if (host == 'dropbox.com' ||
+          host.endsWith('.dropbox.com') ||
+          host == 'dropboxusercontent.com' ||
+          host.endsWith('.dropboxusercontent.com')) {
+        final queryParams = Map<String, String>.from(uri.queryParameters);
+        queryParams['dl'] = '1';
+        return uri.replace(queryParameters: queryParams).toString();
+      }
+    } catch (_) {
+      // Fallback
+    }
+    return url;
+  }
+
   static String transformRepositoryUrl(String rawUrl) {
     var trimmed = rawUrl.trim();
+
+    // Dropbox direct download links
+    if (_isDropboxUrl(trimmed)) {
+      return _normalizeDropboxUrl(trimmed);
+    }
+
+    // Strip fragment
+    if (trimmed.contains('#')) {
+      trimmed = trimmed.split('#').first;
+    }
+
+    // GitLab link handling
+    final uri = Uri.tryParse(Uri.encodeFull(trimmed));
+    final host = uri?.host.toLowerCase() ?? '';
+    final isGitLab = host == 'gitlab.com' || host == 'www.gitlab.com';
+
+    if (isGitLab) {
+      // Strip query parameters for GitLab repository / tree / blob web links
+      if (trimmed.contains('?')) {
+        trimmed = trimmed.split('?').first;
+      }
+
+      if (trimmed.endsWith('/')) {
+        trimmed = trimmed.substring(0, trimmed.length - 1);
+      }
+      if (trimmed.endsWith('.git')) {
+        trimmed = trimmed.substring(0, trimmed.length - 4);
+      }
+
+      // GitLab blob link: https://gitlab.com/user/repo/-/blob/branch/path/to/manifest.json
+      final gitlabBlobRegex = RegExp(r'^https?://(?:www\.)?gitlab\.com/(.+?)/-/blob/([^/]+)/(.*)$');
+      final blobMatch = gitlabBlobRegex.firstMatch(trimmed);
+      if (blobMatch != null) {
+        final project = blobMatch.group(1);
+        final branch = blobMatch.group(2);
+        final path = blobMatch.group(3);
+        return 'https://gitlab.com/$project/-/raw/$branch/$path';
+      }
+
+      // GitLab tree link: https://gitlab.com/user/repo/-/tree/branch or https://gitlab.com/user/repo/-/tree/branch/subfolder
+      final gitlabTreeRegex = RegExp(r'^https?://(?:www\.)?gitlab\.com/(.+?)/-/tree/(.+?)/?$');
+      final treeMatch = gitlabTreeRegex.firstMatch(trimmed);
+      if (treeMatch != null) {
+        final project = treeMatch.group(1);
+        final branchAndPath = treeMatch.group(2);
+        return 'https://gitlab.com/$project/-/raw/$branchAndPath/repository.json';
+      }
+
+      // GitLab repository root: https://gitlab.com/user/repo or https://gitlab.com/group/subgroup/repo
+      final gitlabRepoRegex = RegExp(r'^https?://(?:www\.)?gitlab\.com/([^/]+(?:/[^/]+)+)/?$');
+      final repoMatch = gitlabRepoRegex.firstMatch(trimmed);
+      if (repoMatch != null && !trimmed.contains('/-/')) {
+        final project = repoMatch.group(1);
+        return 'https://gitlab.com/$project/-/raw/main/repository.json';
+      }
+    }
+
     if (trimmed.endsWith('/')) {
       trimmed = trimmed.substring(0, trimmed.length - 1);
     }
     if (trimmed.endsWith('.git')) {
       trimmed = trimmed.substring(0, trimmed.length - 4);
-    }
-
-    // GitHub blob link: https://github.com/user/repo/blob/branch/file.json
-    final githubBlobRegex = RegExp(r'^https?://github\.com/([^/]+)/([^/]+)/blob/([^/]+)/(.*)$');
-    final blobMatch = githubBlobRegex.firstMatch(trimmed);
-    if (blobMatch != null) {
-      final user = blobMatch.group(1);
-      final repo = blobMatch.group(2);
-      final branch = blobMatch.group(3);
-      final path = blobMatch.group(4);
-      return 'https://raw.githubusercontent.com/$user/$repo/$branch/$path';
-    }
-
-    // Transform GitHub URL: https://github.com/user/repo or https://github.com/user/repo/tree/branch
-    final githubRegex = RegExp(r'^https?://github\.com/([^/]+)/([^/]+)(?:/tree/([^/]+))?/?$');
-    final match = githubRegex.firstMatch(trimmed);
-    if (match != null) {
-      final user = match.group(1);
-      final repo = match.group(2);
-      final branch = match.group(3) ?? 'main';
-      return 'https://raw.githubusercontent.com/$user/$repo/$branch/repository.json';
     }
 
     if (trimmed.endsWith('.json')) {
@@ -57,11 +127,19 @@ class SceneRepositoryNetworkService {
   }
 
   static String resolveUrl(String baseUrl, String pathOrUrl) {
-    if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
-      return pathOrUrl;
+    String resolved;
+    final trimmedPath = pathOrUrl.trim();
+    if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
+      resolved = trimmedPath;
+    } else {
+      final baseUri = Uri.parse(Uri.encodeFull(baseUrl.trim()));
+      final encodedPath = Uri.encodeFull(trimmedPath);
+      resolved = baseUri.resolve(encodedPath).toString();
     }
-    final baseUri = Uri.parse(Uri.encodeFull(baseUrl));
-    return baseUri.resolve(pathOrUrl).toString();
+    if (_isDropboxUrl(resolved)) {
+      return _normalizeDropboxUrl(resolved);
+    }
+    return resolved;
   }
 
   Future<ManifestFetchResult> fetchManifestWithResolvedUrl(String rawUrl) async {
@@ -69,14 +147,6 @@ class SceneRepositoryNetworkService {
     LoggerService().info('Fetching scene repository manifest from: $primaryUrl');
 
     List<String> urlsToTry = [primaryUrl];
-
-    // If primary URL auto-defaulted to main branch on GitHub raw, also try master branch as fallback
-    if (primaryUrl.contains('raw.githubusercontent.com') && primaryUrl.contains('/main/repository.json')) {
-      final masterFallbackUrl = primaryUrl.replaceAll('/main/repository.json', '/master/repository.json');
-      if (!urlsToTry.contains(masterFallbackUrl)) {
-        urlsToTry.add(masterFallbackUrl);
-      }
-    }
 
     Object? lastException;
     for (final targetUrl in urlsToTry) {

@@ -5,24 +5,112 @@ import 'package:ttrpg_audio_player/domain/models/scene_repository_model.dart';
 void main() {
   group('SceneRepositoryNetworkService Tests', () {
     test(
-      'Что проверяем: Трансформация GitHub URL в прямой raw URL на repository.json. '
-      'Входные данные: "https://github.com/user/myrepo". '
-      'Ожидаемый результат: "https://raw.githubusercontent.com/user/myrepo/main/repository.json".',
+      'Что проверяем: Трансформация короткого GitLab URL в прямой raw URL на repository.json. '
+      'Входные данные: "https://gitlab.com/user/myrepo". '
+      'Ожидаемый результат: "https://gitlab.com/user/myrepo/-/raw/main/repository.json".',
       () {
-        const input = 'https://github.com/user/myrepo';
+        const input = 'https://gitlab.com/user/myrepo';
         final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
-        expect(result, 'https://raw.githubusercontent.com/user/myrepo/main/repository.json');
+        expect(result, 'https://gitlab.com/user/myrepo/-/raw/main/repository.json');
       },
     );
 
     test(
-      'Что проверяем: Трансформация GitHub URL с указанной веткой. '
-      'Входные данные: "https://github.com/user/myrepo/tree/dev". '
-      'Ожидаемый результат: "https://raw.githubusercontent.com/user/myrepo/dev/repository.json".',
+      'Что проверяем: Трансформация GitLab URL с префиксом www и query-параметрами браузера. '
+      'Входные данные: "https://www.gitlab.com/user/myrepo?ref_type=heads". '
+      'Ожидаемый результат: "https://gitlab.com/user/myrepo/-/raw/main/repository.json".',
       () {
-        const input = 'https://github.com/user/myrepo/tree/dev';
+        const input = 'https://www.gitlab.com/user/myrepo?ref_type=heads';
         final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
-        expect(result, 'https://raw.githubusercontent.com/user/myrepo/dev/repository.json');
+        expect(result, 'https://gitlab.com/user/myrepo/-/raw/main/repository.json');
+      },
+    );
+
+    test(
+      'Что проверяем: Трансформация GitLab URL с указанной веткой (tree) и параметром ref_type. '
+      'Входные данные: "https://gitlab.com/user/myrepo/-/tree/dev?ref_type=heads". '
+      'Ожидаемый результат: "https://gitlab.com/user/myrepo/-/raw/dev/repository.json".',
+      () {
+        const input = 'https://gitlab.com/user/myrepo/-/tree/dev?ref_type=heads';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://gitlab.com/user/myrepo/-/raw/dev/repository.json');
+      },
+    );
+
+    test(
+      'Что проверяем: Трансформация GitLab tree URL со вложенной папкой. '
+      'Входные данные: "https://gitlab.com/user/myrepo/-/tree/main/subfolder/audio_pack". '
+      'Ожидаемый результат: "https://gitlab.com/user/myrepo/-/raw/main/subfolder/audio_pack/repository.json".',
+      () {
+        const input = 'https://gitlab.com/user/myrepo/-/tree/main/subfolder/audio_pack';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://gitlab.com/user/myrepo/-/raw/main/subfolder/audio_pack/repository.json');
+      },
+    );
+
+    test(
+      'Что проверяем: Трансформация GitLab blob URL на конкретный файл манифеста. '
+      'Входные данные: "https://gitlab.com/user/myrepo/-/blob/master/custom_manifest.json". '
+      'Ожидаемый результат: "https://gitlab.com/user/myrepo/-/raw/master/custom_manifest.json".',
+      () {
+        const input = 'https://gitlab.com/user/myrepo/-/blob/master/custom_manifest.json';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://gitlab.com/user/myrepo/-/raw/master/custom_manifest.json');
+      },
+    );
+
+    test(
+      'Что проверяем: Отсечение суффикса .git у репозитория GitLab. '
+      'Входные данные: "https://gitlab.com/user/myrepo.git". '
+      'Ожидаемый результат: "https://gitlab.com/user/myrepo/-/raw/main/repository.json".',
+      () {
+        const input = 'https://gitlab.com/user/myrepo.git';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://gitlab.com/user/myrepo/-/raw/main/repository.json');
+      },
+    );
+
+    test(
+      'Что проверяем: Трансформация GitLab репозитория во вложенной группе (subgroup). '
+      'Входные данные: "https://gitlab.com/my-group/subgroup/audio-repo". '
+      'Ожидаемый результат: "https://gitlab.com/my-group/subgroup/audio-repo/-/raw/main/repository.json".',
+      () {
+        const input = 'https://gitlab.com/my-group/subgroup/audio-repo';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://gitlab.com/my-group/subgroup/audio-repo/-/raw/main/repository.json');
+      },
+    );
+
+    test(
+      'Что проверяем: Автоматическое преобразование Dropbox ссылки с dl=0 в dl=1. '
+      'Входные данные: "https://www.dropbox.com/s/abcdef123456/repository.json?dl=0". '
+      'Ожидаемый результат: "https://www.dropbox.com/s/abcdef123456/repository.json?dl=1".',
+      () {
+        const input = 'https://www.dropbox.com/s/abcdef123456/repository.json?dl=0';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://www.dropbox.com/s/abcdef123456/repository.json?dl=1');
+      },
+    );
+
+    test(
+      'Что проверяем: Автоматическое добавление параметра dl=1 для ссылки Dropbox без параметров. '
+      'Входные данные: "https://dropbox.com/s/abcdef123456/repository.json". '
+      'Ожидаемый результат: "https://dropbox.com/s/abcdef123456/repository.json?dl=1".',
+      () {
+        const input = 'https://dropbox.com/s/abcdef123456/repository.json';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://dropbox.com/s/abcdef123456/repository.json?dl=1');
+      },
+    );
+
+    test(
+      'Что проверяем: Преобразование ссылки Dropbox scl с параметрами rlkey и dl=0. '
+      'Входные данные: "https://www.dropbox.com/scl/fi/xyz123/manifest.json?rlkey=secretkey&dl=0". '
+      'Ожидаемый результат: "https://www.dropbox.com/scl/fi/xyz123/manifest.json?rlkey=secretkey&dl=1".',
+      () {
+        const input = 'https://www.dropbox.com/scl/fi/xyz123/manifest.json?rlkey=secretkey&dl=0';
+        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
+        expect(result, 'https://www.dropbox.com/scl/fi/xyz123/manifest.json?rlkey=secretkey&dl=1');
       },
     );
 
@@ -38,36 +126,38 @@ void main() {
     );
 
     test(
-      'Что проверяем: Трансформация GitHub blob URL на конкретный файл манифеста. '
-      'Входные данные: "https://github.com/user/myrepo/blob/master/custom_manifest.json". '
-      'Ожидаемый результат: "https://raw.githubusercontent.com/user/myrepo/master/custom_manifest.json".',
+      'Что проверяем: Разрешение относительного download_url на базе GitLab raw URL. '
+      'Входные данные: baseUrl="https://gitlab.com/user/repo/-/raw/main/repository.json", path="scenes/dragon.scene.zip". '
+      'Ожидаемый результат: "https://gitlab.com/user/repo/-/raw/main/scenes/dragon.scene.zip".',
       () {
-        const input = 'https://github.com/user/myrepo/blob/master/custom_manifest.json';
-        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
-        expect(result, 'https://raw.githubusercontent.com/user/myrepo/master/custom_manifest.json');
-      },
-    );
-
-    test(
-      'Что проверяем: Отсечение суффикса .git у репозитория GitHub. '
-      'Входные данные: "https://github.com/user/myrepo.git". '
-      'Ожидаемый результат: "https://raw.githubusercontent.com/user/myrepo/main/repository.json".',
-      () {
-        const input = 'https://github.com/user/myrepo.git';
-        final result = SceneRepositoryNetworkService.transformRepositoryUrl(input);
-        expect(result, 'https://raw.githubusercontent.com/user/myrepo/main/repository.json');
-      },
-    );
-
-    test(
-      'Что проверяем: Разрешение относительного download_url. '
-      'Входные данные: baseUrl="https://raw.githubusercontent.com/user/repo/main/repository.json", path="scenes/dragon.scene.zip". '
-      'Ожидаемый результат: "https://raw.githubusercontent.com/user/repo/main/scenes/dragon.scene.zip".',
-      () {
-        const baseUrl = 'https://raw.githubusercontent.com/user/repo/main/repository.json';
+        const baseUrl = 'https://gitlab.com/user/repo/-/raw/main/repository.json';
         const relativePath = 'scenes/dragon.scene.zip';
         final resolved = SceneRepositoryNetworkService.resolveUrl(baseUrl, relativePath);
-        expect(resolved, 'https://raw.githubusercontent.com/user/repo/main/scenes/dragon.scene.zip');
+        expect(resolved, 'https://gitlab.com/user/repo/-/raw/main/scenes/dragon.scene.zip');
+      },
+    );
+
+    test(
+      'Что проверяем: Разрешение относительного пути с пробелами на базе GitLab raw URL. '
+      'Входные данные: baseUrl="https://gitlab.com/user/repo/-/raw/main/repository.json", path="scenes/Dragon Lair.scene.zip". '
+      'Ожидаемый результат: "https://gitlab.com/user/repo/-/raw/main/scenes/Dragon%20Lair.scene.zip".',
+      () {
+        const baseUrl = 'https://gitlab.com/user/repo/-/raw/main/repository.json';
+        const relativePath = 'scenes/Dragon Lair.scene.zip';
+        final resolved = SceneRepositoryNetworkService.resolveUrl(baseUrl, relativePath);
+        expect(resolved, 'https://gitlab.com/user/repo/-/raw/main/scenes/Dragon%20Lair.scene.zip');
+      },
+    );
+
+    test(
+      'Что проверяем: Разрешение абсолютного медиа URL на Dropbox с заменой dl=0 на dl=1. '
+      'Входные данные: baseUrl="https://example.com/repo/repository.json", path="https://www.dropbox.com/scl/fi/track/battle.mp3?rlkey=abc&dl=0". '
+      'Ожидаемый результат: "https://www.dropbox.com/scl/fi/track/battle.mp3?rlkey=abc&dl=1".',
+      () {
+        const baseUrl = 'https://example.com/repo/repository.json';
+        const mediaUrl = 'https://www.dropbox.com/scl/fi/track/battle.mp3?rlkey=abc&dl=0';
+        final resolved = SceneRepositoryNetworkService.resolveUrl(baseUrl, mediaUrl);
+        expect(resolved, 'https://www.dropbox.com/scl/fi/track/battle.mp3?rlkey=abc&dl=1');
       },
     );
 
