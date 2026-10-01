@@ -517,6 +517,81 @@ def scan_media(repo_dir):
 
     return items
 
+def _extract_scene_tracks_count(s, pack_tracks=None, total_scenes=1):
+    if not isinstance(s, dict):
+        return 0
+
+    explicit_count = s.get("tracks_count")
+    if explicit_count is None:
+        explicit_count = s.get("tracksCount")
+    if isinstance(explicit_count, int) and explicit_count > 0:
+        return explicit_count
+
+    direct_tracks = s.get("tracks")
+    if isinstance(direct_tracks, list) and len(direct_tracks) > 0:
+        return len(direct_tracks)
+
+    scene_track_ids = set()
+
+    music_id = s.get("music_track_id") or s.get("musicTrackId")
+    if music_id and isinstance(music_id, str) and music_id.strip():
+        scene_track_ids.add(music_id.strip())
+
+    amb = s.get("ambient_layer_volumes") or s.get("ambientLayerVolumes")
+    if amb:
+        if isinstance(amb, str):
+            try:
+                amb = json.loads(amb)
+            except Exception:
+                amb = {}
+        if isinstance(amb, dict):
+            for k in amb.keys():
+                if k and str(k).strip():
+                    scene_track_ids.add(str(k).strip())
+        elif isinstance(amb, (list, set, tuple)):
+            for k in amb:
+                if k and str(k).strip():
+                    scene_track_ids.add(str(k).strip())
+
+    sfx = s.get("soundboard_sfx_ids") or s.get("soundboardSfxIds")
+    if sfx:
+        if isinstance(sfx, str):
+            try:
+                sfx = json.loads(sfx)
+            except Exception:
+                sfx = []
+        if isinstance(sfx, (list, set, tuple)):
+            for k in sfx:
+                if k and str(k).strip():
+                    scene_track_ids.add(str(k).strip())
+        elif isinstance(sfx, dict):
+            for k in sfx.keys():
+                if k and str(k).strip():
+                    scene_track_ids.add(str(k).strip())
+
+    extra_ids = s.get("track_ids") or s.get("trackIds")
+    if extra_ids:
+        if isinstance(extra_ids, str):
+            try:
+                extra_ids = json.loads(extra_ids)
+            except Exception:
+                extra_ids = []
+        if isinstance(extra_ids, (list, set, tuple)):
+            for k in extra_ids:
+                if k and str(k).strip():
+                    scene_track_ids.add(str(k).strip())
+
+    if len(scene_track_ids) > 0:
+        return len(scene_track_ids)
+
+    if total_scenes == 1 and pack_tracks and len(pack_tracks) > 0:
+        return len(pack_tracks)
+
+    if isinstance(explicit_count, int):
+        return explicit_count
+
+    return 0
+
 def scan_packs(repo_dir):
     packs_dir = os.path.join(repo_dir, "packs")
     if not os.path.exists(packs_dir):
@@ -550,12 +625,18 @@ def scan_packs(repo_dir):
 
                     scenes_summary = []
                     for s in scenes_data:
-                        trks = s.get("tracks", [])
-                        tracks_cnt = s.get("tracks_count") or (len(trks) if isinstance(trks, list) else 0)
+                        tracks_cnt = _extract_scene_tracks_count(s, tracks_data, len(scenes_data))
+                        scene_name = s.get("name") or s.get("title") or "Untitled Scene"
                         scenes_summary.append({
-                            "name": s.get("name", "Untitled Scene"),
+                            "name": scene_name,
                             "tracks_count": tracks_cnt
                         })
+
+                    total_tracks = manifest_data.get("tracks_count") or manifest_data.get("tracksCount")
+                    if total_tracks is None:
+                        total_tracks = len(tracks_data)
+                    if total_tracks == 0 and scenes_summary:
+                        total_tracks = sum(sc.get("tracks_count", 0) for sc in scenes_summary)
 
                     items.append({
                         "id": pack_id,
@@ -565,7 +646,7 @@ def scan_packs(repo_dir):
                         "cover_url": cover_url,
                         "color_hex": color_hex,
                         "scenes_count": len(scenes_summary),
-                        "tracks_count": len(tracks_data),
+                        "tracks_count": total_tracks,
                         "size_bytes": size_bytes,
                         "scenes": scenes_summary
                     })
