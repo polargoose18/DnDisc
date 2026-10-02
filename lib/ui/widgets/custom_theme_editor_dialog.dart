@@ -53,15 +53,11 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
     Color(0xFFFAEDCD), // Warm text
   ];
 
-  bool _initialized = false;
-
   @override
   void initState() {
     super.initState();
     final base = widget.initialTheme ?? AppThemes.deepDark;
-    _nameController = TextEditingController(
-      text: widget.initialTheme != null ? widget.initialTheme!.name : '',
-    );
+    _nameController = TextEditingController();
     _isDark = base.isDark;
     _primary = base.primary;
     _secondary = base.secondary;
@@ -74,18 +70,6 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
     _duckingBadge = base.duckingBadge;
     _battleIntensity = base.battleIntensity;
     _bossIntensity = base.bossIntensity;
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_initialized) {
-      _initialized = true;
-      if (widget.initialTheme == null) {
-        final l10n = AppLocalizations.of(context);
-        _nameController.text = l10n?.newThemeDefaultName ?? 'New Theme';
-      }
-    }
   }
 
   @override
@@ -210,7 +194,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                         controller: _nameController,
                         style: TextStyle(color: _textPrimary),
                         decoration: InputDecoration(
-                          labelText: l10n?.themeNameLabel ?? 'Theme Name',
+                          hintText: l10n?.themeNameLabel ?? 'Theme Name',
                           labelStyle: TextStyle(color: _textSecondary),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: _textSecondary.withValues(alpha: 0.3)),

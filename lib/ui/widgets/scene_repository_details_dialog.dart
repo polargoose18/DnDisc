@@ -399,7 +399,7 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
                                     }
                                   },
                             icon: const Icon(Icons.delete_outline_rounded),
-                            label: Text(l10n?.deleteFromApp ?? 'Delete from application'),
+                            label: Text(l10n?.removeFromApp(typeName) ?? 'Delete $typeName'),
                           )
                         : ElevatedButton.icon(
                             onPressed: isDownloading

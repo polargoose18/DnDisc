@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "TTRPG Audio Master",
+  "appTitle": "DnDisc",
   "tabGmDashboard": "GM Dashboard",
   "tabLibrary": "Media Library",
   "tabSettings": "Settings",
@@ -29,8 +29,8 @@
   "duckReleaseSubtitle": "music fade-up speed to full volume",
   "duckMultiplierTitle": "Ducking Depth",
   "duckMultiplierSubtitle": "of original music volume",
-  "presetPacksTitle": "Preset Packs (ZIP)",
-  "presetPacksSubtitle": "Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure packs.",
+  "presetPacksTitle": "Preset Bundles (ZIP)",
+  "presetPacksSubtitle": "Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure bundles.",
   "importPresetBtn": "Import Preset (ZIP)",
   "exportPresetBtn": "Export Preset to (ZIP)",
   "interfaceTitle": "Interface & Control Panel",
@@ -42,13 +42,13 @@
   "builtinThemes": "Built-in Presets (5 variants)",
   "customThemes": "Custom Themes",
   "noCustomThemes": "You don't have custom themes yet. Create your own theme with a custom palette!",
-  "createThemeBtn": "+ Create new theme",
+  "createThemeBtn": "Create new theme",
   "hotkeysTitle": "Centralized Shortcuts",
   "hotkeysSubtitle": "Control soundscape during game session without distraction:",
   "actionCol": "Action",
   "descriptionCol": "Description",
   "keyCol": "Key",
-  "scenesTitle": "Atmospheric Scenes",
+  "scenesTitle": "Scenes",
   "createSceneBtn": "Create Scene",
   "noScenesHint": "No scenes created yet. Click \"Create Scene\" to combine music and ambients.",
   "activeBadge": "ACTIVE",
@@ -116,7 +116,7 @@
   "persistentSfxCheckbox": "Persistent SFX (do not reset on scene change)",
   "loopModeCheckbox": "Loop Mode",
   "addSfxBtn": "Add SFX",
-  "exportScenePackTooltip": "Export Scene Pack (.pack.zip)",
+  "exportScenePackTooltip": "Export Scene Bundles (.pack.zip)",
   "searchScenesPlaceholder": "Search scenes...",
   "noScenesMatching": "No scenes found matching your search.",
   "saveSceneAs": "Save scene as...",
@@ -136,13 +136,13 @@
       }
     }
   },
-  "exportScenePackTitle": "Export Scene Pack (.pack.zip)",
-  "packTitleLabel": "Pack Name",
-  "packDescLabel": "Pack Description",
-  "defaultPackTitle": "Adventure Pack",
+  "exportScenePackTitle": "Export Bundle (.pack.zip)",
+  "packTitleLabel": "Bundle Name",
+  "packDescLabel": "Bundle Description",
+  "defaultPackTitle": "Adventure Bundle",
   "defaultPackDesc": "Atmospheric scenes collection",
-  "savePackAs": "Save scene pack as...",
-  "packExported": "Scene pack \"{name}\" successfully exported!",
+  "savePackAs": "Save Bundle as...",
+  "packExported": "Bundle \"{name}\" successfully exported!",
   "@packExported": {
     "placeholders": {
       "name": {
@@ -150,7 +150,7 @@
       }
     }
   },
-  "packExportError": "Error exporting scene pack: {error}",
+  "packExportError": "Error exporting bundle: {error}",
   "@packExportError": {
     "placeholders": {
       "error": {
@@ -160,7 +160,7 @@
   },
   "exportSceneMenu": "Export (.scene.zip)",
   "currentSceneBadge": "CURRENT SCENE",
-  "selectScenePrompt": "Select a scene on the left to set up the game environment",
+  "selectScenePrompt": "Select a scene to set up the game environment",
   "musicIntensityLabel": "Music Intensity",
   "createSceneTitle": "Create New Scene",
   "editSceneTitle": "Edit Scene",
@@ -228,7 +228,7 @@
   "mediaPackageNameLabel": "Package Name",
   "mediaPackageDescLabel": "Package Description",
   "defaultMediaPackageName": "My Media Package",
-  "defaultMediaPackageDesc": "TTRPG Audio tracks collection",
+  "defaultMediaPackageDesc": "Audio tracks collection",
   "saveMediaPackageAs": "Save media package as...",
   "mediaPackageExported": "Media package \"{name}\" successfully exported!",
   "@mediaPackageExported": {
@@ -350,7 +350,7 @@
       }
     }
   },
-  "scenesInPack": "Scenes in Pack",
+  "scenesInPack": "Scenes in Bundle",
   "mediaSetContent": "Media Set Content",
   "sceneContent": "Scene Content",
   "tracksMissingInManifest": "Track list is missing in manifest.",
@@ -496,7 +496,7 @@
   "shortcutPanicStopDesc": "Instantly stop all playing SFX sounds",
   "shortcutFullscreenTitle": "Fullscreen Mode",
   "shortcutFullscreenDesc": "Toggle fullscreen display",
-  "deleteFromApp": "Delete from application",
+  "deleteFromApp": "Delete",
   "repositoryNameLabel": "Name",
   "intensityCalm": "Calm",
   "intensitySuspense": "Suspense",
@@ -505,18 +505,18 @@
   "play": "Play",
   "catalogTypeScene": "scene",
   "catalogTypeMedia": "media package",
-  "catalogTypePack": "pack",
+  "catalogTypePack": "bundle",
   "sceneTitle": "Scene",
   "mediaTitle": "Media",
-  "packTitle": "Pack",
+  "packTitle": "Bundle",
   "catalogSceneBadge": "🎭 Scene",
   "catalogMediaBadge": "🎵 Media",
-  "catalogPackBadge": "📦 Pack",
+  "catalogPackBadge": "📦 Bundle",
   "filterAll": "All",
   "filterScenes": "🎭 Scenes",
   "filterMedia": "🎵 Media",
-  "filterPacks": "📦 Packs",
-  "repoStats": "Scenes: {scenes} | Media: {media} | Packs: {packs}",
+  "filterPacks": "📦 Bundles",
+  "repoStats": "Scenes: {scenes} | Media: {media} | Bundles: {packs}",
   "@repoStats": {
     "placeholders": {
       "scenes": {
@@ -547,5 +547,7 @@
   "colorNameTextSecondary": "Text Secondary",
   "colorNameDuckingBadge": "Ducking Badge",
   "colorNameBattleIntensity": "Battle Intensity",
-  "colorNameBossIntensity": "Boss Intensity"
+  "colorNameBossIntensity": "Boss Intensity",
+  "seconds": "sec",
+  "milliseconds": "ms"
 }

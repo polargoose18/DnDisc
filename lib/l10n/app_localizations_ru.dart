@@ -9,7 +9,7 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get appTitle => 'TTRPG Audio Master';
+  String get appTitle => 'DnDisc';
 
   @override
   String get tabGmDashboard => 'Панель Мастера';
@@ -99,11 +99,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get duckMultiplierSubtitle => 'от исходной громкости музыки';
 
   @override
-  String get presetPacksTitle => 'Пакеты Пресетов (ZIP Архивы)';
+  String get presetPacksTitle => 'Коллекции (ZIP Архивы)';
 
   @override
   String get presetPacksSubtitle =>
-      'Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые пакеты приключений.';
+      'Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые коллекции приключений.';
 
   @override
   String get importPresetBtn => 'Импорт пресета (ZIP)';
@@ -141,7 +141,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'У вас пока нет кастомных тем. Создайте свою тему с уникальной палитрой цветов!';
 
   @override
-  String get createThemeBtn => '+ Создать новую тему';
+  String get createThemeBtn => 'Создать новую тему';
 
   @override
   String get hotkeysTitle => 'Централизованные горячие клавиши';
@@ -160,7 +160,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get keyCol => 'Клавиша';
 
   @override
-  String get scenesTitle => 'Атмосферные Сцены';
+  String get scenesTitle => 'Сцены';
 
   @override
   String get createSceneBtn => 'Создать сцену';
@@ -374,7 +374,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addSfxBtn => 'Добавить SFX';
 
   @override
-  String get exportScenePackTooltip => 'Экспорт пака сцен (.pack.zip)';
+  String get exportScenePackTooltip => 'Экспорт коллекции (.pack.zip)';
 
   @override
   String get searchScenesPlaceholder => 'Поиск сцен...';
@@ -396,31 +396,31 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get exportScenePackTitle => 'Экспорт Пака сцен (.pack.zip)';
+  String get exportScenePackTitle => 'Экспорт коллекции (.pack.zip)';
 
   @override
-  String get packTitleLabel => 'Название пака';
+  String get packTitleLabel => 'Название коллекции';
 
   @override
-  String get packDescLabel => 'Описание пака';
+  String get packDescLabel => 'Описание коллекции';
 
   @override
-  String get defaultPackTitle => 'Пак Приключений';
+  String get defaultPackTitle => 'Коллекция Приключений';
 
   @override
   String get defaultPackDesc => 'Комплект атмосферных сцен';
 
   @override
-  String get savePackAs => 'Сохранить пак сцен как...';
+  String get savePackAs => 'Сохранить коллекцию как...';
 
   @override
   String packExported(String name) {
-    return 'Пак сцен \"$name\" успешно экспортирован!';
+    return 'Коллекция \"$name\" успешно экспортирован!';
   }
 
   @override
   String packExportError(String error) {
-    return 'Ошибка при экспорте пака сцен: $error';
+    return 'Ошибка при экспорте коллекции: $error';
   }
 
   @override
@@ -431,7 +431,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get selectScenePrompt =>
-      'Выберите сцену слева для создания игрового окружения';
+      'Выберите сцену для создания игрового окружения';
 
   @override
   String get musicIntensityLabel => 'Интенсивность музыки';
@@ -507,7 +507,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get themeNameRequired => 'Укажите название темы';
 
   @override
-  String get baseOnPreset => 'Взять основу';
+  String get baseOnPreset => 'Использовать в качестве основы...';
 
   @override
   String get baseOnPresetTooltip => 'Взять за основу пресет';
@@ -580,7 +580,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get defaultMediaPackageName => 'Мой Медиа Набор';
 
   @override
-  String get defaultMediaPackageDesc => 'Коллекция аудиодорожек для TTRPG';
+  String get defaultMediaPackageDesc => 'Коллекция аудиодорожек';
 
   @override
   String get saveMediaPackageAs => 'Сохранить медиа-набор как...';
@@ -623,7 +623,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get manageRepositoriesTooltip => 'Управление репозиториями';
 
   @override
-  String get addRepositoryBtn => '+ Добавить';
+  String get addRepositoryBtn => 'Добавить';
 
   @override
   String get searchCatalogPlaceholder => 'Поиск элементов в каталоге...';
@@ -713,7 +713,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get scenesInPack => 'Сцены в паке';
+  String get scenesInPack => 'Сцены в коллекции';
 
   @override
   String get mediaSetContent => 'Состав медиа-набора';
@@ -874,7 +874,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Принудительное приглушение музыки на время речи';
 
   @override
-  String get shortcutPanicStopTitle => 'Экстренная остановка (Panic Stop)';
+  String get shortcutPanicStopTitle => 'Экстренная остановка';
 
   @override
   String get shortcutPanicStopDesc =>
@@ -914,7 +914,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get catalogTypeMedia => 'медиа-пакет';
 
   @override
-  String get catalogTypePack => 'пак';
+  String get catalogTypePack => 'коллекция';
 
   @override
   String get sceneTitle => 'Сцена';
@@ -923,7 +923,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mediaTitle => 'Медиа';
 
   @override
-  String get packTitle => 'Пак';
+  String get packTitle => 'Коллекция';
 
   @override
   String get catalogSceneBadge => '🎭 Сцена';
@@ -932,7 +932,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get catalogMediaBadge => '🎵 Медиа';
 
   @override
-  String get catalogPackBadge => '📦 Пак';
+  String get catalogPackBadge => '📦 Коллекция';
 
   @override
   String get filterAll => 'Все';
@@ -944,11 +944,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get filterMedia => '🎵 Медиа';
 
   @override
-  String get filterPacks => '📦 Паки';
+  String get filterPacks => '📦 Коллекции';
 
   @override
   String repoStats(int scenes, int media, int packs) {
-    return 'Сцен: $scenes | Медиа: $media | Паков: $packs';
+    return 'Сцен: $scenes | Медиа: $media | Коллекций: $packs';
   }
 
   @override
@@ -1004,4 +1004,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get colorNameBossIntensity => 'Интенсивность босса';
+
+  @override
+  String get seconds => 'сек';
+
+  @override
+  String get milliseconds => 'мс';
 }

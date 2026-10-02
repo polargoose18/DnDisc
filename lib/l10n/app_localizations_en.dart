@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'TTRPG Audio Master';
+  String get appTitle => 'DnDisc';
 
   @override
   String get tabGmDashboard => 'GM Dashboard';
@@ -97,11 +97,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get duckMultiplierSubtitle => 'of original music volume';
 
   @override
-  String get presetPacksTitle => 'Preset Packs (ZIP)';
+  String get presetPacksTitle => 'Preset Bundles (ZIP)';
 
   @override
   String get presetPacksSubtitle =>
-      'Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure packs.';
+      'Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure bundles.';
 
   @override
   String get importPresetBtn => 'Import Preset (ZIP)';
@@ -139,7 +139,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'You don\'t have custom themes yet. Create your own theme with a custom palette!';
 
   @override
-  String get createThemeBtn => '+ Create new theme';
+  String get createThemeBtn => 'Create new theme';
 
   @override
   String get hotkeysTitle => 'Centralized Shortcuts';
@@ -158,7 +158,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keyCol => 'Key';
 
   @override
-  String get scenesTitle => 'Atmospheric Scenes';
+  String get scenesTitle => 'Scenes';
 
   @override
   String get createSceneBtn => 'Create Scene';
@@ -371,7 +371,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addSfxBtn => 'Add SFX';
 
   @override
-  String get exportScenePackTooltip => 'Export Scene Pack (.pack.zip)';
+  String get exportScenePackTooltip => 'Export Scene Bundles (.pack.zip)';
 
   @override
   String get searchScenesPlaceholder => 'Search scenes...';
@@ -393,31 +393,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get exportScenePackTitle => 'Export Scene Pack (.pack.zip)';
+  String get exportScenePackTitle => 'Export Bundle (.pack.zip)';
 
   @override
-  String get packTitleLabel => 'Pack Name';
+  String get packTitleLabel => 'Bundle Name';
 
   @override
-  String get packDescLabel => 'Pack Description';
+  String get packDescLabel => 'Bundle Description';
 
   @override
-  String get defaultPackTitle => 'Adventure Pack';
+  String get defaultPackTitle => 'Adventure Bundle';
 
   @override
   String get defaultPackDesc => 'Atmospheric scenes collection';
 
   @override
-  String get savePackAs => 'Save scene pack as...';
+  String get savePackAs => 'Save Bundle as...';
 
   @override
   String packExported(String name) {
-    return 'Scene pack \"$name\" successfully exported!';
+    return 'Bundle \"$name\" successfully exported!';
   }
 
   @override
   String packExportError(String error) {
-    return 'Error exporting scene pack: $error';
+    return 'Error exporting bundle: $error';
   }
 
   @override
@@ -428,7 +428,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectScenePrompt =>
-      'Select a scene on the left to set up the game environment';
+      'Select a scene to set up the game environment';
 
   @override
   String get musicIntensityLabel => 'Music Intensity';
@@ -576,7 +576,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get defaultMediaPackageName => 'My Media Package';
 
   @override
-  String get defaultMediaPackageDesc => 'TTRPG Audio tracks collection';
+  String get defaultMediaPackageDesc => 'Audio tracks collection';
 
   @override
   String get saveMediaPackageAs => 'Save media package as...';
@@ -708,7 +708,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get scenesInPack => 'Scenes in Pack';
+  String get scenesInPack => 'Scenes in Bundle';
 
   @override
   String get mediaSetContent => 'Media Set Content';
@@ -874,7 +874,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutFullscreenDesc => 'Toggle fullscreen display';
 
   @override
-  String get deleteFromApp => 'Delete from application';
+  String get deleteFromApp => 'Delete';
 
   @override
   String get repositoryNameLabel => 'Name';
@@ -901,7 +901,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogTypeMedia => 'media package';
 
   @override
-  String get catalogTypePack => 'pack';
+  String get catalogTypePack => 'bundle';
 
   @override
   String get sceneTitle => 'Scene';
@@ -910,7 +910,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mediaTitle => 'Media';
 
   @override
-  String get packTitle => 'Pack';
+  String get packTitle => 'Bundle';
 
   @override
   String get catalogSceneBadge => '🎭 Scene';
@@ -919,7 +919,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogMediaBadge => '🎵 Media';
 
   @override
-  String get catalogPackBadge => '📦 Pack';
+  String get catalogPackBadge => '📦 Bundle';
 
   @override
   String get filterAll => 'All';
@@ -931,11 +931,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterMedia => '🎵 Media';
 
   @override
-  String get filterPacks => '📦 Packs';
+  String get filterPacks => '📦 Bundles';
 
   @override
   String repoStats(int scenes, int media, int packs) {
-    return 'Scenes: $scenes | Media: $media | Packs: $packs';
+    return 'Scenes: $scenes | Media: $media | Bundles: $packs';
   }
 
   @override
@@ -991,4 +991,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorNameBossIntensity => 'Boss Intensity';
+
+  @override
+  String get seconds => 'sec';
+
+  @override
+  String get milliseconds => 'ms';
 }

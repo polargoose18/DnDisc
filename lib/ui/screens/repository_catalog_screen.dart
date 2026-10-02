@@ -406,11 +406,11 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
             tooltip: l10n?.refreshCatalogTooltip ?? 'Refresh catalog',
             onPressed: () => vm.loadRepositories(),
           ),
-          IconButton(
-            icon: const Icon(Icons.settings_input_composite_rounded),
-            tooltip: l10n?.manageRepositoriesTooltip ?? 'Manage repositories',
-            onPressed: () => _showManageRepositoriesModal(context),
-          ),
+//          IconButton(
+//            icon: const Icon(Icons.settings_input_composite_rounded),
+//            tooltip: l10n?.manageRepositoriesTooltip ?? 'Manage repositories',
+//            onPressed: () => _showManageRepositoriesModal(context),
+//          ),
           const SizedBox(width: 8),
           ElevatedButton.icon(
             onPressed: () => _showAddRepositoryDialog(context),
@@ -454,7 +454,7 @@ class _RepositoryCatalogScreenState extends State<RepositoryCatalogScreen> {
                     const SizedBox(width: 16),
                     OutlinedButton.icon(
                       onPressed: () => _showManageRepositoriesModal(context),
-                      icon: const Icon(Icons.source),
+                      icon: const Icon(Icons.settings_input_composite_rounded),
                       label: Text(l10n?.sourcesBtn(vm.repositories.length) ?? 'Sources (${vm.repositories.length})'),
                     ),
                   ],

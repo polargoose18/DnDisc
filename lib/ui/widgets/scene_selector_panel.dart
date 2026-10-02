@@ -272,8 +272,8 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
 
   Future<void> _exportScenePack(BuildContext context, List<SceneModel> scenes) async {
     final l10n = AppLocalizations.of(context);
-    final titleController = TextEditingController(text: l10n?.defaultPackTitle ?? 'Adventure Pack');
-    final descController = TextEditingController(text: l10n?.defaultPackDesc ?? 'Atmospheric scenes collection');
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -284,12 +284,21 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
           children: [
             TextField(
               controller: titleController,
-              decoration: InputDecoration(labelText: l10n?.packTitleLabel ?? 'Pack Name'),
+              decoration: InputDecoration(
+                labelText: l10n?.packTitleLabel ?? 'Pack Name',
+                hintText: l10n?.defaultPackTitle ?? 'Adventure Pack'
+                ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: descController,
-              decoration: InputDecoration(labelText: l10n?.packDescLabel ?? 'Pack Description'),
+              decoration: InputDecoration(
+                labelText: l10n?.packDescLabel ?? 'Pack Description',
+                hintText: l10n?.defaultPackDesc ?? 'Atmospheric scenes collection',
+                hintStyle: TextStyle(
+                  color: Colors.grey.withValues(alpha: 0.4)
+                )
+                ),
             ),
           ],
         ),

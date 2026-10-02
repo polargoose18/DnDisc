@@ -324,8 +324,8 @@ class LibraryScreen extends StatelessWidget {
 
   Future<void> _handleExportMediaPackage(BuildContext context, MediaLibraryViewModel library) async {
     final l10n = AppLocalizations.of(context);
-    final titleController = TextEditingController(text: l10n?.defaultMediaPackageName ?? 'My Media Package');
-    final descController = TextEditingController(text: l10n?.defaultMediaPackageDesc ?? 'TTRPG Audio tracks collection');
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -336,12 +336,18 @@ class LibraryScreen extends StatelessWidget {
           children: [
             TextField(
               controller: titleController,
-              decoration: InputDecoration(labelText: l10n?.mediaPackageNameLabel ?? 'Package Name'),
+              decoration: InputDecoration(
+                labelText: l10n?.mediaPackageNameLabel ?? 'Package Name',
+                hintText: l10n?.defaultMediaPackageName ?? 'Media Package'
+                ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: descController,
-              decoration: InputDecoration(labelText: l10n?.mediaPackageDescLabel ?? 'Package Description'),
+              decoration: InputDecoration(
+                labelText: l10n?.mediaPackageDescLabel ?? 'Package Description',
+                hintText: l10n?.defaultMediaPackageDesc ?? 'Media package description'
+                ),
             ),
           ],
         ),

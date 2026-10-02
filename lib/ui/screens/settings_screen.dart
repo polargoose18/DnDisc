@@ -101,7 +101,7 @@ class SettingsScreen extends StatelessWidget {
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(l10n?.musicFadeTitle ?? 'Music fade in/out duration', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.musicFadeMs} ms (${(settings.musicFadeMs / 1000).toStringAsFixed(1)} s)', style: TextStyle(color: activeTheme.textSecondary)),
+                        subtitle: Text('${settings.musicFadeMs} ${l10n?.milliseconds ?? 'ms'} (${(settings.musicFadeMs / 1000).toStringAsFixed(1)} ${l10n?.seconds ?? 's'})', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -109,7 +109,7 @@ class SettingsScreen extends StatelessWidget {
                             min: 0,
                             max: 5000,
                             divisions: 50,
-                            label: '${settings.musicFadeMs} ms',
+                            label: '${settings.musicFadeMs} ${l10n?.milliseconds ?? 'ms'}',
                             onChanged: (val) => settings.setMusicFadeMs(val.toInt()),
                           ),
                         ),
@@ -119,7 +119,7 @@ class SettingsScreen extends StatelessWidget {
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(l10n?.ambientFadeTitle ?? 'Ambient fade in/out duration', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.ambientFadeMs} ms (${(settings.ambientFadeMs / 1000).toStringAsFixed(1)} s)', style: TextStyle(color: activeTheme.textSecondary)),
+                        subtitle: Text('${settings.ambientFadeMs} ${l10n?.milliseconds ?? 'ms'} (${(settings.ambientFadeMs / 1000).toStringAsFixed(1)} ${l10n?.seconds ?? 's'})', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -127,7 +127,7 @@ class SettingsScreen extends StatelessWidget {
                             min: 0,
                             max: 5000,
                             divisions: 50,
-                            label: '${settings.ambientFadeMs} ms',
+                            label: '${settings.ambientFadeMs} ${l10n?.milliseconds ?? 'ms'}',
                             onChanged: (val) => settings.setAmbientFadeMs(val.toInt()),
                           ),
                         ),
@@ -165,7 +165,7 @@ class SettingsScreen extends StatelessWidget {
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(l10n?.duckAttackTitle ?? 'Duck Attack Time', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.duckAttackMs} ms — ${l10n?.duckAttackSubtitle ?? 'music fade-down speed when SFX triggers'}', style: TextStyle(color: activeTheme.textSecondary)),
+                        subtitle: Text('${settings.duckAttackMs} ${l10n?.milliseconds ?? 'ms'} — ${l10n?.duckAttackSubtitle ?? 'music fade-down speed when SFX triggers'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -173,7 +173,7 @@ class SettingsScreen extends StatelessWidget {
                             min: 50,
                             max: 1000,
                             divisions: 19,
-                            label: '${settings.duckAttackMs} ms',
+                            label: '${settings.duckAttackMs} ${l10n?.milliseconds ?? 'ms'}',
                             onChanged: (val) => settings.setDuckAttackMs(val.toInt()),
                           ),
                         ),
@@ -183,7 +183,7 @@ class SettingsScreen extends StatelessWidget {
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(l10n?.duckReleaseTitle ?? 'Duck Release Time', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.duckReleaseMs} ms — ${l10n?.duckReleaseSubtitle ?? 'music fade-up speed to full volume'}', style: TextStyle(color: activeTheme.textSecondary)),
+                        subtitle: Text('${settings.duckReleaseMs} ${l10n?.milliseconds ?? 'ms'} — ${l10n?.duckReleaseSubtitle ?? 'music fade-up speed to full volume'}', style: TextStyle(color: activeTheme.textSecondary)),
                         trailing: SizedBox(
                           width: 250,
                           child: Slider(
@@ -191,7 +191,7 @@ class SettingsScreen extends StatelessWidget {
                             min: 200,
                             max: 4000,
                             divisions: 38,
-                            label: '${settings.duckReleaseMs} ms',
+                            label: '${settings.duckReleaseMs} ${l10n?.milliseconds ?? 'ms'}',
                             onChanged: (val) => settings.setDuckReleaseMs(val.toInt()),
                           ),
                         ),

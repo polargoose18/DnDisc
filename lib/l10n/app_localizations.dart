@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'TTRPG Audio Master'**
+  /// **'DnDisc'**
   String get appTitle;
 
   /// No description provided for @tabGmDashboard.
@@ -275,13 +275,13 @@ abstract class AppLocalizations {
   /// No description provided for @presetPacksTitle.
   ///
   /// In en, this message translates to:
-  /// **'Preset Packs (ZIP)'**
+  /// **'Preset Bundles (ZIP)'**
   String get presetPacksTitle;
 
   /// No description provided for @presetPacksSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure packs.'**
+  /// **'Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure bundles.'**
   String get presetPacksSubtitle;
 
   /// No description provided for @importPresetBtn.
@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @createThemeBtn.
   ///
   /// In en, this message translates to:
-  /// **'+ Create new theme'**
+  /// **'Create new theme'**
   String get createThemeBtn;
 
   /// No description provided for @hotkeysTitle.
@@ -389,7 +389,7 @@ abstract class AppLocalizations {
   /// No description provided for @scenesTitle.
   ///
   /// In en, this message translates to:
-  /// **'Atmospheric Scenes'**
+  /// **'Scenes'**
   String get scenesTitle;
 
   /// No description provided for @createSceneBtn.
@@ -797,7 +797,7 @@ abstract class AppLocalizations {
   /// No description provided for @exportScenePackTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Export Scene Pack (.pack.zip)'**
+  /// **'Export Scene Bundles (.pack.zip)'**
   String get exportScenePackTooltip;
 
   /// No description provided for @searchScenesPlaceholder.
@@ -833,25 +833,25 @@ abstract class AppLocalizations {
   /// No description provided for @exportScenePackTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Scene Pack (.pack.zip)'**
+  /// **'Export Bundle (.pack.zip)'**
   String get exportScenePackTitle;
 
   /// No description provided for @packTitleLabel.
   ///
   /// In en, this message translates to:
-  /// **'Pack Name'**
+  /// **'Bundle Name'**
   String get packTitleLabel;
 
   /// No description provided for @packDescLabel.
   ///
   /// In en, this message translates to:
-  /// **'Pack Description'**
+  /// **'Bundle Description'**
   String get packDescLabel;
 
   /// No description provided for @defaultPackTitle.
   ///
   /// In en, this message translates to:
-  /// **'Adventure Pack'**
+  /// **'Adventure Bundle'**
   String get defaultPackTitle;
 
   /// No description provided for @defaultPackDesc.
@@ -863,19 +863,19 @@ abstract class AppLocalizations {
   /// No description provided for @savePackAs.
   ///
   /// In en, this message translates to:
-  /// **'Save scene pack as...'**
+  /// **'Save Bundle as...'**
   String get savePackAs;
 
   /// No description provided for @packExported.
   ///
   /// In en, this message translates to:
-  /// **'Scene pack \"{name}\" successfully exported!'**
+  /// **'Bundle \"{name}\" successfully exported!'**
   String packExported(String name);
 
   /// No description provided for @packExportError.
   ///
   /// In en, this message translates to:
-  /// **'Error exporting scene pack: {error}'**
+  /// **'Error exporting bundle: {error}'**
   String packExportError(String error);
 
   /// No description provided for @exportSceneMenu.
@@ -893,7 +893,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectScenePrompt.
   ///
   /// In en, this message translates to:
-  /// **'Select a scene on the left to set up the game environment'**
+  /// **'Select a scene to set up the game environment'**
   String get selectScenePrompt;
 
   /// No description provided for @musicIntensityLabel.
@@ -1175,7 +1175,7 @@ abstract class AppLocalizations {
   /// No description provided for @defaultMediaPackageDesc.
   ///
   /// In en, this message translates to:
-  /// **'TTRPG Audio tracks collection'**
+  /// **'Audio tracks collection'**
   String get defaultMediaPackageDesc;
 
   /// No description provided for @saveMediaPackageAs.
@@ -1391,7 +1391,7 @@ abstract class AppLocalizations {
   /// No description provided for @scenesInPack.
   ///
   /// In en, this message translates to:
-  /// **'Scenes in Pack'**
+  /// **'Scenes in Bundle'**
   String get scenesInPack;
 
   /// No description provided for @mediaSetContent.
@@ -1667,7 +1667,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteFromApp.
   ///
   /// In en, this message translates to:
-  /// **'Delete from application'**
+  /// **'Delete'**
   String get deleteFromApp;
 
   /// No description provided for @repositoryNameLabel.
@@ -1721,7 +1721,7 @@ abstract class AppLocalizations {
   /// No description provided for @catalogTypePack.
   ///
   /// In en, this message translates to:
-  /// **'pack'**
+  /// **'bundle'**
   String get catalogTypePack;
 
   /// No description provided for @sceneTitle.
@@ -1739,7 +1739,7 @@ abstract class AppLocalizations {
   /// No description provided for @packTitle.
   ///
   /// In en, this message translates to:
-  /// **'Pack'**
+  /// **'Bundle'**
   String get packTitle;
 
   /// No description provided for @catalogSceneBadge.
@@ -1757,7 +1757,7 @@ abstract class AppLocalizations {
   /// No description provided for @catalogPackBadge.
   ///
   /// In en, this message translates to:
-  /// **'📦 Pack'**
+  /// **'📦 Bundle'**
   String get catalogPackBadge;
 
   /// No description provided for @filterAll.
@@ -1781,13 +1781,13 @@ abstract class AppLocalizations {
   /// No description provided for @filterPacks.
   ///
   /// In en, this message translates to:
-  /// **'📦 Packs'**
+  /// **'📦 Bundles'**
   String get filterPacks;
 
   /// No description provided for @repoStats.
   ///
   /// In en, this message translates to:
-  /// **'Scenes: {scenes} | Media: {media} | Packs: {packs}'**
+  /// **'Scenes: {scenes} | Media: {media} | Bundles: {packs}'**
   String repoStats(int scenes, int media, int packs);
 
   /// No description provided for @addRepositoryTooltip.
@@ -1897,6 +1897,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Boss Intensity'**
   String get colorNameBossIntensity;
+
+  /// No description provided for @seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'sec'**
+  String get seconds;
+
+  /// No description provided for @milliseconds.
+  ///
+  /// In en, this message translates to:
+  /// **'ms'**
+  String get milliseconds;
 }
 
 class _AppLocalizationsDelegate

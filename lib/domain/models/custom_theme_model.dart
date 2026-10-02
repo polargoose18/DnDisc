@@ -133,6 +133,11 @@ class CustomThemeModel {
           ),
         ),
       ),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(
+          color: Colors.grey.withValues(alpha: 0.5)
+        ),
+      )
     );
   }
 
