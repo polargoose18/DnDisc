@@ -364,7 +364,8 @@ void main() {
       // Act & Assert - 3. Dashboard tab
       await tester.tap(find.text(l10n.tabGmDashboard));
       await tester.pumpAndSettle();
-      expect(find.text(l10n.scenesTitle), findsOneWidget);
+      expect(find.byType(SceneSelectorPanel), findsOneWidget);
+      expect(find.text(l10n.createSceneBtn), findsOneWidget);
 
       engine.dispose();
       library.dispose();

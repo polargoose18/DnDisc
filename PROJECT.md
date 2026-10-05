@@ -46,16 +46,29 @@ TTRPG Audio Master is a desktop-first Flutter application structured around a la
 | 14 | Test Specification Standards (AAA Pattern) | Ensure all tests adhere to AAA pattern ('should <result> when <condition>') in English | M5 | ORIGINAL_REQUEST §R5, Survey Explorer 3 |
 | 15 | Theme Persistence Verification Tests | Add unit/widget tests for theme selection persistence across app restarts | M5 | ORIGINAL_REQUEST §Acceptance, Survey Explorer 3 |
 | 16 | Complete Localization Verification Tests | Add unit/widget tests for dynamic language switching across UI components | M5 | ORIGINAL_REQUEST §Acceptance, Survey Explorer 3 |
-| 17 | Final Project Verification | Full run of `flutter analyze` (0 issues) and `flutter test` (145+ tests passing, 0 failures) | M5 | ORIGINAL_REQUEST §Acceptance |
+| 17 | Final Project Verification | Full run of `flutter analyze` (0 issues) and `flutter test` (175+ tests passing, 0 failures) | M5 | ORIGINAL_REQUEST §Acceptance |
+| 18 | UI/UX Layout & Ergonomics Overhaul | Modernize layout, color harmony, and visual ergonomics across GM Dashboard, mixer panels, and dialogs | M6 | ORIGINAL_ROADMAP §R6 |
+| 19 | Responsive Component Polish | Refine track cards, sliders, soundboard triggers, and compact view adaptations | M6 | ORIGINAL_ROADMAP §R6 |
+| 20 | UI Widget & Regression Test Suite | Maintain 100% test pass rate across redesigned UI components and dialogs | M6 | ORIGINAL_ROADMAP §R6 |
+| 21 | Embedded HTTP & WebSocket Server | Lightweight local network server using `shelf` and WebSockets for wireless control | M7 | ORIGINAL_ROADMAP §R5, Survey Explorer |
+| 22 | QR Code Pairing & Network Discovery | Local IP resolution and QR code generator for zero-configuration pairing with mobile devices | M7 | ORIGINAL_ROADMAP §R5 |
+| 23 | Bi-directional Remote Control Protocol | Real-time state broadcasting (playback, scene, ducking) and incoming GM command handling | M7 | ORIGINAL_ROADMAP §R5 |
+| 24 | Touch-friendly Mobile Web / Client Remote | Responsive web controller optimized for smartphones and tablets over Wi-Fi | M7 | ORIGINAL_ROADMAP §R5 |
+| 25 | Google TV / Android TV Target & Engine | TV platform support, hardware audio output routing (HDMI ARC / optical), and leanback layout | M8 | ORIGINAL_ROADMAP §R5.5 |
+| 26 | Spotify-style Fullscreen Atmosphere Visualizer | Immersive artwork display, dynamic mood lighting, scene title, and ambient layer indicators | M8 | ORIGINAL_ROADMAP §R5.5 |
+| 27 | Slave Audio Receiver Mode | TV functions as a dedicated playback endpoint driven by remote GM controller | M8 | ORIGINAL_ROADMAP §R5.5 |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
 | M1 | Static Analysis Cleanliness | Fix all 16 analyzer warnings/infos across 7 files | none | DONE |
 | M2 | Legacy Export Proxies Cleanup | Remove `lib/models/` and `lib/db/`, redirect all imports | M1 | DONE |
-| M3 | Layered Architecture Alignment | Move 7 data services to `lib/data/services/`, update all imports | M2 | PLANNED |
-| M4 | Theme Persistence & Localization Polish | SQLite app_settings, persist activeThemeId, add ARB keys, gen-l10n, update UI | M3 | PLANNED |
-| M5 | Audio Rules & Comprehensive Acceptance | Add theme & l10n tests (3-part spec), verify audio rules, verify 0 issues & 145+ tests | M4 | PLANNED |
+| M3 | Layered Architecture Alignment | Move 7 data services to `lib/data/services/`, update all imports | M2 | DONE |
+| M4 | Theme Persistence & Localization Polish | SQLite app_settings, persist activeThemeId, add ARB keys, gen-l10n, update UI | M3 | DONE |
+| M5 | Audio Rules & Comprehensive Acceptance | Add theme & l10n tests (3-part spec), verify audio rules, verify 0 issues & 175+ tests | M4 | DONE |
+| M6 | UI/UX Overhaul & Polish | Redesign GM Dashboard, mixer panels, soundboard, and dialog ergonomics | M5 | PLANNED |
+| M7 | Wi-Fi Remote Control Protocol | Embedded HTTP/WebSocket server, QR-code pairing, bi-directional control API & web remote | M6 | PLANNED |
+| M8 | Android TV / Google TV Display & Receiver | TV target, Spotify-style atmosphere visualizer, slave audio playback over home theater | M7 | PLANNED |
 
 ## Interface Contracts
 ### SQLite Storage ↔ Repositories (`DatabaseService` ↔ `CustomThemeRepository`)

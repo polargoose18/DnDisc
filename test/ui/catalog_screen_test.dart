@@ -425,10 +425,10 @@ void main() {
       final l10n = AppLocalizationsEn();
 
       expect(find.text(l10n.installedBadge), findsOneWidget);
-      expect(find.text(l10n.deleteFromApp), findsOneWidget);
+      expect(find.text(l10n.removeFromApp(l10n.catalogTypePack)), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.deleteFromApp));
+      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypePack)));
       await tester.pumpAndSettle();
 
       expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypePack)), findsOneWidget);
@@ -495,10 +495,10 @@ void main() {
 
       final l10n = AppLocalizationsEn();
 
-      expect(find.text(l10n.deleteFromApp), findsOneWidget);
+      expect(find.text(l10n.removeFromApp(l10n.catalogTypePack)), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.deleteFromApp));
+      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypePack)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.widgetWithText(TextButton, l10n.cancel));
@@ -506,7 +506,7 @@ void main() {
 
       // Assert
       expect(sceneVm.scenes.length, 1);
-      expect(find.text(l10n.deleteFromApp), findsOneWidget);
+      expect(find.text(l10n.removeFromApp(l10n.catalogTypePack)), findsOneWidget);
       expect(find.text(l10n.installItem(l10n.catalogTypePack)), findsNothing);
     });
 
@@ -567,10 +567,10 @@ void main() {
 
       final l10n = AppLocalizationsEn();
 
-      expect(find.text(l10n.deleteFromApp), findsOneWidget);
+      expect(find.text(l10n.removeFromApp(l10n.catalogTypeMedia)), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.deleteFromApp));
+      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypeMedia)));
       await tester.pumpAndSettle();
 
       expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypeMedia)), findsOneWidget);
@@ -647,10 +647,10 @@ void main() {
 
       final l10n = AppLocalizationsEn();
 
-      expect(find.text(l10n.deleteFromApp), findsOneWidget);
+      expect(find.text(l10n.removeFromApp(l10n.catalogTypeScene)), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.deleteFromApp));
+      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypeScene)));
       await tester.pumpAndSettle();
 
       expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypeScene)), findsOneWidget);
@@ -736,7 +736,7 @@ void main() {
       final l10n = AppLocalizationsEn();
 
       // Act
-      await tester.tap(find.text(l10n.deleteFromApp));
+      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypePack)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
