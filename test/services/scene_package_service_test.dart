@@ -51,9 +51,8 @@ void main() {
       // Arrange
       final packageService = ScenePackageService(db: dbService);
 
-      final projectRoot = Directory.current.path;
-      final musicFile = File(p.join(projectRoot, 'audio', 'music.mp3'));
-      final ambFile = File(p.join(projectRoot, 'audio', 'ambient.mp3'));
+      final musicFile = File(p.join(tempDir.path, 'music.mp3'))..writeAsBytesSync([0, 1, 2, 3, 4]);
+      final ambFile = File(p.join(tempDir.path, 'ambient.mp3'))..writeAsBytesSync([0, 1, 2, 3, 4]);
 
       expect(musicFile.existsSync(), isTrue);
       expect(ambFile.existsSync(), isTrue);
