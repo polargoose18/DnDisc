@@ -997,4 +997,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get milliseconds => 'ms';
+
+  @override
+  String get toggleMenuTooltip => 'Toggle navigation menu';
+
+  @override
+  String get collapseSidebarTooltip => 'Collapse sidebar';
+
+  @override
+  String get expandSidebarTooltip => 'Expand sidebar';
+
+  @override
+  String get sceneTown => 'Town';
+
+  @override
+  String get sceneEnchantedForest => 'Enchanted Forest';
+
+  @override
+  String get sceneCaves => 'Caves';
+
+  @override
+  String get categoryFoley => 'Foley';
+
+  @override
+  String get masterVolumeLabel => 'Master Volume';
 }

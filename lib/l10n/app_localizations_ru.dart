@@ -1010,4 +1010,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get milliseconds => 'мс';
+
+  @override
+  String get toggleMenuTooltip => 'Переключить меню навигации';
+
+  @override
+  String get collapseSidebarTooltip => 'Свернуть боковую панель';
+
+  @override
+  String get expandSidebarTooltip => 'Развернуть боковую панель';
+
+  @override
+  String get sceneTown => 'Город';
+
+  @override
+  String get sceneEnchantedForest => 'Зачарованный лес';
+
+  @override
+  String get sceneCaves => 'Пещеры';
+
+  @override
+  String get categoryFoley => 'Шумы (Foley)';
+
+  @override
+  String get masterVolumeLabel => 'Общая громкость';
 }

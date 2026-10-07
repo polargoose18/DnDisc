@@ -7,6 +7,9 @@ import '../widgets/ambient_mixer_panel.dart';
 import '../widgets/soundboard_grid.dart';
 import '../widgets/sticky_mini_player.dart';
 
+/// Alias for ResponsiveGmDashboard to support desktop dashboard naming conventions.
+typedef GmDashboardScreen = ResponsiveGmDashboard;
+
 class ResponsiveGmDashboard extends StatefulWidget {
   const ResponsiveGmDashboard({super.key});
 
