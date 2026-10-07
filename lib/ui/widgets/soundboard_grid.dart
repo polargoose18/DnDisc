@@ -135,7 +135,7 @@ class SoundboardGrid extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
-                      childAspectRatio: 1.35,
+                      childAspectRatio: 1.0,
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 8,
                     ),

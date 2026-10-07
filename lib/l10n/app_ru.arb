@@ -561,5 +561,7 @@
   "intensityStepped3": "III",
   "optionsTooltip": "Настройки",
   "scenesQuickPicker": "Сцены",
-  "sessionAudioDeck": "Сессионная аудиопанель"
+  "sessionAudioDeck": "Сессионная аудиопанель",
+  "collapseSidebarTooltip": "Свернуть панель",
+  "expandSidebarTooltip": "Развернуть панель"
 }

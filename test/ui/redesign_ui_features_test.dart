@@ -27,9 +27,12 @@ import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/theme_view_model.dart';
 import 'package:ttrpg_audio_player/ui/screens/main_dashboard_screen.dart';
+import 'package:ttrpg_audio_player/ui/screens/settings_screen.dart';
 import 'package:ttrpg_audio_player/ui/widgets/scene_backdrop_header.dart';
 import 'package:ttrpg_audio_player/ui/widgets/ambient_mixer_panel.dart';
+import 'package:ttrpg_audio_player/ui/widgets/soundboard_grid.dart';
 import 'package:ttrpg_audio_player/ui/widgets/sticky_mini_player.dart';
+import 'package:ttrpg_audio_player/domain/models/sfx_trigger.dart';
 
 class _FakePathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin
@@ -141,8 +144,8 @@ void main() {
     });
   });
 
-  group('Active Music Mode Pills Tests', () {
-    testWidgets('should switch music mode intensity when mode pills are tapped in SceneBackdropHeader', (tester) async {
+  group('Active Music Intensity Level Pills Tests', () {
+    testWidgets('should switch music mode intensity when intensity level pills are tapped in SceneBackdropHeader', (tester) async {
       // Arrange
       final sceneService = SceneService(autoLoad: false);
       final engine = AudioEngineService();
@@ -167,32 +170,81 @@ void main() {
 
       // Assert - initial state
       expect(find.text('Enchanted Grove'), findsOneWidget);
-      expect(find.text(l10n.activeMusicMode), findsOneWidget);
+      expect(find.text('${l10n.intensityLevel}:'), findsOneWidget);
       expect(find.text(l10n.musicModeOff), findsOneWidget);
-      expect(find.text(l10n.musicModeExplore), findsOneWidget);
-      expect(find.text(l10n.musicModeCombat), findsOneWidget);
-      expect(find.text(l10n.musicModeVictory), findsOneWidget);
+      expect(find.text(l10n.intensityCalm), findsOneWidget);
+      expect(find.text(l10n.intensitySuspense), findsOneWidget);
+      expect(find.text(l10n.intensityBattle), findsOneWidget);
+      expect(find.text(l10n.intensityBoss), findsOneWidget);
 
-      // Act - Tap Explore mode
-      await tester.tap(find.text(l10n.musicModeExplore));
+      // Act - Tap Calm mode
+      await tester.tap(find.text(l10n.intensityCalm));
       await tester.pumpAndSettle();
 
       // Assert
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.calm));
 
-      // Act - Tap Combat mode
-      await tester.tap(find.text(l10n.musicModeCombat));
+      // Act - Tap Suspense mode
+      await tester.tap(find.text(l10n.intensitySuspense));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(engine.musicBus.currentIntensity, equals(MusicIntensity.suspense));
+
+      // Act - Tap Battle mode
+      await tester.tap(find.text(l10n.intensityBattle));
       await tester.pumpAndSettle();
 
       // Assert
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.battle));
 
-      // Act - Tap Victory mode
-      await tester.tap(find.text(l10n.musicModeVictory));
+      // Act - Tap Boss mode
+      await tester.tap(find.text(l10n.intensityBoss));
       await tester.pumpAndSettle();
 
       // Assert
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.boss));
+
+      engine.dispose();
+    });
+
+    testWidgets('should render borderless SceneBackdropHeader with transparent background and centered title when scene is active', (tester) async {
+      // Arrange
+      final sceneService = SceneService(autoLoad: false);
+      final engine = AudioEngineService();
+      final scene = SceneModel(
+        id: 'sc_borderless_test',
+        name: 'Dragon Mountain',
+        description: 'Smoking craters and obsidian stones',
+      );
+      await tester.runAsync(() async {
+        await sceneService.createScene(scene);
+        await sceneService.activateScene(scene);
+      });
+
+      // Act
+      await tester.pumpWidget(
+        _createTestApp(
+          sceneService: sceneService,
+          audioEngine: engine,
+          child: const SceneBackdropHeader(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Dragon Mountain'), findsOneWidget);
+      expect(find.text(l10n.currentSceneBadge), findsNothing);
+      expect(find.byIcon(Icons.theater_comedy_rounded), findsNothing);
+
+      // Verify borderless & transparent container decoration
+      final containerFinder = find.byWidgetPredicate(
+        (widget) => widget is Container && widget.decoration is BoxDecoration && (widget.decoration as BoxDecoration).color == Colors.transparent,
+      );
+      expect(containerFinder, findsOneWidget);
+      final container = tester.widget<Container>(containerFinder);
+      final boxDecoration = container.decoration as BoxDecoration;
+      expect(boxDecoration.border, isNull);
 
       engine.dispose();
     });
@@ -328,6 +380,108 @@ void main() {
       expect(find.byType(StickyMiniPlayer), findsOneWidget);
       expect(find.text(l10n.noMusic), findsOneWidget);
       expect(find.byIcon(Icons.dangerous_rounded), findsOneWidget);
+
+      engine.dispose();
+    });
+
+    testWidgets('should collapse and expand desktop sidebar when sidebar toggle button is clicked', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(1280, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final engine = AudioEngineService();
+
+      await tester.pumpWidget(
+        _createTestApp(
+          audioEngine: engine,
+          screenSize: const Size(1280, 900),
+          child: const MainDashboardScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert - initially expanded with title and collapse button
+      expect(find.byKey(const ValueKey('sidebar_collapse_toggle_btn')), findsOneWidget);
+      expect(find.text(l10n.tabGmDashboard), findsOneWidget);
+
+      // Act - Collapse
+      await tester.tap(find.byKey(const ValueKey('sidebar_collapse_toggle_btn')));
+      await tester.pumpAndSettle();
+
+      // Assert - collapsed state: expand button present, labels hidden
+      expect(find.byKey(const ValueKey('sidebar_expand_toggle_btn')), findsOneWidget);
+      expect(find.byKey(const ValueKey('sidebar_collapse_toggle_btn')), findsNothing);
+
+      // Act - Expand again
+      await tester.tap(find.byKey(const ValueKey('sidebar_expand_toggle_btn')));
+      await tester.pumpAndSettle();
+
+      // Assert - back to expanded
+      expect(find.byKey(const ValueKey('sidebar_collapse_toggle_btn')), findsOneWidget);
+      expect(find.text(l10n.tabGmDashboard), findsOneWidget);
+
+      engine.dispose();
+    });
+
+    testWidgets('should navigate to settings when clicking the last navigation item', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(1280, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final engine = AudioEngineService();
+
+      await tester.pumpWidget(
+        _createTestApp(
+          audioEngine: engine,
+          screenSize: const Size(1280, 900),
+          child: const MainDashboardScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Act - Tap Settings (the 4th item)
+      await tester.tap(find.text(l10n.tabSettings));
+      await tester.pumpAndSettle();
+
+      // Assert - Settings screen is shown
+      expect(find.byType(SettingsScreen), findsOneWidget);
+
+      engine.dispose();
+    });
+  });
+
+  group('Square SFX Buttons Tests', () {
+    testWidgets('should render square aspect ratio grid cells for soundboard triggers', (tester) async {
+      // Arrange
+      final engine = AudioEngineService();
+      engine.sfxBus.addTrigger(
+        const SfxTrigger(
+          id: 'sfx_test_horn',
+          title: 'Battle Horn',
+          filePath: '/test/horn.mp3',
+        ),
+      );
+
+      await tester.pumpWidget(
+        _createTestApp(
+          audioEngine: engine,
+          child: const SingleChildScrollView(
+            child: SoundboardGrid(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert - SFX button has 1.0 aspect ratio
+      final gridFinder = find.byType(GridView);
+      expect(gridFinder, findsOneWidget);
+      final grid = tester.widget<GridView>(gridFinder);
+      final delegate = grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.childAspectRatio, equals(1.0));
 
       engine.dispose();
     });

@@ -561,5 +561,7 @@
   "intensityStepped3": "III",
   "optionsTooltip": "Options",
   "scenesQuickPicker": "Scenes",
-  "sessionAudioDeck": "Session Audio Deck"
+  "sessionAudioDeck": "Session Audio Deck",
+  "collapseSidebarTooltip": "Collapse sidebar",
+  "expandSidebarTooltip": "Expand sidebar"
 }

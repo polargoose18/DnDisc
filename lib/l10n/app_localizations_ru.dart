@@ -1046,4 +1046,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get sessionAudioDeck => 'Сессионная аудиопанель';
+
+  @override
+  String get collapseSidebarTooltip => 'Свернуть панель';
+
+  @override
+  String get expandSidebarTooltip => 'Развернуть панель';
 }

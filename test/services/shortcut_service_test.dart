@@ -69,17 +69,6 @@ void main() {
       expect(audioEngine.masterVolume, equals(0.8));
     });
 
-    test('should activate manual ducking when manualDucking action is dispatched', () {
-      // Arrange
-      expect(audioEngine.duckingController.isDucked, isFalse);
-
-      // Act
-      shortcutService.handleActionDirectly(AppShortcutAction.manualDucking);
-
-      // Assert
-      expect(audioEngine.duckingController.isDucked, isTrue);
-    });
-
     test('should stop all active sound effects when panicStopSfx action is triggered', () {
       // Arrange & Act
       shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
@@ -129,7 +118,6 @@ void main() {
       // Arrange & Act
       shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
       shortcutService.handleActionDirectly(AppShortcutAction.intensityBattle);
-      shortcutService.handleActionDirectly(AppShortcutAction.manualDucking);
       shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
       shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
 

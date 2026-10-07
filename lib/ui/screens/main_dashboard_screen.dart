@@ -22,6 +22,7 @@ class MainDashboardScreen extends StatefulWidget {
 class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isSidebarCollapsed = false;
 
   @override
   void initState() {
@@ -64,9 +65,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Left Sidebar (DnDisc Style)
+          // Left Sidebar (DnDisc Style - Collapsible)
           Container(
-            width: 220,
+            width: _isSidebarCollapsed ? 68 : 220,
             decoration: BoxDecoration(
               color: activeTheme.surface,
               border: Border(
@@ -80,39 +81,71 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Brand Header: DnDisc
+                  // Brand Header: DnDisc + Collapse/Expand Toggle
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: activeTheme.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 0.8),
-                          ),
-                          child: Icon(Icons.shield_moon_rounded, color: activeTheme.primary, size: 20),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          l10n?.appTitle ?? 'DnDisc',
-                          style: TextStyle(
-                            fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            letterSpacing: 0.6,
-                            color: activeTheme.textPrimary,
-                          ),
-                        ),
-                      ],
+                    padding: EdgeInsets.symmetric(
+                      horizontal: _isSidebarCollapsed ? 8.0 : 14.0,
+                      vertical: 14.0,
                     ),
+                    child: _isSidebarCollapsed
+                        ? Center(
+                            child: IconButton(
+                              key: const ValueKey('sidebar_expand_toggle_btn'),
+                              icon: Transform.flip(
+                                flipX: true,
+                                child: Icon(Icons.view_sidebar_outlined, color: activeTheme.primary, size: 20),
+                              ),
+                              tooltip: l10n?.expandSidebarTooltip ?? 'Expand sidebar',
+                              onPressed: () => setState(() => _isSidebarCollapsed = false),
+                            ),
+                          )
+                        : Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: activeTheme.primary.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 0.8),
+                                ),
+                                child: Icon(Icons.shield_moon_rounded, color: activeTheme.primary, size: 20),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    l10n?.appTitle ?? 'DnDisc',
+                                    style: TextStyle(
+                                      fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      letterSpacing: 0.6,
+                                      color: activeTheme.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                key: const ValueKey('sidebar_collapse_toggle_btn'),
+                                icon: Transform.flip(
+                                  flipX: true,
+                                  child: Icon(Icons.view_sidebar_outlined, size: 18, color: activeTheme.textSecondary),
+                                ),
+                                tooltip: l10n?.collapseSidebarTooltip ?? 'Collapse sidebar',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                                onPressed: () => setState(() => _isSidebarCollapsed = true),
+                              ),
+                            ],
+                          ),
                   ),
                   const SizedBox(height: 8),
 
                   // Navigation Menu Items
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: EdgeInsets.symmetric(horizontal: _isSidebarCollapsed ? 8.0 : 10.0),
                     child: Column(
                       children: [
                         _buildSidebarNavItem(
@@ -120,6 +153,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                           icon: Icons.dashboard_rounded,
                           label: l10n?.tabGmDashboard ?? 'GM Dashboard',
                           activeTheme: activeTheme,
+                          isCollapsed: _isSidebarCollapsed,
                         ),
                         const SizedBox(height: 4),
                         _buildSidebarNavItem(
@@ -127,20 +161,23 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                           icon: Icons.library_music_rounded,
                           label: l10n?.tabLibrary ?? 'Media Library',
                           activeTheme: activeTheme,
+                          isCollapsed: _isSidebarCollapsed,
                         ),
                         const SizedBox(height: 4),
                         _buildSidebarNavItem(
                           index: 2,
-                          icon: Icons.settings_rounded,
-                          label: l10n?.tabSettings ?? 'Settings',
+                          icon: Icons.grid_view_rounded,
+                          label: l10n?.tabCatalog ?? 'Catalog',
                           activeTheme: activeTheme,
+                          isCollapsed: _isSidebarCollapsed,
                         ),
                         const SizedBox(height: 4),
                         _buildSidebarNavItem(
                           index: 3,
-                          icon: Icons.grid_view_rounded,
-                          label: l10n?.tabCatalog ?? 'Catalog',
+                          icon: Icons.settings_rounded,
+                          label: l10n?.tabSettings ?? 'Settings',
                           activeTheme: activeTheme,
+                          isCollapsed: _isSidebarCollapsed,
                         ),
                       ],
                     ),
@@ -150,36 +187,51 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
 
                   // Sidebar Bottom: Log Console Trigger & Version Tag
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: _isSidebarCollapsed ? 8 : 12, vertical: 10),
                     decoration: BoxDecoration(
                       border: Border(
                         top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Consumer<SettingsService>(
-                          builder: (context, settings, _) {
-                            if (!settings.showLogConsoleIcon) return const SizedBox.shrink();
-                            return IconButton(
-                              icon: Icon(Icons.terminal_rounded, color: activeTheme.primary, size: 20),
-                              tooltip: l10n?.logConsoleTooltip ?? 'Open log and debug console',
-                              onPressed: () {
-                                _scaffoldKey.currentState?.openEndDrawer();
+                    child: _isSidebarCollapsed
+                        ? Center(
+                            child: Consumer<SettingsService>(
+                              builder: (context, settings, _) {
+                                if (!settings.showLogConsoleIcon) return const SizedBox.shrink();
+                                return IconButton(
+                                  icon: Icon(Icons.terminal_rounded, color: activeTheme.primary, size: 20),
+                                  tooltip: l10n?.logConsoleTooltip ?? 'Open log and debug console',
+                                  onPressed: () {
+                                    _scaffoldKey.currentState?.openEndDrawer();
+                                  },
+                                );
                               },
-                            );
-                          },
-                        ),
-                        Text(
-                          'v1.0.0',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: activeTheme.textSecondary.withValues(alpha: 0.5),
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Consumer<SettingsService>(
+                                builder: (context, settings, _) {
+                                  if (!settings.showLogConsoleIcon) return const SizedBox.shrink();
+                                  return IconButton(
+                                    icon: Icon(Icons.terminal_rounded, color: activeTheme.primary, size: 20),
+                                    tooltip: l10n?.logConsoleTooltip ?? 'Open log and debug console',
+                                    onPressed: () {
+                                      _scaffoldKey.currentState?.openEndDrawer();
+                                    },
+                                  );
+                                },
+                              ),
+                              Text(
+                                'v1.0.0',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: activeTheme.textSecondary.withValues(alpha: 0.5),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
@@ -201,8 +253,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                     children: const [
                       ResponsiveGmDashboard(),
                       LibraryScreen(),
-                      SettingsScreen(),
                       RepositoryCatalogScreen(),
+                      SettingsScreen(),
                     ],
                   ),
                 ),
@@ -241,20 +293,6 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
           ),
           const Spacer(),
 
-          // Manual Ducking Button
-          Consumer<AudioEngineService>(
-            builder: (context, engine, _) {
-              return IconButton(
-                icon: Icon(
-                  Icons.volume_down_rounded,
-                  size: 20,
-                  color: engine.duckingController.isDucked ? activeTheme.duckingBadge : activeTheme.textSecondary,
-                ),
-                tooltip: l10n?.manualDuckingTooltip ?? 'Manual Ducking [D]',
-                onPressed: () => engine.triggerManualDuck(),
-              );
-            },
-          ),
           // Master Mute & Volume
           Consumer<AudioEngineService>(
             builder: (context, engine, _) {
@@ -308,9 +346,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
       case 1:
         return l10n?.libraryTitle ?? 'Media Library';
       case 2:
-        return l10n?.settingsTitle ?? 'Audio Engine Settings';
-      case 3:
         return l10n?.catalogTitle ?? 'Catalog';
+      case 3:
+        return l10n?.settingsTitle ?? 'Audio Engine Settings';
       default:
         return '';
     }
@@ -321,9 +359,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
     required IconData icon,
     required String label,
     required dynamic activeTheme,
+    required bool isCollapsed,
   }) {
     final isSelected = _tabController.index == index;
-    return Material(
+    final itemWidget = Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
@@ -333,7 +372,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
         borderRadius: BorderRadius.circular(10),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: EdgeInsets.symmetric(
+            horizontal: isCollapsed ? 8 : 12,
+            vertical: 10,
+          ),
           decoration: BoxDecoration(
             color: isSelected ? activeTheme.primary.withValues(alpha: 0.15) : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
@@ -342,31 +384,48 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               width: 0.8,
             ),
           ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 18,
-                color: isSelected ? activeTheme.primary : activeTheme.textSecondary,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? activeTheme.textPrimary : activeTheme.textSecondary,
+          child: isCollapsed
+              ? Center(
+                  child: Icon(
+                    icon,
+                    size: 20,
+                    color: isSelected ? activeTheme.primary : activeTheme.textSecondary,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                )
+              : Row(
+                  children: [
+                    Icon(
+                      icon,
+                      size: 18,
+                      color: isSelected ? activeTheme.primary : activeTheme.textSecondary,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected ? activeTheme.textPrimary : activeTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
+
+    if (isCollapsed) {
+      return Tooltip(
+        message: label,
+        waitDuration: const Duration(milliseconds: 300),
+        child: itemWidget,
+      );
+    }
+    return itemWidget;
   }
 
   Widget _buildMobileLayout(dynamic activeTheme, AppLocalizations? l10n) {
@@ -376,30 +435,36 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
       appBar: AppBar(
         backgroundColor: activeTheme.surface,
         elevation: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: activeTheme.primary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 0.8),
+        centerTitle: false,
+        titleSpacing: 12,
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: activeTheme.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 0.8),
+                ),
+                child: Icon(Icons.shield_moon_rounded, color: activeTheme.primary, size: 20),
               ),
-              child: Icon(Icons.shield_moon_rounded, color: activeTheme.primary, size: 20),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              l10n?.appTitle ?? 'DnDisc',
-              style: TextStyle(
-                fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
-                fontWeight: FontWeight.bold,
-                fontSize: 19,
-                letterSpacing: 0.6,
-                color: activeTheme.textPrimary,
+              const SizedBox(width: 8),
+              Text(
+                l10n?.appTitle ?? 'DnDisc',
+                style: TextStyle(
+                  fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: 0.6,
+                  color: activeTheme.textPrimary,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
@@ -420,26 +485,13 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               tabs: [
                 Tab(icon: const Icon(Icons.dashboard_rounded, size: 18), text: l10n?.tabGmDashboard ?? 'GM Dashboard'),
                 Tab(icon: const Icon(Icons.library_music_rounded, size: 18), text: l10n?.tabLibrary ?? 'Media Library'),
-                Tab(icon: const Icon(Icons.settings_rounded, size: 18), text: l10n?.tabSettings ?? 'Settings'),
                 Tab(icon: const Icon(Icons.grid_view_rounded, size: 18), text: l10n?.tabCatalog ?? 'Catalog'),
+                Tab(icon: const Icon(Icons.settings_rounded, size: 18), text: l10n?.tabSettings ?? 'Settings'),
               ],
             ),
           ),
         ),
         actions: [
-          // Manual Ducking Button
-          Consumer<AudioEngineService>(
-            builder: (context, engine, _) {
-              return IconButton(
-                icon: Icon(
-                  Icons.volume_down_rounded,
-                  color: engine.duckingController.isDucked ? activeTheme.duckingBadge : activeTheme.textSecondary,
-                ),
-                tooltip: l10n?.manualDuckingTooltip ?? 'Manual Ducking [D]',
-                onPressed: () => engine.triggerManualDuck(),
-              );
-            },
-          ),
           // Master Mute & Volume
           Consumer<AudioEngineService>(
             builder: (context, engine, _) {
@@ -454,7 +506,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                     onPressed: () => engine.toggleMute(),
                   ),
                   SizedBox(
-                    width: 100,
+                    width: 75,
                     child: SliderTheme(
                       data: SliderThemeData(
                         trackHeight: 3,
@@ -494,8 +546,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
         children: const [
           ResponsiveGmDashboard(),
           LibraryScreen(),
-          SettingsScreen(),
           RepositoryCatalogScreen(),
+          SettingsScreen(),
         ],
       ),
     );

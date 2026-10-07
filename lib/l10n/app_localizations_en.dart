@@ -1033,4 +1033,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessionAudioDeck => 'Session Audio Deck';
+
+  @override
+  String get collapseSidebarTooltip => 'Collapse sidebar';
+
+  @override
+  String get expandSidebarTooltip => 'Expand sidebar';
 }

@@ -244,19 +244,6 @@ class StickyMiniPlayer extends StatelessWidget {
                                   }
                                 },
                               ),
-                              const SizedBox(width: 4),
-                              // Manual Ducking trigger
-                              IconButton(
-                                icon: Icon(
-                                  Icons.volume_down_rounded,
-                                  size: 20,
-                                  color: audioEngine.duckingController.isDucked
-                                      ? activeTheme.duckingBadge
-                                      : activeTheme.textSecondary,
-                                ),
-                                tooltip: l10n?.manualDuckingTooltip ?? 'Manual Ducking [D]',
-                                onPressed: () => audioEngine.triggerManualDuck(),
-                              ),
                             ],
                           ),
                         ),

@@ -244,7 +244,7 @@ void main() {
 
       // Assert
       expect(find.text('Dragon Cave'), findsOneWidget);
-      expect(find.text(l10n.currentSceneBadge), findsOneWidget);
+      expect(find.text(l10n.currentSceneBadge), findsNothing);
       expect(find.text(l10n.intensityCalm), findsOneWidget);
       expect(find.text(l10n.intensityBattle), findsOneWidget);
     });

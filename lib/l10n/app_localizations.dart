@@ -1981,6 +1981,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Session Audio Deck'**
   String get sessionAudioDeck;
+
+  /// No description provided for @collapseSidebarTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse sidebar'**
+  String get collapseSidebarTooltip;
+
+  /// No description provided for @expandSidebarTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand sidebar'**
+  String get expandSidebarTooltip;
 }
 
 class _AppLocalizationsDelegate

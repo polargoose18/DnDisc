@@ -97,11 +97,6 @@ class AudioEngineService extends ChangeNotifier {
     sfxBus.stopAll();
   }
 
-  void triggerManualDuck() {
-    LoggerService().info('AudioEngine: Manual ducking triggered');
-    _handleSfxDucking();
-  }
-
   void _handleSfxDucking() {
     duckingController.triggerDuck(
       onVolumeUpdate: (multiplier) {

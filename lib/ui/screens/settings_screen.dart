@@ -780,12 +780,6 @@ class SettingsScreen extends StatelessWidget {
         keyDisplay: 'M',
       ),
       ShortcutDefinition(
-        action: AppShortcutAction.manualDucking,
-        title: 'Manual Ducking',
-        description: 'Temporarily lower music volume during speech',
-        keyDisplay: 'D',
-      ),
-      ShortcutDefinition(
         action: AppShortcutAction.panicStopSfx,
         title: 'Panic Stop',
         description: 'Immediately stop all playing SFX sounds',

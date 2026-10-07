@@ -21,7 +21,6 @@ enum AppShortcutAction {
   sfx8,
   sfx9,
   masterMute,
-  manualDucking,
   panicStopSfx,
   toggleFullscreen,
 }
@@ -74,8 +73,6 @@ extension ShortcutDefinitionLocalizationExtension on ShortcutDefinition {
         return l10n.shortcutSfxTitle(9);
       case AppShortcutAction.masterMute:
         return l10n.shortcutMasterMuteTitle;
-      case AppShortcutAction.manualDucking:
-        return l10n.shortcutManualDuckingTitle;
       case AppShortcutAction.panicStopSfx:
         return l10n.shortcutPanicStopTitle;
       case AppShortcutAction.toggleFullscreen:
@@ -116,8 +113,6 @@ extension ShortcutDefinitionLocalizationExtension on ShortcutDefinition {
         return l10n.shortcutSfxDesc(9);
       case AppShortcutAction.masterMute:
         return l10n.shortcutMasterMuteDesc;
-      case AppShortcutAction.manualDucking:
-        return l10n.shortcutManualDuckingDesc;
       case AppShortcutAction.panicStopSfx:
         return l10n.shortcutPanicStopDesc;
       case AppShortcutAction.toggleFullscreen:
@@ -222,12 +217,6 @@ class ShortcutService extends ChangeNotifier {
       description: 'Quick mute or unmute master audio',
       keyDisplay: 'M',
     ),
-    AppShortcutAction.manualDucking: const ShortcutDefinition(
-      action: AppShortcutAction.manualDucking,
-      title: 'Manual Ducking',
-      description: 'Duck music during speech',
-      keyDisplay: 'D',
-    ),
     AppShortcutAction.panicStopSfx: const ShortcutDefinition(
       action: AppShortcutAction.panicStopSfx,
       title: 'Panic Stop SFX',
@@ -300,12 +289,6 @@ class ShortcutService extends ChangeNotifier {
     // Key M -> Master Mute
     if (event.logicalKey == LogicalKeyboardKey.keyM) {
       _executeAction(AppShortcutAction.masterMute);
-      return true;
-    }
-
-    // Key D -> Manual Ducking
-    if (event.logicalKey == LogicalKeyboardKey.keyD) {
-      _executeAction(AppShortcutAction.manualDucking);
       return true;
     }
 
@@ -399,10 +382,6 @@ class ShortcutService extends ChangeNotifier {
 
       case AppShortcutAction.masterMute:
         _audioEngine!.toggleMute();
-        break;
-
-      case AppShortcutAction.manualDucking:
-        _audioEngine!.triggerManualDuck();
         break;
 
       case AppShortcutAction.panicStopSfx:
