@@ -24,15 +24,15 @@ class SceneBackdropHeader extends StatelessWidget {
     if (activeScene == null) {
       return Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: activeTheme.card,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: activeTheme.textSecondary.withValues(alpha: 0.15)),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
         ),
         child: Row(
           children: [
-            Icon(Icons.theater_comedy_rounded, color: activeTheme.textSecondary, size: 28),
+            Icon(Icons.theater_comedy_rounded, color: activeTheme.primary, size: 28),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -50,13 +50,14 @@ class SceneBackdropHeader extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
+        color: activeTheme.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: sceneColor.withValues(alpha: 0.5), width: 1.5),
+        border: Border.all(color: activeTheme.primary.withValues(alpha: 0.25), width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: sceneColor.withValues(alpha: 0.25),
+            color: Colors.black.withValues(alpha: 0.35),
             blurRadius: 16,
-            spreadRadius: 1,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -64,7 +65,7 @@ class SceneBackdropHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         child: Stack(
           children: [
-            // Background Image or atmospheric backdrop gradient
+            // Atmospheric Backdrop Image or Warm Vignette Gradient
             if (activeScene.imagePath != null &&
                 activeScene.imagePath!.isNotEmpty &&
                 File(activeScene.imagePath!).existsSync())
@@ -72,7 +73,7 @@ class SceneBackdropHeader extends StatelessWidget {
                 child: Image.file(
                   File(activeScene.imagePath!),
                   fit: BoxFit.cover,
-                  color: Colors.black.withValues(alpha: 0.7),
+                  color: Colors.black.withValues(alpha: 0.72),
                   colorBlendMode: BlendMode.darken,
                 ),
               )
@@ -84,104 +85,181 @@ class SceneBackdropHeader extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        sceneColor.withValues(alpha: 0.55),
-                        activeTheme.surface.withValues(alpha: 0.95),
+                        sceneColor.withValues(alpha: 0.28),
+                        activeTheme.card.withValues(alpha: 0.95),
+                        activeTheme.surface,
                       ],
                     ),
                   ),
                 ),
               ),
 
-            // Content
+            // Content Layout
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: sceneColor,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: sceneColor.withValues(alpha: 0.6), blurRadius: 10),
-                      ],
-                    ),
-                    child: const Icon(Icons.auto_awesome, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 8,
-                          runSpacing: 4,
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: sceneColor.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: sceneColor.withValues(alpha: 0.6), width: 1.2),
+                        ),
+                        child: Icon(Icons.auto_awesome, color: activeTheme.primary, size: 22),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              activeScene.name,
-                              style: TextStyle(
-                                color: activeTheme.textPrimary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: activeTheme.primary.withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: activeTheme.primary, width: 0.8),
-                              ),
-                              child: Text(
-                                l10n?.currentSceneBadge ?? 'CURRENT SCENE',
-                                style: TextStyle(
-                                  color: activeTheme.textPrimary,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: [
+                                Text(
+                                  activeScene.name,
+                                  style: TextStyle(
+                                    color: activeTheme.textPrimary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    letterSpacing: 0.4,
+                                    fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+                                  ),
                                 ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: activeTheme.primary.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: activeTheme.primary.withValues(alpha: 0.5), width: 0.8),
+                                  ),
+                                  child: Text(
+                                    l10n?.currentSceneBadge ?? 'CURRENT SCENE',
+                                    style: TextStyle(
+                                      color: activeTheme.primary,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (activeScene.description.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                activeScene.description,
+                                style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Integrated Active Music Mode Pill Bar
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: activeTheme.surface.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                    ),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      alignment: WrapAlignment.spaceBetween,
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.tune_rounded, size: 14, color: activeTheme.primary),
+                            const SizedBox(width: 6),
+                            Text(
+                              l10n?.activeMusicMode ?? 'Active music mode:',
+                              style: TextStyle(
+                                color: activeTheme.textSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
-                        if (activeScene.description.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            activeScene.description,
-                            style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            // Off Pill
+                            _buildModePill(
+                              context: context,
+                              title: l10n?.musicModeOff ?? 'Off',
+                              subtitle: null,
+                              isSelected: !musicBus.isPlaying,
+                              selectedColor: Colors.grey.shade400,
+                              activeTheme: activeTheme,
+                              onTap: () {
+                                if (musicBus.isPlaying) {
+                                  musicBus.pause();
+                                }
+                              },
+                            ),
+                            // Explore (Calm) Pill
+                            _buildModePill(
+                              context: context,
+                              title: l10n?.musicModeExplore ?? 'Explore',
+                              subtitle: l10n?.intensityCalm ?? 'Calm',
+                              isSelected: musicBus.isPlaying && musicBus.currentIntensity == MusicIntensity.calm,
+                              selectedColor: activeTheme.secondary,
+                              activeTheme: activeTheme,
+                              onTap: () {
+                                musicBus.setIntensity(MusicIntensity.calm);
+                                if (!musicBus.isPlaying) musicBus.resume();
+                              },
+                            ),
+                            // Combat (Battle) Pill
+                            _buildModePill(
+                              context: context,
+                              title: l10n?.musicModeCombat ?? 'Combat',
+                              subtitle: l10n?.intensityBattle ?? 'Battle',
+                              isSelected: musicBus.isPlaying &&
+                                  (musicBus.currentIntensity == MusicIntensity.battle ||
+                                      musicBus.currentIntensity == MusicIntensity.suspense),
+                              selectedColor: activeTheme.battleIntensity,
+                              activeTheme: activeTheme,
+                              onTap: () {
+                                musicBus.setIntensity(MusicIntensity.battle);
+                                if (!musicBus.isPlaying) musicBus.resume();
+                              },
+                            ),
+                            // Victory (Boss) Pill
+                            _buildModePill(
+                              context: context,
+                              title: l10n?.musicModeVictory ?? 'Victory',
+                              subtitle: l10n?.intensityBoss ?? 'Boss',
+                              isSelected: musicBus.isPlaying && musicBus.currentIntensity == MusicIntensity.boss,
+                              selectedColor: activeTheme.bossIntensity,
+                              activeTheme: activeTheme,
+                              onTap: () {
+                                musicBus.setIntensity(MusicIntensity.boss);
+                                if (!musicBus.isPlaying) musicBus.resume();
+                              },
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Quick Music Intensity Selector
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        l10n?.musicIntensityLabel ?? 'Music Intensity',
-                        style: TextStyle(color: activeTheme.textSecondary, fontSize: 11),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildIntensityBtn(context, MusicIntensity.calm.getLocalizedName(l10n), MusicIntensity.calm, musicBus, activeTheme),
-                          const SizedBox(width: 4),
-                          _buildIntensityBtn(context, MusicIntensity.suspense.getLocalizedName(l10n), MusicIntensity.suspense, musicBus, activeTheme),
-                          const SizedBox(width: 4),
-                          _buildIntensityBtn(context, MusicIntensity.battle.getLocalizedName(l10n), MusicIntensity.battle, musicBus, activeTheme),
-                          const SizedBox(width: 4),
-                          _buildIntensityBtn(context, MusicIntensity.boss.getLocalizedName(l10n), MusicIntensity.boss, musicBus, activeTheme),
-                        ],
-                      ),
-                    ],
                   ),
                 ],
               ),
@@ -192,47 +270,68 @@ class SceneBackdropHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildIntensityBtn(
-    BuildContext context,
-    String label,
-    MusicIntensity intensity,
-    MusicBusController musicBus,
-    dynamic activeTheme,
-  ) {
-    final isSelected = musicBus.currentIntensity == intensity;
-    Color color;
-    switch (intensity) {
-      case MusicIntensity.calm:
-        color = activeTheme.secondary;
-        break;
-      case MusicIntensity.suspense:
-        color = Colors.amberAccent;
-        break;
-      case MusicIntensity.battle:
-        color = activeTheme.battleIntensity;
-        break;
-      case MusicIntensity.boss:
-        color = activeTheme.bossIntensity;
-        break;
-    }
-
+  Widget _buildModePill({
+    required BuildContext context,
+    required String title,
+    required String? subtitle,
+    required bool isSelected,
+    required Color selectedColor,
+    required dynamic activeTheme,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
-      onTap: () => musicBus.setIntensity(intensity),
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? color : color.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color, width: isSelected ? 1.5 : 0.8),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : color,
-            fontSize: 11,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? selectedColor.withValues(alpha: 0.28) : activeTheme.card,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? selectedColor : Colors.white.withValues(alpha: 0.1),
+            width: isSelected ? 1.4 : 0.8,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: selectedColor.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.white : activeTheme.textPrimary,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              ),
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(width: 4),
+              Text(
+                '·',
+                style: TextStyle(
+                  color: isSelected ? Colors.white60 : activeTheme.textSecondary.withValues(alpha: 0.5),
+                  fontSize: 10,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: isSelected ? Colors.white70 : activeTheme.textSecondary,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

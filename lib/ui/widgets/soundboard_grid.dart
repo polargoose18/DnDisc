@@ -37,7 +37,7 @@ class SoundboardGrid extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.campaign_rounded, color: activeTheme.accent),
+                          Icon(Icons.campaign_rounded, color: activeTheme.primary),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -45,6 +45,8 @@ class SoundboardGrid extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                letterSpacing: 0.3,
+                                fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
                                 color: activeTheme.textPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -59,7 +61,7 @@ class SoundboardGrid extends StatelessWidget {
                           key: const ValueKey('add_sfx_trigger_btn'),
                           icon: const Icon(Icons.add_rounded, size: 20),
                           tooltip: l10n?.addSfxTooltip ?? 'Add SFX / Persistent Button',
-                          color: activeTheme.accent,
+                          color: activeTheme.primary,
                           onPressed: () => _showAddSfxDialog(context, sfx),
                         ),
                         ElevatedButton.icon(
@@ -67,11 +69,12 @@ class SoundboardGrid extends StatelessWidget {
                           icon: const Icon(Icons.dangerous_rounded, size: 16),
                           label: Text(l10n?.panicStopBtn ?? 'Panic Stop [Esc]', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade700,
+                            backgroundColor: activeTheme.battleIntensity,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             minimumSize: const Size(0, 30),
-                            elevation: 2,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                           onPressed: () => sfx.stopAll(),
                         ),
@@ -90,7 +93,7 @@ class SoundboardGrid extends StatelessWidget {
                     Expanded(
                       child: Slider(
                         value: sfx.rawVolume,
-                        activeColor: activeTheme.accent,
+                        activeColor: activeTheme.primary,
                         onChanged: (val) => sfx.setVolume(val),
                       ),
                     ),
@@ -106,6 +109,7 @@ class SoundboardGrid extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: activeTheme.surface,
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                     ),
                     child: Center(
                       child: Column(
@@ -141,26 +145,27 @@ class SoundboardGrid extends StatelessWidget {
                       final isLooping = sfx.isTriggerLooping(trigger.id);
                       final color = Color(trigger.colorHex);
                       final hotkeyText = trigger.hotkey != null ? '[${trigger.hotkey}]' : (index < 9 ? '[${index + 1}]' : null);
+                      final sfxIcon = _getSfxIcon(trigger.title, index);
 
                       return InkWell(
                         key: ValueKey('sfx_btn_${trigger.id}'),
                         onTap: () => sfx.triggerSfx(trigger.id),
                         onLongPress: () => _showTriggerOptions(context, sfx, trigger),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                           decoration: BoxDecoration(
-                            color: isLooping ? color : color.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(10),
+                            color: isLooping ? color.withValues(alpha: 0.35) : activeTheme.surface,
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isLooping
-                                  ? Colors.white
-                                  : (trigger.isPersistent ? Colors.amberAccent : color.withValues(alpha: 0.7)),
-                              width: isLooping ? 2.0 : 1.0,
+                                  ? activeTheme.primary
+                                  : (trigger.isPersistent ? Colors.amberAccent.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.08)),
+                              width: isLooping ? 1.6 : 1.0,
                             ),
                             boxShadow: isLooping
-                                ? [BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 10, spreadRadius: 1)]
+                                ? [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 10, spreadRadius: 1)]
                                 : null,
                           ),
                           child: Column(
@@ -172,15 +177,16 @@ class SoundboardGrid extends StatelessWidget {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                       decoration: BoxDecoration(
-                                        color: Colors.black45,
+                                        color: Colors.black38,
                                         borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: Colors.white10),
                                       ),
                                       child: Text(
                                         hotkeyText,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 9,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                          color: activeTheme.primary,
                                         ),
                                       ),
                                     )
@@ -195,8 +201,8 @@ class SoundboardGrid extends StatelessWidget {
                                       padding: const EdgeInsets.all(2.0),
                                       child: Icon(
                                         trigger.isPersistent ? Icons.push_pin_rounded : Icons.push_pin_outlined,
-                                        size: 14,
-                                        color: trigger.isPersistent ? Colors.amberAccent : Colors.white38,
+                                        size: 13,
+                                        color: trigger.isPersistent ? Colors.amberAccent : Colors.white30,
                                       ),
                                     ),
                                   ),
@@ -209,34 +215,40 @@ class SoundboardGrid extends StatelessWidget {
                                       padding: const EdgeInsets.all(2.0),
                                       child: Icon(
                                         Icons.repeat_rounded,
-                                        size: 15,
-                                        color: trigger.isLoop ? Colors.amberAccent : Colors.white38,
+                                        size: 14,
+                                        color: trigger.isLoop ? Colors.amberAccent : Colors.white30,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 2),
-                              Expanded(
-                                child: Center(
-                                  child: Text(
-                                    trigger.title,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      color: isLooping ? Colors.white : activeTheme.textPrimary,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(sfxIcon, size: 14, color: isLooping ? activeTheme.primary : activeTheme.textSecondary.withValues(alpha: 0.7)),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      trigger.title,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 11,
+                                        color: isLooping ? Colors.white : activeTheme.textPrimary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
+                                ],
                               ),
                               if (isLooping)
                                 Text(
                                   l10n?.loopingBadge ?? 'LOOPING',
                                   style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.amberAccent),
-                                ),
+                                )
+                              else
+                                const SizedBox(height: 2),
                             ],
                           ),
                         ),
@@ -281,6 +293,46 @@ class SoundboardGrid extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _getSfxIcon(String title, int index) {
+    final lower = title.toLowerCase();
+    if (lower.contains('sword') || lower.contains('attack') || lower.contains('hit') || lower.contains('slash')) {
+      return Icons.hardware_rounded;
+    }
+    if (lower.contains('coin') || lower.contains('gold') || lower.contains('chest')) {
+      return Icons.monetization_on_rounded;
+    }
+    if (lower.contains('roar') || lower.contains('monster') || lower.contains('dragon') || lower.contains('beast')) {
+      return Icons.pets_rounded;
+    }
+    if (lower.contains('spell') || lower.contains('magic') || lower.contains('cast') || lower.contains('fire')) {
+      return Icons.auto_awesome_rounded;
+    }
+    if (lower.contains('foot') || lower.contains('walk') || lower.contains('step')) {
+      return Icons.directions_walk_rounded;
+    }
+    if (lower.contains('shield') || lower.contains('defend') || lower.contains('block')) {
+      return Icons.shield_rounded;
+    }
+    if (lower.contains('horn') || lower.contains('trumpet') || lower.contains('alarm')) {
+      return Icons.campaign_rounded;
+    }
+    if (lower.contains('potion') || lower.contains('heal') || lower.contains('drink')) {
+      return Icons.local_drink_rounded;
+    }
+    if (lower.contains('dice') || lower.contains('roll')) {
+      return Icons.casino_rounded;
+    }
+    const icons = [
+      Icons.flash_on_rounded,
+      Icons.auto_awesome,
+      Icons.hardware_rounded,
+      Icons.shield_rounded,
+      Icons.campaign_rounded,
+      Icons.casino_rounded,
+    ];
+    return icons[index % icons.length];
   }
 
   void _showAddSfxDialog(BuildContext context, SfxBusController sfx) {

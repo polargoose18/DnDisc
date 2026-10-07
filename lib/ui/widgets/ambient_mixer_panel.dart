@@ -36,7 +36,7 @@ class AmbientMixerPanel extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.waves_rounded, color: activeTheme.secondary),
+                          Icon(Icons.waves_rounded, color: activeTheme.primary),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -44,11 +44,32 @@ class AmbientMixerPanel extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                letterSpacing: 0.3,
+                                fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
                                 color: activeTheme.textPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          if (ambient.layers.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: activeTheme.primary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: activeTheme.primary.withValues(alpha: 0.3), width: 0.8),
+                              ),
+                              child: Text(
+                                '${ambient.layers.where((l) => l.isActive).length}/${ambient.layers.length}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: activeTheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -58,7 +79,7 @@ class AmbientMixerPanel extends StatelessWidget {
                           key: const ValueKey('add_ambient_layer_btn'),
                           icon: const Icon(Icons.add_rounded, size: 20),
                           tooltip: l10n?.addAmbientTooltip ?? 'Add Layer / Persistent Ambient',
-                          color: activeTheme.secondary,
+                          color: activeTheme.primary,
                           onPressed: () => _showAddAmbientDialog(context, ambient),
                         ),
                         if (ambient.layers.isNotEmpty)
@@ -86,6 +107,7 @@ class AmbientMixerPanel extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: activeTheme.surface,
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                     ),
                     child: Center(
                       child: Column(
@@ -115,14 +137,14 @@ class AmbientMixerPanel extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: layer.isActive
-                              ? activeTheme.primary.withValues(alpha: 0.12)
+                              ? activeTheme.primary.withValues(alpha: 0.1)
                               : activeTheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: layer.isActive
-                                ? activeTheme.primary.withValues(alpha: 0.5)
-                                : (layer.isPersistent ? Colors.amberAccent.withValues(alpha: 0.4) : Colors.white10),
-                            width: layer.isActive ? 1.5 : 1.0,
+                                ? activeTheme.primary.withValues(alpha: 0.45)
+                                : (layer.isPersistent ? Colors.amberAccent.withValues(alpha: 0.35) : Colors.white.withValues(alpha: 0.05)),
+                            width: layer.isActive ? 1.4 : 1.0,
                           ),
                         ),
                         child: Row(
@@ -169,14 +191,26 @@ class AmbientMixerPanel extends StatelessWidget {
                               ),
                             ),
                             Expanded(
-                              flex: 4,
+                              flex: 3,
                               child: Slider(
                                 key: ValueKey('ambient_slider_${layer.id}'),
                                 value: layer.volume,
-                                activeColor: activeTheme.secondary,
+                                activeColor: activeTheme.primary,
                                 onChanged: (val) => ambient.setLayerVolume(layer.id, val),
                               ),
                             ),
+                            // Stepped discrete intensity controls [ I | II | III ]
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildSteppedPill(l10n?.intensityStepped1 ?? 'I', 0.33, layer.volume, () => ambient.setLayerVolume(layer.id, 0.33), activeTheme),
+                                const SizedBox(width: 2),
+                                _buildSteppedPill(l10n?.intensityStepped2 ?? 'II', 0.66, layer.volume, () => ambient.setLayerVolume(layer.id, 0.66), activeTheme),
+                                const SizedBox(width: 2),
+                                _buildSteppedPill(l10n?.intensityStepped3 ?? 'III', 1.0, layer.volume, () => ambient.setLayerVolume(layer.id, 1.0), activeTheme),
+                              ],
+                            ),
+                            const SizedBox(width: 4),
                             // Persistent Pin Button
                             IconButton(
                               icon: Icon(
@@ -194,7 +228,7 @@ class AmbientMixerPanel extends StatelessWidget {
                               icon: Icon(
                                 layer.isActive ? Icons.volume_up : Icons.volume_off,
                                 size: 18,
-                                color: layer.isActive ? activeTheme.secondary : activeTheme.textSecondary,
+                                color: layer.isActive ? activeTheme.primary : activeTheme.textSecondary,
                               ),
                               tooltip: layer.isActive
                                   ? (l10n?.muteLayerTooltip ?? 'Mute layer')
@@ -218,6 +252,33 @@ class AmbientMixerPanel extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSteppedPill(String label, double targetVal, double currentVal, VoidCallback onTap, dynamic activeTheme) {
+    final isSelected = (currentVal - targetVal).abs() < 0.18;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+        decoration: BoxDecoration(
+          color: isSelected ? activeTheme.primary.withValues(alpha: 0.25) : activeTheme.surface,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isSelected ? activeTheme.primary : Colors.white12,
+            width: 0.8,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? activeTheme.primary : activeTheme.textSecondary,
+          ),
+        ),
+      ),
     );
   }
 

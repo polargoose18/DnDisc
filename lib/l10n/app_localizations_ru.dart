@@ -330,7 +330,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addLayerBtn => 'Добавить слой';
 
   @override
-  String get soundboardTitle => 'Soundboard (SFX эффекты)';
+  String get soundboardTitle => 'Быстрые эффекты SFX';
 
   @override
   String get addSfxTooltip => 'Добавить SFX / Постоянную кнопку';
@@ -1010,4 +1010,40 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get milliseconds => 'мс';
+
+  @override
+  String get sfxQuickTrigger => 'Быстрые эффекты SFX';
+
+  @override
+  String get activeMusicMode => 'Режим музыки';
+
+  @override
+  String get musicModeOff => 'Выкл';
+
+  @override
+  String get musicModeExplore => 'Исследование';
+
+  @override
+  String get musicModeCombat => 'Бой';
+
+  @override
+  String get musicModeVictory => 'Победа';
+
+  @override
+  String get intensityStepped1 => 'I';
+
+  @override
+  String get intensityStepped2 => 'II';
+
+  @override
+  String get intensityStepped3 => 'III';
+
+  @override
+  String get optionsTooltip => 'Настройки';
+
+  @override
+  String get scenesQuickPicker => 'Сцены';
+
+  @override
+  String get sessionAudioDeck => 'Сессионная аудиопанель';
 }

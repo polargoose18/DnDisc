@@ -102,7 +102,7 @@
   "selected": "Выбран: ",
   "persistentLayerCheckbox": "Постоянный слой (не сбрасывать при смене сцены)",
   "addLayerBtn": "Добавить слой",
-  "soundboardTitle": "Soundboard (SFX эффекты)",
+  "soundboardTitle": "Быстрые эффекты SFX",
   "addSfxTooltip": "Добавить SFX / Постоянную кнопку",
   "panicStopBtn": "Panic Stop [Esc]",
   "sfxVolume": "SFX Громкость: ",
@@ -549,5 +549,17 @@
   "colorNameBattleIntensity": "Интенсивность боя",
   "colorNameBossIntensity": "Интенсивность босса",
   "seconds": "сек",
-  "milliseconds": "мс"
+  "milliseconds": "мс",
+  "sfxQuickTrigger": "Быстрые эффекты SFX",
+  "activeMusicMode": "Режим музыки",
+  "musicModeOff": "Выкл",
+  "musicModeExplore": "Исследование",
+  "musicModeCombat": "Бой",
+  "musicModeVictory": "Победа",
+  "intensityStepped1": "I",
+  "intensityStepped2": "II",
+  "intensityStepped3": "III",
+  "optionsTooltip": "Настройки",
+  "scenesQuickPicker": "Сцены",
+  "sessionAudioDeck": "Сессионная аудиопанель"
 }

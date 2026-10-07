@@ -713,7 +713,7 @@ abstract class AppLocalizations {
   /// No description provided for @soundboardTitle.
   ///
   /// In en, this message translates to:
-  /// **'Soundboard (SFX Effects)'**
+  /// **'SFX Quick-Trigger'**
   String get soundboardTitle;
 
   /// No description provided for @addSfxTooltip.
@@ -1909,6 +1909,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ms'**
   String get milliseconds;
+
+  /// No description provided for @sfxQuickTrigger.
+  ///
+  /// In en, this message translates to:
+  /// **'SFX Quick-Trigger'**
+  String get sfxQuickTrigger;
+
+  /// No description provided for @activeMusicMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Active music mode'**
+  String get activeMusicMode;
+
+  /// No description provided for @musicModeOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get musicModeOff;
+
+  /// No description provided for @musicModeExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get musicModeExplore;
+
+  /// No description provided for @musicModeCombat.
+  ///
+  /// In en, this message translates to:
+  /// **'Combat'**
+  String get musicModeCombat;
+
+  /// No description provided for @musicModeVictory.
+  ///
+  /// In en, this message translates to:
+  /// **'Victory'**
+  String get musicModeVictory;
+
+  /// No description provided for @intensityStepped1.
+  ///
+  /// In en, this message translates to:
+  /// **'I'**
+  String get intensityStepped1;
+
+  /// No description provided for @intensityStepped2.
+  ///
+  /// In en, this message translates to:
+  /// **'II'**
+  String get intensityStepped2;
+
+  /// No description provided for @intensityStepped3.
+  ///
+  /// In en, this message translates to:
+  /// **'III'**
+  String get intensityStepped3;
+
+  /// No description provided for @optionsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Options'**
+  String get optionsTooltip;
+
+  /// No description provided for @scenesQuickPicker.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenes'**
+  String get scenesQuickPicker;
+
+  /// No description provided for @sessionAudioDeck.
+  ///
+  /// In en, this message translates to:
+  /// **'Session Audio Deck'**
+  String get sessionAudioDeck;
 }
 
 class _AppLocalizationsDelegate

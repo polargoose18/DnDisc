@@ -73,10 +73,14 @@ class CustomThemeModel {
       cardColor: card,
       cardTheme: CardThemeData(
         color: card,
-        elevation: 3,
+        elevation: 1,
         shadowColor: isDark ? Colors.black54 : Colors.black12,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(14)),
+          side: BorderSide(
+            color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.black.withValues(alpha: 0.08),
+            width: 1.0,
+          ),
         ),
       ),
       appBarTheme: AppBarTheme(
@@ -87,47 +91,69 @@ class CustomThemeModel {
           color: textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
         ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(
+            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
+            width: 1.0,
+          ),
         ),
         titleTextStyle: TextStyle(
           color: textPrimary,
           fontSize: 18,
           fontWeight: FontWeight.bold,
+          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
         ),
       ),
       sliderTheme: SliderThemeData(
+        trackHeight: 3,
         activeTrackColor: primary,
         thumbColor: primary,
-        inactiveTrackColor: primary.withValues(alpha: 0.25),
-        overlayColor: primary.withValues(alpha: 0.15),
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+        inactiveTrackColor: primary.withValues(alpha: 0.2),
+        overlayColor: primary.withValues(alpha: 0.12),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: card,
-        selectedColor: primary.withValues(alpha: 0.35),
+        selectedColor: primary.withValues(alpha: 0.25),
         labelStyle: TextStyle(color: textPrimary, fontSize: 12),
         secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 12),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
         ),
       ),
       textTheme: TextTheme(
         bodyLarge: TextStyle(color: textPrimary),
         bodyMedium: TextStyle(color: textPrimary),
         bodySmall: TextStyle(color: textSecondary),
-        titleLarge: TextStyle(color: textPrimary, fontWeight: FontWeight.bold),
-        titleMedium: TextStyle(color: textPrimary, fontWeight: FontWeight.w600),
+        titleLarge: TextStyle(
+          color: textPrimary,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.4,
+          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+        ),
+        titleMedium: TextStyle(
+          color: textPrimary,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+        ),
         titleSmall: TextStyle(color: textSecondary),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -135,9 +161,9 @@ class CustomThemeModel {
       ),
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: TextStyle(
-          color: Colors.grey.withValues(alpha: 0.5)
+          color: Colors.grey.withValues(alpha: 0.5),
         ),
-      )
+      ),
     );
   }
 

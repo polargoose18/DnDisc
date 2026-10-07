@@ -39,7 +39,7 @@ class _ResponsiveGmDashboardState extends State<ResponsiveGmDashboard>
         final isDesktop = constraints.maxWidth >= 1000 || MediaQuery.of(context).size.width >= 1000;
 
         if (isDesktop) {
-          return _buildDesktop3ColumnLayout();
+          return _buildDesktop3ColumnLayout(constraints.maxWidth);
         } else {
           return _buildMobileCompactTabbedLayout(l10n);
         }
@@ -47,39 +47,62 @@ class _ResponsiveGmDashboardState extends State<ResponsiveGmDashboard>
     );
   }
 
-  Widget _buildDesktop3ColumnLayout() {
-    return const Padding(
-      padding: EdgeInsets.all(12.0),
+  Widget _buildDesktop3ColumnLayout(double availableWidth) {
+    final isWideWorkstation = availableWidth >= 950;
+
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Column 1: Scenes Gallery (320px)
-          SizedBox(
-            width: 320,
+          // Left Sidebar: Scenes Gallery (295px)
+          const SizedBox(
+            width: 295,
             child: SceneSelectorPanel(isVertical: true),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
 
-          // Column 2: Center Stage (Scene Backdrop + Music + Ambient)
+          // Main Center Stage: Hero + Workstation
           Expanded(
-            flex: 2,
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  SceneBackdropHeader(),
-                  MusicPlayerPanel(),
-                  AmbientMixerPanel(),
+                  // Scene Hero Centerpiece at the top
+                  const SceneBackdropHeader(),
+                  const SizedBox(height: 4),
+
+                  // Workstation: Side-by-side on wide screens, stacked on medium screens
+                  if (isWideWorkstation)
+                    const Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Column(
+                            children: [
+                              MusicPlayerPanel(),
+                              AmbientMixerPanel(),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          flex: 1,
+                          child: SoundboardGrid(),
+                        ),
+                      ],
+                    )
+                  else
+                    const Column(
+                      children: [
+                        MusicPlayerPanel(),
+                        AmbientMixerPanel(),
+                        SizedBox(height: 8),
+                        SoundboardGrid(),
+                      ],
+                    ),
                 ],
               ),
-            ),
-          ),
-          SizedBox(width: 12),
-
-          // Column 3: Soundboard SFX (340px)
-          SizedBox(
-            width: 340,
-            child: SingleChildScrollView(
-              child: SoundboardGrid(),
             ),
           ),
         ],

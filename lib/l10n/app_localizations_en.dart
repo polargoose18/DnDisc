@@ -327,7 +327,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addLayerBtn => 'Add Layer';
 
   @override
-  String get soundboardTitle => 'Soundboard (SFX Effects)';
+  String get soundboardTitle => 'SFX Quick-Trigger';
 
   @override
   String get addSfxTooltip => 'Add SFX / Persistent Button';
@@ -997,4 +997,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get milliseconds => 'ms';
+
+  @override
+  String get sfxQuickTrigger => 'SFX Quick-Trigger';
+
+  @override
+  String get activeMusicMode => 'Active music mode';
+
+  @override
+  String get musicModeOff => 'Off';
+
+  @override
+  String get musicModeExplore => 'Explore';
+
+  @override
+  String get musicModeCombat => 'Combat';
+
+  @override
+  String get musicModeVictory => 'Victory';
+
+  @override
+  String get intensityStepped1 => 'I';
+
+  @override
+  String get intensityStepped2 => 'II';
+
+  @override
+  String get intensityStepped3 => 'III';
+
+  @override
+  String get optionsTooltip => 'Options';
+
+  @override
+  String get scenesQuickPicker => 'Scenes';
+
+  @override
+  String get sessionAudioDeck => 'Session Audio Deck';
 }

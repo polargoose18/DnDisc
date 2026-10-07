@@ -102,7 +102,7 @@
   "selected": "Selected: ",
   "persistentLayerCheckbox": "Persistent layer (do not reset on scene change)",
   "addLayerBtn": "Add Layer",
-  "soundboardTitle": "Soundboard (SFX Effects)",
+  "soundboardTitle": "SFX Quick-Trigger",
   "addSfxTooltip": "Add SFX / Persistent Button",
   "panicStopBtn": "Panic Stop [Esc]",
   "sfxVolume": "SFX Volume: ",
@@ -549,5 +549,17 @@
   "colorNameBattleIntensity": "Battle Intensity",
   "colorNameBossIntensity": "Boss Intensity",
   "seconds": "sec",
-  "milliseconds": "ms"
+  "milliseconds": "ms",
+  "sfxQuickTrigger": "SFX Quick-Trigger",
+  "activeMusicMode": "Active music mode",
+  "musicModeOff": "Off",
+  "musicModeExplore": "Explore",
+  "musicModeCombat": "Combat",
+  "musicModeVictory": "Victory",
+  "intensityStepped1": "I",
+  "intensityStepped2": "II",
+  "intensityStepped3": "III",
+  "optionsTooltip": "Options",
+  "scenesQuickPicker": "Scenes",
+  "sessionAudioDeck": "Session Audio Deck"
 }

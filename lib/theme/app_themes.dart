@@ -11,17 +11,17 @@ class AppThemes {
     id: deepDarkId,
     name: 'Deep Dark',
     isDark: true,
-    primaryColor: 0xFF7C4DFF, // Deep Purple Accent
-    secondaryColor: 0xFF00E5FF, // Cyan
-    backgroundColor: 0xFF121218,
-    surfaceColor: 0xFF181824,
-    cardColor: 0xFF1E1E2A,
-    accentColor: 0xFFBB86FC,
-    textPrimaryColor: 0xFFFFFFFF,
-    textSecondaryColor: 0xFFB0B0C0,
-    duckingBadgeColor: 0xFFFF9800,
-    battleIntensityColor: 0xFFEF4444,
-    bossIntensityColor: 0xFF9333EA,
+    primaryColor: 0xFFD4A373, // Antique warm gold / amber
+    secondaryColor: 0xFF9E8E81, // Muted warm hazel / sand
+    backgroundColor: 0xFF151210, // Dark warm espresso
+    surfaceColor: 0xFF1E1916, // Warm charcoal surface
+    cardColor: 0xFF29221D, // Matte warm card
+    accentColor: 0xFFE29578, // Warm terracotta
+    textPrimaryColor: 0xFFF5EFE6, // Warm parchment ivory
+    textSecondaryColor: 0xFFA69688, // Muted clay / warm sand
+    duckingBadgeColor: 0xFFE76F51, // Warm ember
+    battleIntensityColor: 0xFFC84B31, // Crimson ember
+    bossIntensityColor: 0xFF8A1C14, // Deep bloodstone
     isBuiltIn: true,
   );
 
