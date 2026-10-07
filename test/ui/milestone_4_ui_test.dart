@@ -314,7 +314,6 @@ void main() {
 
       // Assert
       expect(find.text('Sword Strike'), findsOneWidget);
-      expect(find.text('[1]'), findsOneWidget);
       expect(find.text(l10n.panicStopBtn), findsOneWidget);
     });
 

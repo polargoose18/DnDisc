@@ -142,113 +142,63 @@ class SoundboardGrid extends StatelessWidget {
                     itemCount: sfx.triggers.length,
                     itemBuilder: (context, index) {
                       final trigger = sfx.triggers[index];
-                      final isLooping = sfx.isTriggerLooping(trigger.id);
-                      final color = Color(trigger.colorHex);
-                      final hotkeyText = trigger.hotkey != null ? '[${trigger.hotkey}]' : (index < 9 ? '[${index + 1}]' : null);
                       final sfxIcon = _getSfxIcon(trigger.title, index);
 
                       return InkWell(
                         key: ValueKey('sfx_btn_${trigger.id}'),
                         onTap: () => sfx.triggerSfx(trigger.id),
-                        onLongPress: () => _showTriggerOptions(context, sfx, trigger),
+                        onLongPress: () => sfx.togglePersistent(trigger.id),
+                        onSecondaryTap: () => _showTriggerOptions(context, sfx, trigger),
                         borderRadius: BorderRadius.circular(12),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                           decoration: BoxDecoration(
-                            color: isLooping ? color.withValues(alpha: 0.35) : activeTheme.surface,
+                            color: activeTheme.surface,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isLooping
-                                  ? activeTheme.primary
-                                  : (trigger.isPersistent ? Colors.amberAccent.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.08)),
-                              width: isLooping ? 1.6 : 1.0,
+                              color: trigger.isPersistent
+                                  ? Colors.amberAccent.withValues(alpha: 0.6)
+                                  : Colors.white.withValues(alpha: 0.08),
+                              width: trigger.isPersistent ? 1.5 : 1.0,
                             ),
-                            boxShadow: isLooping
-                                ? [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 10, spreadRadius: 1)]
+                            boxShadow: trigger.isPersistent
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.amberAccent.withValues(alpha: 0.12),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    ),
+                                  ]
                                 : null,
                           ),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Row(
-                                children: [
-                                  if (hotkeyText != null)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black38,
-                                        borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(color: Colors.white10),
-                                      ),
-                                      child: Text(
-                                        hotkeyText,
-                                        style: TextStyle(
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                          color: activeTheme.primary,
-                                        ),
-                                      ),
-                                    )
-                                  else
-                                    const SizedBox.shrink(),
-                                  const Spacer(),
-                                  // Persistent Pin Icon
-                                  InkWell(
-                                    onTap: () => sfx.togglePersistent(trigger.id),
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Icon(
-                                        trigger.isPersistent ? Icons.push_pin_rounded : Icons.push_pin_outlined,
-                                        size: 13,
-                                        color: trigger.isPersistent ? Colors.amberAccent : Colors.white30,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  // Loop toggle icon
-                                  InkWell(
-                                    onTap: () => sfx.toggleTriggerLoop(trigger.id),
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Icon(
-                                        Icons.repeat_rounded,
-                                        size: 14,
-                                        color: trigger.isLoop ? Colors.amberAccent : Colors.white30,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              Icon(
+                                sfxIcon,
+                                size: 32,
+                                color: trigger.isPersistent
+                                    ? Colors.amberAccent
+                                    : activeTheme.primary,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(sfxIcon, size: 14, color: isLooping ? activeTheme.primary : activeTheme.textSecondary.withValues(alpha: 0.7)),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      trigger.title,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 11,
-                                        color: isLooping ? Colors.white : activeTheme.textPrimary,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                              const SizedBox(height: 8),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Text(
+                                  trigger.title,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    color: activeTheme.textPrimary,
+                                    letterSpacing: 0.2,
                                   ),
-                                ],
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              if (isLooping)
-                                Text(
-                                  l10n?.loopingBadge ?? 'LOOPING',
-                                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.amberAccent),
-                                )
-                              else
-                                const SizedBox(height: 2),
                             ],
                           ),
                         ),
@@ -297,7 +247,7 @@ class SoundboardGrid extends StatelessWidget {
 
   IconData _getSfxIcon(String title, int index) {
     final lower = title.toLowerCase();
-    if (lower.contains('sword') || lower.contains('attack') || lower.contains('hit') || lower.contains('slash')) {
+    if (lower.contains('sword') || lower.contains('attack') || lower.contains('hit') || lower.contains('slash') || lower.contains('clash')) {
       return Icons.hardware_rounded;
     }
     if (lower.contains('coin') || lower.contains('gold') || lower.contains('chest')) {
@@ -356,7 +306,6 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
   String _customPath = '';
   String _customTitle = '';
   double _volume = 1.0;
-  bool _isLoop = false;
   bool _isPersistent = true;
   String? _hotkey;
 
@@ -461,13 +410,6 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
                 activeTrackColor: activeTheme.accent,
                 onChanged: (v) => setState(() => _isPersistent = v),
               ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n?.loopModeCheckbox ?? 'Loop Mode (Loop)', style: const TextStyle(fontSize: 13)),
-                value: _isLoop,
-                activeTrackColor: activeTheme.accent,
-                onChanged: (v) => setState(() => _isLoop = v),
-              ),
             ],
           ),
         ),
@@ -486,10 +428,10 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
                     SfxTrigger(
                       id: sfxId,
                       title: _customTitle.isNotEmpty ? _customTitle : 'SFX',
-                      filePath: _customPath,
+                       filePath: _customPath,
                       volume: _volume,
                       isPersistent: _isPersistent,
-                      isLoop: _isLoop,
+                      isLoop: false,
                       hotkey: _hotkey,
                     ),
                   );

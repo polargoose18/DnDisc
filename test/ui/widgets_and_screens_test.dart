@@ -216,7 +216,6 @@ void main() {
 
       expect(find.textContaining(l10n.soundboardTitle), findsOneWidget);
       expect(find.text('Sword Strike'), findsOneWidget);
-      expect(find.text('[1]'), findsOneWidget);
 
       // Act
       await tester.tap(find.byKey(const ValueKey('sfx_btn_sword-trig')));

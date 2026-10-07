@@ -485,5 +485,44 @@ void main() {
 
       engine.dispose();
     });
+
+    testWidgets('should toggle persistent state when SFX button is long-pressed and omit loop/hotkey controls', (WidgetTester tester) async {
+      // Arrange
+      final engine = AudioEngineService();
+      engine.sfxBus.addTrigger(
+        const SfxTrigger(
+          id: 'sfx_test_clash',
+          title: 'Sword Clash',
+          filePath: '/test/clash.mp3',
+          hotkey: '2',
+          isPersistent: false,
+        ),
+      );
+
+      await tester.pumpWidget(
+        _createTestApp(
+          audioEngine: engine,
+          child: const SingleChildScrollView(
+            child: SoundboardGrid(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert - initial state and absence of hotkey badge / loop icon
+      expect(find.text('Sword Clash'), findsOneWidget);
+      expect(find.text('[2]'), findsNothing);
+      expect(find.byIcon(Icons.repeat_rounded), findsNothing);
+      expect(engine.sfxBus.triggers.first.isPersistent, isFalse);
+
+      // Act - long press on the SFX button
+      await tester.longPress(find.byKey(const ValueKey('sfx_btn_sfx_test_clash')));
+      await tester.pumpAndSettle();
+
+      // Assert - persistence is now toggled to true
+      expect(engine.sfxBus.triggers.first.isPersistent, isTrue);
+
+      engine.dispose();
+    });
   });
 }
