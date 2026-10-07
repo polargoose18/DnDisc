@@ -549,13 +549,5 @@
   "colorNameBattleIntensity": "Интенсивность боя",
   "colorNameBossIntensity": "Интенсивность босса",
   "seconds": "сек",
-  "milliseconds": "мс",
-  "toggleMenuTooltip": "Переключить меню навигации",
-  "collapseSidebarTooltip": "Свернуть боковую панель",
-  "expandSidebarTooltip": "Развернуть боковую панель",
-  "sceneTown": "Город",
-  "sceneEnchantedForest": "Зачарованный лес",
-  "sceneCaves": "Пещеры",
-  "categoryFoley": "Шумы (Foley)",
-  "masterVolumeLabel": "Общая громкость"
+  "milliseconds": "мс"
 }

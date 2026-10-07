@@ -1909,54 +1909,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ms'**
   String get milliseconds;
-
-  /// No description provided for @toggleMenuTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Toggle navigation menu'**
-  String get toggleMenuTooltip;
-
-  /// No description provided for @collapseSidebarTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Collapse sidebar'**
-  String get collapseSidebarTooltip;
-
-  /// No description provided for @expandSidebarTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Expand sidebar'**
-  String get expandSidebarTooltip;
-
-  /// No description provided for @sceneTown.
-  ///
-  /// In en, this message translates to:
-  /// **'Town'**
-  String get sceneTown;
-
-  /// No description provided for @sceneEnchantedForest.
-  ///
-  /// In en, this message translates to:
-  /// **'Enchanted Forest'**
-  String get sceneEnchantedForest;
-
-  /// No description provided for @sceneCaves.
-  ///
-  /// In en, this message translates to:
-  /// **'Caves'**
-  String get sceneCaves;
-
-  /// No description provided for @categoryFoley.
-  ///
-  /// In en, this message translates to:
-  /// **'Foley'**
-  String get categoryFoley;
-
-  /// No description provided for @masterVolumeLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Master Volume'**
-  String get masterVolumeLabel;
 }
 
 class _AppLocalizationsDelegate

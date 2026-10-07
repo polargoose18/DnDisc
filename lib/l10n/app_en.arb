@@ -549,13 +549,5 @@
   "colorNameBattleIntensity": "Battle Intensity",
   "colorNameBossIntensity": "Boss Intensity",
   "seconds": "sec",
-  "milliseconds": "ms",
-  "toggleMenuTooltip": "Toggle navigation menu",
-  "collapseSidebarTooltip": "Collapse sidebar",
-  "expandSidebarTooltip": "Expand sidebar",
-  "sceneTown": "Town",
-  "sceneEnchantedForest": "Enchanted Forest",
-  "sceneCaves": "Caves",
-  "categoryFoley": "Foley",
-  "masterVolumeLabel": "Master Volume"
+  "milliseconds": "ms"
 }
