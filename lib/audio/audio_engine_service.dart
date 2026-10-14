@@ -92,11 +92,6 @@ class AudioEngineService extends ChangeNotifier {
     }
   }
 
-  void panicStopSfx() {
-    LoggerService().info('AudioEngine: Panic stop all SFX requested');
-    sfxBus.stopAll();
-  }
-
   void _handleSfxDucking() {
     duckingController.triggerDuck(
       onVolumeUpdate: (multiplier) {

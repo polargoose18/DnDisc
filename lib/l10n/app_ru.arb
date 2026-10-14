@@ -104,7 +104,6 @@
   "addLayerBtn": "Добавить слой",
   "soundboardTitle": "Быстрые эффекты SFX",
   "addSfxTooltip": "Добавить SFX / Постоянную кнопку",
-  "panicStopBtn": "Panic Stop [Esc]",
   "sfxVolume": "SFX Громкость: ",
   "soundboardEmpty": "Soundboard пуст. Добавьте SFX или постоянные быстрые кнопки.",
   "addPersistentSfx": "Добавить постоянный SFX",
@@ -257,8 +256,6 @@
   "shortcutMasterMuteDesc": "Быстрое глушение или включение общего звука",
   "shortcutManualDuckingTitle": "Ручной Ducking",
   "shortcutManualDuckingDesc": "Принудительное приглушение музыки на время речи",
-  "shortcutPanicStopTitle": "Экстренная остановка",
-  "shortcutPanicStopDesc": "Мгновенная остановка всех играющих SFX звуков",
   "shortcutFullscreenTitle": "Полноэкранный режим",
   "shortcutFullscreenDesc": "Переключение отображения во весь экран",
   "@sceneExported": {
@@ -534,7 +531,6 @@
   "repositoryUrlHint": "https://gitlab.com/user/repo",
   "playTooltip": "Воспроизведение [Space]",
   "pauseTooltip": "Пауза [Space]",
-  "panicStopTooltip": "Экстренная остановка SFX [Esc]",
   "loopingBadge": "ЦИКЛ",
   "tagsPrefix": "Теги: ",
   "colorNamePrimary": "Основной",
@@ -556,12 +552,12 @@
   "musicModeExplore": "Исследование",
   "musicModeCombat": "Бой",
   "musicModeVictory": "Победа",
-  "intensityStepped1": "I",
-  "intensityStepped2": "II",
-  "intensityStepped3": "III",
   "optionsTooltip": "Настройки",
   "scenesQuickPicker": "Сцены",
   "sessionAudioDeck": "Сессионная аудиопанель",
   "collapseSidebarTooltip": "Свернуть панель",
-  "expandSidebarTooltip": "Развернуть панель"
+  "expandSidebarTooltip": "Развернуть панель",
+  "aboutTitle": "О приложении DnDisc",
+  "aboutDesc": "Атмосферный аудиоплеер, микшер сцен и саундборд для мастеров НРИ.",
+  "appVersion": "Версия 1.0.0"
 }

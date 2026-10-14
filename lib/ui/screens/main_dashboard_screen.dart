@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../audio/audio_engine_service.dart';
@@ -6,7 +7,7 @@ import '../../data/services/settings_service.dart';
 import '../../ui/view_models/theme_view_model.dart';
 import '../../theme/app_themes.dart';
 import '../widgets/logger_console_drawer.dart';
-import '../widgets/sticky_mini_player.dart';
+import '../widgets/dndisc_logo.dart';
 import 'responsive_gm_dashboard.dart';
 import 'library_screen.dart';
 import 'settings_screen.dart';
@@ -65,8 +66,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Left Sidebar (DnDisc Style - Collapsible)
-          Container(
+          // Left Sidebar (DnDisc Style - Collapsible with Smooth Animation)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOutCubic,
             width: _isSidebarCollapsed ? 68 : 220,
             decoration: BoxDecoration(
               color: activeTheme.surface,
@@ -78,70 +81,95 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               ),
             ),
             child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Brand Header: DnDisc + Collapse/Expand Toggle
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: _isSidebarCollapsed ? 8.0 : 14.0,
-                      vertical: 14.0,
-                    ),
-                    child: _isSidebarCollapsed
-                        ? Center(
-                            child: IconButton(
-                              key: const ValueKey('sidebar_expand_toggle_btn'),
-                              icon: Transform.flip(
-                                flipX: true,
-                                child: Icon(Icons.view_sidebar_outlined, color: activeTheme.primary, size: 20),
-                              ),
-                              tooltip: l10n?.expandSidebarTooltip ?? 'Expand sidebar',
-                              onPressed: () => setState(() => _isSidebarCollapsed = false),
-                            ),
-                          )
-                        : Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: activeTheme.primary.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 0.8),
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  minWidth: _isSidebarCollapsed ? 68 : 220,
+                  maxWidth: _isSidebarCollapsed ? 68 : 220,
+                  child: SizedBox(
+                    width: _isSidebarCollapsed ? 68 : 220,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Brand Header: DnDisc + Collapse/Expand Toggle (fixed height 48, pinned Y position)
+                    Container(
+                      height: 48,
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.06),
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                      child: _isSidebarCollapsed
+                          ? Center(
+                              child: IconButton(
+                                key: const ValueKey('sidebar_expand_toggle_btn'),
+                                icon: Transform.flip(
+                                  flipX: true,
+                                  child: Icon(
+                                    Icons.view_sidebar_outlined,
+                                    color: activeTheme.textSecondary,
+                                    size: 20,
+                                  ),
                                 ),
-                                child: Icon(Icons.shield_moon_rounded, color: activeTheme.primary, size: 20),
+                                tooltip: l10n?.expandSidebarTooltip ?? 'Expand sidebar',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                onPressed: () => setState(() => _isSidebarCollapsed = false),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    l10n?.appTitle ?? 'DnDisc',
-                                    style: TextStyle(
-                                      fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                      letterSpacing: 0.6,
-                                      color: activeTheme.textPrimary,
+                            )
+                          : Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: activeTheme.primary.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: activeTheme.primary.withValues(alpha: 0.4),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: DnDiscLogo(size: 18, color: activeTheme.primary),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      l10n?.appTitle ?? 'DnDisc',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        letterSpacing: -0.2,
+                                        color: activeTheme.textPrimary,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              IconButton(
-                                key: const ValueKey('sidebar_collapse_toggle_btn'),
-                                icon: Transform.flip(
-                                  flipX: true,
-                                  child: Icon(Icons.view_sidebar_outlined, size: 18, color: activeTheme.textSecondary),
+                                IconButton(
+                                  key: const ValueKey('sidebar_collapse_toggle_btn'),
+                                  icon: Transform.flip(
+                                    flipX: true,
+                                    child: Icon(
+                                      Icons.view_sidebar_outlined,
+                                      size: 20,
+                                      color: activeTheme.textSecondary,
+                                    ),
+                                  ),
+                                  tooltip: l10n?.collapseSidebarTooltip ?? 'Collapse sidebar',
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                  onPressed: () => setState(() => _isSidebarCollapsed = true),
                                 ),
-                                tooltip: l10n?.collapseSidebarTooltip ?? 'Collapse sidebar',
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                                onPressed: () => setState(() => _isSidebarCollapsed = true),
-                              ),
-                            ],
-                          ),
-                  ),
-                  const SizedBox(height: 8),
+                              ],
+                            ),
+                    ),
+                    const SizedBox(height: 8),
 
                   // Navigation Menu Items
                   Padding(
@@ -237,6 +265,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               ),
             ),
           ),
+        ),
+      ),
+    ),
 
           // Main Content View
           Expanded(
@@ -263,7 +294,6 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
           ),
         ],
       ),
-      bottomNavigationBar: const StickyMiniPlayer(),
     );
   }
 
@@ -283,11 +313,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
           const SizedBox(width: 8),
           Text(
             _getDesktopSectionTitle(l10n),
-            style: TextStyle(
-              fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
+              letterSpacing: -0.1,
               color: activeTheme.textPrimary,
             ),
           ),
@@ -327,7 +356,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                   ),
                   Text(
                     '${(engine.masterVolume * 100).toInt()}%',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: activeTheme.textSecondary),
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: activeTheme.textSecondary,
+                    ),
                   ),
                 ],
               );
@@ -403,9 +436,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                     Expanded(
                       child: Text(
                         label,
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                           color: isSelected ? activeTheme.textPrimary : activeTheme.textSecondary,
                         ),
                         maxLines: 1,
@@ -450,16 +483,15 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 0.8),
                 ),
-                child: Icon(Icons.shield_moon_rounded, color: activeTheme.primary, size: 20),
+                child: DnDiscLogo(size: 20, color: activeTheme.primary),
               ),
               const SizedBox(width: 8),
               Text(
                 l10n?.appTitle ?? 'DnDisc',
-                style: TextStyle(
-                  fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+                style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
-                  letterSpacing: 0.6,
+                  letterSpacing: -0.2,
                   color: activeTheme.textPrimary,
                 ),
               ),
@@ -480,8 +512,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               indicatorWeight: 2.5,
               labelColor: activeTheme.primary,
               unselectedLabelColor: activeTheme.textSecondary,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+              labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13),
+              unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.normal, fontSize: 13),
               tabs: [
                 Tab(icon: const Icon(Icons.dashboard_rounded, size: 18), text: l10n?.tabGmDashboard ?? 'GM Dashboard'),
                 Tab(icon: const Icon(Icons.library_music_rounded, size: 18), text: l10n?.tabLibrary ?? 'Media Library'),

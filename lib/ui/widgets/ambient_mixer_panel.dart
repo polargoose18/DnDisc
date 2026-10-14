@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -41,11 +42,10 @@ class AmbientMixerPanel extends StatelessWidget {
                           Flexible(
                             child: Text(
                               l10n?.ambientLayers ?? 'Ambient Layers (Background Sounds)',
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 0.3,
-                                fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+                                letterSpacing: -0.2,
                                 color: activeTheme.textPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -62,7 +62,7 @@ class AmbientMixerPanel extends StatelessWidget {
                               ),
                               child: Text(
                                 '${ambient.layers.where((l) => l.isActive).length}/${ambient.layers.length}',
-                                style: TextStyle(
+                                style: GoogleFonts.jetBrainsMono(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: activeTheme.primary,
@@ -87,7 +87,10 @@ class AmbientMixerPanel extends StatelessWidget {
                             key: const ValueKey('ambient_stop_all_btn'),
                             onPressed: () => ambient.stopAllLayers(),
                             icon: const Icon(Icons.stop_rounded, size: 16),
-                            label: Text(l10n?.stopAll ?? 'Stop All', style: const TextStyle(fontSize: 11)),
+                            label: Text(
+                              l10n?.stopAll ?? 'Stop All',
+                              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600),
+                            ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.redAccent,
                               side: const BorderSide(color: Colors.redAccent, width: 0.8),
@@ -199,18 +202,6 @@ class AmbientMixerPanel extends StatelessWidget {
                                 onChanged: (val) => ambient.setLayerVolume(layer.id, val),
                               ),
                             ),
-                            // Stepped discrete intensity controls [ I | II | III ]
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildSteppedPill(l10n?.intensityStepped1 ?? 'I', 0.33, layer.volume, () => ambient.setLayerVolume(layer.id, 0.33), activeTheme),
-                                const SizedBox(width: 2),
-                                _buildSteppedPill(l10n?.intensityStepped2 ?? 'II', 0.66, layer.volume, () => ambient.setLayerVolume(layer.id, 0.66), activeTheme),
-                                const SizedBox(width: 2),
-                                _buildSteppedPill(l10n?.intensityStepped3 ?? 'III', 1.0, layer.volume, () => ambient.setLayerVolume(layer.id, 1.0), activeTheme),
-                              ],
-                            ),
-                            const SizedBox(width: 4),
                             // Persistent Pin Button
                             IconButton(
                               icon: Icon(
@@ -252,33 +243,6 @@ class AmbientMixerPanel extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSteppedPill(String label, double targetVal, double currentVal, VoidCallback onTap, dynamic activeTheme) {
-    final isSelected = (currentVal - targetVal).abs() < 0.18;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        decoration: BoxDecoration(
-          color: isSelected ? activeTheme.primary.withValues(alpha: 0.25) : activeTheme.surface,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: isSelected ? activeTheme.primary : Colors.white12,
-            width: 0.8,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? activeTheme.primary : activeTheme.textSecondary,
-          ),
-        ),
-      ),
     );
   }
 

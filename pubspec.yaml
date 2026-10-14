@@ -1,5 +1,5 @@
 name: ttrpg_audio_player
-description: A cross-platform audio, ambient, and soundboard player for TTRPG Game Masters.
+description: DnDisc — cross-platform audio, ambient, and soundboard player for TTRPG Game Masters.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -22,6 +22,8 @@ dependencies:
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.2
   archive: ^4.3.0
+  google_fonts: ^9.0.0
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:

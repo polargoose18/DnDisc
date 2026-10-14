@@ -722,12 +722,6 @@ abstract class AppLocalizations {
   /// **'Add SFX / Persistent Button'**
   String get addSfxTooltip;
 
-  /// No description provided for @panicStopBtn.
-  ///
-  /// In en, this message translates to:
-  /// **'Panic Stop [Esc]'**
-  String get panicStopBtn;
-
   /// No description provided for @sfxVolume.
   ///
   /// In en, this message translates to:
@@ -1640,18 +1634,6 @@ abstract class AppLocalizations {
   /// **'Duck music during speech'**
   String get shortcutManualDuckingDesc;
 
-  /// No description provided for @shortcutPanicStopTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Panic Stop SFX'**
-  String get shortcutPanicStopTitle;
-
-  /// No description provided for @shortcutPanicStopDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Instantly stop all playing SFX sounds'**
-  String get shortcutPanicStopDesc;
-
   /// No description provided for @shortcutFullscreenTitle.
   ///
   /// In en, this message translates to:
@@ -1814,12 +1796,6 @@ abstract class AppLocalizations {
   /// **'Pause [Space]'**
   String get pauseTooltip;
 
-  /// No description provided for @panicStopTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Panic Stop SFX [Esc]'**
-  String get panicStopTooltip;
-
   /// No description provided for @loopingBadge.
   ///
   /// In en, this message translates to:
@@ -1946,24 +1922,6 @@ abstract class AppLocalizations {
   /// **'Victory'**
   String get musicModeVictory;
 
-  /// No description provided for @intensityStepped1.
-  ///
-  /// In en, this message translates to:
-  /// **'I'**
-  String get intensityStepped1;
-
-  /// No description provided for @intensityStepped2.
-  ///
-  /// In en, this message translates to:
-  /// **'II'**
-  String get intensityStepped2;
-
-  /// No description provided for @intensityStepped3.
-  ///
-  /// In en, this message translates to:
-  /// **'III'**
-  String get intensityStepped3;
-
   /// No description provided for @optionsTooltip.
   ///
   /// In en, this message translates to:
@@ -1993,6 +1951,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expand sidebar'**
   String get expandSidebarTooltip;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About DnDisc'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Atmospheric audio engine, scene mixer, and soundboard player for TTRPG Game Masters.'**
+  String get aboutDesc;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version 1.0.0'**
+  String get appVersion;
 }
 
 class _AppLocalizationsDelegate

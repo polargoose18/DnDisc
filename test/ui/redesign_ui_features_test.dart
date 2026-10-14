@@ -171,39 +171,43 @@ void main() {
       // Assert - initial state
       expect(find.text('Enchanted Grove'), findsOneWidget);
       expect(find.text('${l10n.intensityLevel}:'), findsOneWidget);
-      expect(find.text(l10n.musicModeOff), findsOneWidget);
-      expect(find.text(l10n.intensityCalm), findsOneWidget);
-      expect(find.text(l10n.intensitySuspense), findsOneWidget);
-      expect(find.text(l10n.intensityBattle), findsOneWidget);
-      expect(find.text(l10n.intensityBoss), findsOneWidget);
+      expect(find.text(l10n.musicModeOff), findsNothing);
+      expect(find.text('Calm'), findsOneWidget);
+      expect(find.text('Suspense'), findsOneWidget);
+      expect(find.text('Battle'), findsOneWidget);
+      expect(find.text('Boss'), findsOneWidget);
 
       // Act - Tap Calm mode
-      await tester.tap(find.text(l10n.intensityCalm));
+      await tester.tap(find.text('Calm'));
       await tester.pumpAndSettle();
 
-      // Assert
+      // Assert - intensity switched but playback did NOT start
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.calm));
+      expect(engine.musicBus.isPlaying, isFalse);
 
       // Act - Tap Suspense mode
-      await tester.tap(find.text(l10n.intensitySuspense));
+      await tester.tap(find.text('Suspense'));
       await tester.pumpAndSettle();
 
-      // Assert
+      // Assert - intensity switched but playback did NOT start
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.suspense));
+      expect(engine.musicBus.isPlaying, isFalse);
 
       // Act - Tap Battle mode
-      await tester.tap(find.text(l10n.intensityBattle));
+      await tester.tap(find.text('Battle'));
       await tester.pumpAndSettle();
 
-      // Assert
+      // Assert - intensity switched but playback did NOT start
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.battle));
+      expect(engine.musicBus.isPlaying, isFalse);
 
       // Act - Tap Boss mode
-      await tester.tap(find.text(l10n.intensityBoss));
+      await tester.tap(find.text('Boss'));
       await tester.pumpAndSettle();
 
-      // Assert
+      // Assert - intensity switched but playback did NOT start
       expect(engine.musicBus.currentIntensity, equals(MusicIntensity.boss));
+      expect(engine.musicBus.isPlaying, isFalse);
 
       engine.dispose();
     });
@@ -250,8 +254,8 @@ void main() {
     });
   });
 
-  group('Stepped Ambient Intensity Controls Tests', () {
-    testWidgets('should adjust layer volume using stepped intensity pills [ I | II | III ]', (tester) async {
+  group('Ambient Mixer Controls Tests', () {
+    testWidgets('should not display stepped intensity pills (I, II, III) and adjust volume via slider when layer is rendered', (tester) async {
       // Arrange
       final engine = AudioEngineService();
       engine.ambientBus.addLayer(
@@ -264,6 +268,7 @@ void main() {
         ),
       );
 
+      // Act
       await tester.pumpWidget(
         _createTestApp(
           audioEngine: engine,
@@ -274,25 +279,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Assert - layer rendered
+      // Assert - layer rendered and stepped intensity pills are removed
       expect(find.text('Forest Brook'), findsOneWidget);
-      expect(find.text('I'), findsOneWidget);
-      expect(find.text('II'), findsOneWidget);
-      expect(find.text('III'), findsOneWidget);
+      expect(find.text('I'), findsNothing);
+      expect(find.text('II'), findsNothing);
+      expect(find.text('III'), findsNothing);
 
-      // Act - Tap Step II (0.66)
-      await tester.tap(find.text('II'));
+      // Act - Adjust volume via slider
+      final sliderFinder = find.byKey(const ValueKey('ambient_slider_amb_forest_brook'));
+      expect(sliderFinder, findsOneWidget);
+      await tester.drag(sliderFinder, const Offset(50, 0));
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(engine.ambientBus.layers.first.volume, closeTo(0.66, 0.05));
-
-      // Act - Tap Step III (1.0)
-      await tester.tap(find.text('III'));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(engine.ambientBus.layers.first.volume, closeTo(1.0, 0.05));
+      // Assert - volume updated
+      expect(engine.ambientBus.layers.first.volume, isNot(closeTo(0.2, 0.01)));
 
       engine.dispose();
     });
@@ -324,7 +324,7 @@ void main() {
       expect(find.text(l10n.tabLibrary), findsOneWidget);
       expect(find.text(l10n.tabSettings), findsOneWidget);
       expect(find.text(l10n.tabCatalog), findsOneWidget);
-      expect(find.byType(StickyMiniPlayer), findsOneWidget);
+      expect(find.byType(StickyMiniPlayer), findsNothing);
 
       engine.dispose();
     });
@@ -379,7 +379,7 @@ void main() {
       // Assert
       expect(find.byType(StickyMiniPlayer), findsOneWidget);
       expect(find.text(l10n.noMusic), findsOneWidget);
-      expect(find.byIcon(Icons.dangerous_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.dangerous_rounded), findsNothing);
 
       engine.dispose();
     });
@@ -421,6 +421,100 @@ void main() {
       // Assert - back to expanded
       expect(find.byKey(const ValueKey('sidebar_collapse_toggle_btn')), findsOneWidget);
       expect(find.text(l10n.tabGmDashboard), findsOneWidget);
+
+      engine.dispose();
+    });
+
+    testWidgets('should keep sidebar toggle button at exact same vertical Y position when toggling collapsed state', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(1280, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final engine = AudioEngineService();
+
+      await tester.pumpWidget(
+        _createTestApp(
+          audioEngine: engine,
+          screenSize: const Size(1280, 900),
+          child: const MainDashboardScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert expanded toggle button position
+      final collapseBtnFinder = find.byKey(const ValueKey('sidebar_collapse_toggle_btn'));
+      expect(collapseBtnFinder, findsOneWidget);
+      final expandedTopY = tester.getTopLeft(collapseBtnFinder).dy;
+
+      // Act - Collapse
+      await tester.tap(collapseBtnFinder);
+      await tester.pumpAndSettle();
+
+      // Assert collapsed toggle button position
+      final expandBtnFinder = find.byKey(const ValueKey('sidebar_expand_toggle_btn'));
+      expect(expandBtnFinder, findsOneWidget);
+      final collapsedTopY = tester.getTopLeft(expandBtnFinder).dy;
+
+      // Verify vertical Y position is unchanged (does NOT jump down)
+      expect(collapsedTopY, equals(expandedTopY));
+
+      engine.dispose();
+    });
+
+    testWidgets('should smoothly animate sidebar width without layout overflow during mid-animation frames', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(1280, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final engine = AudioEngineService();
+
+      await tester.pumpWidget(
+        _createTestApp(
+          audioEngine: engine,
+          screenSize: const Size(1280, 900),
+          child: const MainDashboardScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final collapseBtnFinder = find.byKey(const ValueKey('sidebar_collapse_toggle_btn'));
+      expect(collapseBtnFinder, findsOneWidget);
+
+      // Act & Assert mid-frame pumps during collapse
+      await tester.tap(collapseBtnFinder);
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.takeException(), isNull);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      final expandBtnFinder = find.byKey(const ValueKey('sidebar_expand_toggle_btn'));
+      expect(expandBtnFinder, findsOneWidget);
+
+      // Act & Assert mid-frame pumps during expand
+      await tester.tap(expandBtnFinder);
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.takeException(), isNull);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      // Rapid toggle stress test
+      await tester.tap(find.byKey(const ValueKey('sidebar_collapse_toggle_btn')));
+      await tester.pump(const Duration(milliseconds: 30));
+      await tester.tap(find.byKey(const ValueKey('sidebar_expand_toggle_btn')));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
 
       engine.dispose();
     });

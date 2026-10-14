@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../ui/view_models/scene_view_model.dart';
@@ -124,12 +125,11 @@ class SceneBackdropHeader extends StatelessWidget {
                     child: Text(
                       activeScene.name,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: GoogleFonts.cinzel(
                         color: activeTheme.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 26,
-                        letterSpacing: 0.5,
-                        fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+                        letterSpacing: 0.8,
                         shadows: [
                           Shadow(
                             color: Colors.black.withValues(alpha: 0.75),
@@ -146,7 +146,7 @@ class SceneBackdropHeader extends StatelessWidget {
                       child: Text(
                         activeScene.description,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: activeTheme.textSecondary,
                           fontSize: 13,
                           shadows: [
@@ -170,7 +170,9 @@ class SceneBackdropHeader extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: activeTheme.surface.withValues(alpha: 0.65),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                      border: Border.all(
+                        color: activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
+                      ),
                     ),
                     child: Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -185,7 +187,7 @@ class SceneBackdropHeader extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               '${l10n?.intensityLevel ?? 'Intensity Level'}:',
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 color: activeTheme.textSecondary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -197,70 +199,52 @@ class SceneBackdropHeader extends StatelessWidget {
                           spacing: 6,
                           runSpacing: 4,
                           children: [
-                            // Off Pill
-                            _buildModePill(
-                              context: context,
-                              title: l10n?.musicModeOff ?? 'Off',
-                              subtitle: null,
-                              isSelected: !musicBus.isPlaying,
-                              selectedColor: Colors.grey.shade400,
-                              activeTheme: activeTheme,
-                              onTap: () {
-                                if (musicBus.isPlaying) {
-                                  musicBus.pause();
-                                }
-                              },
-                            ),
                             // Calm Pill
                             _buildModePill(
                               context: context,
-                              title: l10n?.intensityCalm ?? 'Calm',
+                              title: MusicIntensity.calm.englishName,
                               subtitle: null,
-                              isSelected: musicBus.isPlaying && musicBus.currentIntensity == MusicIntensity.calm,
+                              isSelected: musicBus.currentIntensity == MusicIntensity.calm,
                               selectedColor: activeTheme.secondary,
                               activeTheme: activeTheme,
                               onTap: () {
                                 musicBus.setIntensity(MusicIntensity.calm);
-                                if (!musicBus.isPlaying) musicBus.resume();
                               },
                             ),
                             // Suspense Pill
                             _buildModePill(
                               context: context,
-                              title: l10n?.intensitySuspense ?? 'Suspense',
+                              title: MusicIntensity.suspense.englishName,
                               subtitle: null,
-                              isSelected: musicBus.isPlaying && musicBus.currentIntensity == MusicIntensity.suspense,
+                              isSelected: musicBus.currentIntensity == MusicIntensity.suspense,
                               selectedColor: const Color(0xFFF59E0B),
                               activeTheme: activeTheme,
                               onTap: () {
                                 musicBus.setIntensity(MusicIntensity.suspense);
-                                if (!musicBus.isPlaying) musicBus.resume();
                               },
                             ),
                             // Battle Pill
                             _buildModePill(
                               context: context,
-                              title: l10n?.intensityBattle ?? 'Battle',
+                              title: MusicIntensity.battle.englishName,
                               subtitle: null,
-                              isSelected: musicBus.isPlaying && musicBus.currentIntensity == MusicIntensity.battle,
+                              isSelected: musicBus.currentIntensity == MusicIntensity.battle,
                               selectedColor: activeTheme.battleIntensity,
                               activeTheme: activeTheme,
                               onTap: () {
                                 musicBus.setIntensity(MusicIntensity.battle);
-                                if (!musicBus.isPlaying) musicBus.resume();
                               },
                             ),
                             // Boss Pill
                             _buildModePill(
                               context: context,
-                              title: l10n?.intensityBoss ?? 'Boss',
+                              title: MusicIntensity.boss.englishName,
                               subtitle: null,
-                              isSelected: musicBus.isPlaying && musicBus.currentIntensity == MusicIntensity.boss,
+                              isSelected: musicBus.currentIntensity == MusicIntensity.boss,
                               selectedColor: activeTheme.bossIntensity,
                               activeTheme: activeTheme,
                               onTap: () {
                                 musicBus.setIntensity(MusicIntensity.boss);
-                                if (!musicBus.isPlaying) musicBus.resume();
                               },
                             ),
                           ],
@@ -293,38 +277,31 @@ class SceneBackdropHeader extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? selectedColor.withValues(alpha: 0.28) : activeTheme.card,
+          color: isSelected ? selectedColor.withValues(alpha: 0.22) : activeTheme.card,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? selectedColor : Colors.white.withValues(alpha: 0.1),
-            width: isSelected ? 1.4 : 0.8,
+            color: isSelected
+                ? selectedColor
+                : (activeTheme.isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1)),
+            width: isSelected ? 1.2 : 0.8,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: selectedColor.withValues(alpha: 0.35),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: GoogleFonts.inter(
                 color: isSelected ? Colors.white : activeTheme.textPrimary,
                 fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
             if (subtitle != null) ...[
               const SizedBox(width: 4),
               Text(
                 '·',
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   color: isSelected ? Colors.white60 : activeTheme.textSecondary.withValues(alpha: 0.5),
                   fontSize: 10,
                 ),
@@ -332,7 +309,7 @@ class SceneBackdropHeader extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 subtitle,
-                style: TextStyle(
+                style: GoogleFonts.jetBrainsMono(
                   color: isSelected ? Colors.white70 : activeTheme.textSecondary,
                   fontSize: 11,
                 ),

@@ -18,6 +18,7 @@ import 'package:ttrpg_audio_player/data/services/settings_service.dart';
 import 'package:ttrpg_audio_player/data/services/scene_service.dart';
 import 'package:ttrpg_audio_player/services/logger_service.dart';
 import 'package:ttrpg_audio_player/data/services/theme_service.dart';
+import 'package:ttrpg_audio_player/theme/app_themes.dart';
 import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/theme_view_model.dart';
@@ -47,13 +48,14 @@ Widget createM3TestableWidget(Widget child, {
   SettingsService? settings,
   SceneService? sceneService,
   LoggerService? logger,
+  ThemeService? themeService,
 }) {
   final eng = engine ?? AudioEngineService();
   final log = logger ?? LoggerService();
   final set = settings ?? SettingsService();
   final scn = sceneService ?? SceneService(autoLoad: false);
   final lib = library ?? MediaLibraryService(autoLoad: false);
-  final thm = ThemeService(autoLoad: false);
+  final thm = themeService ?? ThemeService(autoLoad: false);
 
   return MultiProvider(
     providers: [
@@ -232,6 +234,235 @@ void main() {
       // Assert
       expect(returnedScene, isNotNull);
       expect(returnedScene!.name, equals('Throne Room'));
+
+      library.dispose();
+    });
+
+    testWidgets('should apply active palette surface and card colors to scene dialog when clean light theme is active', (WidgetTester tester) async {
+      // Arrange
+      final library = MediaLibraryService(autoLoad: false);
+      final themeService = ThemeService(autoLoad: false, initialThemeId: AppThemes.cleanLightId);
+      themeService.selectTheme(AppThemes.cleanLightId);
+
+      await tester.pumpWidget(
+        createM3TestableWidget(
+          Scaffold(
+            body: Builder(
+              builder: (ctx) => ElevatedButton(
+                onPressed: () => showDialog<SceneModel>(
+                  context: ctx,
+                  builder: (_) => const CreateEditSceneDialog(),
+                ),
+                child: const Text('Open Scene Dialog'),
+              ),
+            ),
+          ),
+          library: library,
+          themeService: themeService,
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Open Scene Dialog'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final dialogFinder = find.byType(Dialog);
+      expect(dialogFinder, findsOneWidget);
+      final dialogWidget = tester.widget<Dialog>(dialogFinder);
+      expect(dialogWidget.backgroundColor, equals(AppThemes.cleanLight.surface));
+
+      final l10n = AppLocalizationsEn();
+      final nameFieldFinder = find.widgetWithText(TextField, l10n.sceneNameLabel);
+      expect(nameFieldFinder, findsOneWidget);
+      final nameFieldWidget = tester.widget<TextField>(nameFieldFinder);
+      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.cleanLight.card));
+
+      library.dispose();
+      themeService.dispose();
+    });
+
+    testWidgets('should apply active palette surface and card colors to scene dialog when deep dark theme is active', (WidgetTester tester) async {
+      // Arrange
+      final library = MediaLibraryService(autoLoad: false);
+      final themeService = ThemeService(autoLoad: false, initialThemeId: AppThemes.deepDarkId);
+      themeService.selectTheme(AppThemes.deepDarkId);
+
+      await tester.pumpWidget(
+        createM3TestableWidget(
+          Scaffold(
+            body: Builder(
+              builder: (ctx) => ElevatedButton(
+                onPressed: () => showDialog<SceneModel>(
+                  context: ctx,
+                  builder: (_) => const CreateEditSceneDialog(),
+                ),
+                child: const Text('Open Scene Dialog'),
+              ),
+            ),
+          ),
+          library: library,
+          themeService: themeService,
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Open Scene Dialog'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final dialogFinder = find.byType(Dialog);
+      expect(dialogFinder, findsOneWidget);
+      final dialogWidget = tester.widget<Dialog>(dialogFinder);
+      expect(dialogWidget.backgroundColor, equals(AppThemes.deepDark.surface));
+
+      final l10n = AppLocalizationsEn();
+      final nameFieldFinder = find.widgetWithText(TextField, l10n.sceneNameLabel);
+      expect(nameFieldFinder, findsOneWidget);
+      final nameFieldWidget = tester.widget<TextField>(nameFieldFinder);
+      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.deepDark.card));
+
+      library.dispose();
+      themeService.dispose();
+    });
+
+    testWidgets('should adapt scene dialog colors and swatches when theme palette is custom preset like emerald forest', (WidgetTester tester) async {
+      // Arrange
+      final library = MediaLibraryService(autoLoad: false);
+      final themeService = ThemeService(autoLoad: false, initialThemeId: AppThemes.emeraldForestId);
+      themeService.selectTheme(AppThemes.emeraldForestId);
+
+      await tester.pumpWidget(
+        createM3TestableWidget(
+          Scaffold(
+            body: Builder(
+              builder: (ctx) => ElevatedButton(
+                onPressed: () => showDialog<SceneModel>(
+                  context: ctx,
+                  builder: (_) => const CreateEditSceneDialog(),
+                ),
+                child: const Text('Open Scene Dialog'),
+              ),
+            ),
+          ),
+          library: library,
+          themeService: themeService,
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Open Scene Dialog'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final dialogFinder = find.byType(Dialog);
+      expect(dialogFinder, findsOneWidget);
+      final dialogWidget = tester.widget<Dialog>(dialogFinder);
+      expect(dialogWidget.backgroundColor, equals(AppThemes.emeraldForest.surface));
+
+      final l10n = AppLocalizationsEn();
+      final nameFieldFinder = find.widgetWithText(TextField, l10n.sceneNameLabel);
+      expect(nameFieldFinder, findsOneWidget);
+      final nameFieldWidget = tester.widget<TextField>(nameFieldFinder);
+      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.emeraldForest.card));
+
+      library.dispose();
+      themeService.dispose();
+    });
+
+    testWidgets('should resolve active palette when only ThemeService is provided without ThemeViewModel', (WidgetTester tester) async {
+      // Arrange
+      final library = MediaLibraryService(autoLoad: false);
+      final themeService = ThemeService(autoLoad: false, initialThemeId: AppThemes.cleanLightId);
+      themeService.selectTheme(AppThemes.cleanLightId);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<MediaLibraryService>.value(value: library),
+            ChangeNotifierProvider<MediaLibraryViewModel>(create: (_) => MediaLibraryViewModel(service: library)),
+            ChangeNotifierProvider<ThemeService>.value(value: themeService),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (ctx) => ElevatedButton(
+                  onPressed: () => showDialog<SceneModel>(
+                    context: ctx,
+                    builder: (_) => const CreateEditSceneDialog(),
+                  ),
+                  child: const Text('Open Scene Dialog'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Open Scene Dialog'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final dialogFinder = find.byType(Dialog);
+      expect(dialogFinder, findsOneWidget);
+      final dialogWidget = tester.widget<Dialog>(dialogFinder);
+      expect(dialogWidget.backgroundColor, equals(AppThemes.cleanLight.surface));
+
+      library.dispose();
+      themeService.dispose();
+    });
+
+    testWidgets('should derive palette from Theme.of(context) ThemeData when no theme providers exist in tree', (WidgetTester tester) async {
+      // Arrange
+      final library = MediaLibraryService(autoLoad: false);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<MediaLibraryService>.value(value: library),
+            ChangeNotifierProvider<MediaLibraryViewModel>(create: (_) => MediaLibraryViewModel(service: library)),
+          ],
+          child: MaterialApp(
+            theme: AppThemes.cleanLight.toThemeData(),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (ctx) => ElevatedButton(
+                  onPressed: () => showDialog<SceneModel>(
+                    context: ctx,
+                    builder: (_) => const CreateEditSceneDialog(),
+                  ),
+                  child: const Text('Open Scene Dialog'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Open Scene Dialog'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final dialogFinder = find.byType(Dialog);
+      expect(dialogFinder, findsOneWidget);
+      final dialogWidget = tester.widget<Dialog>(dialogFinder);
+      expect(dialogWidget.backgroundColor, equals(AppThemes.cleanLight.surface));
 
       library.dispose();
     });

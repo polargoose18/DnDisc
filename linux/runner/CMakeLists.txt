@@ -11,6 +11,8 @@ add_executable(${BINARY_NAME}
   "my_application.cc"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
 )
+add_executable(ttrpg_audio_player ALIAS ${BINARY_NAME})
+
 
 # Apply the standard set of build settings. This can be removed for applications
 # that need different build settings.

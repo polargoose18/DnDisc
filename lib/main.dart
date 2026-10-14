@@ -89,7 +89,8 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
             child: Consumer2<ThemeViewModel, SettingsService>(
               builder: (context, themeViewModel, settingsService, _) {
                 return MaterialApp(
-                  title: 'TTRPG Audio Master',
+                  title: 'DnDisc',
+                  onGenerateTitle: (context) => AppLocalizations.of(context)?.appTitle ?? 'DnDisc',
                   debugShowCheckedModeBanner: false,
                   theme: themeViewModel.currentThemeData,
                   darkTheme: themeViewModel.currentThemeData,

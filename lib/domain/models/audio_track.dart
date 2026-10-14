@@ -6,6 +6,19 @@ enum MusicIntensity {
 }
 
 extension MusicIntensityExtension on MusicIntensity {
+  String get englishName {
+    switch (this) {
+      case MusicIntensity.calm:
+        return 'Calm';
+      case MusicIntensity.suspense:
+        return 'Suspense';
+      case MusicIntensity.battle:
+        return 'Battle';
+      case MusicIntensity.boss:
+        return 'Boss';
+    }
+  }
+
   String getLocalizedName([dynamic l10n]) {
     switch (this) {
       case MusicIntensity.calm:

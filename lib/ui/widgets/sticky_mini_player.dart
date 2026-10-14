@@ -118,12 +118,6 @@ class StickyMiniPlayer extends StatelessWidget {
                           }
                         },
                       ),
-                      // Panic Stop SFX button
-                      IconButton(
-                        icon: const Icon(Icons.dangerous_rounded, color: Colors.redAccent, size: 20),
-                        tooltip: l10n?.panicStopTooltip ?? 'Panic Stop SFX [Esc]',
-                        onPressed: () => audioEngine.panicStopSfx(),
-                      ),
                       // Master Mute
                       IconButton(
                         icon: Icon(
@@ -250,16 +244,10 @@ class StickyMiniPlayer extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
 
-                      // Right: Master Controls (Panic stop, Mute, Volume)
+                      // Right: Master Controls (Mute, Volume)
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Panic Stop SFX button
-                          IconButton(
-                            icon: const Icon(Icons.dangerous_rounded, color: Colors.redAccent, size: 22),
-                            tooltip: l10n?.panicStopTooltip ?? 'Panic Stop SFX [Esc]',
-                            onPressed: () => audioEngine.panicStopSfx(),
-                          ),
                           // Master Mute
                           IconButton(
                             icon: Icon(

@@ -16,7 +16,6 @@ import 'package:ttrpg_audio_player/audio/sfx_bus_controller.dart';
 import 'package:ttrpg_audio_player/data/services/media_library_service.dart';
 import 'package:ttrpg_audio_player/services/logger_service.dart';
 import 'package:ttrpg_audio_player/data/services/database_service.dart';
-import 'package:ttrpg_audio_player/domain/models/audio_track.dart';
 import 'package:ttrpg_audio_player/domain/models/ambient_layer.dart';
 import 'package:ttrpg_audio_player/domain/models/sfx_trigger.dart';
 import 'package:ttrpg_audio_player/domain/models/library_track.dart';
@@ -120,20 +119,16 @@ void main() {
   });
 
   group('MusicPlayerPanel Widget Tests', () {
-    testWidgets('should display playback idle message and update intensity when intensity chip is clicked', (WidgetTester tester) async {
+    testWidgets('should display playback idle message and ensure intensity chips are removed from MusicPlayerPanel', (WidgetTester tester) async {
       // Arrange
       final engine = AudioEngineService();
       await tester.pumpWidget(createTestableWidget(const MusicPlayerPanel(), engine: engine));
 
+      // Assert
       expect(find.text(l10n.musicTrack), findsOneWidget);
       expect(find.text(l10n.musicNotPlaying), findsOneWidget);
-
-      // Act
-      await tester.tap(find.byKey(const ValueKey('chip_boss')));
-      await tester.pump(const Duration(milliseconds: 300));
-
-      // Assert
-      expect(engine.musicBus.currentIntensity, equals(MusicIntensity.boss));
+      expect(find.byKey(const ValueKey('chip_boss')), findsNothing);
+      expect(find.byKey(const ValueKey('music_intensity_wrap')), findsNothing);
       engine.dispose();
     });
 

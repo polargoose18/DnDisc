@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
+  <g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="500.0" cy="500.0" r="427.24609375" stroke-width="20.5"/>
+    <line x1="500.0" y1="285.2" x2="686.1" y2="392.6" stroke-width="20.5"/>
+    <line x1="686.1" y1="392.6" x2="686.1" y2="607.4" stroke-width="20.5"/>
+    <line x1="686.1" y1="607.4" x2="500.0" y2="714.8" stroke-width="20.5"/>
+    <line x1="500.0" y1="714.8" x2="313.9" y2="607.4" stroke-width="20.5"/>
+    <line x1="313.9" y1="607.4" x2="313.9" y2="392.6" stroke-width="20.5"/>
+    <line x1="313.9" y1="392.6" x2="500.0" y2="285.2" stroke-width="20.5"/>
+    <line x1="403.2" y1="444.1" x2="596.8" y2="444.1" stroke-width="20.5"/>
+    <line x1="596.8" y1="444.1" x2="500.0" y2="611.7" stroke-width="20.5"/>
+    <line x1="500.0" y1="611.7" x2="403.2" y2="444.1" stroke-width="20.5"/>
+    <line x1="403.2" y1="444.1" x2="500.0" y2="285.2" stroke-width="20.5"/>
+    <line x1="596.8" y1="444.1" x2="500.0" y2="285.2" stroke-width="20.5"/>
+    <line x1="596.8" y1="444.1" x2="686.1" y2="392.6" stroke-width="20.5"/>
+    <line x1="596.8" y1="444.1" x2="686.1" y2="607.4" stroke-width="20.5"/>
+    <line x1="500.0" y1="611.7" x2="686.1" y2="607.4" stroke-width="20.5"/>
+    <line x1="500.0" y1="611.7" x2="500.0" y2="714.8" stroke-width="20.5"/>
+    <line x1="500.0" y1="611.7" x2="313.9" y2="607.4" stroke-width="20.5"/>
+    <line x1="403.2" y1="444.1" x2="313.9" y2="607.4" stroke-width="20.5"/>
+    <line x1="403.2" y1="444.1" x2="313.9" y2="392.6" stroke-width="20.5"/>
+    <line x1="164.8" y1="480.5" x2="164.8" y2="519.5" stroke-width="20.5"/>
+    <line x1="189.2" y1="464.6" x2="189.2" y2="535.4" stroke-width="20.5"/>
+    <line x1="213.6" y1="443.8" x2="213.6" y2="556.2" stroke-width="20.5"/>
+    <line x1="238.0" y1="421.9" x2="238.0" y2="578.1" stroke-width="20.5"/>
+    <line x1="262.5" y1="443.8" x2="262.5" y2="556.2" stroke-width="20.5"/>
+    <line x1="286.9" y1="465.8" x2="286.9" y2="534.2" stroke-width="20.5"/>
+    <line x1="712.9" y1="480.5" x2="712.9" y2="519.5" stroke-width="20.5"/>
+    <line x1="737.3" y1="464.6" x2="737.3" y2="535.4" stroke-width="20.5"/>
+    <line x1="761.7" y1="443.8" x2="761.7" y2="556.2" stroke-width="20.5"/>
+    <line x1="786.1" y1="421.9" x2="786.1" y2="578.1" stroke-width="20.5"/>
+    <line x1="810.5" y1="443.8" x2="810.5" y2="556.2" stroke-width="20.5"/>
+    <line x1="835.0" y1="465.8" x2="835.0" y2="534.2" stroke-width="20.5"/>
+  </g>
+</svg>

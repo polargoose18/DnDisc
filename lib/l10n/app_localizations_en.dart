@@ -333,9 +333,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addSfxTooltip => 'Add SFX / Persistent Button';
 
   @override
-  String get panicStopBtn => 'Panic Stop [Esc]';
-
-  @override
   String get sfxVolume => 'SFX Volume: ';
 
   @override
@@ -862,12 +859,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutManualDuckingDesc => 'Duck music during speech';
 
   @override
-  String get shortcutPanicStopTitle => 'Panic Stop SFX';
-
-  @override
-  String get shortcutPanicStopDesc => 'Instantly stop all playing SFX sounds';
-
-  @override
   String get shortcutFullscreenTitle => 'Fullscreen Mode';
 
   @override
@@ -951,9 +942,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pauseTooltip => 'Pause [Space]';
 
   @override
-  String get panicStopTooltip => 'Panic Stop SFX [Esc]';
-
-  @override
   String get loopingBadge => 'LOOPING';
 
   @override
@@ -1017,15 +1005,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get musicModeVictory => 'Victory';
 
   @override
-  String get intensityStepped1 => 'I';
-
-  @override
-  String get intensityStepped2 => 'II';
-
-  @override
-  String get intensityStepped3 => 'III';
-
-  @override
   String get optionsTooltip => 'Options';
 
   @override
@@ -1039,4 +1018,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expandSidebarTooltip => 'Expand sidebar';
+
+  @override
+  String get aboutTitle => 'About DnDisc';
+
+  @override
+  String get aboutDesc =>
+      'Atmospheric audio engine, scene mixer, and soundboard player for TTRPG Game Masters.';
+
+  @override
+  String get appVersion => 'Version 1.0.0';
 }

@@ -69,14 +69,6 @@ void main() {
       expect(audioEngine.masterVolume, equals(0.8));
     });
 
-    test('should stop all active sound effects when panicStopSfx action is triggered', () {
-      // Arrange & Act
-      shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
-
-      // Assert
-      expect(audioEngine.sfxBus.triggers.isEmpty, isTrue);
-    });
-
     test('should toggle fullscreen state when toggleFullscreen action is triggered', () {
       // Arrange
       expect(shortcutService.isFullscreen, isFalse);
@@ -111,7 +103,6 @@ void main() {
       // Act & Assert
       shortcutService.handleActionDirectly(AppShortcutAction.sfx1);
       expect(shortcutService.getDisplayForAction(AppShortcutAction.sfx1), equals('Num 1 / Ctrl+1'));
-      expect(shortcutService.getDisplayForAction(AppShortcutAction.panicStopSfx), equals('Escape'));
     });
 
     test('should process rapid consecutive shortcut actions without errors or state inconsistency', () {
@@ -119,7 +110,6 @@ void main() {
       shortcutService.handleActionDirectly(AppShortcutAction.playPauseMusic);
       shortcutService.handleActionDirectly(AppShortcutAction.intensityBattle);
       shortcutService.handleActionDirectly(AppShortcutAction.masterMute);
-      shortcutService.handleActionDirectly(AppShortcutAction.panicStopSfx);
 
       // Assert
       expect(audioEngine.musicBus.currentIntensity, equals(MusicIntensity.battle));

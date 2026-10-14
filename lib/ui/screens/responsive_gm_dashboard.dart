@@ -5,7 +5,6 @@ import '../widgets/scene_backdrop_header.dart';
 import '../widgets/music_player_panel.dart';
 import '../widgets/ambient_mixer_panel.dart';
 import '../widgets/soundboard_grid.dart';
-import '../widgets/sticky_mini_player.dart';
 
 class ResponsiveGmDashboard extends StatefulWidget {
   const ResponsiveGmDashboard({super.key});
@@ -167,13 +166,6 @@ class _ResponsiveGmDashboardState extends State<ResponsiveGmDashboard>
               ),
             ],
           ),
-        ),
-
-        // Sticky MiniPlayer at the bottom of compact view
-        StickyMiniPlayer(
-          onExpand: () {
-            _compactTabController.animateTo(1); // switch to Music tab
-          },
         ),
       ],
     );

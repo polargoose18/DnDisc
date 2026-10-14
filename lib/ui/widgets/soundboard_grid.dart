@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -30,7 +31,7 @@ class SoundboardGrid extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with Add SFX and Panic Stop Button
+                // Header with Add SFX Button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -42,11 +43,10 @@ class SoundboardGrid extends StatelessWidget {
                           Flexible(
                             child: Text(
                               l10n?.soundboardTitle ?? 'Soundboard (SFX Effects)',
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 0.3,
-                                fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+                                letterSpacing: -0.2,
                                 color: activeTheme.textPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -55,30 +55,12 @@ class SoundboardGrid extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Row(
-                      children: [
-                        IconButton(
-                          key: const ValueKey('add_sfx_trigger_btn'),
-                          icon: const Icon(Icons.add_rounded, size: 20),
-                          tooltip: l10n?.addSfxTooltip ?? 'Add SFX / Persistent Button',
-                          color: activeTheme.primary,
-                          onPressed: () => _showAddSfxDialog(context, sfx),
-                        ),
-                        ElevatedButton.icon(
-                          key: const ValueKey('panic_stop_sfx_btn'),
-                          icon: const Icon(Icons.dangerous_rounded, size: 16),
-                          label: Text(l10n?.panicStopBtn ?? 'Panic Stop [Esc]', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: activeTheme.battleIntensity,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            minimumSize: const Size(0, 30),
-                            elevation: 1,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                          onPressed: () => sfx.stopAll(),
-                        ),
-                      ],
+                    IconButton(
+                      key: const ValueKey('add_sfx_trigger_btn'),
+                      icon: const Icon(Icons.add_rounded, size: 20),
+                      tooltip: l10n?.addSfxTooltip ?? 'Add SFX / Persistent Button',
+                      color: activeTheme.primary,
+                      onPressed: () => _showAddSfxDialog(context, sfx),
                     ),
                   ],
                 ),
@@ -89,7 +71,10 @@ class SoundboardGrid extends StatelessWidget {
                   children: [
                     Icon(Icons.volume_down, size: 16, color: activeTheme.textSecondary),
                     const SizedBox(width: 6),
-                    Text(l10n?.sfxVolume ?? 'SFX Volume: ', style: TextStyle(fontSize: 12, color: activeTheme.textSecondary)),
+                    Text(
+                      l10n?.sfxVolume ?? 'SFX Volume: ',
+                      style: GoogleFonts.inter(fontSize: 12, color: activeTheme.textSecondary),
+                    ),
                     Expanded(
                       child: Slider(
                         value: sfx.rawVolume,
@@ -97,7 +82,10 @@ class SoundboardGrid extends StatelessWidget {
                         onChanged: (val) => sfx.setVolume(val),
                       ),
                     ),
-                    Text('${(sfx.rawVolume * 100).toInt()}%', style: TextStyle(fontSize: 12, color: activeTheme.textSecondary)),
+                    Text(
+                      '${(sfx.rawVolume * 100).toInt()}%',
+                      style: GoogleFonts.jetBrainsMono(fontSize: 12, color: activeTheme.textSecondary),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -109,7 +97,9 @@ class SoundboardGrid extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: activeTheme.surface,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                      border: Border.all(
+                        color: activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
+                      ),
                     ),
                     child: Center(
                       child: Column(
@@ -117,7 +107,7 @@ class SoundboardGrid extends StatelessWidget {
                           Text(
                             l10n?.soundboardEmpty ?? 'Soundboard is empty. Add SFX or persistent quick buttons.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
+                            style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 13),
                           ),
                           const SizedBox(height: 8),
                           TextButton.icon(
@@ -159,7 +149,7 @@ class SoundboardGrid extends StatelessWidget {
                             border: Border.all(
                               color: trigger.isPersistent
                                   ? Colors.amberAccent.withValues(alpha: 0.6)
-                                  : Colors.white.withValues(alpha: 0.08),
+                                  : (activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08)),
                               width: trigger.isPersistent ? 1.5 : 1.0,
                             ),
                             boxShadow: trigger.isPersistent
@@ -189,11 +179,11 @@ class SoundboardGrid extends StatelessWidget {
                                 child: Text(
                                   trigger.title,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: GoogleFonts.plusJakartaSans(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 13,
                                     color: activeTheme.textPrimary,
-                                    letterSpacing: 0.2,
+                                    letterSpacing: -0.1,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,

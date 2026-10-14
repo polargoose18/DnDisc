@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 import '../../l10n/app_localizations.dart';
 import '../../domain/models/custom_theme_model.dart';
@@ -267,7 +268,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                         children: [
                           Text(
                             l10n?.themePreviewTitle ?? 'Theme Preview',
-                            style: TextStyle(color: _textSecondary, fontSize: 12, fontWeight: FontWeight.bold),
+                            style: GoogleFonts.plusJakartaSans(color: _textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -281,7 +282,10 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                               children: [
                                 Icon(Icons.volume_down, size: 14, color: _duckingBadge),
                                 const SizedBox(width: 4),
-                                Text(l10n?.duckingActive ?? 'Ducking Active', style: TextStyle(color: _duckingBadge, fontSize: 11, fontWeight: FontWeight.bold)),
+                                Text(
+                                  l10n?.duckingActive ?? 'Ducking Active',
+                                  style: GoogleFonts.jetBrainsMono(color: _duckingBadge, fontSize: 11, fontWeight: FontWeight.bold),
+                                ),
                               ],
                             ),
                           ),
@@ -293,21 +297,21 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                             decoration: BoxDecoration(
                               color: _card,
                               borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(color: _primary.withValues(alpha: 0.15), blurRadius: 6, spreadRadius: 1),
-                              ],
+                              border: Border.all(
+                                color: _isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   _nameController.text.isEmpty ? (l10n?.cardExampleTitle ?? 'Sample Card') : _nameController.text,
-                                  style: TextStyle(color: _textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
+                                  style: GoogleFonts.plusJakartaSans(color: _textPrimary, fontWeight: FontWeight.w600, fontSize: 15),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   l10n?.cardExampleDesc ?? 'Scene or track description in the selected color palette.',
-                                  style: TextStyle(color: _textSecondary, fontSize: 12),
+                                  style: GoogleFonts.inter(color: _textSecondary, fontSize: 12),
                                 ),
                                 const SizedBox(height: 10),
                                 Wrap(
@@ -325,10 +329,11 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: _primary,
                                         foregroundColor: Colors.white,
+                                        elevation: 0,
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       ),
                                       icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                                      label: Text(l10n?.play ?? 'Play', style: const TextStyle(fontSize: 12)),
+                                      label: Text(l10n?.play ?? 'Play', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600)),
                                       onPressed: () {},
                                     ),
                                     const SizedBox(width: 12),

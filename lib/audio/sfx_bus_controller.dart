@@ -138,7 +138,7 @@ class SfxBusController extends ChangeNotifier {
   }
 
   Future<void> stopAll() async {
-    LoggerService().info('SfxBus: Panic Stop! Stopping all ${_activePlayers.length} active SFX players.');
+    LoggerService().info('SfxBus: Stopping all ${_activePlayers.length} active SFX players.');
     _loopingPlayers.clear();
     final toStop = List<AudioPlayer>.from(_activePlayers);
     _activePlayers.clear();

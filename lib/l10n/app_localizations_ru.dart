@@ -336,9 +336,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addSfxTooltip => 'Добавить SFX / Постоянную кнопку';
 
   @override
-  String get panicStopBtn => 'Panic Stop [Esc]';
-
-  @override
   String get sfxVolume => 'SFX Громкость: ';
 
   @override
@@ -874,13 +871,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Принудительное приглушение музыки на время речи';
 
   @override
-  String get shortcutPanicStopTitle => 'Экстренная остановка';
-
-  @override
-  String get shortcutPanicStopDesc =>
-      'Мгновенная остановка всех играющих SFX звуков';
-
-  @override
   String get shortcutFullscreenTitle => 'Полноэкранный режим';
 
   @override
@@ -964,9 +954,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pauseTooltip => 'Пауза [Space]';
 
   @override
-  String get panicStopTooltip => 'Экстренная остановка SFX [Esc]';
-
-  @override
   String get loopingBadge => 'ЦИКЛ';
 
   @override
@@ -1030,15 +1017,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get musicModeVictory => 'Победа';
 
   @override
-  String get intensityStepped1 => 'I';
-
-  @override
-  String get intensityStepped2 => 'II';
-
-  @override
-  String get intensityStepped3 => 'III';
-
-  @override
   String get optionsTooltip => 'Настройки';
 
   @override
@@ -1052,4 +1030,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get expandSidebarTooltip => 'Развернуть панель';
+
+  @override
+  String get aboutTitle => 'О приложении DnDisc';
+
+  @override
+  String get aboutDesc =>
+      'Атмосферный аудиоплеер, микшер сцен и саундборд для мастеров НРИ.';
+
+  @override
+  String get appVersion => 'Версия 1.0.0';
 }

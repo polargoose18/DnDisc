@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../audio/music_bus_controller.dart';
-import '../../domain/models/audio_track.dart';
 import '../../ui/view_models/theme_view_model.dart';
 
 import '../../domain/models/custom_theme_model.dart';
@@ -38,9 +38,10 @@ class MusicPlayerPanel extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           l10n?.musicTrack ?? 'Music Track',
-                          style: TextStyle(
-                            fontSize: 17,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: -0.2,
                             color: activeTheme.textPrimary,
                           ),
                         ),
@@ -65,7 +66,7 @@ class MusicPlayerPanel extends StatelessWidget {
                         track != null
                             ? '${l10n?.nowPlaying ?? "Now playing"}: ${track.title} ${music.isPlaying ? '' : (l10n?.pausedSuffix ?? '(Paused)')}'
                             : (l10n?.musicNotPlaying ?? 'Music is not playing'),
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: track != null ? activeTheme.textPrimary : activeTheme.textSecondary,
                           fontWeight: track != null ? FontWeight.w500 : FontWeight.normal,
                           fontSize: 13,
@@ -76,84 +77,6 @@ class MusicPlayerPanel extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-
-                // Intensity Selector Chips with Hotkey Badges
-                Row(
-                  children: [
-                    Text(
-                      '${l10n?.intensityLevel ?? "Intensity Level"}:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                        color: activeTheme.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  key: const ValueKey('music_intensity_wrap'),
-                  spacing: 8.0,
-                  runSpacing: 6.0,
-                  children: MusicIntensity.values.asMap().entries.map((entry) {
-                    final index = entry.key + 1;
-                    final intensity = entry.value;
-                    final isSelected = music.currentIntensity == intensity;
-                    final chipColor = _getIntensityColor(intensity, activeTheme);
-
-                    return InkWell(
-                      key: ValueKey('chip_${intensity.name}'),
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () => music.setIntensity(intensity),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                        decoration: BoxDecoration(
-                          color: isSelected ? chipColor : chipColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: isSelected ? chipColor : chipColor.withValues(alpha: 0.4),
-                            width: isSelected ? 1.5 : 1.0,
-                          ),
-                          boxShadow: isSelected
-                              ? [BoxShadow(color: chipColor.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 1)]
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                              margin: const EdgeInsets.only(right: 6),
-                              decoration: BoxDecoration(
-                                color: isSelected ? Colors.black26 : Colors.white12,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                '$index',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: isSelected ? Colors.white : activeTheme.textSecondary,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              intensity.name.toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.white : activeTheme.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-
                 const SizedBox(height: 14),
 
                 // Playback Controls & Volume Slider
@@ -196,7 +119,11 @@ class MusicPlayerPanel extends StatelessWidget {
                           ),
                           Text(
                             '${(music.rawVolume * 100).toInt()}%',
-                            style: TextStyle(fontSize: 12, color: activeTheme.textSecondary),
+                            style: GoogleFonts.jetBrainsMono(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: activeTheme.textSecondary,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           Icon(Icons.volume_up, size: 20, color: activeTheme.textSecondary),
@@ -211,18 +138,5 @@ class MusicPlayerPanel extends StatelessWidget {
         );
       },
     );
-  }
-
-  Color _getIntensityColor(MusicIntensity intensity, dynamic activeTheme) {
-    switch (intensity) {
-      case MusicIntensity.calm:
-        return activeTheme.secondary;
-      case MusicIntensity.suspense:
-        return const Color(0xFFF59E0B); // Amber
-      case MusicIntensity.battle:
-        return activeTheme.battleIntensity;
-      case MusicIntensity.boss:
-        return activeTheme.bossIntensity;
-    }
   }
 }

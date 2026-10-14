@@ -38,7 +38,6 @@ The application enables GMs to instantly set the right mood at the table: from a
 
 * **Auto-Ducking**: Automatically lowers background music volume when SFX triggers or speech occurs.
 * **Fading & Crossfade**: Smooth transition curves for music tracks and ambient layers.
-* **Panic Stop**: Instantly halt all active sound effects or the entire audio engine with a single hotkey [Esc].
 * **Shortcuts & Hotkeys**: Customizable keyboard shortcuts for rapid game session control.
 * **Custom Themes**: Built-in color theme editor.
 * **Localization**: Full internationalization with English and Russian language support (i10n).

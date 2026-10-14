@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../domain/models/library_track.dart';
 import '../../ui/view_models/media_library_view_model.dart';
+import '../../ui/view_models/theme_view_model.dart';
 import '../../audio/audio_engine_service.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../data/services/media_package_service.dart';
@@ -14,6 +16,12 @@ class LibraryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final themeViewModel = context.watch<ThemeViewModel?>();
+    final activeTheme = themeViewModel?.activeTheme;
+    final isDark = activeTheme?.isDark ?? (theme.brightness == Brightness.dark);
+    final textPrimary = activeTheme?.textPrimary ?? theme.colorScheme.onSurface;
+    final textSecondary = activeTheme?.textSecondary ?? theme.textTheme.bodySmall?.color ?? Colors.grey;
 
     return Consumer2<MediaLibraryViewModel, AudioEngineService>(
       builder: (context, library, audioEngine, _) {
@@ -29,8 +37,10 @@ class LibraryScreen extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         key: const ValueKey('library_search_input'),
+                        style: GoogleFonts.inter(fontSize: 13, color: textPrimary),
                         decoration: InputDecoration(
                           hintText: l10n?.searchPlaceholder ?? 'Search by title or tags (e.g. Tavern, Battle)...',
+                          hintStyle: GoogleFonts.inter(fontSize: 13, color: textSecondary.withValues(alpha: 0.6)),
                           prefixIcon: const Icon(Icons.search),
                           border: const OutlineInputBorder(),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -43,9 +53,9 @@ class LibraryScreen extends StatelessWidget {
                       key: const ValueKey('import_media_button'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-                        backgroundColor: const Color(0xFF673AB7),
+                        backgroundColor: activeTheme?.primary ?? theme.colorScheme.primary,
                         foregroundColor: Colors.white,
-                        elevation: 2,
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -54,8 +64,8 @@ class LibraryScreen extends StatelessWidget {
                       icon: const Icon(Icons.file_upload_rounded, color: Colors.white),
                       label: Text(
                         l10n?.importFilesBtn ?? 'Import Files',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                           fontSize: 14,
                         ),
@@ -66,13 +76,18 @@ class LibraryScreen extends StatelessWidget {
                       key: const ValueKey('export_media_package_button'),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                        foregroundColor: textPrimary,
+                        side: BorderSide(color: isDark ? Colors.white24 : Colors.black26),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       onPressed: library.tracks.isEmpty ? null : () => _handleExportMediaPackage(context, library),
                       icon: const Icon(Icons.archive_outlined),
-                      label: Text(l10n?.exportMediaPackageBtn ?? 'Export Set'),
+                      label: Text(
+                        l10n?.exportMediaPackageBtn ?? 'Export Set',
+                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ],
                 ),
@@ -111,22 +126,22 @@ class LibraryScreen extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.library_music_outlined, size: 64, color: Colors.grey),
+                                  Icon(Icons.library_music_outlined, size: 64, color: textSecondary),
                                   const SizedBox(height: 12),
                                   Text(
                                     l10n?.libraryEmpty ?? 'Media library is empty',
-                                    style: const TextStyle(fontSize: 18, color: Colors.grey),
+                                    style: GoogleFonts.plusJakartaSans(fontSize: 18, color: textSecondary, fontWeight: FontWeight.w600),
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
                                     l10n?.libraryEmptyHint ?? 'Click "Import Files" to add music, ambient or SFX.',
-                                    style: const TextStyle(color: Colors.white54),
+                                    style: GoogleFonts.inter(color: textSecondary.withValues(alpha: 0.8)),
                                   ),
                                   const SizedBox(height: 16),
                                   ElevatedButton.icon(
                                     onPressed: () => _handleImport(context, library),
                                     icon: const Icon(Icons.file_upload_outlined),
-                                    label: Text(l10n?.importFilesBtn ?? 'Import Files'),
+                                    label: Text(l10n?.importFilesBtn ?? 'Import Files', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                                   ),
                                 ],
                               ),
@@ -153,7 +168,11 @@ class LibraryScreen extends StatelessWidget {
                                         Expanded(
                                           child: Text(
                                             track.title,
-                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: textPrimary,
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
@@ -161,19 +180,19 @@ class LibraryScreen extends StatelessWidget {
                                           key: ValueKey('library_track_duration_${track.id}'),
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: Colors.white12,
+                                            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(Icons.timer_outlined, size: 12, color: Colors.white70),
+                                              Icon(Icons.timer_outlined, size: 12, color: textSecondary),
                                               const SizedBox(width: 4),
                                               Text(
                                                 _formatDuration(track.durationMs),
-                                                style: const TextStyle(
+                                                style: GoogleFonts.jetBrainsMono(
                                                   fontSize: 11,
-                                                  color: Colors.white70,
+                                                  color: textSecondary,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
@@ -190,7 +209,7 @@ class LibraryScreen extends StatelessWidget {
                                               'Bus: ${track.busType.displayName} | Duration: ${_formatDuration(track.durationMs)} | Path: ${track.filePath}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(fontSize: 11, color: Colors.white60),
+                                          style: GoogleFonts.inter(fontSize: 11, color: textSecondary),
                                         ),
                                         if (track.tags.isNotEmpty) ...[
                                           const SizedBox(height: 4),
@@ -200,12 +219,12 @@ class LibraryScreen extends StatelessWidget {
                                               return Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.white12,
+                                                  color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
                                                   borderRadius: BorderRadius.circular(4),
                                                 ),
                                                 child: Text(
                                                   '#$tag',
-                                                  style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: textSecondary),
                                                 ),
                                               );
                                             }).toList(),

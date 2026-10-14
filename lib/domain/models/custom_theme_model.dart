@@ -1,6 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomThemeModel {
+  static bool _fontConfigured = false;
+  static void _ensureFontConfigured() {
+    if (!_fontConfigured) {
+      _fontConfigured = true;
+      if (Platform.environment.containsKey('FLUTTER_TEST')) {
+        GoogleFonts.config.allowRuntimeFetching = false;
+      }
+    }
+  }
   final String id;
   final String name;
   final bool isDark;
@@ -50,6 +61,7 @@ class CustomThemeModel {
   Color get bossIntensity => Color(bossIntensityColor);
 
   ThemeData toThemeData() {
+    _ensureFontConfigured();
     final brightness = isDark ? Brightness.dark : Brightness.light;
     final colorScheme = ColorScheme(
       brightness: brightness,
@@ -73,12 +85,12 @@ class CustomThemeModel {
       cardColor: card,
       cardTheme: CardThemeData(
         color: card,
-        elevation: 1,
-        shadowColor: isDark ? Colors.black54 : Colors.black12,
+        elevation: 0,
+        shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(14)),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
           side: BorderSide(
-            color: isDark ? Colors.white.withValues(alpha: 0.07) : Colors.black.withValues(alpha: 0.08),
+            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
             width: 1.0,
           ),
         ),
@@ -87,12 +99,11 @@ class CustomThemeModel {
         backgroundColor: surface,
         elevation: 0,
         foregroundColor: textPrimary,
-        titleTextStyle: TextStyle(
+        titleTextStyle: GoogleFonts.plusJakartaSans(
           color: textPrimary,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.2,
         ),
       ),
       dialogTheme: DialogThemeData(
@@ -104,11 +115,11 @@ class CustomThemeModel {
             width: 1.0,
           ),
         ),
-        titleTextStyle: TextStyle(
+        titleTextStyle: GoogleFonts.plusJakartaSans(
           color: textPrimary,
           fontSize: 18,
-          fontWeight: FontWeight.bold,
-          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.2,
         ),
       ),
       sliderTheme: SliderThemeData(
@@ -123,31 +134,57 @@ class CustomThemeModel {
       chipTheme: ChipThemeData(
         backgroundColor: card,
         selectedColor: primary.withValues(alpha: 0.25),
-        labelStyle: TextStyle(color: textPrimary, fontSize: 12),
-        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 12),
+        labelStyle: GoogleFonts.inter(color: textPrimary, fontSize: 12),
+        secondaryLabelStyle: GoogleFonts.inter(color: Colors.white, fontSize: 12),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
         ),
       ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: primary,
+        unselectedLabelColor: textSecondary,
+        indicatorColor: primary,
+        labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.normal, fontSize: 13),
+        indicatorSize: TabBarIndicatorSize.label,
+        dividerColor: Colors.transparent,
+      ),
+      dividerTheme: DividerThemeData(
+        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
+        thickness: 1.0,
+        space: 1.0,
+      ),
       textTheme: TextTheme(
-        bodyLarge: TextStyle(color: textPrimary),
-        bodyMedium: TextStyle(color: textPrimary),
-        bodySmall: TextStyle(color: textSecondary),
-        titleLarge: TextStyle(
+        displayLarge: GoogleFonts.outfit(color: textPrimary, fontWeight: FontWeight.bold),
+        displayMedium: GoogleFonts.outfit(color: textPrimary, fontWeight: FontWeight.w600),
+        headlineLarge: GoogleFonts.plusJakartaSans(color: textPrimary, fontWeight: FontWeight.w700, letterSpacing: -0.5),
+        headlineMedium: GoogleFonts.plusJakartaSans(color: textPrimary, fontWeight: FontWeight.w600, letterSpacing: -0.3),
+        headlineSmall: GoogleFonts.plusJakartaSans(color: textPrimary, fontWeight: FontWeight.w600),
+        titleLarge: GoogleFonts.plusJakartaSans(
           color: textPrimary,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.4,
-          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
-        ),
-        titleMedium: TextStyle(
-          color: textPrimary,
+          fontSize: 18,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0.2,
-          fontFamilyFallback: const ['Georgia', 'Times New Roman', 'serif'],
+          letterSpacing: -0.2,
         ),
-        titleSmall: TextStyle(color: textSecondary),
+        titleMedium: GoogleFonts.plusJakartaSans(
+          color: textPrimary,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.1,
+        ),
+        titleSmall: GoogleFonts.plusJakartaSans(
+          color: textSecondary,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+        bodyLarge: GoogleFonts.inter(color: textPrimary, fontSize: 14, height: 1.4),
+        bodyMedium: GoogleFonts.inter(color: textPrimary, fontSize: 13, height: 1.4),
+        bodySmall: GoogleFonts.inter(color: textSecondary, fontSize: 12, height: 1.3),
+        labelLarge: GoogleFonts.inter(color: textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+        labelMedium: GoogleFonts.inter(color: textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
+        labelSmall: GoogleFonts.inter(color: textSecondary, fontSize: 10),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

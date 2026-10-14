@@ -157,7 +157,7 @@ void main() {
       expect(find.textContaining(l10n.soundboardTitle), findsWidgets);
     });
 
-    testWidgets('should display tabs and StickyMiniPlayer on compact and mobile screens (< 1000px)', (tester) async {
+    testWidgets('should display tabs without StickyMiniPlayer on compact and mobile screens (< 1000px)', (tester) async {
       // Arrange
       tester.view.physicalSize = const Size(800, 900);
       tester.view.devicePixelRatio = 1.0;
@@ -174,7 +174,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.byType(StickyMiniPlayer), findsOneWidget);
+      expect(find.byType(StickyMiniPlayer), findsNothing);
       expect(find.text(l10n.scenes), findsWidgets);
       expect(find.text(l10n.music), findsWidgets);
       expect(find.text(l10n.ambient), findsWidgets);
@@ -217,6 +217,45 @@ void main() {
       await tester.tap(find.byType(ElevatedButton));
       expect(activated, isTrue);
     });
+
+    testWidgets('should render properly without overflow when Russian locale is used in constrained width', (tester) async {
+      // Arrange
+      final scene = SceneModel(
+        id: 'sc_card_ru',
+        name: 'Таверна «Пьяный дракон»',
+        description: 'Шумная таверна с кружками эля и менестрелями',
+        musicTrackId: 'track_1',
+        musicIntensity: MusicIntensity.calm,
+        ambientLayerVolumes: const {'amb_1': 0.8},
+      );
+
+      final settings = SettingsService(appLanguage: 'ru');
+
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          settingsService: settings,
+          child: SizedBox(
+            width: 280,
+            height: 180,
+            child: SceneCard(
+              scene: scene,
+              isActive: true,
+              onActivate: () {},
+              onEdit: () {},
+              onDuplicate: () {},
+              onDelete: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Таверна «Пьяный дракон»'), findsOneWidget);
+      expect(find.byType(ElevatedButton), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 
   group('SceneBackdropHeader Widget Tests', () {
@@ -245,8 +284,54 @@ void main() {
       // Assert
       expect(find.text('Dragon Cave'), findsOneWidget);
       expect(find.text(l10n.currentSceneBadge), findsNothing);
-      expect(find.text(l10n.intensityCalm), findsOneWidget);
-      expect(find.text(l10n.intensityBattle), findsOneWidget);
+      expect(find.text('Calm'), findsOneWidget);
+      expect(find.text('Battle'), findsOneWidget);
+    });
+
+    testWidgets('should show intensity levels in English regardless of Russian locale and not start playback when switched', (tester) async {
+      // Arrange
+      final sceneService = SceneService(autoLoad: false);
+      final settings = SettingsService(appLanguage: 'ru');
+      final engine = AudioEngineService(settings: settings);
+      final scene = SceneModel(
+        id: 'sc_ru_test',
+        name: 'Русская сцена',
+        description: 'Описание сцены',
+      );
+      await tester.runAsync(() async {
+        await sceneService.createScene(scene);
+        await sceneService.activateScene(scene);
+      });
+
+      // Act
+      await tester.pumpWidget(
+        createTestApp(
+          settingsService: settings,
+          sceneService: sceneService,
+          audioEngine: engine,
+          child: const SceneBackdropHeader(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert - Header displays English intensity names even in Russian locale
+      expect(find.text('Calm'), findsOneWidget);
+      expect(find.text('Suspense'), findsOneWidget);
+      expect(find.text('Battle'), findsOneWidget);
+      expect(find.text('Boss'), findsOneWidget);
+      // 'Выкл' / 'Off' must not be present
+      expect(find.text('Выкл'), findsNothing);
+      expect(find.text('Off'), findsNothing);
+
+      // Act - switch intensity
+      await tester.tap(find.text('Suspense'));
+      await tester.pumpAndSettle();
+
+      // Assert - intensity switched to suspense and music did NOT start playing
+      expect(engine.musicBus.currentIntensity, equals(MusicIntensity.suspense));
+      expect(engine.musicBus.isPlaying, isFalse);
+
+      engine.dispose();
     });
   });
 
@@ -314,7 +399,7 @@ void main() {
 
       // Assert
       expect(find.text('Sword Strike'), findsOneWidget);
-      expect(find.text(l10n.panicStopBtn), findsOneWidget);
+      expect(find.byKey(const ValueKey('panic_stop_sfx_btn')), findsNothing);
     });
 
     testWidgets('should allow volume slider interaction on inactive ambient layer', (tester) async {

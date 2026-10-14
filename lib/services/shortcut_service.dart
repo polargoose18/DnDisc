@@ -21,7 +21,6 @@ enum AppShortcutAction {
   sfx8,
   sfx9,
   masterMute,
-  panicStopSfx,
   toggleFullscreen,
 }
 
@@ -73,8 +72,6 @@ extension ShortcutDefinitionLocalizationExtension on ShortcutDefinition {
         return l10n.shortcutSfxTitle(9);
       case AppShortcutAction.masterMute:
         return l10n.shortcutMasterMuteTitle;
-      case AppShortcutAction.panicStopSfx:
-        return l10n.shortcutPanicStopTitle;
       case AppShortcutAction.toggleFullscreen:
         return l10n.shortcutFullscreenTitle;
     }
@@ -113,8 +110,6 @@ extension ShortcutDefinitionLocalizationExtension on ShortcutDefinition {
         return l10n.shortcutSfxDesc(9);
       case AppShortcutAction.masterMute:
         return l10n.shortcutMasterMuteDesc;
-      case AppShortcutAction.panicStopSfx:
-        return l10n.shortcutPanicStopDesc;
       case AppShortcutAction.toggleFullscreen:
         return l10n.shortcutFullscreenDesc;
     }
@@ -217,12 +212,6 @@ class ShortcutService extends ChangeNotifier {
       description: 'Quick mute or unmute master audio',
       keyDisplay: 'M',
     ),
-    AppShortcutAction.panicStopSfx: const ShortcutDefinition(
-      action: AppShortcutAction.panicStopSfx,
-      title: 'Panic Stop SFX',
-      description: 'Instantly stop all playing SFX sounds',
-      keyDisplay: 'Escape',
-    ),
     AppShortcutAction.toggleFullscreen: const ShortcutDefinition(
       action: AppShortcutAction.toggleFullscreen,
       title: 'Fullscreen Mode',
@@ -263,7 +252,7 @@ class ShortcutService extends ChangeNotifier {
       final isEditable = context.widget is EditableText ||
           context.findAncestorWidgetOfExactType<EditableText>() != null;
       if (isEditable) {
-        // Allow escape even in editable text to lose focus or panic stop
+        // Allow escape in editable text to lose focus
         if (event.logicalKey == LogicalKeyboardKey.escape) {
           primaryFocus.unfocus();
           return false;
@@ -277,12 +266,6 @@ class ShortcutService extends ChangeNotifier {
     // Space -> Play/Pause
     if (event.logicalKey == LogicalKeyboardKey.space) {
       _executeAction(AppShortcutAction.playPauseMusic);
-      return true;
-    }
-
-    // Escape -> Panic Stop
-    if (event.logicalKey == LogicalKeyboardKey.escape) {
-      _executeAction(AppShortcutAction.panicStopSfx);
       return true;
     }
 
@@ -382,10 +365,6 @@ class ShortcutService extends ChangeNotifier {
 
       case AppShortcutAction.masterMute:
         _audioEngine!.toggleMute();
-        break;
-
-      case AppShortcutAction.panicStopSfx:
-        _audioEngine!.panicStopSfx();
         break;
 
       case AppShortcutAction.toggleFullscreen:

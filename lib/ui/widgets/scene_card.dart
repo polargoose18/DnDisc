@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../domain/models/scene_model.dart';
@@ -38,30 +39,24 @@ class SceneCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
       decoration: BoxDecoration(
         color: activeTheme.card,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isActive ? activeTheme.primary : Colors.white12,
-          width: isActive ? 2.5 : 1.0,
+          color: isActive ? activeTheme.primary : (activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08)),
+          width: isActive ? 2.0 : 1.0,
         ),
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: activeTheme.primary.withValues(alpha: 0.45),
-                  blurRadius: 14,
-                  spreadRadius: 2,
+                  color: activeTheme.primary.withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  spreadRadius: 1,
                 ),
               ]
-            : [
-                const BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                ),
-              ],
+            : null,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(13),
@@ -122,10 +117,11 @@ class SceneCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           scene.name,
-                          style: TextStyle(
+                          style: GoogleFonts.plusJakartaSans(
                             color: activeTheme.textPrimary,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             fontSize: 15,
+                            letterSpacing: -0.1,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -133,17 +129,17 @@ class SceneCard extends StatelessWidget {
                       ),
                       if (isActive)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                           margin: const EdgeInsets.only(right: 4),
                           decoration: BoxDecoration(
                             color: activeTheme.primary,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             l10n?.activeBadge ?? 'ACTIVE',
-                            style: const TextStyle(
+                            style: GoogleFonts.jetBrainsMono(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: 9,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
                             ),
@@ -207,11 +203,11 @@ class SceneCard extends StatelessWidget {
                   ),
 
                   // Description
-                  if (scene.description.isNotEmpty) ...[
+                    if (scene.description.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(
                       scene.description,
-                      style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
+                      style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 12),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -221,38 +217,45 @@ class SceneCard extends StatelessWidget {
 
                   // Bottom Row: Summary Badges and Activate Button
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Wrap(
-                        spacing: 6,
-                        children: [
-                          if (scene.musicTrackId != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: _getIntensityColor(scene.musicIntensity, activeTheme).withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: _getIntensityColor(scene.musicIntensity, activeTheme),
-                                  width: 0.8,
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            if (scene.musicTrackId != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _getIntensityColor(scene.musicIntensity, activeTheme).withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: _getIntensityColor(scene.musicIntensity, activeTheme),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.music_note, size: 12, color: _getIntensityColor(scene.musicIntensity, activeTheme)),
+                                    const SizedBox(width: 2),
+                                    ConstrainedBox(
+                                      constraints: const BoxConstraints(maxWidth: 95),
+                                      child: Text(
+                                        (scene.musicIntensity?.getLocalizedName(l10n) ?? l10n?.intensityCalm ?? 'Calm').toUpperCase(),
+                                        style: GoogleFonts.jetBrainsMono(
+                                          color: _getIntensityColor(scene.musicIntensity, activeTheme),
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.music_note, size: 12, color: _getIntensityColor(scene.musicIntensity, activeTheme)),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    (scene.musicIntensity?.getLocalizedName(l10n) ?? l10n?.intensityCalm ?? 'Calm').toUpperCase(),
-                                    style: TextStyle(
-                                      color: _getIntensityColor(scene.musicIntensity, activeTheme),
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           if (scene.ambientLayerVolumes.isNotEmpty)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -266,12 +269,17 @@ class SceneCard extends StatelessWidget {
                                 children: [
                                   const Icon(Icons.waves, size: 12, color: Colors.tealAccent),
                                   const SizedBox(width: 2),
-                                  Text(
-                                    '${scene.ambientLayerVolumes.length} ${l10n?.ambient ?? "ambient"}',
-                                    style: const TextStyle(
-                                      color: Colors.tealAccent,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 95),
+                                    child: Text(
+                                      '${scene.ambientLayerVolumes.length} ${l10n?.ambient ?? "ambient"}',
+                                      style: GoogleFonts.jetBrainsMono(
+                                        color: Colors.tealAccent,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
@@ -279,20 +287,31 @@ class SceneCard extends StatelessWidget {
                             ),
                         ],
                       ),
-                      ElevatedButton.icon(
+                    ),
+                    const SizedBox(width: 6),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 130),
+                      child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isActive ? Colors.teal : activeTheme.primary,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           minimumSize: const Size(0, 30),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         icon: Icon(isActive ? Icons.volume_up_rounded : Icons.play_arrow_rounded, size: 14),
-                        label: Text(isActive ? (l10n?.activeBadge ?? 'ACTIVE') : (l10n?.enableSceneBtn ?? 'Enable'), style: const TextStyle(fontSize: 11)),
+                        label: Text(
+                          isActive ? (l10n?.activeBadge ?? 'ACTIVE') : (l10n?.enableSceneBtn ?? 'Enable'),
+                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         onPressed: onActivate,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
                 ],
               ),
             ),

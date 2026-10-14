@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../l10n/app_localizations.dart';
@@ -8,6 +9,7 @@ import '../../ui/view_models/theme_view_model.dart';
 import '../../domain/models/custom_theme_model.dart';
 import '../../theme/app_themes.dart';
 import '../widgets/custom_theme_editor_dialog.dart';
+import '../widgets/dndisc_logo.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -289,10 +291,9 @@ class SettingsScreen extends StatelessWidget {
                                   Text(
                                     settings.customDownloadDirectory ?? (l10n?.defaultStoragePath ?? 'Default: Documents/audio_library'),
                                     key: const ValueKey('download_directory_display_path'),
-                                    style: TextStyle(
+                                    style: GoogleFonts.jetBrainsMono(
                                       color: activeTheme.textPrimary,
                                       fontSize: 13,
-                                      fontFamily: 'monospace',
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -435,6 +436,65 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // About DnDisc Card
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: activeTheme.primary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 1.0),
+                        ),
+                        child: DnDiscLogo(size: 36, color: activeTheme.primary),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  l10n?.aboutTitle ?? 'About DnDisc',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: activeTheme.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: activeTheme.surface,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                                  ),
+                                  child: Text(
+                                    l10n?.appVersion ?? 'Version 1.0.0',
+                                    style: TextStyle(fontSize: 10, color: activeTheme.textSecondary),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              l10n?.aboutDesc ?? 'Atmospheric audio engine, scene mixer, and soundboard player for TTRPG Game Masters.',
+                              style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 32),
             ],
           ),
@@ -514,15 +574,17 @@ class SettingsScreen extends StatelessWidget {
                       color: Color(preset.surfaceColor),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: isSelected ? Color(preset.primaryColor) : Colors.white12,
-                        width: isSelected ? 2.5 : 1.0,
+                        color: isSelected
+                            ? Color(preset.primaryColor)
+                            : (activeTheme.isDark ? Colors.white12 : Colors.black12),
+                        width: isSelected ? 1.8 : 1.0,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: Color(preset.primaryColor).withValues(alpha: 0.4),
-                                blurRadius: 8,
-                                spreadRadius: 1,
+                                color: Color(preset.primaryColor).withValues(alpha: 0.15),
+                                blurRadius: 4,
+                                spreadRadius: 0,
                               ),
                             ]
                           : null,
@@ -566,9 +628,9 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           preset.name,
-                          style: TextStyle(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: Color(preset.textPrimaryColor),
                           ),
                           maxLines: 1,
@@ -644,15 +706,17 @@ class SettingsScreen extends StatelessWidget {
                         color: Color(custom.surfaceColor),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: isSelected ? Color(custom.primaryColor) : Colors.white12,
-                          width: isSelected ? 2.5 : 1.0,
+                          color: isSelected
+                              ? Color(custom.primaryColor)
+                              : (activeTheme.isDark ? Colors.white12 : Colors.black12),
+                          width: isSelected ? 1.8 : 1.0,
                         ),
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: Color(custom.primaryColor).withValues(alpha: 0.4),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
+                                  color: Color(custom.primaryColor).withValues(alpha: 0.15),
+                                  blurRadius: 4,
+                                  spreadRadius: 0,
                                 ),
                               ]
                             : null,
@@ -720,9 +784,9 @@ class SettingsScreen extends StatelessWidget {
                           const SizedBox(height: 6),
                           Text(
                             custom.name,
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: Color(custom.textPrimaryColor),
                             ),
                             maxLines: 1,
@@ -778,12 +842,6 @@ class SettingsScreen extends StatelessWidget {
         title: 'Mute',
         description: 'Quick mute or unmute master volume',
         keyDisplay: 'M',
-      ),
-      ShortcutDefinition(
-        action: AppShortcutAction.panicStopSfx,
-        title: 'Panic Stop',
-        description: 'Immediately stop all playing SFX sounds',
-        keyDisplay: 'Escape',
       ),
       ShortcutDefinition(
         action: AppShortcutAction.toggleFullscreen,
