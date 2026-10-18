@@ -129,7 +129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themesTitle => 'App Themes';
 
   @override
-  String get builtinThemes => 'Built-in Presets (5 variants)';
+  String get builtinThemes => 'Built-in Presets (3 variants)';
 
   @override
   String get customThemes => 'Custom Themes';

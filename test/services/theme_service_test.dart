@@ -58,11 +58,11 @@ void main() {
       final themeService = ThemeService(dbService: dbService);
 
       // Act
-      themeService.selectTheme(AppThemes.emeraldForestId);
+      themeService.selectTheme(AppThemes.ancientParchmentId);
 
       // Assert
-      expect(themeService.activeThemeId, equals(AppThemes.emeraldForestId));
-      expect(themeService.activeTheme.name, equals('Emerald Forest'));
+      expect(themeService.activeThemeId, equals(AppThemes.ancientParchmentId));
+      expect(themeService.activeTheme.name, equals('Ancient Parchment'));
       expect(themeService.activeTheme.isBuiltIn, isTrue);
     });
 
@@ -95,20 +95,34 @@ void main() {
       expect(themeService.activeTheme.name, equals('Dragon Lair'));
     });
 
+    test('should fall back to Deep Dark when the saved theme preset was removed', () async {
+      // Arrange
+      await dbService.setSetting('active_theme_id', 'preset_emerald_forest');
+      final themeService = ThemeService(dbService: dbService);
+
+      // Act
+      await themeService.loadActiveThemeId();
+
+      // Assert
+      expect(themeService.activeThemeId, equals(AppThemes.deepDarkId));
+      expect(themeService.activeTheme.id, equals(AppThemes.deepDarkId));
+      expect(await dbService.getSetting('active_theme_id'), equals(AppThemes.deepDarkId));
+    });
+
     test('should create editable custom duplicate of existing theme preset', () async {
       // Arrange
       final themeService = ThemeService(dbService: dbService);
 
       // Act
       final duplicate = await themeService.duplicateCustomTheme(
-        AppThemes.crimsonDungeonId,
+        AppThemes.cleanLightId,
         newName: 'Blood Crypt',
       );
 
       // Assert
       expect(duplicate, isNotNull);
       expect(duplicate!.name, equals('Blood Crypt'));
-      expect(duplicate.primaryColor, equals(AppThemes.crimsonDungeon.primaryColor));
+      expect(duplicate.primaryColor, equals(AppThemes.cleanLight.primaryColor));
       expect(duplicate.isBuiltIn, isFalse);
       expect(themeService.customThemes.any((t) => t.id == duplicate.id), isTrue);
     });

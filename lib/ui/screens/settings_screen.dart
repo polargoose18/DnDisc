@@ -550,7 +550,7 @@ class SettingsScreen extends StatelessWidget {
 
             // Subsection 1: Built-in Presets
             Text(
-              l10n?.builtinThemes ?? 'Built-in Presets (5 variants)',
+              l10n?.builtinThemes ?? 'Built-in Presets (3 variants)',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,

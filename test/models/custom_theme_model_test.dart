@@ -92,18 +92,20 @@ void main() {
       expect(lightThemeData.scaffoldBackgroundColor, equals(AppThemes.cleanLight.background));
     });
 
-    test('should provide 5 built-in theme presets in AppThemes', () {
+    test('should provide 3 built-in theme presets in AppThemes', () {
       // Arrange & Act
       const presets = AppThemes.presets;
 
       // Assert
-      expect(presets.length, equals(5));
+      expect(presets.length, equals(3));
       final ids = presets.map((p) => p.id).toList();
       expect(ids, contains(AppThemes.deepDarkId));
       expect(ids, contains(AppThemes.cleanLightId));
       expect(ids, contains(AppThemes.ancientParchmentId));
-      expect(ids, contains(AppThemes.emeraldForestId));
-      expect(ids, contains(AppThemes.crimsonDungeonId));
+      for (final removed in AppThemes.removedPresetIds) {
+        expect(ids, isNot(contains(removed)));
+        expect(AppThemes.getPresetById(removed).id, equals(AppThemes.deepDarkId));
+      }
 
       for (final p in presets) {
         expect(p.isBuiltIn, isTrue);

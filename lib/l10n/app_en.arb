@@ -39,7 +39,7 @@
   "resetDefaultsBtn": "Reset all settings to defaults",
   "settingsResetToast": "Audio engine settings reset.",
   "themesTitle": "App Themes",
-  "builtinThemes": "Built-in Presets (5 variants)",
+  "builtinThemes": "Built-in Presets (3 variants)",
   "customThemes": "Custom Themes",
   "noCustomThemes": "You don't have custom themes yet. Create your own theme with a custom palette!",
   "createThemeBtn": "Create new theme",

@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @builtinThemes.
   ///
   /// In en, this message translates to:
-  /// **'Built-in Presets (5 variants)'**
+  /// **'Built-in Presets (3 variants)'**
   String get builtinThemes;
 
   /// No description provided for @customThemes.

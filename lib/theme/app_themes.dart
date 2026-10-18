@@ -4,8 +4,13 @@ class AppThemes {
   static const String deepDarkId = 'preset_deep_dark';
   static const String cleanLightId = 'preset_clean_light';
   static const String ancientParchmentId = 'preset_ancient_parchment';
-  static const String emeraldForestId = 'preset_emerald_forest';
-  static const String crimsonDungeonId = 'preset_crimson_dungeon';
+
+  /// Ids of presets that were removed from the app. A saved active theme with
+  /// one of these ids falls back to [deepDark] on startup.
+  static const Set<String> removedPresetIds = {
+    'preset_emerald_forest',
+    'preset_crimson_dungeon',
+  };
 
   static const CustomThemeModel deepDark = CustomThemeModel(
     id: deepDarkId,
@@ -61,48 +66,10 @@ class AppThemes {
     isBuiltIn: true,
   );
 
-  static const CustomThemeModel emeraldForest = CustomThemeModel(
-    id: emeraldForestId,
-    name: 'Emerald Forest',
-    isDark: true,
-    primaryColor: 0xFF10B981, // Emerald Green
-    secondaryColor: 0xFF34D399, // Mint
-    backgroundColor: 0xFF091E16, // Deep Forest Dark
-    surfaceColor: 0xFF0F2D22,
-    cardColor: 0xFF143B2D,
-    accentColor: 0xFF6EE7B7,
-    textPrimaryColor: 0xFFECFDF5,
-    textSecondaryColor: 0xFFA7F3D0,
-    duckingBadgeColor: 0xFFF59E0B,
-    battleIntensityColor: 0xFFE11D48,
-    bossIntensityColor: 0xFF9F1239,
-    isBuiltIn: true,
-  );
-
-  static const CustomThemeModel crimsonDungeon = CustomThemeModel(
-    id: crimsonDungeonId,
-    name: 'Crimson Dungeon',
-    isDark: true,
-    primaryColor: 0xFFE11D48, // Crimson Red
-    secondaryColor: 0xFFFB7185, // Rose Accent
-    backgroundColor: 0xFF140B0E, // Dark Ash
-    surfaceColor: 0xFF221116,
-    cardColor: 0xFF2D161C,
-    accentColor: 0xFFF43F5E,
-    textPrimaryColor: 0xFFFFF1F2,
-    textSecondaryColor: 0xFFFDA4AF,
-    duckingBadgeColor: 0xFFEA580C,
-    battleIntensityColor: 0xFFFF2E63,
-    bossIntensityColor: 0xFF880808,
-    isBuiltIn: true,
-  );
-
   static const List<CustomThemeModel> presets = [
     deepDark,
     cleanLight,
     ancientParchment,
-    emeraldForest,
-    crimsonDungeon,
   ];
 
   static CustomThemeModel getPresetById(String id) {

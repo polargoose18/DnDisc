@@ -215,8 +215,6 @@ void main() {
       const deepDark = AppThemes.deepDark;
       const cleanLight = AppThemes.cleanLight;
       const parchment = AppThemes.ancientParchment;
-      const forest = AppThemes.emeraldForest;
-      const dungeon = AppThemes.crimsonDungeon;
 
       // Act & Assert
       expect(deepDark.primaryColor, 0xFFD4A373);
@@ -225,10 +223,6 @@ void main() {
       expect(cleanLight.backgroundColor, 0xFFF8FAFC);
       expect(parchment.primaryColor, 0xFFD4A373);
       expect(parchment.backgroundColor, 0xFF1C1917);
-      expect(forest.primaryColor, 0xFF10B981);
-      expect(forest.backgroundColor, 0xFF091E16);
-      expect(dungeon.primaryColor, 0xFFE11D48);
-      expect(dungeon.backgroundColor, 0xFF140B0E);
 
       final themeData = deepDark.toThemeData();
       expect(themeData.brightness, Brightness.dark);
