@@ -36,7 +36,7 @@ class DatabaseService {
 
     return await openDatabase(
       dbPath,
-      version: 5,
+      version: 6,
       onConfigure: (db) async {
         await db.execute('PRAGMA journal_mode = WAL;');
         await db.execute('PRAGMA synchronous = NORMAL;');
@@ -63,6 +63,9 @@ class DatabaseService {
         }
         if (oldVersion < 5) {
           await _createAppSettingsTable(db);
+        }
+        if (oldVersion < 6) {
+          await _migrateCustomThemesToDesignSystem(db);
         }
         await _createIndexes(db);
       },
@@ -118,25 +121,52 @@ class DatabaseService {
   }
 
   static Future<void> _createCustomThemesTable(Database db) async {
+    // Defaults are the Deep Dark tokens; real rows always set every column.
     await db.execute('''
       CREATE TABLE IF NOT EXISTS custom_themes (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
-        is_dark INTEGER NOT NULL,
-        primary_color INTEGER NOT NULL,
-        secondary_color INTEGER NOT NULL,
-        background_color INTEGER NOT NULL,
-        surface_color INTEGER NOT NULL,
-        card_color INTEGER NOT NULL,
-        accent_color INTEGER NOT NULL,
-        text_primary_color INTEGER NOT NULL,
-        text_secondary_color INTEGER NOT NULL,
-        ducking_badge_color INTEGER NOT NULL,
-        battle_intensity_color INTEGER NOT NULL,
-        boss_intensity_color INTEGER NOT NULL,
+        is_dark INTEGER NOT NULL DEFAULT 1,
+        background_color INTEGER NOT NULL DEFAULT 4279505167,
+        surface_color INTEGER NOT NULL DEFAULT 4280031253,
+        surface_raised_color INTEGER NOT NULL DEFAULT 4280688411,
+        surface_hover_color INTEGER NOT NULL DEFAULT 4281346083,
+        border_color INTEGER NOT NULL DEFAULT 4282003497,
+        border_strong_color INTEGER NOT NULL DEFAULT 4286936423,
+        text_primary_color INTEGER NOT NULL DEFAULT 4294175970,
+        text_secondary_color INTEGER NOT NULL DEFAULT 4290292121,
+        text_disabled_color INTEGER NOT NULL DEFAULT 4285490266,
+        primary_color INTEGER NOT NULL DEFAULT 4292125555,
+        primary_hover_color INTEGER NOT NULL DEFAULT 4293113994,
+        primary_subtle_color INTEGER NOT NULL DEFAULT 4282068256,
+        on_primary_color INTEGER NOT NULL DEFAULT 4279898377,
+        focus_ring_color INTEGER NOT NULL DEFAULT 4294100109,
+        danger_color INTEGER NOT NULL DEFAULT 4293885041,
+        danger_subtle_color INTEGER NOT NULL DEFAULT 4282195225,
+        on_danger_color INTEGER NOT NULL DEFAULT 4280027656,
+        success_color INTEGER NOT NULL DEFAULT 4285318320,
+        success_subtle_color INTEGER NOT NULL DEFAULT 4279710509,
+        calm_intensity_color INTEGER NOT NULL DEFAULT 4286101414,
+        suspense_intensity_color INTEGER NOT NULL DEFAULT 4290222816,
+        battle_intensity_color INTEGER NOT NULL DEFAULT 4293424207,
+        boss_intensity_color INTEGER NOT NULL DEFAULT 4292888670,
         created_at TEXT NOT NULL
       )
     ''');
+  }
+
+  /// v6: themes follow the design-system tokens. Old rows hold only the base
+  /// colours, so they are read through [CustomThemeModel.fromMap] (which
+  /// derives the missing tokens), then the table is rebuilt: `secondary`,
+  /// `accent` and `ducking_badge` are gone and cannot be dropped in place.
+  static Future<void> _migrateCustomThemesToDesignSystem(Database db) async {
+    final rows = await db.query('custom_themes');
+    final themes = rows.map(CustomThemeModel.fromMap).toList();
+    await db.execute('DROP TABLE IF EXISTS custom_themes');
+    await _createCustomThemesTable(db);
+    for (final theme in themes) {
+      await db.insert('custom_themes', theme.toMap());
+    }
   }
 
   static Future<void> _createSceneRepositoriesTable(Database db) async {
