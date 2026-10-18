@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// No description provided for @tabLibrary.
   ///
   /// In en, this message translates to:
-  /// **'Media Library'**
+  /// **'Media library'**
   String get tabLibrary;
 
   /// No description provided for @tabSettings.
@@ -128,40 +128,22 @@ abstract class AppLocalizations {
   /// **'Catalog'**
   String get tabCatalog;
 
-  /// No description provided for @manualDuckingTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Manual Ducking [D]'**
-  String get manualDuckingTooltip;
-
   /// No description provided for @muteTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Mute [M]'**
+  /// **'Mute'**
   String get muteTooltip;
 
   /// No description provided for @unmuteTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Unmute [M]'**
+  /// **'Unmute'**
   String get unmuteTooltip;
-
-  /// No description provided for @fullscreenTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Fullscreen [F11]'**
-  String get fullscreenTooltip;
-
-  /// No description provided for @logConsoleTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Open log and debug console'**
-  String get logConsoleTooltip;
 
   /// No description provided for @logConsoleTitle.
   ///
   /// In en, this message translates to:
-  /// **'Log Console'**
+  /// **'Log console'**
   String get logConsoleTitle;
 
   /// No description provided for @clearLogs.
@@ -179,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @language.
   ///
   /// In en, this message translates to:
-  /// **'Interface Language'**
+  /// **'Interface language'**
   String get language;
 
   /// No description provided for @languageSystem.
@@ -200,191 +182,89 @@ abstract class AppLocalizations {
   /// **'English'**
   String get languageEnglish;
 
-  /// No description provided for @settingsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Audio Engine Settings'**
-  String get settingsTitle;
-
-  /// No description provided for @settingsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Themes, shortcuts, audio engine and preset management'**
-  String get settingsSubtitle;
-
-  /// No description provided for @fadeEngineTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Fade Engine'**
-  String get fadeEngineTitle;
-
   /// No description provided for @musicFadeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Music fade in/out duration'**
+  /// **'Music crossfade'**
   String get musicFadeTitle;
 
   /// No description provided for @ambientFadeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Ambient fade in/out duration'**
+  /// **'Ambient crossfade'**
   String get ambientFadeTitle;
 
   /// No description provided for @duckingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Auto-ducking music during SFX (Ducking)'**
+  /// **'Ducking'**
   String get duckingTitle;
 
   /// No description provided for @duckAttackTitle.
   ///
   /// In en, this message translates to:
-  /// **'Duck Attack Time'**
+  /// **'Duck attack'**
   String get duckAttackTitle;
 
   /// No description provided for @duckAttackSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'music fade-down speed when SFX triggers'**
+  /// **'How fast the music fades down when an effect starts'**
   String get duckAttackSubtitle;
 
   /// No description provided for @duckReleaseTitle.
   ///
   /// In en, this message translates to:
-  /// **'Duck Release Time'**
+  /// **'Duck release'**
   String get duckReleaseTitle;
 
   /// No description provided for @duckReleaseSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'music fade-up speed to full volume'**
+  /// **'How fast the music returns to full volume'**
   String get duckReleaseSubtitle;
 
   /// No description provided for @duckMultiplierTitle.
   ///
   /// In en, this message translates to:
-  /// **'Ducking Depth'**
+  /// **'Ducking depth'**
   String get duckMultiplierTitle;
 
   /// No description provided for @duckMultiplierSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'of original music volume'**
+  /// **'Share of the music volume that stays while an effect plays'**
   String get duckMultiplierSubtitle;
-
-  /// No description provided for @presetPacksTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Preset Bundles (ZIP)'**
-  String get presetPacksTitle;
-
-  /// No description provided for @presetPacksSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Export your scenes and tracks into a single archive to share with other GMs or import ready-made adventure bundles.'**
-  String get presetPacksSubtitle;
-
-  /// No description provided for @importPresetBtn.
-  ///
-  /// In en, this message translates to:
-  /// **'Import Preset (ZIP)'**
-  String get importPresetBtn;
-
-  /// No description provided for @exportPresetBtn.
-  ///
-  /// In en, this message translates to:
-  /// **'Export Preset to (ZIP)'**
-  String get exportPresetBtn;
-
-  /// No description provided for @interfaceTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Interface & Control Panel'**
-  String get interfaceTitle;
-
-  /// No description provided for @showLogConsoleTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Show log console icon'**
-  String get showLogConsoleTitle;
-
-  /// No description provided for @showLogConsoleSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Show quick toggle button for log console in top header'**
-  String get showLogConsoleSubtitle;
 
   /// No description provided for @resetDefaultsBtn.
   ///
   /// In en, this message translates to:
-  /// **'Reset all settings to defaults'**
+  /// **'Reset to defaults'**
   String get resetDefaultsBtn;
-
-  /// No description provided for @settingsResetToast.
-  ///
-  /// In en, this message translates to:
-  /// **'Audio engine settings reset.'**
-  String get settingsResetToast;
-
-  /// No description provided for @themesTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'App Themes'**
-  String get themesTitle;
-
-  /// No description provided for @builtinThemes.
-  ///
-  /// In en, this message translates to:
-  /// **'Built-in Presets (3 variants)'**
-  String get builtinThemes;
 
   /// No description provided for @customThemes.
   ///
   /// In en, this message translates to:
-  /// **'Custom Themes'**
+  /// **'Custom themes'**
   String get customThemes;
-
-  /// No description provided for @noCustomThemes.
-  ///
-  /// In en, this message translates to:
-  /// **'You don\'t have custom themes yet. Create your own theme with a custom palette!'**
-  String get noCustomThemes;
 
   /// No description provided for @createThemeBtn.
   ///
   /// In en, this message translates to:
-  /// **'Create new theme'**
+  /// **'Create theme'**
   String get createThemeBtn;
 
   /// No description provided for @hotkeysTitle.
   ///
   /// In en, this message translates to:
-  /// **'Centralized Shortcuts'**
+  /// **'Shortcuts'**
   String get hotkeysTitle;
 
   /// No description provided for @hotkeysSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Control soundscape during game session without distraction:'**
+  /// **'Work while the app window is focused'**
   String get hotkeysSubtitle;
-
-  /// No description provided for @actionCol.
-  ///
-  /// In en, this message translates to:
-  /// **'Action'**
-  String get actionCol;
-
-  /// No description provided for @descriptionCol.
-  ///
-  /// In en, this message translates to:
-  /// **'Description'**
-  String get descriptionCol;
-
-  /// No description provided for @keyCol.
-  ///
-  /// In en, this message translates to:
-  /// **'Key'**
-  String get keyCol;
 
   /// No description provided for @scenesTitle.
   ///
@@ -395,56 +275,32 @@ abstract class AppLocalizations {
   /// No description provided for @createSceneBtn.
   ///
   /// In en, this message translates to:
-  /// **'Create Scene'**
+  /// **'Create scene'**
   String get createSceneBtn;
 
   /// No description provided for @noScenesHint.
   ///
   /// In en, this message translates to:
-  /// **'No scenes created yet. Click \"Create Scene\" to combine music and ambients.'**
+  /// **'Create a scene to combine music, ambient layers and sound effects'**
   String get noScenesHint;
-
-  /// No description provided for @activeBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'ACTIVE'**
-  String get activeBadge;
-
-  /// No description provided for @enableSceneBtn.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable'**
-  String get enableSceneBtn;
-
-  /// No description provided for @libraryTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Media Library'**
-  String get libraryTitle;
 
   /// No description provided for @libraryEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Media library is empty'**
+  /// **'Your library is empty'**
   String get libraryEmpty;
 
   /// No description provided for @libraryEmptyHint.
   ///
   /// In en, this message translates to:
-  /// **'Click \"Import Files\" to add music, ambient or SFX.'**
+  /// **'Import audio files to use them in scenes'**
   String get libraryEmptyHint;
 
   /// No description provided for @importFilesBtn.
   ///
   /// In en, this message translates to:
-  /// **'Import Files'**
+  /// **'Import files'**
   String get importFilesBtn;
-
-  /// No description provided for @allSounds.
-  ///
-  /// In en, this message translates to:
-  /// **'All Sounds'**
-  String get allSounds;
 
   /// No description provided for @music.
   ///
@@ -473,7 +329,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchPlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Search by title or tags (e.g., Tavern, Battle)...'**
+  /// **'Search by title or tag'**
   String get searchPlaceholder;
 
   /// No description provided for @cancel.
@@ -518,59 +374,29 @@ abstract class AppLocalizations {
   /// **'Export'**
   String get export;
 
-  /// No description provided for @nowPlaying.
-  ///
-  /// In en, this message translates to:
-  /// **'Now playing'**
-  String get nowPlaying;
-
-  /// No description provided for @musicNotPlaying.
-  ///
-  /// In en, this message translates to:
-  /// **'Music is not playing'**
-  String get musicNotPlaying;
-
   /// No description provided for @musicTrack.
   ///
   /// In en, this message translates to:
-  /// **'Music Track'**
+  /// **'Music track'**
   String get musicTrack;
-
-  /// No description provided for @intensityLevel.
-  ///
-  /// In en, this message translates to:
-  /// **'Intensity Level'**
-  String get intensityLevel;
 
   /// No description provided for @stopMusic.
   ///
   /// In en, this message translates to:
-  /// **'Stop music'**
+  /// **'Stop'**
   String get stopMusic;
-
-  /// No description provided for @pausedSuffix.
-  ///
-  /// In en, this message translates to:
-  /// **'(Paused)'**
-  String get pausedSuffix;
 
   /// No description provided for @noAmbientTracksInLibrary.
   ///
   /// In en, this message translates to:
-  /// **'No ambient tracks in the library.'**
+  /// **'No ambient tracks in the library'**
   String get noAmbientTracksInLibrary;
 
   /// No description provided for @noSfxTracksInLibrary.
   ///
   /// In en, this message translates to:
-  /// **'No SFX tracks in the library.'**
+  /// **'No sound effects in the library'**
   String get noSfxTracksInLibrary;
-
-  /// No description provided for @playPause.
-  ///
-  /// In en, this message translates to:
-  /// **'Play / Pause'**
-  String get playPause;
 
   /// No description provided for @playing.
   ///
@@ -590,53 +416,23 @@ abstract class AppLocalizations {
   /// **'No music'**
   String get noMusic;
 
-  /// No description provided for @noMusicSilence.
-  ///
-  /// In en, this message translates to:
-  /// **'No music (silence)'**
-  String get noMusicSilence;
-
-  /// No description provided for @noMusicDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'When activating the scene, background music smoothly fades out'**
-  String get noMusicDesc;
-
-  /// No description provided for @nothingFound.
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing found'**
-  String get nothingFound;
-
   /// No description provided for @ambientLayers.
   ///
   /// In en, this message translates to:
-  /// **'Ambient Layers (Background Sounds)'**
+  /// **'Ambient layers'**
   String get ambientLayers;
 
   /// No description provided for @addAmbientTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Add Layer / Persistent Ambient'**
+  /// **'Add layer'**
   String get addAmbientTooltip;
 
   /// No description provided for @stopAll.
   ///
   /// In en, this message translates to:
-  /// **'Stop All'**
+  /// **'Stop all'**
   String get stopAll;
-
-  /// No description provided for @noActiveAmbients.
-  ///
-  /// In en, this message translates to:
-  /// **'No active ambients. Click \"+\" to add a persistent background sound.'**
-  String get noActiveAmbients;
-
-  /// No description provided for @addPersistentAmbient.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Persistent Ambient'**
-  String get addPersistentAmbient;
 
   /// No description provided for @volume.
   ///
@@ -644,208 +440,118 @@ abstract class AppLocalizations {
   /// **'Volume'**
   String get volume;
 
-  /// No description provided for @persistentLayerTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Persistent layer (not reset when switching scenes)'**
-  String get persistentLayerTooltip;
-
-  /// No description provided for @makePersistentTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Make persistent layer'**
-  String get makePersistentTooltip;
-
-  /// No description provided for @muteLayerTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Mute layer'**
-  String get muteLayerTooltip;
-
-  /// No description provided for @unmuteLayerTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Unmute layer'**
-  String get unmuteLayerTooltip;
-
-  /// No description provided for @removeLayerTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove layer'**
-  String get removeLayerTooltip;
-
   /// No description provided for @addAmbientDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Add Ambient Layer'**
+  /// **'Add ambient layer'**
   String get addAmbientDialogTitle;
-
-  /// No description provided for @selectTrackFromLibrary.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a track from the media library:'**
-  String get selectTrackFromLibrary;
-
-  /// No description provided for @selectLocalAudioFile.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose local audio file...'**
-  String get selectLocalAudioFile;
 
   /// No description provided for @selected.
   ///
   /// In en, this message translates to:
-  /// **'Selected: '**
+  /// **'Selected'**
   String get selected;
 
   /// No description provided for @persistentLayerCheckbox.
   ///
   /// In en, this message translates to:
-  /// **'Persistent layer (do not reset on scene change)'**
+  /// **'Pin to every scene'**
   String get persistentLayerCheckbox;
 
   /// No description provided for @addLayerBtn.
   ///
   /// In en, this message translates to:
-  /// **'Add Layer'**
+  /// **'Add layer'**
   String get addLayerBtn;
 
   /// No description provided for @soundboardTitle.
   ///
   /// In en, this message translates to:
-  /// **'SFX Quick-Trigger'**
+  /// **'SFX'**
   String get soundboardTitle;
-
-  /// No description provided for @addSfxTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Add SFX / Persistent Button'**
-  String get addSfxTooltip;
-
-  /// No description provided for @sfxVolume.
-  ///
-  /// In en, this message translates to:
-  /// **'SFX Volume: '**
-  String get sfxVolume;
-
-  /// No description provided for @soundboardEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'Soundboard is empty. Add SFX or persistent quick buttons.'**
-  String get soundboardEmpty;
-
-  /// No description provided for @addPersistentSfx.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Persistent SFX'**
-  String get addPersistentSfx;
 
   /// No description provided for @unpinSfx.
   ///
   /// In en, this message translates to:
-  /// **'Unpin (make temporary)'**
+  /// **'Unpin'**
   String get unpinSfx;
 
   /// No description provided for @pinSfx.
   ///
   /// In en, this message translates to:
-  /// **'Pin as persistent SFX'**
+  /// **'Pin to every scene'**
   String get pinSfx;
 
   /// No description provided for @deleteSfxButton.
   ///
   /// In en, this message translates to:
-  /// **'Delete SFX button'**
+  /// **'Remove from soundboard'**
   String get deleteSfxButton;
 
   /// No description provided for @addSfxDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Add SFX Button'**
+  /// **'Add sound effect'**
   String get addSfxDialogTitle;
-
-  /// No description provided for @selectSoundFromLibrary.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a sound from library:'**
-  String get selectSoundFromLibrary;
 
   /// No description provided for @persistentSfxCheckbox.
   ///
   /// In en, this message translates to:
-  /// **'Persistent SFX (do not reset on scene change)'**
+  /// **'Pin to every scene'**
   String get persistentSfxCheckbox;
 
   /// No description provided for @loopModeCheckbox.
   ///
   /// In en, this message translates to:
-  /// **'Loop Mode'**
+  /// **'Loop'**
   String get loopModeCheckbox;
 
   /// No description provided for @addSfxBtn.
   ///
   /// In en, this message translates to:
-  /// **'Add SFX'**
+  /// **'Add effect'**
   String get addSfxBtn;
-
-  /// No description provided for @exportScenePackTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Export Scene Bundles (.pack.zip)'**
-  String get exportScenePackTooltip;
 
   /// No description provided for @searchScenesPlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Search scenes...'**
+  /// **'Search scenes'**
   String get searchScenesPlaceholder;
 
   /// No description provided for @noScenesMatching.
   ///
   /// In en, this message translates to:
-  /// **'No scenes found matching your search.'**
+  /// **'Try a different name'**
   String get noScenesMatching;
 
   /// No description provided for @saveSceneAs.
   ///
   /// In en, this message translates to:
-  /// **'Save scene as...'**
+  /// **'Save scene as'**
   String get saveSceneAs;
-
-  /// No description provided for @sceneExported.
-  ///
-  /// In en, this message translates to:
-  /// **'Scene \"{name}\" exported!'**
-  String sceneExported(String name);
-
-  /// No description provided for @sceneExportError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error exporting scene: {error}'**
-  String sceneExportError(String error);
 
   /// No description provided for @exportScenePackTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Bundle (.pack.zip)'**
+  /// **'Export bundle'**
   String get exportScenePackTitle;
 
   /// No description provided for @packTitleLabel.
   ///
   /// In en, this message translates to:
-  /// **'Bundle Name'**
+  /// **'Bundle name'**
   String get packTitleLabel;
 
   /// No description provided for @packDescLabel.
   ///
   /// In en, this message translates to:
-  /// **'Bundle Description'**
+  /// **'Description'**
   String get packDescLabel;
 
   /// No description provided for @defaultPackTitle.
   ///
   /// In en, this message translates to:
-  /// **'Adventure Bundle'**
+  /// **'Adventure bundle'**
   String get defaultPackTitle;
 
   /// No description provided for @defaultPackDesc.
@@ -857,313 +563,151 @@ abstract class AppLocalizations {
   /// No description provided for @savePackAs.
   ///
   /// In en, this message translates to:
-  /// **'Save Bundle as...'**
+  /// **'Save bundle as'**
   String get savePackAs;
-
-  /// No description provided for @packExported.
-  ///
-  /// In en, this message translates to:
-  /// **'Bundle \"{name}\" successfully exported!'**
-  String packExported(String name);
-
-  /// No description provided for @packExportError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error exporting bundle: {error}'**
-  String packExportError(String error);
-
-  /// No description provided for @exportSceneMenu.
-  ///
-  /// In en, this message translates to:
-  /// **'Export (.scene.zip)'**
-  String get exportSceneMenu;
-
-  /// No description provided for @currentSceneBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'CURRENT SCENE'**
-  String get currentSceneBadge;
 
   /// No description provided for @selectScenePrompt.
   ///
   /// In en, this message translates to:
-  /// **'Select a scene to set up the game environment'**
+  /// **'Select a scene to set up the table'**
   String get selectScenePrompt;
 
   /// No description provided for @musicIntensityLabel.
   ///
   /// In en, this message translates to:
-  /// **'Music Intensity'**
+  /// **'Music intensity'**
   String get musicIntensityLabel;
 
   /// No description provided for @createSceneTitle.
   ///
   /// In en, this message translates to:
-  /// **'Create New Scene'**
+  /// **'Create scene'**
   String get createSceneTitle;
 
   /// No description provided for @editSceneTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit Scene'**
+  /// **'Edit scene'**
   String get editSceneTitle;
 
   /// No description provided for @sceneNameLabel.
   ///
   /// In en, this message translates to:
-  /// **'Scene Name *'**
+  /// **'Scene name'**
   String get sceneNameLabel;
 
   /// No description provided for @sceneNameHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. Tavern \"The Drunken Dragon\"'**
+  /// **'Harbor at dusk'**
   String get sceneNameHint;
-
-  /// No description provided for @sceneDescLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Atmosphere Description / GM Notes'**
-  String get sceneDescLabel;
-
-  /// No description provided for @sceneDescHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Warm fireplace, clinking mugs, quiet lute...'**
-  String get sceneDescHint;
-
-  /// No description provided for @sceneCoverLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Image / Cover Art Path'**
-  String get sceneCoverLabel;
-
-  /// No description provided for @browseBtn.
-  ///
-  /// In en, this message translates to:
-  /// **'Browse'**
-  String get browseBtn;
-
-  /// No description provided for @colorAccent.
-  ///
-  /// In en, this message translates to:
-  /// **'Color Accent:'**
-  String get colorAccent;
-
-  /// No description provided for @musicChannel.
-  ///
-  /// In en, this message translates to:
-  /// **'Music Channel'**
-  String get musicChannel;
-
-  /// No description provided for @ambientChannel.
-  ///
-  /// In en, this message translates to:
-  /// **'Ambient Channel'**
-  String get ambientChannel;
-
-  /// No description provided for @sfxChannel.
-  ///
-  /// In en, this message translates to:
-  /// **'SFX Channel (Soundboard)'**
-  String get sfxChannel;
-
-  /// No description provided for @searchMusicHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search music by title or tags...'**
-  String get searchMusicHint;
-
-  /// No description provided for @searchAmbientHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search ambient by title or tags...'**
-  String get searchAmbientHint;
-
-  /// No description provided for @searchSfxHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search SFX by title or tags...'**
-  String get searchSfxHint;
-
-  /// No description provided for @layersSelected.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} layers selected'**
-  String layersSelected(int count);
-
-  /// No description provided for @sfxSelected.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} SFX selected'**
-  String sfxSelected(int count);
 
   /// No description provided for @specifySceneName.
   ///
   /// In en, this message translates to:
-  /// **'Please specify scene name'**
+  /// **'Enter a name for the scene'**
   String get specifySceneName;
 
   /// No description provided for @createCustomThemeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Create Custom Theme'**
+  /// **'Create theme'**
   String get createCustomThemeTitle;
 
   /// No description provided for @editCustomThemeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit Theme'**
+  /// **'Edit theme'**
   String get editCustomThemeTitle;
 
   /// No description provided for @themeNameLabel.
   ///
   /// In en, this message translates to:
-  /// **'Theme Name'**
+  /// **'Theme name'**
   String get themeNameLabel;
 
   /// No description provided for @themeNameRequired.
   ///
   /// In en, this message translates to:
-  /// **'Please specify theme name'**
+  /// **'Enter a theme name'**
   String get themeNameRequired;
 
   /// No description provided for @baseOnPreset.
   ///
   /// In en, this message translates to:
-  /// **'Base on Preset'**
+  /// **'Start from a preset'**
   String get baseOnPreset;
-
-  /// No description provided for @baseOnPresetTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Use preset as template'**
-  String get baseOnPresetTooltip;
-
-  /// No description provided for @themePreviewTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Theme Preview'**
-  String get themePreviewTitle;
-
-  /// No description provided for @duckingActive.
-  ///
-  /// In en, this message translates to:
-  /// **'Ducking Active'**
-  String get duckingActive;
-
-  /// No description provided for @cardExampleTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sample Card'**
-  String get cardExampleTitle;
-
-  /// No description provided for @cardExampleDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Scene or track description in the selected color palette.'**
-  String get cardExampleDesc;
-
-  /// No description provided for @colorPaletteConfig.
-  ///
-  /// In en, this message translates to:
-  /// **'Color Palette Settings'**
-  String get colorPaletteConfig;
 
   /// No description provided for @colorPickTitle.
   ///
   /// In en, this message translates to:
-  /// **'Color Choice: {title}'**
+  /// **'Choose color: {title}'**
   String colorPickTitle(String title);
 
   /// No description provided for @saveThemeBtn.
   ///
   /// In en, this message translates to:
-  /// **'Save Theme'**
+  /// **'Save theme'**
   String get saveThemeBtn;
 
   /// No description provided for @newThemeDefaultName.
   ///
   /// In en, this message translates to:
-  /// **'New Theme'**
+  /// **'New theme'**
   String get newThemeDefaultName;
 
   /// No description provided for @editTrackTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit Audio Track'**
+  /// **'Edit details'**
   String get editTrackTitle;
 
   /// No description provided for @trackTitleLabel.
   ///
   /// In en, this message translates to:
-  /// **'Track Title'**
+  /// **'Title'**
   String get trackTitleLabel;
-
-  /// No description provided for @targetAudioBus.
-  ///
-  /// In en, this message translates to:
-  /// **'Target Audio Bus:'**
-  String get targetAudioBus;
-
-  /// No description provided for @musicIntensitySetting.
-  ///
-  /// In en, this message translates to:
-  /// **'Music Intensity Level:'**
-  String get musicIntensitySetting;
 
   /// No description provided for @tagsLabel.
   ///
   /// In en, this message translates to:
-  /// **'Tags (comma separated)'**
+  /// **'Tags'**
   String get tagsLabel;
 
   /// No description provided for @tagsHint.
   ///
   /// In en, this message translates to:
-  /// **'Tavern, Battle, Forest, Magic'**
+  /// **'Comma separated, for example tavern, battle'**
   String get tagsHint;
-
-  /// No description provided for @colorLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Color Badge:'**
-  String get colorLabel;
 
   /// No description provided for @exportMediaPackageBtn.
   ///
   /// In en, this message translates to:
-  /// **'Export Set'**
+  /// **'Export set'**
   String get exportMediaPackageBtn;
-
-  /// No description provided for @selectBusForImport.
-  ///
-  /// In en, this message translates to:
-  /// **'Select target audio bus for imported files'**
-  String get selectBusForImport;
 
   /// No description provided for @exportMediaPackageTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Media Package (.media.zip)'**
+  /// **'Export set'**
   String get exportMediaPackageTitle;
 
   /// No description provided for @mediaPackageNameLabel.
   ///
   /// In en, this message translates to:
-  /// **'Package Name'**
+  /// **'Set name'**
   String get mediaPackageNameLabel;
 
   /// No description provided for @mediaPackageDescLabel.
   ///
   /// In en, this message translates to:
-  /// **'Package Description'**
+  /// **'Description'**
   String get mediaPackageDescLabel;
 
   /// No description provided for @defaultMediaPackageName.
   ///
   /// In en, this message translates to:
-  /// **'My Media Package'**
+  /// **'My media set'**
   String get defaultMediaPackageName;
 
   /// No description provided for @defaultMediaPackageDesc.
@@ -1175,44 +719,8 @@ abstract class AppLocalizations {
   /// No description provided for @saveMediaPackageAs.
   ///
   /// In en, this message translates to:
-  /// **'Save media package as...'**
+  /// **'Save set as'**
   String get saveMediaPackageAs;
-
-  /// No description provided for @mediaPackageExported.
-  ///
-  /// In en, this message translates to:
-  /// **'Media package \"{name}\" successfully exported!'**
-  String mediaPackageExported(String name);
-
-  /// No description provided for @mediaPackageExportError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error exporting media package: {error}'**
-  String mediaPackageExportError(String error);
-
-  /// No description provided for @dispatchToBus.
-  ///
-  /// In en, this message translates to:
-  /// **'Play on {bus} bus'**
-  String dispatchToBus(String bus);
-
-  /// No description provided for @dispatchedToBus.
-  ///
-  /// In en, this message translates to:
-  /// **'Sent to {bus} bus: \"{title}\"'**
-  String dispatchedToBus(String bus, String title);
-
-  /// No description provided for @deleteFromLibrary.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete from library'**
-  String get deleteFromLibrary;
-
-  /// No description provided for @busInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Bus: {bus} | Duration: {duration} | Path: {path}'**
-  String busInfo(String bus, String duration, String path);
 
   /// No description provided for @catalogTitle.
   ///
@@ -1223,121 +731,31 @@ abstract class AppLocalizations {
   /// No description provided for @refreshCatalogTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Refresh catalog'**
+  /// **'Refresh'**
   String get refreshCatalogTooltip;
-
-  /// No description provided for @manageRepositoriesTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage repositories'**
-  String get manageRepositoriesTooltip;
-
-  /// No description provided for @addRepositoryBtn.
-  ///
-  /// In en, this message translates to:
-  /// **'Add'**
-  String get addRepositoryBtn;
 
   /// No description provided for @searchCatalogPlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Search items in catalog...'**
+  /// **'Search the catalog'**
   String get searchCatalogPlaceholder;
 
   /// No description provided for @sourcesBtn.
   ///
   /// In en, this message translates to:
-  /// **'Sources ({count})'**
+  /// **'Sources · {count}'**
   String sourcesBtn(int count);
-
-  /// No description provided for @noRepositoriesConnected.
-  ///
-  /// In en, this message translates to:
-  /// **'No connected repositories'**
-  String get noRepositoriesConnected;
-
-  /// No description provided for @addRepositoryUrlHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Add a link to GitLab, Dropbox or Webserver with repository.json manifest'**
-  String get addRepositoryUrlHint;
-
-  /// No description provided for @addRepositoryDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Repository'**
-  String get addRepositoryDialogTitle;
-
-  /// No description provided for @editRepositoryDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit Repository'**
-  String get editRepositoryDialogTitle;
-
-  /// No description provided for @manageRepositoriesTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage Repositories ({count})'**
-  String manageRepositoriesTitle(int count);
-
-  /// No description provided for @repositoryUrlLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Repository URL (GitLab / Dropbox / HTTP)'**
-  String get repositoryUrlLabel;
-
-  /// No description provided for @repositoryNameOptionalLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Name (optional)'**
-  String get repositoryNameOptionalLabel;
-
-  /// No description provided for @repositoryNameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Will be extracted from manifest if empty'**
-  String get repositoryNameHint;
-
-  /// No description provided for @repositoryDescOptionalLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Description (optional)'**
-  String get repositoryDescOptionalLabel;
-
-  /// No description provided for @enterRepositoryUrl.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter repository URL'**
-  String get enterRepositoryUrl;
 
   /// No description provided for @urlHttpPrefixValidation.
   ///
   /// In en, this message translates to:
-  /// **'URL must start with http:// or https://'**
+  /// **'Enter a full https:// address'**
   String get urlHttpPrefixValidation;
-
-  /// No description provided for @enterRepositoryName.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter repository name'**
-  String get enterRepositoryName;
-
-  /// No description provided for @repositoryUpdated.
-  ///
-  /// In en, this message translates to:
-  /// **'Repository updated successfully'**
-  String get repositoryUpdated;
-
-  /// No description provided for @noConnectedRepositories.
-  ///
-  /// In en, this message translates to:
-  /// **'No connected repositories.'**
-  String get noConnectedRepositories;
 
   /// No description provided for @noCatalogItemsFound.
   ///
   /// In en, this message translates to:
-  /// **'No items found matching your query.'**
+  /// **'Try another name or switch the filter'**
   String get noCatalogItemsFound;
 
   /// No description provided for @installedBadge.
@@ -1355,13 +773,13 @@ abstract class AppLocalizations {
   /// No description provided for @scenesCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} scenes'**
+  /// **'{count, plural, =1{1 scene} other{{count} scenes}}'**
   String scenesCount(int count);
 
   /// No description provided for @tracksCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} tracks'**
+  /// **'{count, plural, =1{1 track} other{{count} tracks}}'**
   String tracksCount(int count);
 
   /// No description provided for @sizeUnknown.
@@ -1379,139 +797,79 @@ abstract class AppLocalizations {
   /// No description provided for @repositoryLabel.
   ///
   /// In en, this message translates to:
-  /// **'Repository: {name}'**
+  /// **'Source: {name}'**
   String repositoryLabel(String name);
 
   /// No description provided for @scenesInPack.
   ///
   /// In en, this message translates to:
-  /// **'Scenes in Bundle'**
+  /// **'Scenes in the bundle'**
   String get scenesInPack;
 
   /// No description provided for @mediaSetContent.
   ///
   /// In en, this message translates to:
-  /// **'Media Set Content'**
+  /// **'Media pack contents'**
   String get mediaSetContent;
 
   /// No description provided for @sceneContent.
   ///
   /// In en, this message translates to:
-  /// **'Scene Content'**
+  /// **'Scene contents'**
   String get sceneContent;
 
   /// No description provided for @tracksMissingInManifest.
   ///
   /// In en, this message translates to:
-  /// **'Track list is missing in manifest.'**
+  /// **'The manifest has no track list'**
   String get tracksMissingInManifest;
 
   /// No description provided for @scenesMissingInManifest.
   ///
   /// In en, this message translates to:
-  /// **'Scene list is missing in manifest.'**
+  /// **'The manifest has no scene list'**
   String get scenesMissingInManifest;
-
-  /// No description provided for @channelLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Channel: {channel}'**
-  String channelLabel(String channel);
-
-  /// No description provided for @downloadingAndImporting.
-  ///
-  /// In en, this message translates to:
-  /// **'Downloading and importing... {percent}%'**
-  String downloadingAndImporting(String percent);
 
   /// No description provided for @removeFromApp.
   ///
   /// In en, this message translates to:
-  /// **'Remove {type}'**
-  String removeFromApp(String type);
-
-  /// No description provided for @installing.
-  ///
-  /// In en, this message translates to:
-  /// **'Installing...'**
-  String get installing;
+  /// **'Remove from app'**
+  String get removeFromApp;
 
   /// No description provided for @installItem.
   ///
   /// In en, this message translates to:
-  /// **'Install {type}'**
-  String installItem(String type);
-
-  /// No description provided for @deleteItemConfirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete {name}?'**
-  String deleteItemConfirmTitle(String name);
-
-  /// No description provided for @deleteItemConfirmMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to delete {type} \"{name}\" and associated files from the application?'**
-  String deleteItemConfirmMessage(String type, String name);
-
-  /// No description provided for @itemUninstalled.
-  ///
-  /// In en, this message translates to:
-  /// **'{type} \"{name}\" successfully removed.'**
-  String itemUninstalled(String type, String name);
-
-  /// No description provided for @itemUninstallError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error removing {type}.'**
-  String itemUninstallError(String type);
-
-  /// No description provided for @itemInstalled.
-  ///
-  /// In en, this message translates to:
-  /// **'{type} \"{name}\" successfully installed!'**
-  String itemInstalled(String type, String name);
-
-  /// No description provided for @itemInstallError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error downloading {type}.'**
-  String itemInstallError(String type);
-
-  /// No description provided for @catalogStorageTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Catalog & Audio File Storage'**
-  String get catalogStorageTitle;
+  /// **'Install'**
+  String get installItem;
 
   /// No description provided for @catalogStorageDesc.
   ///
   /// In en, this message translates to:
-  /// **'Folder for downloading and extracting audio files from online repository catalog:'**
+  /// **'Folder for audio files downloaded from the catalog'**
   String get catalogStorageDesc;
 
   /// No description provided for @customDirectory.
   ///
   /// In en, this message translates to:
-  /// **'Custom Directory'**
+  /// **'Custom folder'**
   String get customDirectory;
 
   /// No description provided for @defaultDirectory.
   ///
   /// In en, this message translates to:
-  /// **'Default Directory'**
+  /// **'Default folder'**
   String get defaultDirectory;
 
   /// No description provided for @defaultStoragePath.
   ///
   /// In en, this message translates to:
-  /// **'Default: Documents/audio_library'**
+  /// **'Documents/audio_library'**
   String get defaultStoragePath;
 
   /// No description provided for @resetDefaultDirTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Reset to default value'**
+  /// **'Reset to default'**
   String get resetDefaultDirTooltip;
 
   /// No description provided for @chooseFolderBtn.
@@ -1523,37 +881,25 @@ abstract class AppLocalizations {
   /// No description provided for @chooseFolderDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Choose folder for catalog audio storage'**
+  /// **'Choose a folder for catalog audio'**
   String get chooseFolderDialogTitle;
-
-  /// No description provided for @storagePathReset.
-  ///
-  /// In en, this message translates to:
-  /// **'Storage path reset to default.'**
-  String get storagePathReset;
-
-  /// No description provided for @storagePathUpdated.
-  ///
-  /// In en, this message translates to:
-  /// **'Catalog storage folder updated: {path}'**
-  String storagePathUpdated(String path);
 
   /// No description provided for @shortcutPlayPauseTitle.
   ///
   /// In en, this message translates to:
-  /// **'Play / Pause'**
+  /// **'Play / pause'**
   String get shortcutPlayPauseTitle;
 
   /// No description provided for @shortcutPlayPauseDesc.
   ///
   /// In en, this message translates to:
-  /// **'Start or pause current music track'**
+  /// **'Current music track'**
   String get shortcutPlayPauseDesc;
 
   /// No description provided for @shortcutIntensityCalmTitle.
   ///
   /// In en, this message translates to:
-  /// **'Intensity: Calm'**
+  /// **'Calm'**
   String get shortcutIntensityCalmTitle;
 
   /// No description provided for @shortcutIntensityCalmDesc.
@@ -1565,7 +911,7 @@ abstract class AppLocalizations {
   /// No description provided for @shortcutIntensitySuspenseTitle.
   ///
   /// In en, this message translates to:
-  /// **'Intensity: Suspense'**
+  /// **'Suspense'**
   String get shortcutIntensitySuspenseTitle;
 
   /// No description provided for @shortcutIntensitySuspenseDesc.
@@ -1577,7 +923,7 @@ abstract class AppLocalizations {
   /// No description provided for @shortcutIntensityBattleTitle.
   ///
   /// In en, this message translates to:
-  /// **'Intensity: Battle'**
+  /// **'Battle'**
   String get shortcutIntensityBattleTitle;
 
   /// No description provided for @shortcutIntensityBattleDesc.
@@ -1589,7 +935,7 @@ abstract class AppLocalizations {
   /// No description provided for @shortcutIntensityBossTitle.
   ///
   /// In en, this message translates to:
-  /// **'Intensity: Boss'**
+  /// **'Boss'**
   String get shortcutIntensityBossTitle;
 
   /// No description provided for @shortcutIntensityBossDesc.
@@ -1601,62 +947,38 @@ abstract class AppLocalizations {
   /// No description provided for @shortcutSfxTitle.
   ///
   /// In en, this message translates to:
-  /// **'SFX Slot {index}'**
+  /// **'SFX slot {index}'**
   String shortcutSfxTitle(int index);
 
   /// No description provided for @shortcutSfxDesc.
   ///
   /// In en, this message translates to:
-  /// **'Trigger sound effect {index}'**
+  /// **'Play sound effect {index}'**
   String shortcutSfxDesc(int index);
 
   /// No description provided for @shortcutMasterMuteTitle.
   ///
   /// In en, this message translates to:
-  /// **'Mute Audio'**
+  /// **'Mute master'**
   String get shortcutMasterMuteTitle;
 
   /// No description provided for @shortcutMasterMuteDesc.
   ///
   /// In en, this message translates to:
-  /// **'Quick mute or unmute master audio'**
+  /// **'Quick mute or unmute'**
   String get shortcutMasterMuteDesc;
-
-  /// No description provided for @shortcutManualDuckingTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Manual Ducking'**
-  String get shortcutManualDuckingTitle;
-
-  /// No description provided for @shortcutManualDuckingDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Duck music during speech'**
-  String get shortcutManualDuckingDesc;
 
   /// No description provided for @shortcutFullscreenTitle.
   ///
   /// In en, this message translates to:
-  /// **'Fullscreen Mode'**
+  /// **'Fullscreen'**
   String get shortcutFullscreenTitle;
 
   /// No description provided for @shortcutFullscreenDesc.
   ///
   /// In en, this message translates to:
-  /// **'Toggle fullscreen display'**
+  /// **'Toggle fullscreen mode'**
   String get shortcutFullscreenDesc;
-
-  /// No description provided for @deleteFromApp.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete'**
-  String get deleteFromApp;
-
-  /// No description provided for @repositoryNameLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Name'**
-  String get repositoryNameLabel;
 
   /// No description provided for @intensityCalm.
   ///
@@ -1727,19 +1049,19 @@ abstract class AppLocalizations {
   /// No description provided for @catalogSceneBadge.
   ///
   /// In en, this message translates to:
-  /// **'🎭 Scene'**
+  /// **'Scene'**
   String get catalogSceneBadge;
 
   /// No description provided for @catalogMediaBadge.
   ///
   /// In en, this message translates to:
-  /// **'🎵 Media'**
+  /// **'Media pack'**
   String get catalogMediaBadge;
 
   /// No description provided for @catalogPackBadge.
   ///
   /// In en, this message translates to:
-  /// **'📦 Bundle'**
+  /// **'Bundle'**
   String get catalogPackBadge;
 
   /// No description provided for @filterAll.
@@ -1751,74 +1073,38 @@ abstract class AppLocalizations {
   /// No description provided for @filterScenes.
   ///
   /// In en, this message translates to:
-  /// **'🎭 Scenes'**
+  /// **'Scenes'**
   String get filterScenes;
 
   /// No description provided for @filterMedia.
   ///
   /// In en, this message translates to:
-  /// **'🎵 Media'**
+  /// **'Media'**
   String get filterMedia;
 
   /// No description provided for @filterPacks.
   ///
   /// In en, this message translates to:
-  /// **'📦 Bundles'**
+  /// **'Bundles'**
   String get filterPacks;
-
-  /// No description provided for @repoStats.
-  ///
-  /// In en, this message translates to:
-  /// **'Scenes: {scenes} | Media: {media} | Bundles: {packs}'**
-  String repoStats(int scenes, int media, int packs);
-
-  /// No description provided for @addRepositoryTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Add repository'**
-  String get addRepositoryTooltip;
-
-  /// No description provided for @repositoryUrlHint.
-  ///
-  /// In en, this message translates to:
-  /// **'https://gitlab.com/user/repo'**
-  String get repositoryUrlHint;
 
   /// No description provided for @playTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Play [Space]'**
+  /// **'Play'**
   String get playTooltip;
 
   /// No description provided for @pauseTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Pause [Space]'**
+  /// **'Pause'**
   String get pauseTooltip;
-
-  /// No description provided for @loopingBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'LOOPING'**
-  String get loopingBadge;
-
-  /// No description provided for @tagsPrefix.
-  ///
-  /// In en, this message translates to:
-  /// **'Tags: '**
-  String get tagsPrefix;
 
   /// No description provided for @colorNamePrimary.
   ///
   /// In en, this message translates to:
-  /// **'Primary'**
+  /// **'Accent'**
   String get colorNamePrimary;
-
-  /// No description provided for @colorNameSecondary.
-  ///
-  /// In en, this message translates to:
-  /// **'Secondary'**
-  String get colorNameSecondary;
 
   /// No description provided for @colorNameBackground.
   ///
@@ -1829,55 +1115,13 @@ abstract class AppLocalizations {
   /// No description provided for @colorNameSurface.
   ///
   /// In en, this message translates to:
-  /// **'Surface'**
+  /// **'Panels'**
   String get colorNameSurface;
-
-  /// No description provided for @colorNameCard.
-  ///
-  /// In en, this message translates to:
-  /// **'Card'**
-  String get colorNameCard;
-
-  /// No description provided for @colorNameAccent.
-  ///
-  /// In en, this message translates to:
-  /// **'Accent'**
-  String get colorNameAccent;
-
-  /// No description provided for @colorNameTextPrimary.
-  ///
-  /// In en, this message translates to:
-  /// **'Text Primary'**
-  String get colorNameTextPrimary;
-
-  /// No description provided for @colorNameTextSecondary.
-  ///
-  /// In en, this message translates to:
-  /// **'Text Secondary'**
-  String get colorNameTextSecondary;
-
-  /// No description provided for @colorNameDuckingBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'Ducking Badge'**
-  String get colorNameDuckingBadge;
-
-  /// No description provided for @colorNameBattleIntensity.
-  ///
-  /// In en, this message translates to:
-  /// **'Battle Intensity'**
-  String get colorNameBattleIntensity;
-
-  /// No description provided for @colorNameBossIntensity.
-  ///
-  /// In en, this message translates to:
-  /// **'Boss Intensity'**
-  String get colorNameBossIntensity;
 
   /// No description provided for @seconds.
   ///
   /// In en, this message translates to:
-  /// **'sec'**
+  /// **'s'**
   String get seconds;
 
   /// No description provided for @milliseconds.
@@ -1885,60 +1129,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ms'**
   String get milliseconds;
-
-  /// No description provided for @sfxQuickTrigger.
-  ///
-  /// In en, this message translates to:
-  /// **'SFX Quick-Trigger'**
-  String get sfxQuickTrigger;
-
-  /// No description provided for @activeMusicMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Active music mode'**
-  String get activeMusicMode;
-
-  /// No description provided for @musicModeOff.
-  ///
-  /// In en, this message translates to:
-  /// **'Off'**
-  String get musicModeOff;
-
-  /// No description provided for @musicModeExplore.
-  ///
-  /// In en, this message translates to:
-  /// **'Explore'**
-  String get musicModeExplore;
-
-  /// No description provided for @musicModeCombat.
-  ///
-  /// In en, this message translates to:
-  /// **'Combat'**
-  String get musicModeCombat;
-
-  /// No description provided for @musicModeVictory.
-  ///
-  /// In en, this message translates to:
-  /// **'Victory'**
-  String get musicModeVictory;
-
-  /// No description provided for @optionsTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Options'**
-  String get optionsTooltip;
-
-  /// No description provided for @scenesQuickPicker.
-  ///
-  /// In en, this message translates to:
-  /// **'Scenes'**
-  String get scenesQuickPicker;
-
-  /// No description provided for @sessionAudioDeck.
-  ///
-  /// In en, this message translates to:
-  /// **'Session Audio Deck'**
-  String get sessionAudioDeck;
 
   /// No description provided for @collapseSidebarTooltip.
   ///
@@ -1952,16 +1142,10 @@ abstract class AppLocalizations {
   /// **'Expand sidebar'**
   String get expandSidebarTooltip;
 
-  /// No description provided for @aboutTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'About DnDisc'**
-  String get aboutTitle;
-
   /// No description provided for @aboutDesc.
   ///
   /// In en, this message translates to:
-  /// **'Atmospheric audio engine, scene mixer, and soundboard player for TTRPG Game Masters.'**
+  /// **'Audio engine for tabletop game masters'**
   String get aboutDesc;
 
   /// No description provided for @appVersion.
@@ -1969,6 +1153,816 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version 1.0.0'**
   String get appVersion;
+
+  /// No description provided for @master.
+  ///
+  /// In en, this message translates to:
+  /// **'Master'**
+  String get master;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @moreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get moreActions;
+
+  /// No description provided for @showScenes.
+  ///
+  /// In en, this message translates to:
+  /// **'Show scenes'**
+  String get showScenes;
+
+  /// No description provided for @openNavigation.
+  ///
+  /// In en, this message translates to:
+  /// **'Open navigation'**
+  String get openNavigation;
+
+  /// No description provided for @channelVolumes.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel volumes'**
+  String get channelVolumes;
+
+  /// No description provided for @noScenesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No scenes yet'**
+  String get noScenesTitle;
+
+  /// No description provided for @noScenesFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No scenes found'**
+  String get noScenesFoundTitle;
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// No description provided for @editDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit details'**
+  String get editDetails;
+
+  /// No description provided for @exportAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportAction;
+
+  /// No description provided for @ambientCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} ambient} other{{count} ambient}}'**
+  String ambientCount(int count);
+
+  /// No description provided for @sfxCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} SFX} other{{count} SFX}}'**
+  String sfxCount(int count);
+
+  /// No description provided for @sceneMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{intensity} · {layers} · {sfx}'**
+  String sceneMeta(String intensity, String layers, String sfx);
+
+  /// No description provided for @deleteSceneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete scene?'**
+  String get deleteSceneTitle;
+
+  /// No description provided for @deleteSceneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} and its layout will be removed. Audio files stay in the library.'**
+  String deleteSceneMessage(String name);
+
+  /// No description provided for @exportBundleTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all scenes as a bundle'**
+  String get exportBundleTooltip;
+
+  /// No description provided for @toastSceneExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Scene exported'**
+  String get toastSceneExported;
+
+  /// No description provided for @toastBundleExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Bundle exported'**
+  String get toastBundleExported;
+
+  /// No description provided for @toastExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed'**
+  String get toastExportFailed;
+
+  /// No description provided for @ambientOnCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{on} of {total} on'**
+  String ambientOnCount(int on, int total);
+
+  /// No description provided for @stopAllLayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop all layers'**
+  String get stopAllLayers;
+
+  /// No description provided for @noAmbientTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No ambient layers'**
+  String get noAmbientTitle;
+
+  /// No description provided for @noAmbientHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a layer to play rain, wind or a crowd under the music'**
+  String get noAmbientHint;
+
+  /// No description provided for @addAmbientLayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add layer'**
+  String get addAmbientLayer;
+
+  /// No description provided for @pinEverywhere.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin to every scene'**
+  String get pinEverywhere;
+
+  /// No description provided for @removeLayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove layer'**
+  String get removeLayer;
+
+  /// No description provided for @addAmbientDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a track from the library or a file'**
+  String get addAmbientDialogDesc;
+
+  /// No description provided for @fromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'From library'**
+  String get fromLibrary;
+
+  /// No description provided for @chooseLocalFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a file'**
+  String get chooseLocalFile;
+
+  /// No description provided for @soundIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get soundIcon;
+
+  /// No description provided for @persistentLayerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The layer keeps playing when the scene changes'**
+  String get persistentLayerDesc;
+
+  /// No description provided for @filterLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter library'**
+  String get filterLibrary;
+
+  /// No description provided for @addSfxSlot.
+  ///
+  /// In en, this message translates to:
+  /// **'Add sound effect'**
+  String get addSfxSlot;
+
+  /// No description provided for @addSfxDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a sound from the library or a file'**
+  String get addSfxDialogDesc;
+
+  /// No description provided for @persistentSfxDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The tile stays on the soundboard when the scene changes'**
+  String get persistentSfxDesc;
+
+  /// No description provided for @loopModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The sound repeats until you press the tile again'**
+  String get loopModeDesc;
+
+  /// No description provided for @createSceneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Name, cover, starting intensity and sounds'**
+  String get createSceneDesc;
+
+  /// No description provided for @coverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover'**
+  String get coverLabel;
+
+  /// No description provided for @coverHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Picked at random if you skip it. Your own image replaces it.'**
+  String get coverHint;
+
+  /// No description provided for @uploadCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get uploadCover;
+
+  /// No description provided for @startingIntensity.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting intensity'**
+  String get startingIntensity;
+
+  /// No description provided for @soundsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds · {count} selected'**
+  String soundsSelected(int count);
+
+  /// No description provided for @soundsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Music, ambient layers and SFX tiles'**
+  String get soundsHint;
+
+  /// No description provided for @noSoundsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No sounds found'**
+  String get noSoundsFound;
+
+  /// No description provided for @everythingEditableLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything can be changed later'**
+  String get everythingEditableLater;
+
+  /// No description provided for @saveBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveBtn;
+
+  /// No description provided for @discardChangesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get discardChangesTitle;
+
+  /// No description provided for @discardChangesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This form has unsaved changes.'**
+  String get discardChangesMessage;
+
+  /// No description provided for @discard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discard;
+
+  /// No description provided for @keepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get keepEditing;
+
+  /// No description provided for @importBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importBtn;
+
+  /// No description provided for @noTracksFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found'**
+  String get noTracksFound;
+
+  /// No description provided for @noTracksFoundHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another title or tag'**
+  String get noTracksFoundHint;
+
+  /// No description provided for @previewTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get previewTrack;
+
+  /// No description provided for @stopPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stopPreview;
+
+  /// No description provided for @locateFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Locate file'**
+  String get locateFile;
+
+  /// No description provided for @fileMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'File missing'**
+  String get fileMissing;
+
+  /// No description provided for @deleteTrackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete track?'**
+  String get deleteTrackTitle;
+
+  /// No description provided for @deleteTrackMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} will be removed from the library. The audio file stays on disk.'**
+  String deleteTrackMessage(String title);
+
+  /// No description provided for @importDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import audio'**
+  String get importDialogTitle;
+
+  /// No description provided for @importDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the channel and add files'**
+  String get importDialogDesc;
+
+  /// No description provided for @importTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel'**
+  String get importTarget;
+
+  /// No description provided for @dropFilesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop audio files here'**
+  String get dropFilesTitle;
+
+  /// No description provided for @dropFilesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'MP3, WAV, OGG, FLAC or M4A, or click to browse'**
+  String get dropFilesHint;
+
+  /// No description provided for @releaseToImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Release to import'**
+  String get releaseToImport;
+
+  /// No description provided for @importNFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Import} =1{Import 1 file} other{Import {count} files}}'**
+  String importNFiles(int count);
+
+  /// No description provided for @removeFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from list'**
+  String get removeFromList;
+
+  /// No description provided for @toastImported.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Imported 1 file} other{Imported {count} files}}'**
+  String toastImported(int count);
+
+  /// No description provided for @toastImportSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 file was skipped: not an audio format} other{{count} files were skipped: not an audio format}}'**
+  String toastImportSkipped(int count);
+
+  /// No description provided for @trackTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get trackTypeLabel;
+
+  /// No description provided for @intensityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity'**
+  String get intensityLabel;
+
+  /// No description provided for @filePathLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get filePathLabel;
+
+  /// No description provided for @toastMediaPackageExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Set exported'**
+  String get toastMediaPackageExported;
+
+  /// No description provided for @addSourceBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add source'**
+  String get addSourceBtn;
+
+  /// No description provided for @downloadingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading'**
+  String get downloadingLabel;
+
+  /// No description provided for @viewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get viewDetails;
+
+  /// No description provided for @removeItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}?'**
+  String removeItemTitle(String name);
+
+  /// No description provided for @removeItemMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'It and the files it installed will be removed from the app.'**
+  String get removeItemMessage;
+
+  /// No description provided for @toastInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get toastInstalled;
+
+  /// No description provided for @toastInstallFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Install failed'**
+  String get toastInstallFailed;
+
+  /// No description provided for @toastInstallFailedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the connection and try again'**
+  String get toastInstallFailedHint;
+
+  /// No description provided for @toastRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed'**
+  String get toastRemoved;
+
+  /// No description provided for @toastRemoveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not remove'**
+  String get toastRemoveFailed;
+
+  /// No description provided for @sourcesDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get sourcesDialogTitle;
+
+  /// No description provided for @sourcesDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Repositories the catalog reads from'**
+  String get sourcesDialogDesc;
+
+  /// No description provided for @addSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add source'**
+  String get addSourceTitle;
+
+  /// No description provided for @editSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit source'**
+  String get editSourceTitle;
+
+  /// No description provided for @sourceUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get sourceUrlLabel;
+
+  /// No description provided for @sourceUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://gitlab.com/user/repo'**
+  String get sourceUrlHint;
+
+  /// No description provided for @sourceNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get sourceNameLabel;
+
+  /// No description provided for @sourceNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken from the manifest if empty'**
+  String get sourceNameHint;
+
+  /// No description provided for @sourceDescLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get sourceDescLabel;
+
+  /// No description provided for @enterSourceUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the source address'**
+  String get enterSourceUrl;
+
+  /// No description provided for @enterSourceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get enterSourceName;
+
+  /// No description provided for @sourceStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenes {scenes} · Media {media} · Bundles {packs}'**
+  String sourceStats(int scenes, int media, int packs);
+
+  /// No description provided for @deleteSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove source?'**
+  String get deleteSourceTitle;
+
+  /// No description provided for @deleteSourceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will no longer be listed in the catalog. Installed items stay.'**
+  String deleteSourceMessage(String name);
+
+  /// No description provided for @noSourcesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No sources connected'**
+  String get noSourcesTitle;
+
+  /// No description provided for @noSourcesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a link to GitLab, Dropbox or a web server with a repository.json manifest'**
+  String get noSourcesHint;
+
+  /// No description provided for @sourceUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Source unavailable'**
+  String get sourceUnavailableTitle;
+
+  /// No description provided for @sourceUnavailableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the connection and try again'**
+  String get sourceUnavailableHint;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @noCatalogItemsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found'**
+  String get noCatalogItemsTitle;
+
+  /// No description provided for @appearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearanceTitle;
+
+  /// No description provided for @appearanceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme applies to every screen. Custom themes are checked for contrast in the editor.'**
+  String get appearanceDesc;
+
+  /// No description provided for @customThemeTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customThemeTag;
+
+  /// No description provided for @deleteThemeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete theme?'**
+  String get deleteThemeTitle;
+
+  /// No description provided for @deleteThemeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be removed. If it is active, the app switches to Deep Dark.'**
+  String deleteThemeMessage(String name);
+
+  /// No description provided for @audioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get audioTitle;
+
+  /// No description provided for @duckingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Music drops while a sound effect plays'**
+  String get duckingDesc;
+
+  /// No description provided for @storageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get storageTitle;
+
+  /// No description provided for @toastStoragePathUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage folder updated'**
+  String get toastStoragePathUpdated;
+
+  /// No description provided for @toastStoragePathReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage folder reset to default'**
+  String get toastStoragePathReset;
+
+  /// No description provided for @shortcutGroupPlayback.
+  ///
+  /// In en, this message translates to:
+  /// **'Playback'**
+  String get shortcutGroupPlayback;
+
+  /// No description provided for @shortcutGroupIntensity.
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity'**
+  String get shortcutGroupIntensity;
+
+  /// No description provided for @shortcutGroupSfx.
+  ///
+  /// In en, this message translates to:
+  /// **'SFX slots'**
+  String get shortcutGroupSfx;
+
+  /// No description provided for @shortcutSfxSlotsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slots 2–9 follow the same pattern'**
+  String get shortcutSfxSlotsDesc;
+
+  /// No description provided for @openLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Open logs'**
+  String get openLogs;
+
+  /// No description provided for @toastSettingsReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings reset to defaults'**
+  String get toastSettingsReset;
+
+  /// No description provided for @themeEditorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick eight colors, the rest is calculated'**
+  String get themeEditorDesc;
+
+  /// No description provided for @colorNameText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get colorNameText;
+
+  /// No description provided for @hexLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hex color'**
+  String get hexLabel;
+
+  /// No description provided for @hexInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a color like #D4A373'**
+  String get hexInvalid;
+
+  /// No description provided for @contrastChecksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contrast checks'**
+  String get contrastChecksTitle;
+
+  /// No description provided for @contrastTextBg.
+  ///
+  /// In en, this message translates to:
+  /// **'Text on background'**
+  String get contrastTextBg;
+
+  /// No description provided for @contrastTextSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Text on panels'**
+  String get contrastTextSurface;
+
+  /// No description provided for @contrastPrimaryBg.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent on background'**
+  String get contrastPrimaryBg;
+
+  /// No description provided for @contrastPrimarySurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent on panels'**
+  String get contrastPrimarySurface;
+
+  /// No description provided for @contrastIntensityOnSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} on panels'**
+  String contrastIntensityOnSurface(String name);
+
+  /// No description provided for @contrastFix.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix'**
+  String get contrastFix;
+
+  /// No description provided for @contrastWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Some pairs are below the readable minimum. You can still save the theme.'**
+  String get contrastWarning;
+
+  /// No description provided for @contrastOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ok'**
+  String get contrastOk;
+
+  /// No description provided for @orWord.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orWord;
+
+  /// No description provided for @choosePreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a preset'**
+  String get choosePreset;
 }
 
 class _AppLocalizationsDelegate

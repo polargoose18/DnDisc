@@ -1,15 +1,12 @@
 {
   "@@locale": "ru",
   "appTitle": "DnDisc",
-  "tabGmDashboard": "Панель Мастера",
-  "tabLibrary": "Общая Библиотека",
+  "tabGmDashboard": "Пульт мастера",
+  "tabLibrary": "Медиатека",
   "tabSettings": "Настройки",
   "tabCatalog": "Каталог",
-  "manualDuckingTooltip": "Ручной Ducking [D]",
-  "muteTooltip": "Заглушить [M]",
-  "unmuteTooltip": "Включить звук [M]",
-  "fullscreenTooltip": "Полноэкранный режим [F11]",
-  "logConsoleTooltip": "Открыть консоль логов и отладки",
+  "muteTooltip": "Выключить звук",
+  "unmuteTooltip": "Включить звук",
   "logConsoleTitle": "Консоль логов и отладки",
   "clearLogs": "Очистить логи",
   "noLogs": "Логи пусты",
@@ -17,52 +14,31 @@
   "languageSystem": "Системный",
   "languageRussian": "Русский",
   "languageEnglish": "English",
-  "settingsTitle": "Настройки звукового движка",
-  "settingsSubtitle": "Темы оформления, горячие клавиши, звуковой движок и управление пресетами",
-  "fadeEngineTitle": "Плавные переходы (Fade Engine)",
-  "musicFadeTitle": "Длительность нарастания/затухания музыки",
-  "ambientFadeTitle": "Длительность плавного включения/выключения эмбиента",
-  "duckingTitle": "Авто-приглушение музыки при SFX (Ducking)",
-  "duckAttackTitle": "Время атаки",
-  "duckAttackSubtitle": "скорость затухания музыки при ударе SFX",
-  "duckReleaseTitle": "Время восстановления",
-  "duckReleaseSubtitle": "скорость возврата музыки на полную громкость",
+  "musicFadeTitle": "Кроссфейд музыки",
+  "ambientFadeTitle": "Кроссфейд эмбиента",
+  "duckingTitle": "Приглушение",
+  "duckAttackTitle": "Скорость приглушения",
+  "duckAttackSubtitle": "Как быстро музыка затихает, когда начинается эффект",
+  "duckReleaseTitle": "Скорость возврата",
+  "duckReleaseSubtitle": "Как быстро музыка возвращается к полной громкости",
   "duckMultiplierTitle": "Глубина приглушения",
-  "duckMultiplierSubtitle": "от исходной громкости музыки",
-  "presetPacksTitle": "Коллекции (ZIP Архивы)",
-  "presetPacksSubtitle": "Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые коллекции приключений.",
-  "importPresetBtn": "Импорт пресета (ZIP)",
-  "exportPresetBtn": "Экспорт пресета в ZIP",
-  "interfaceTitle": "Интерфейс и панель управления",
-  "showLogConsoleTitle": "Отображать иконку консоли логов",
-  "showLogConsoleSubtitle": "Показывать кнопку быстрого открытия консоли логов в верхней панели мастера",
-  "resetDefaultsBtn": "Сбросить все настройки по умолчанию",
-  "settingsResetToast": "Настройки звукового движка сброшены.",
-  "themesTitle": "Темы оформления (Themes)",
-  "builtinThemes": "Встроенные пресеты (3 варианта)",
+  "duckMultiplierSubtitle": "Доля громкости музыки, которая остаётся, пока играет эффект",
+  "resetDefaultsBtn": "Сбросить настройки",
   "customThemes": "Пользовательские темы",
-  "noCustomThemes": "У вас пока нет кастомных тем. Создайте свою тему с уникальной палитрой цветов!",
-  "createThemeBtn": "Создать новую тему",
-  "hotkeysTitle": "Централизованные горячие клавиши",
-  "hotkeysSubtitle": "Управляйте звуковым окружением во время игровой сессии не отвлекаясь от книги правил:",
-  "actionCol": "Действие",
-  "descriptionCol": "Описание",
-  "keyCol": "Клавиша",
+  "createThemeBtn": "Создать тему",
+  "hotkeysTitle": "Горячие клавиши",
+  "hotkeysSubtitle": "Работают, пока окно приложения в фокусе",
   "scenesTitle": "Сцены",
   "createSceneBtn": "Создать сцену",
-  "noScenesHint": "Сцены пока не созданы. Нажмите \"Создать сцену\" для комбинации музыки и эмбиентов.",
-  "activeBadge": "АКТИВНА",
-  "enableSceneBtn": "Включить",
-  "libraryTitle": "Медиабиблиотека",
+  "noScenesHint": "Создайте сцену, чтобы собрать музыку, фоновые слои и звуковые эффекты",
   "libraryEmpty": "Медиатека пуста",
-  "libraryEmptyHint": "Нажмите \"Импорт файлов\", чтобы добавить музыку, эмбиент или SFX.",
-  "importFilesBtn": "Импорт файлов",
-  "allSounds": "Все звуки",
+  "libraryEmptyHint": "Импортируйте аудиофайлы, чтобы использовать их в сценах",
+  "importFilesBtn": "Импортировать файлы",
   "music": "Музыка",
   "ambient": "Эмбиент",
-  "sfx": "SFX Эффект",
+  "sfx": "SFX",
   "scenes": "Сцены",
-  "searchPlaceholder": "Поиск по названию или тегам (например, Таверна, Бой)...",
+  "searchPlaceholder": "Поиск по названию или тегу",
   "cancel": "Отмена",
   "save": "Сохранить",
   "delete": "Удалить",
@@ -70,236 +46,107 @@
   "create": "Создать",
   "edit": "Редактировать",
   "export": "Экспортировать",
-  "nowPlaying": "Сейчас играет",
-  "musicNotPlaying": "Музыка не воспроизводится",
   "musicTrack": "Музыкальная дорожка",
-  "intensityLevel": "Уровень Интенсивности",
-  "stopMusic": "Остановить музыку",
-  "pausedSuffix": "(Пауза)",
-  "noAmbientTracksInLibrary": "В библиотеке нет треков с типом \"Эмбиент\".",
-  "noSfxTracksInLibrary": "В библиотеке нет SFX-треков.",
-  "playPause": "Воспроизведение / Пауза",
-  "playing": "Воспроизведение",
-  "paused": "На паузе",
-  "noMusic": "Без музыки",
-  "noMusicSilence": "Без музыки (тишина)",
-  "noMusicDesc": "При активации сцены фоновая музыка плавно затухает",
-  "nothingFound": "Ничего не найдено",
-  "ambientLayers": "Эмбиент-слои (Фоновые звуки)",
-  "addAmbientTooltip": "Добавить слой / Постоянный эмбиент",
+  "stopMusic": "Стоп",
+  "noAmbientTracksInLibrary": "В медиатеке нет эмбиент-треков",
+  "noSfxTracksInLibrary": "В медиатеке нет звуковых эффектов",
+  "playing": "Играет",
+  "paused": "Пауза",
+  "noMusic": "Нет музыки",
+  "ambientLayers": "Фоновые слои",
+  "addAmbientTooltip": "Добавить слой",
   "stopAll": "Выключить все",
-  "noActiveAmbients": "Нет активных эмбиентов. Нажмите «+» для добавления постоянного фона.",
-  "addPersistentAmbient": "Добавить постоянный эмбиент",
   "volume": "Громкость",
-  "persistentLayerTooltip": "Постоянный слой (не сбрасывается при смене сцены)",
-  "makePersistentTooltip": "Сделать постоянным слоем",
-  "muteLayerTooltip": "Заглушить слой",
-  "unmuteLayerTooltip": "Включить слой",
-  "removeLayerTooltip": "Удалить слой",
-  "addAmbientDialogTitle": "Добавить Эмбиент-слой",
-  "selectTrackFromLibrary": "Выберите трек из медиабиблиотеки:",
-  "selectLocalAudioFile": "Выбрать локальный аудиофайл...",
-  "selected": "Выбран: ",
-  "persistentLayerCheckbox": "Постоянный слой (не сбрасывать при смене сцены)",
+  "addAmbientDialogTitle": "Добавить фоновый слой",
+  "selected": "Выбрано",
+  "persistentLayerCheckbox": "Закрепить во всех сценах",
   "addLayerBtn": "Добавить слой",
-  "soundboardTitle": "Быстрые эффекты SFX",
-  "addSfxTooltip": "Добавить SFX / Постоянную кнопку",
-  "sfxVolume": "SFX Громкость: ",
-  "soundboardEmpty": "Soundboard пуст. Добавьте SFX или постоянные быстрые кнопки.",
-  "addPersistentSfx": "Добавить постоянный SFX",
-  "unpinSfx": "Снять закрепление (сделать временным)",
-  "pinSfx": "Закрепить как постоянный SFX",
-  "deleteSfxButton": "Удалить кнопку SFX",
-  "addSfxDialogTitle": "Добавить кнопку SFX",
-  "selectSoundFromLibrary": "Выберите звук из библиотеки:",
-  "persistentSfxCheckbox": "Постоянный SFX (не сбрасывать при смене сцены)",
-  "loopModeCheckbox": "Режим зацикливания (Loop)",
-  "addSfxBtn": "Добавить SFX",
-  "exportScenePackTooltip": "Экспорт коллекции (.pack.zip)",
-  "searchScenesPlaceholder": "Поиск сцен...",
-  "noScenesMatching": "Сцен по запросу не найдено.",
-  "saveSceneAs": "Сохранить сцену как...",
-  "sceneExported": "Сцена \"{name}\" экспортирована!",
-  "sceneExportError": "Ошибка при экспорте сцены: {error}",
-  "exportScenePackTitle": "Экспорт коллекции (.pack.zip)",
-  "packTitleLabel": "Название коллекции",
-  "packDescLabel": "Описание коллекции",
-  "defaultPackTitle": "Коллекция Приключений",
-  "defaultPackDesc": "Комплект атмосферных сцен",
-  "savePackAs": "Сохранить коллекцию как...",
-  "packExported": "Коллекция \"{name}\" успешно экспортирован!",
-  "packExportError": "Ошибка при экспорте коллекции: {error}",
-  "exportSceneMenu": "Экспорт (.scene.zip)",
-  "currentSceneBadge": "ТЕКУЩАЯ СЦЕНА",
-  "selectScenePrompt": "Выберите сцену для создания игрового окружения",
+  "soundboardTitle": "SFX",
+  "unpinSfx": "Открепить",
+  "pinSfx": "Закрепить во всех сценах",
+  "deleteSfxButton": "Убрать с пульта",
+  "addSfxDialogTitle": "Добавить звуковой эффект",
+  "persistentSfxCheckbox": "Закрепить во всех сценах",
+  "loopModeCheckbox": "Зациклить",
+  "addSfxBtn": "Добавить эффект",
+  "searchScenesPlaceholder": "Поиск сцен",
+  "noScenesMatching": "Попробуйте другое название",
+  "saveSceneAs": "Сохранить сцену как",
+  "exportScenePackTitle": "Экспорт набора",
+  "packTitleLabel": "Название набора",
+  "packDescLabel": "Описание",
+  "defaultPackTitle": "Набор приключения",
+  "defaultPackDesc": "Коллекция атмосферных сцен",
+  "savePackAs": "Сохранить набор как",
+  "selectScenePrompt": "Выберите сцену, чтобы настроить звук стола",
   "musicIntensityLabel": "Интенсивность музыки",
-  "createSceneTitle": "Создание новой сцены",
-  "editSceneTitle": "Редактирование сцены",
-  "sceneNameLabel": "Название сцены *",
-  "sceneNameHint": "например: Таверна «Пьяный Дракон»",
-  "sceneDescLabel": "Описание атмосферы / Заметки мастера",
-  "sceneDescHint": "Теплый камин, звон кружек, тихая лютня...",
-  "sceneCoverLabel": "Путь к изображению / обложке сцены",
-  "browseBtn": "Обзор",
-  "colorAccent": "Цветовой акцент:",
-  "musicChannel": "Канал Музыки",
-  "ambientChannel": "Канал Эмбиента",
-  "sfxChannel": "Канал SFX (Саундборд)",
-  "searchMusicHint": "Поиск музыки по названию или тегам...",
-  "searchAmbientHint": "Поиск эмбиента по названию или тегам...",
-  "searchSfxHint": "Поиск SFX по названию или тегам...",
-  "layersSelected": "{count} слоев выбрано",
-  "sfxSelected": "{count} SFX выбрано",
-  "specifySceneName": "Укажите название сцены",
-  "createCustomThemeTitle": "Создание кастомной темы",
-  "editCustomThemeTitle": "Редактирование темы",
+  "createSceneTitle": "Создание сцены",
+  "editSceneTitle": "Изменение сцены",
+  "sceneNameLabel": "Название сцены",
+  "sceneNameHint": "Гавань на закате",
+  "specifySceneName": "Введите название сцены",
+  "createCustomThemeTitle": "Создание темы",
+  "editCustomThemeTitle": "Изменение темы",
   "themeNameLabel": "Название темы",
-  "themeNameRequired": "Укажите название темы",
-  "baseOnPreset": "Использовать в качестве основы...",
-  "baseOnPresetTooltip": "Взять за основу пресет",
-  "themePreviewTitle": "Предпросмотр темы",
-  "duckingActive": "Ducking Active",
-  "cardExampleTitle": "Пример карточки",
-  "cardExampleDesc": "Текст описания сцены или трека в выбранной палитре цветов.",
-  "colorPaletteConfig": "Настройка палитры цветов",
-  "colorPickTitle": "Выбор цвета: {title}",
+  "themeNameRequired": "Введите название темы",
+  "baseOnPreset": "Начать с пресета",
+  "colorPickTitle": "Цвет: {title}",
   "saveThemeBtn": "Сохранить тему",
   "newThemeDefaultName": "Новая тема",
-  "editTrackTitle": "Редактировать аудиозапись",
-  "trackTitleLabel": "Название трека",
-  "targetAudioBus": "Целевая аудио-шина:",
-  "musicIntensitySetting": "Уровень Интенсивности Музыки:",
-  "tagsLabel": "Теги (через запятую)",
-  "tagsHint": "Таверна, Бой, Лес, Магия",
-  "colorLabel": "Цветовая метка:",
+  "editTrackTitle": "Изменение трека",
+  "trackTitleLabel": "Название",
+  "tagsLabel": "Теги",
+  "tagsHint": "Через запятую, например таверна, бой",
   "exportMediaPackageBtn": "Экспорт набора",
-  "selectBusForImport": "Выберите целевую шину для импортируемых файлов",
-  "exportMediaPackageTitle": "Экспорт Медиа-набора (.media.zip)",
+  "exportMediaPackageTitle": "Экспорт набора",
   "mediaPackageNameLabel": "Название набора",
-  "mediaPackageDescLabel": "Описание набора",
-  "defaultMediaPackageName": "Мой Медиа Набор",
-  "defaultMediaPackageDesc": "Коллекция аудиодорожек",
-  "saveMediaPackageAs": "Сохранить медиа-набор как...",
-  "mediaPackageExported": "Медиа-набор \"{name}\" успешно экспортирован!",
-  "mediaPackageExportError": "Ошибка экспорта медиа-набора: {error}",
-  "dispatchToBus": "Воспроизвести на шине {bus}",
-  "dispatchedToBus": "Отправлено на шину {bus}: \"{title}\"",
-  "deleteFromLibrary": "Удалить из библиотеки",
-  "busInfo": "Шина: {bus} | Длительность: {duration} | Путь: {path}",
+  "mediaPackageDescLabel": "Описание",
+  "defaultMediaPackageName": "Мой набор",
+  "defaultMediaPackageDesc": "Коллекция аудиотреков",
+  "saveMediaPackageAs": "Сохранить набор как",
   "catalogTitle": "Каталог",
-  "refreshCatalogTooltip": "Обновить каталог",
-  "manageRepositoriesTooltip": "Управление репозиториями",
-  "addRepositoryBtn": "Добавить",
-  "searchCatalogPlaceholder": "Поиск элементов в каталоге...",
-  "sourcesBtn": "Источники ({count})",
-  "noRepositoriesConnected": "Нет подключенных репозиториев",
-  "addRepositoryUrlHint": "Добавьте ссылку на GitLab, Dropbox или CDN с манифестом repository.json",
-  "addRepositoryDialogTitle": "Добавить репозиторий",
-  "editRepositoryDialogTitle": "Редактировать репозиторий",
-  "manageRepositoriesTitle": "Управление репозиториями ({count})",
-  "repositoryUrlLabel": "URL репозитория (GitLab / Dropbox / HTTP / JSON)",
-  "repositoryNameOptionalLabel": "Название (опционально)",
-  "repositoryNameHint": "Извлечётся из манифеста, если пусто",
-  "repositoryDescOptionalLabel": "Описание (опционально)",
-  "enterRepositoryUrl": "Введите URL репозитория",
-  "urlHttpPrefixValidation": "URL должен начинаться с http:// или https://",
-  "enterRepositoryName": "Введите название репозитория",
-  "repositoryUpdated": "Репозиторий успешно обновлен",
-  "noConnectedRepositories": "Нет подключенных репозиториев.",
-  "noCatalogItemsFound": "Элементы не найдены по вашему запросу.",
-  "installedBadge": "Загружено",
-  "noDescription": "Без описания",
-  "scenesCount": "{count} сцен",
-  "tracksCount": "{count} треков",
+  "refreshCatalogTooltip": "Обновить",
+  "searchCatalogPlaceholder": "Поиск по каталогу",
+  "sourcesBtn": "Источники · {count}",
+  "urlHttpPrefixValidation": "Введите полный адрес вида https://",
+  "noCatalogItemsFound": "Попробуйте другое название или смените фильтр",
+  "installedBadge": "Установлено",
+  "noDescription": "Нет описания",
+  "scenesCount": "{count, plural, one{{count} сцена} few{{count} сцены} many{{count} сцен} other{{count} сцены}}",
+  "tracksCount": "{count, plural, one{{count} трек} few{{count} трека} many{{count} треков} other{{count} трека}}",
   "sizeUnknown": "Размер неизвестен",
   "sizeMb": "{size} МБ",
-  "repositoryLabel": "Репозиторий: {name}",
-  "scenesInPack": "Сцены в коллекции",
-  "mediaSetContent": "Состав медиа-набора",
+  "repositoryLabel": "Источник: {name}",
+  "scenesInPack": "Сцены в наборе",
+  "mediaSetContent": "Состав медиапака",
   "sceneContent": "Состав сцены",
-  "tracksMissingInManifest": "Список треков отсутствует в манифесте.",
-  "scenesMissingInManifest": "Список сцен отсутствует в манифесте.",
-  "channelLabel": "Канал: {channel}",
-  "downloadingAndImporting": "Скачивание и импорт... {percent}%",
-  "removeFromApp": "Удалить {type}",
-  "installing": "Установка...",
-  "installItem": "Установить {type}",
-  "deleteItemConfirmTitle": "Удалить {name}?",
-  "deleteItemConfirmMessage": "Вы уверены, что хотите удалить {type} \"{name}\" и связанные файлы из приложения?",
-  "itemUninstalled": "{type} \"{name}\" успешно удален(а) из приложения.",
-  "itemUninstallError": "Ошибка при удалении {type}.",
-  "itemInstalled": "{type} \"{name}\" успешно установлен(а)!",
-  "itemInstallError": "Ошибка при скачивании {type}.",
-  "catalogStorageTitle": "Каталог и хранилище аудиофайлов",
-  "catalogStorageDesc": "Папка для загрузки и распаковки аудиофайлов из онлайн-каталога репозиториев:",
-  "customDirectory": "Пользовательская директория",
-  "defaultDirectory": "Директория по умолчанию",
-  "defaultStoragePath": "По умолчанию: Documents/audio_library",
-  "resetDefaultDirTooltip": "Сбросить к значению по умолчанию",
+  "tracksMissingInManifest": "В манифесте нет списка треков",
+  "scenesMissingInManifest": "В манифесте нет списка сцен",
+  "removeFromApp": "Удалить из приложения",
+  "installItem": "Установить",
+  "catalogStorageDesc": "Папка для аудиофайлов, скачанных из каталога",
+  "customDirectory": "Своя папка",
+  "defaultDirectory": "Папка по умолчанию",
+  "defaultStoragePath": "Documents/audio_library",
+  "resetDefaultDirTooltip": "Вернуть по умолчанию",
   "chooseFolderBtn": "Выбрать папку",
-  "chooseFolderDialogTitle": "Выберите папку для сохранения аудиофайлов каталога",
-  "storagePathReset": "Путь сохранения сброшен к значению по умолчанию.",
-  "storagePathUpdated": "Папка сохранения каталога обновлена: {path}",
-  "shortcutPlayPauseTitle": "Воспроизведение / Пауза",
-  "shortcutPlayPauseDesc": "Старт или пауза текущего музыкального трека",
-  "shortcutIntensityCalmTitle": "Интенсивность: Спокойствие",
+  "chooseFolderDialogTitle": "Выберите папку для аудио из каталога",
+  "shortcutPlayPauseTitle": "Пуск / пауза",
+  "shortcutPlayPauseDesc": "Текущий трек музыки",
+  "shortcutIntensityCalmTitle": "Спокойно",
   "shortcutIntensityCalmDesc": "Переключить режим музыки на Спокойствие",
-  "shortcutIntensitySuspenseTitle": "Интенсивность: Напряжение",
+  "shortcutIntensitySuspenseTitle": "Тревога",
   "shortcutIntensitySuspenseDesc": "Переключить режим музыки на Напряжение",
-  "shortcutIntensityBattleTitle": "Интенсивность: Битва",
+  "shortcutIntensityBattleTitle": "Бой",
   "shortcutIntensityBattleDesc": "Переключить режим музыки на Битву",
-  "shortcutIntensityBossTitle": "Интенсивность: Босс",
+  "shortcutIntensityBossTitle": "Босс",
   "shortcutIntensityBossDesc": "Переключить режим музыки на Босса",
-  "shortcutSfxTitle": "SFX Слот {index}",
-  "shortcutSfxDesc": "Воспроизвести звуковой эффект {index}",
-  "shortcutMasterMuteTitle": "Глушение звука (Mute)",
-  "shortcutMasterMuteDesc": "Быстрое глушение или включение общего звука",
-  "shortcutManualDuckingTitle": "Ручной Ducking",
-  "shortcutManualDuckingDesc": "Принудительное приглушение музыки на время речи",
-  "shortcutFullscreenTitle": "Полноэкранный режим",
-  "shortcutFullscreenDesc": "Переключение отображения во весь экран",
-  "@sceneExported": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@sceneExportError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@packExported": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@packExportError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@layersSelected": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@sfxSelected": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "shortcutSfxTitle": "Слот SFX {index}",
+  "shortcutSfxDesc": "Запустить эффект {index}",
+  "shortcutMasterMuteTitle": "Выключить звук",
+  "shortcutMasterMuteDesc": "Быстро выключить или включить звук",
+  "shortcutFullscreenTitle": "Полный экран",
+  "shortcutFullscreenDesc": "Включить или выключить полноэкранный режим",
   "@colorPickTitle": {
     "placeholders": {
       "title": {
@@ -307,58 +154,7 @@
       }
     }
   },
-  "@mediaPackageExported": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@mediaPackageExportError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "@dispatchToBus": {
-    "placeholders": {
-      "bus": {
-        "type": "String"
-      }
-    }
-  },
-  "@dispatchedToBus": {
-    "placeholders": {
-      "bus": {
-        "type": "String"
-      },
-      "title": {
-        "type": "String"
-      }
-    }
-  },
-  "@busInfo": {
-    "placeholders": {
-      "bus": {
-        "type": "String"
-      },
-      "duration": {
-        "type": "String"
-      },
-      "path": {
-        "type": "String"
-      }
-    }
-  },
   "@sourcesBtn": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@manageRepositoriesTitle": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -393,92 +189,6 @@
       }
     }
   },
-  "@channelLabel": {
-    "placeholders": {
-      "channel": {
-        "type": "String"
-      }
-    }
-  },
-  "@downloadingAndImporting": {
-    "placeholders": {
-      "percent": {
-        "type": "String"
-      }
-    }
-  },
-  "@removeFromApp": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      }
-    }
-  },
-  "@installItem": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      }
-    }
-  },
-  "@deleteItemConfirmTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@deleteItemConfirmMessage": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      },
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@itemUninstalled": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      },
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@itemUninstallError": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      }
-    }
-  },
-  "@itemInstalled": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      },
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@itemInstallError": {
-    "placeholders": {
-      "type": {
-        "type": "String"
-      }
-    }
-  },
-  "@storagePathUpdated": {
-    "placeholders": {
-      "path": {
-        "type": "String"
-      }
-    }
-  },
   "@shortcutSfxTitle": {
     "placeholders": {
       "index": {
@@ -493,11 +203,9 @@
       }
     }
   },
-  "deleteFromApp": "Удалить из приложения",
-  "repositoryNameLabel": "Название",
-  "intensityCalm": "Спокойная",
-  "intensitySuspense": "Напряжение",
-  "intensityBattle": "Битва",
+  "intensityCalm": "Спокойно",
+  "intensitySuspense": "Тревога",
+  "intensityBattle": "Бой",
   "intensityBoss": "Босс",
   "play": "Воспроизвести",
   "catalogTypeScene": "сцену",
@@ -506,15 +214,207 @@
   "sceneTitle": "Сцена",
   "mediaTitle": "Медиа",
   "packTitle": "Коллекция",
-  "catalogSceneBadge": "🎭 Сцена",
-  "catalogMediaBadge": "🎵 Медиа",
-  "catalogPackBadge": "📦 Коллекция",
+  "catalogSceneBadge": "Сцена",
+  "catalogMediaBadge": "Медиапак",
+  "catalogPackBadge": "Набор",
   "filterAll": "Все",
-  "filterScenes": "🎭 Сцены",
-  "filterMedia": "🎵 Медиа",
-  "filterPacks": "📦 Коллекции",
-  "repoStats": "Сцен: {scenes} | Медиа: {media} | Коллекций: {packs}",
-  "@repoStats": {
+  "filterScenes": "Сцены",
+  "filterMedia": "Медиа",
+  "filterPacks": "Наборы",
+  "playTooltip": "Воспроизвести",
+  "pauseTooltip": "Пауза",
+  "colorNamePrimary": "Акцент",
+  "colorNameBackground": "Фон",
+  "colorNameSurface": "Панели",
+  "seconds": "с",
+  "milliseconds": "мс",
+  "collapseSidebarTooltip": "Свернуть панель",
+  "expandSidebarTooltip": "Развернуть панель",
+  "aboutDesc": "Аудиопульт для мастеров настольных игр",
+  "appVersion": "Версия 1.0.0",
+  "master": "Общая",
+  "close": "Закрыть",
+  "moreActions": "Ещё",
+  "showScenes": "Показать сцены",
+  "openNavigation": "Открыть навигацию",
+  "channelVolumes": "Громкость каналов",
+  "noScenesTitle": "Сцен пока нет",
+  "noScenesFoundTitle": "Сцены не найдены",
+  "clearSearch": "Очистить поиск",
+  "editDetails": "Изменить",
+  "exportAction": "Экспортировать",
+  "ambientCount": "{count, plural, one{{count} слой} few{{count} слоя} many{{count} слоёв} other{{count} слоя}}",
+  "@ambientCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sfxCount": "{count, plural, one{{count} эффект} few{{count} эффекта} many{{count} эффектов} other{{count} эффекта}}",
+  "@sfxCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sceneMeta": "{intensity} · {layers} · {sfx}",
+  "@sceneMeta": {
+    "placeholders": {
+      "intensity": {
+        "type": "String"
+      },
+      "layers": {
+        "type": "String"
+      },
+      "sfx": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSceneTitle": "Удалить сцену?",
+  "deleteSceneMessage": "Сцена «{name}» и её раскладка будут удалены. Аудиофайлы останутся в медиатеке.",
+  "@deleteSceneMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exportBundleTooltip": "Экспортировать все сцены набором",
+  "toastSceneExported": "Сцена экспортирована",
+  "toastBundleExported": "Набор экспортирован",
+  "toastExportFailed": "Не удалось экспортировать",
+  "ambientOnCount": "Включено {on} из {total}",
+  "@ambientOnCount": {
+    "placeholders": {
+      "on": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "stopAllLayers": "Остановить все слои",
+  "noAmbientTitle": "Фоновых слоёв нет",
+  "noAmbientHint": "Добавьте слой, чтобы под музыку звучали дождь, ветер или толпа",
+  "addAmbientLayer": "Добавить слой",
+  "pinEverywhere": "Закрепить во всех сценах",
+  "removeLayer": "Убрать слой",
+  "addAmbientDialogDesc": "Выберите трек из медиатеки или файл",
+  "fromLibrary": "Из медиатеки",
+  "chooseLocalFile": "Выбрать файл",
+  "soundIcon": "Значок",
+  "persistentLayerDesc": "Слой продолжит звучать при смене сцены",
+  "filterLibrary": "Фильтр по медиатеке",
+  "addSfxSlot": "Добавить эффект",
+  "addSfxDialogDesc": "Выберите звук из медиатеки или файл",
+  "persistentSfxDesc": "Плитка останется на пульте при смене сцены",
+  "loopModeDesc": "Звук повторяется, пока вы снова не нажмёте плитку",
+  "createSceneDesc": "Название, обложка, стартовая интенсивность и звуки",
+  "coverLabel": "Обложка",
+  "coverHint": "Если пропустить, выберется случайная. Своё изображение её заменит.",
+  "uploadCover": "Загрузить",
+  "startingIntensity": "Стартовая интенсивность",
+  "soundsSelected": "Звуки · выбрано {count}",
+  "@soundsSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "soundsHint": "Музыка, фоновые слои и плитки SFX",
+  "noSoundsFound": "Звуки не найдены",
+  "everythingEditableLater": "Всё можно изменить позже",
+  "saveBtn": "Сохранить",
+  "discardChangesTitle": "Отменить изменения?",
+  "discardChangesMessage": "В форме есть несохранённые изменения.",
+  "discard": "Отменить",
+  "keepEditing": "Продолжить",
+  "importBtn": "Импорт",
+  "noTracksFound": "Ничего не найдено",
+  "noTracksFoundHint": "Попробуйте другое название или тег",
+  "previewTrack": "Прослушать",
+  "stopPreview": "Остановить",
+  "locateFile": "Указать файл",
+  "fileMissing": "Файл не найден",
+  "deleteTrackTitle": "Удалить трек?",
+  "deleteTrackMessage": "Трек «{title}» исчезнет из медиатеки. Аудиофайл останется на диске.",
+  "@deleteTrackMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "importDialogTitle": "Импорт аудио",
+  "importDialogDesc": "Выберите канал и добавьте файлы",
+  "importTarget": "Канал",
+  "dropFilesTitle": "Перетащите аудиофайлы сюда",
+  "dropFilesHint": "MP3, WAV, OGG, FLAC или M4A, либо нажмите для выбора",
+  "releaseToImport": "Отпустите для импорта",
+  "importNFiles": "{count, plural, =0{Импортировать} one{Импортировать {count} файл} few{Импортировать {count} файла} many{Импортировать {count} файлов} other{Импортировать {count} файла}}",
+  "@importNFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "removeFromList": "Убрать из списка",
+  "toastImported": "{count, plural, one{Импортирован {count} файл} few{Импортировано {count} файла} many{Импортировано {count} файлов} other{Импортировано {count} файла}}",
+  "@toastImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "toastImportSkipped": "{count, plural, one{Пропущен {count} файл: не аудиоформат} few{Пропущено {count} файла: не аудиоформат} many{Пропущено {count} файлов: не аудиоформат} other{Пропущено {count} файла: не аудиоформат}}",
+  "@toastImportSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackTypeLabel": "Тип",
+  "intensityLabel": "Интенсивность",
+  "filePathLabel": "Файл",
+  "toastMediaPackageExported": "Набор экспортирован",
+  "addSourceBtn": "Добавить источник",
+  "downloadingLabel": "Загрузка",
+  "viewDetails": "Подробнее",
+  "removeItemTitle": "Удалить «{name}»?",
+  "@removeItemTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeItemMessage": "Он и установленные им файлы будут удалены из приложения.",
+  "toastInstalled": "Установлено",
+  "toastInstallFailed": "Не удалось установить",
+  "toastInstallFailedHint": "Проверьте соединение и повторите",
+  "toastRemoved": "Удалено",
+  "toastRemoveFailed": "Не удалось удалить",
+  "sourcesDialogTitle": "Источники",
+  "sourcesDialogDesc": "Репозитории, из которых читается каталог",
+  "addSourceTitle": "Добавление источника",
+  "editSourceTitle": "Изменение источника",
+  "sourceUrlLabel": "Адрес",
+  "sourceUrlHint": "https://gitlab.com/user/repo",
+  "sourceNameLabel": "Название",
+  "sourceNameHint": "Если пусто, возьмётся из манифеста",
+  "sourceDescLabel": "Описание",
+  "enterSourceUrl": "Введите адрес источника",
+  "enterSourceName": "Введите название",
+  "sourceStats": "Сцены {scenes} · Медиа {media} · Наборы {packs}",
+  "@sourceStats": {
     "placeholders": {
       "scenes": {
         "type": "int"
@@ -527,37 +427,64 @@
       }
     }
   },
-  "addRepositoryTooltip": "Добавить репозиторий",
-  "repositoryUrlHint": "https://gitlab.com/user/repo",
-  "playTooltip": "Воспроизведение [Space]",
-  "pauseTooltip": "Пауза [Space]",
-  "loopingBadge": "ЦИКЛ",
-  "tagsPrefix": "Теги: ",
-  "colorNamePrimary": "Основной",
-  "colorNameSecondary": "Вторичный",
-  "colorNameBackground": "Фон",
-  "colorNameSurface": "Поверхность",
-  "colorNameCard": "Карточка",
-  "colorNameAccent": "Акцент",
-  "colorNameTextPrimary": "Основной текст",
-  "colorNameTextSecondary": "Вторичный текст",
-  "colorNameDuckingBadge": "Индикатор Ducking",
-  "colorNameBattleIntensity": "Интенсивность боя",
-  "colorNameBossIntensity": "Интенсивность босса",
-  "seconds": "сек",
-  "milliseconds": "мс",
-  "sfxQuickTrigger": "Быстрые эффекты SFX",
-  "activeMusicMode": "Режим музыки",
-  "musicModeOff": "Выкл",
-  "musicModeExplore": "Исследование",
-  "musicModeCombat": "Бой",
-  "musicModeVictory": "Победа",
-  "optionsTooltip": "Настройки",
-  "scenesQuickPicker": "Сцены",
-  "sessionAudioDeck": "Сессионная аудиопанель",
-  "collapseSidebarTooltip": "Свернуть панель",
-  "expandSidebarTooltip": "Развернуть панель",
-  "aboutTitle": "О приложении DnDisc",
-  "aboutDesc": "Атмосферный аудиоплеер, микшер сцен и саундборд для мастеров НРИ.",
-  "appVersion": "Версия 1.0.0"
+  "deleteSourceTitle": "Удалить источник?",
+  "deleteSourceMessage": "«{name}» исчезнет из каталога. Установленное останется.",
+  "@deleteSourceMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noSourcesTitle": "Источников нет",
+  "noSourcesHint": "Добавьте ссылку на GitLab, Dropbox или веб-сервер с манифестом repository.json",
+  "sourceUnavailableTitle": "Источник недоступен",
+  "sourceUnavailableHint": "Проверьте соединение и повторите",
+  "retry": "Повторить",
+  "noCatalogItemsTitle": "Ничего не найдено",
+  "appearanceTitle": "Оформление",
+  "appearanceDesc": "Тема применяется ко всем экранам. Свои темы проверяются на контраст в редакторе.",
+  "customThemeTag": "Своя",
+  "deleteThemeTitle": "Удалить тему?",
+  "deleteThemeMessage": "Тема «{name}» будет удалена. Если она активна, приложение вернётся к Deep Dark.",
+  "@deleteThemeMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "audioTitle": "Звук",
+  "duckingDesc": "Музыка тише, пока играет звуковой эффект",
+  "storageTitle": "Хранение",
+  "toastStoragePathUpdated": "Папка хранения обновлена",
+  "toastStoragePathReset": "Папка хранения сброшена",
+  "shortcutGroupPlayback": "Воспроизведение",
+  "shortcutGroupIntensity": "Интенсивность",
+  "shortcutGroupSfx": "Слоты SFX",
+  "shortcutSfxSlotsDesc": "Слоты 2–9 работают так же",
+  "openLogs": "Открыть логи",
+  "toastSettingsReset": "Настройки сброшены",
+  "themeEditorDesc": "Выберите восемь цветов, остальное вычислится",
+  "colorNameText": "Текст",
+  "hexLabel": "Цвет в hex",
+  "hexInvalid": "Введите цвет вида #D4A373",
+  "contrastChecksTitle": "Проверка контраста",
+  "contrastTextBg": "Текст на фоне",
+  "contrastTextSurface": "Текст на панелях",
+  "contrastPrimaryBg": "Акцент на фоне",
+  "contrastPrimarySurface": "Акцент на панелях",
+  "contrastIntensityOnSurface": "«{name}» на панелях",
+  "@contrastIntensityOnSurface": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "contrastFix": "Исправить",
+  "contrastWarning": "Некоторые пары ниже читаемого минимума. Тему всё равно можно сохранить.",
+  "contrastOk": "Норма",
+  "orWord": "или",
+  "choosePreset": "Выберите пресет"
 }

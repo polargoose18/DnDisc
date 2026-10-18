@@ -12,10 +12,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appTitle => 'DnDisc';
 
   @override
-  String get tabGmDashboard => 'Панель Мастера';
+  String get tabGmDashboard => 'Пульт мастера';
 
   @override
-  String get tabLibrary => 'Общая Библиотека';
+  String get tabLibrary => 'Медиатека';
 
   @override
   String get tabSettings => 'Настройки';
@@ -24,19 +24,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tabCatalog => 'Каталог';
 
   @override
-  String get manualDuckingTooltip => 'Ручной Ducking [D]';
+  String get muteTooltip => 'Выключить звук';
 
   @override
-  String get muteTooltip => 'Заглушить [M]';
-
-  @override
-  String get unmuteTooltip => 'Включить звук [M]';
-
-  @override
-  String get fullscreenTooltip => 'Полноэкранный режим [F11]';
-
-  @override
-  String get logConsoleTooltip => 'Открыть консоль логов и отладки';
+  String get unmuteTooltip => 'Включить звук';
 
   @override
   String get logConsoleTitle => 'Консоль логов и отладки';
@@ -60,104 +51,49 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languageEnglish => 'English';
 
   @override
-  String get settingsTitle => 'Настройки звукового движка';
+  String get musicFadeTitle => 'Кроссфейд музыки';
 
   @override
-  String get settingsSubtitle =>
-      'Темы оформления, горячие клавиши, звуковой движок и управление пресетами';
+  String get ambientFadeTitle => 'Кроссфейд эмбиента';
 
   @override
-  String get fadeEngineTitle => 'Плавные переходы (Fade Engine)';
+  String get duckingTitle => 'Приглушение';
 
   @override
-  String get musicFadeTitle => 'Длительность нарастания/затухания музыки';
+  String get duckAttackTitle => 'Скорость приглушения';
 
   @override
-  String get ambientFadeTitle =>
-      'Длительность плавного включения/выключения эмбиента';
+  String get duckAttackSubtitle =>
+      'Как быстро музыка затихает, когда начинается эффект';
 
   @override
-  String get duckingTitle => 'Авто-приглушение музыки при SFX (Ducking)';
-
-  @override
-  String get duckAttackTitle => 'Время атаки';
-
-  @override
-  String get duckAttackSubtitle => 'скорость затухания музыки при ударе SFX';
-
-  @override
-  String get duckReleaseTitle => 'Время восстановления';
+  String get duckReleaseTitle => 'Скорость возврата';
 
   @override
   String get duckReleaseSubtitle =>
-      'скорость возврата музыки на полную громкость';
+      'Как быстро музыка возвращается к полной громкости';
 
   @override
   String get duckMultiplierTitle => 'Глубина приглушения';
 
   @override
-  String get duckMultiplierSubtitle => 'от исходной громкости музыки';
+  String get duckMultiplierSubtitle =>
+      'Доля громкости музыки, которая остаётся, пока играет эффект';
 
   @override
-  String get presetPacksTitle => 'Коллекции (ZIP Архивы)';
-
-  @override
-  String get presetPacksSubtitle =>
-      'Экспортируйте созданные сцены и аудиодорожки в единый архив для обмена с другими мастерами или импортируйте готовые коллекции приключений.';
-
-  @override
-  String get importPresetBtn => 'Импорт пресета (ZIP)';
-
-  @override
-  String get exportPresetBtn => 'Экспорт пресета в ZIP';
-
-  @override
-  String get interfaceTitle => 'Интерфейс и панель управления';
-
-  @override
-  String get showLogConsoleTitle => 'Отображать иконку консоли логов';
-
-  @override
-  String get showLogConsoleSubtitle =>
-      'Показывать кнопку быстрого открытия консоли логов в верхней панели мастера';
-
-  @override
-  String get resetDefaultsBtn => 'Сбросить все настройки по умолчанию';
-
-  @override
-  String get settingsResetToast => 'Настройки звукового движка сброшены.';
-
-  @override
-  String get themesTitle => 'Темы оформления (Themes)';
-
-  @override
-  String get builtinThemes => 'Встроенные пресеты (3 варианта)';
+  String get resetDefaultsBtn => 'Сбросить настройки';
 
   @override
   String get customThemes => 'Пользовательские темы';
 
   @override
-  String get noCustomThemes =>
-      'У вас пока нет кастомных тем. Создайте свою тему с уникальной палитрой цветов!';
+  String get createThemeBtn => 'Создать тему';
 
   @override
-  String get createThemeBtn => 'Создать новую тему';
+  String get hotkeysTitle => 'Горячие клавиши';
 
   @override
-  String get hotkeysTitle => 'Централизованные горячие клавиши';
-
-  @override
-  String get hotkeysSubtitle =>
-      'Управляйте звуковым окружением во время игровой сессии не отвлекаясь от книги правил:';
-
-  @override
-  String get actionCol => 'Действие';
-
-  @override
-  String get descriptionCol => 'Описание';
-
-  @override
-  String get keyCol => 'Клавиша';
+  String get hotkeysSubtitle => 'Работают, пока окно приложения в фокусе';
 
   @override
   String get scenesTitle => 'Сцены';
@@ -167,29 +103,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noScenesHint =>
-      'Сцены пока не созданы. Нажмите \"Создать сцену\" для комбинации музыки и эмбиентов.';
-
-  @override
-  String get activeBadge => 'АКТИВНА';
-
-  @override
-  String get enableSceneBtn => 'Включить';
-
-  @override
-  String get libraryTitle => 'Медиабиблиотека';
+      'Создайте сцену, чтобы собрать музыку, фоновые слои и звуковые эффекты';
 
   @override
   String get libraryEmpty => 'Медиатека пуста';
 
   @override
   String get libraryEmptyHint =>
-      'Нажмите \"Импорт файлов\", чтобы добавить музыку, эмбиент или SFX.';
+      'Импортируйте аудиофайлы, чтобы использовать их в сценах';
 
   @override
-  String get importFilesBtn => 'Импорт файлов';
-
-  @override
-  String get allSounds => 'Все звуки';
+  String get importFilesBtn => 'Импортировать файлы';
 
   @override
   String get music => 'Музыка';
@@ -198,14 +122,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get ambient => 'Эмбиент';
 
   @override
-  String get sfx => 'SFX Эффект';
+  String get sfx => 'SFX';
 
   @override
   String get scenes => 'Сцены';
 
   @override
-  String get searchPlaceholder =>
-      'Поиск по названию или тегам (например, Таверна, Бой)...';
+  String get searchPlaceholder => 'Поиск по названию или тегу';
 
   @override
   String get cancel => 'Отмена';
@@ -229,305 +152,140 @@ class AppLocalizationsRu extends AppLocalizations {
   String get export => 'Экспортировать';
 
   @override
-  String get nowPlaying => 'Сейчас играет';
-
-  @override
-  String get musicNotPlaying => 'Музыка не воспроизводится';
-
-  @override
   String get musicTrack => 'Музыкальная дорожка';
 
   @override
-  String get intensityLevel => 'Уровень Интенсивности';
+  String get stopMusic => 'Стоп';
 
   @override
-  String get stopMusic => 'Остановить музыку';
+  String get noAmbientTracksInLibrary => 'В медиатеке нет эмбиент-треков';
 
   @override
-  String get pausedSuffix => '(Пауза)';
+  String get noSfxTracksInLibrary => 'В медиатеке нет звуковых эффектов';
 
   @override
-  String get noAmbientTracksInLibrary =>
-      'В библиотеке нет треков с типом \"Эмбиент\".';
+  String get playing => 'Играет';
 
   @override
-  String get noSfxTracksInLibrary => 'В библиотеке нет SFX-треков.';
+  String get paused => 'Пауза';
 
   @override
-  String get playPause => 'Воспроизведение / Пауза';
+  String get noMusic => 'Нет музыки';
 
   @override
-  String get playing => 'Воспроизведение';
+  String get ambientLayers => 'Фоновые слои';
 
   @override
-  String get paused => 'На паузе';
-
-  @override
-  String get noMusic => 'Без музыки';
-
-  @override
-  String get noMusicSilence => 'Без музыки (тишина)';
-
-  @override
-  String get noMusicDesc =>
-      'При активации сцены фоновая музыка плавно затухает';
-
-  @override
-  String get nothingFound => 'Ничего не найдено';
-
-  @override
-  String get ambientLayers => 'Эмбиент-слои (Фоновые звуки)';
-
-  @override
-  String get addAmbientTooltip => 'Добавить слой / Постоянный эмбиент';
+  String get addAmbientTooltip => 'Добавить слой';
 
   @override
   String get stopAll => 'Выключить все';
 
   @override
-  String get noActiveAmbients =>
-      'Нет активных эмбиентов. Нажмите «+» для добавления постоянного фона.';
-
-  @override
-  String get addPersistentAmbient => 'Добавить постоянный эмбиент';
-
-  @override
   String get volume => 'Громкость';
 
   @override
-  String get persistentLayerTooltip =>
-      'Постоянный слой (не сбрасывается при смене сцены)';
+  String get addAmbientDialogTitle => 'Добавить фоновый слой';
 
   @override
-  String get makePersistentTooltip => 'Сделать постоянным слоем';
+  String get selected => 'Выбрано';
 
   @override
-  String get muteLayerTooltip => 'Заглушить слой';
-
-  @override
-  String get unmuteLayerTooltip => 'Включить слой';
-
-  @override
-  String get removeLayerTooltip => 'Удалить слой';
-
-  @override
-  String get addAmbientDialogTitle => 'Добавить Эмбиент-слой';
-
-  @override
-  String get selectTrackFromLibrary => 'Выберите трек из медиабиблиотеки:';
-
-  @override
-  String get selectLocalAudioFile => 'Выбрать локальный аудиофайл...';
-
-  @override
-  String get selected => 'Выбран: ';
-
-  @override
-  String get persistentLayerCheckbox =>
-      'Постоянный слой (не сбрасывать при смене сцены)';
+  String get persistentLayerCheckbox => 'Закрепить во всех сценах';
 
   @override
   String get addLayerBtn => 'Добавить слой';
 
   @override
-  String get soundboardTitle => 'Быстрые эффекты SFX';
+  String get soundboardTitle => 'SFX';
 
   @override
-  String get addSfxTooltip => 'Добавить SFX / Постоянную кнопку';
+  String get unpinSfx => 'Открепить';
 
   @override
-  String get sfxVolume => 'SFX Громкость: ';
+  String get pinSfx => 'Закрепить во всех сценах';
 
   @override
-  String get soundboardEmpty =>
-      'Soundboard пуст. Добавьте SFX или постоянные быстрые кнопки.';
+  String get deleteSfxButton => 'Убрать с пульта';
 
   @override
-  String get addPersistentSfx => 'Добавить постоянный SFX';
+  String get addSfxDialogTitle => 'Добавить звуковой эффект';
 
   @override
-  String get unpinSfx => 'Снять закрепление (сделать временным)';
+  String get persistentSfxCheckbox => 'Закрепить во всех сценах';
 
   @override
-  String get pinSfx => 'Закрепить как постоянный SFX';
+  String get loopModeCheckbox => 'Зациклить';
 
   @override
-  String get deleteSfxButton => 'Удалить кнопку SFX';
+  String get addSfxBtn => 'Добавить эффект';
 
   @override
-  String get addSfxDialogTitle => 'Добавить кнопку SFX';
+  String get searchScenesPlaceholder => 'Поиск сцен';
 
   @override
-  String get selectSoundFromLibrary => 'Выберите звук из библиотеки:';
+  String get noScenesMatching => 'Попробуйте другое название';
 
   @override
-  String get persistentSfxCheckbox =>
-      'Постоянный SFX (не сбрасывать при смене сцены)';
+  String get saveSceneAs => 'Сохранить сцену как';
 
   @override
-  String get loopModeCheckbox => 'Режим зацикливания (Loop)';
+  String get exportScenePackTitle => 'Экспорт набора';
 
   @override
-  String get addSfxBtn => 'Добавить SFX';
+  String get packTitleLabel => 'Название набора';
 
   @override
-  String get exportScenePackTooltip => 'Экспорт коллекции (.pack.zip)';
+  String get packDescLabel => 'Описание';
 
   @override
-  String get searchScenesPlaceholder => 'Поиск сцен...';
+  String get defaultPackTitle => 'Набор приключения';
 
   @override
-  String get noScenesMatching => 'Сцен по запросу не найдено.';
+  String get defaultPackDesc => 'Коллекция атмосферных сцен';
 
   @override
-  String get saveSceneAs => 'Сохранить сцену как...';
+  String get savePackAs => 'Сохранить набор как';
 
   @override
-  String sceneExported(String name) {
-    return 'Сцена \"$name\" экспортирована!';
-  }
-
-  @override
-  String sceneExportError(String error) {
-    return 'Ошибка при экспорте сцены: $error';
-  }
-
-  @override
-  String get exportScenePackTitle => 'Экспорт коллекции (.pack.zip)';
-
-  @override
-  String get packTitleLabel => 'Название коллекции';
-
-  @override
-  String get packDescLabel => 'Описание коллекции';
-
-  @override
-  String get defaultPackTitle => 'Коллекция Приключений';
-
-  @override
-  String get defaultPackDesc => 'Комплект атмосферных сцен';
-
-  @override
-  String get savePackAs => 'Сохранить коллекцию как...';
-
-  @override
-  String packExported(String name) {
-    return 'Коллекция \"$name\" успешно экспортирован!';
-  }
-
-  @override
-  String packExportError(String error) {
-    return 'Ошибка при экспорте коллекции: $error';
-  }
-
-  @override
-  String get exportSceneMenu => 'Экспорт (.scene.zip)';
-
-  @override
-  String get currentSceneBadge => 'ТЕКУЩАЯ СЦЕНА';
-
-  @override
-  String get selectScenePrompt =>
-      'Выберите сцену для создания игрового окружения';
+  String get selectScenePrompt => 'Выберите сцену, чтобы настроить звук стола';
 
   @override
   String get musicIntensityLabel => 'Интенсивность музыки';
 
   @override
-  String get createSceneTitle => 'Создание новой сцены';
+  String get createSceneTitle => 'Создание сцены';
 
   @override
-  String get editSceneTitle => 'Редактирование сцены';
+  String get editSceneTitle => 'Изменение сцены';
 
   @override
-  String get sceneNameLabel => 'Название сцены *';
+  String get sceneNameLabel => 'Название сцены';
 
   @override
-  String get sceneNameHint => 'например: Таверна «Пьяный Дракон»';
+  String get sceneNameHint => 'Гавань на закате';
 
   @override
-  String get sceneDescLabel => 'Описание атмосферы / Заметки мастера';
+  String get specifySceneName => 'Введите название сцены';
 
   @override
-  String get sceneDescHint => 'Теплый камин, звон кружек, тихая лютня...';
+  String get createCustomThemeTitle => 'Создание темы';
 
   @override
-  String get sceneCoverLabel => 'Путь к изображению / обложке сцены';
-
-  @override
-  String get browseBtn => 'Обзор';
-
-  @override
-  String get colorAccent => 'Цветовой акцент:';
-
-  @override
-  String get musicChannel => 'Канал Музыки';
-
-  @override
-  String get ambientChannel => 'Канал Эмбиента';
-
-  @override
-  String get sfxChannel => 'Канал SFX (Саундборд)';
-
-  @override
-  String get searchMusicHint => 'Поиск музыки по названию или тегам...';
-
-  @override
-  String get searchAmbientHint => 'Поиск эмбиента по названию или тегам...';
-
-  @override
-  String get searchSfxHint => 'Поиск SFX по названию или тегам...';
-
-  @override
-  String layersSelected(int count) {
-    return '$count слоев выбрано';
-  }
-
-  @override
-  String sfxSelected(int count) {
-    return '$count SFX выбрано';
-  }
-
-  @override
-  String get specifySceneName => 'Укажите название сцены';
-
-  @override
-  String get createCustomThemeTitle => 'Создание кастомной темы';
-
-  @override
-  String get editCustomThemeTitle => 'Редактирование темы';
+  String get editCustomThemeTitle => 'Изменение темы';
 
   @override
   String get themeNameLabel => 'Название темы';
 
   @override
-  String get themeNameRequired => 'Укажите название темы';
+  String get themeNameRequired => 'Введите название темы';
 
   @override
-  String get baseOnPreset => 'Использовать в качестве основы...';
-
-  @override
-  String get baseOnPresetTooltip => 'Взять за основу пресет';
-
-  @override
-  String get themePreviewTitle => 'Предпросмотр темы';
-
-  @override
-  String get duckingActive => 'Ducking Active';
-
-  @override
-  String get cardExampleTitle => 'Пример карточки';
-
-  @override
-  String get cardExampleDesc =>
-      'Текст описания сцены или трека в выбранной палитре цветов.';
-
-  @override
-  String get colorPaletteConfig => 'Настройка палитры цветов';
+  String get baseOnPreset => 'Начать с пресета';
 
   @override
   String colorPickTitle(String title) {
-    return 'Выбор цвета: $title';
+    return 'Цвет: $title';
   }
 
   @override
@@ -537,163 +295,89 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newThemeDefaultName => 'Новая тема';
 
   @override
-  String get editTrackTitle => 'Редактировать аудиозапись';
+  String get editTrackTitle => 'Изменение трека';
 
   @override
-  String get trackTitleLabel => 'Название трека';
+  String get trackTitleLabel => 'Название';
 
   @override
-  String get targetAudioBus => 'Целевая аудио-шина:';
+  String get tagsLabel => 'Теги';
 
   @override
-  String get musicIntensitySetting => 'Уровень Интенсивности Музыки:';
-
-  @override
-  String get tagsLabel => 'Теги (через запятую)';
-
-  @override
-  String get tagsHint => 'Таверна, Бой, Лес, Магия';
-
-  @override
-  String get colorLabel => 'Цветовая метка:';
+  String get tagsHint => 'Через запятую, например таверна, бой';
 
   @override
   String get exportMediaPackageBtn => 'Экспорт набора';
 
   @override
-  String get selectBusForImport =>
-      'Выберите целевую шину для импортируемых файлов';
-
-  @override
-  String get exportMediaPackageTitle => 'Экспорт Медиа-набора (.media.zip)';
+  String get exportMediaPackageTitle => 'Экспорт набора';
 
   @override
   String get mediaPackageNameLabel => 'Название набора';
 
   @override
-  String get mediaPackageDescLabel => 'Описание набора';
+  String get mediaPackageDescLabel => 'Описание';
 
   @override
-  String get defaultMediaPackageName => 'Мой Медиа Набор';
+  String get defaultMediaPackageName => 'Мой набор';
 
   @override
-  String get defaultMediaPackageDesc => 'Коллекция аудиодорожек';
+  String get defaultMediaPackageDesc => 'Коллекция аудиотреков';
 
   @override
-  String get saveMediaPackageAs => 'Сохранить медиа-набор как...';
-
-  @override
-  String mediaPackageExported(String name) {
-    return 'Медиа-набор \"$name\" успешно экспортирован!';
-  }
-
-  @override
-  String mediaPackageExportError(String error) {
-    return 'Ошибка экспорта медиа-набора: $error';
-  }
-
-  @override
-  String dispatchToBus(String bus) {
-    return 'Воспроизвести на шине $bus';
-  }
-
-  @override
-  String dispatchedToBus(String bus, String title) {
-    return 'Отправлено на шину $bus: \"$title\"';
-  }
-
-  @override
-  String get deleteFromLibrary => 'Удалить из библиотеки';
-
-  @override
-  String busInfo(String bus, String duration, String path) {
-    return 'Шина: $bus | Длительность: $duration | Путь: $path';
-  }
+  String get saveMediaPackageAs => 'Сохранить набор как';
 
   @override
   String get catalogTitle => 'Каталог';
 
   @override
-  String get refreshCatalogTooltip => 'Обновить каталог';
+  String get refreshCatalogTooltip => 'Обновить';
 
   @override
-  String get manageRepositoriesTooltip => 'Управление репозиториями';
-
-  @override
-  String get addRepositoryBtn => 'Добавить';
-
-  @override
-  String get searchCatalogPlaceholder => 'Поиск элементов в каталоге...';
+  String get searchCatalogPlaceholder => 'Поиск по каталогу';
 
   @override
   String sourcesBtn(int count) {
-    return 'Источники ($count)';
+    return 'Источники · $count';
   }
 
   @override
-  String get noRepositoriesConnected => 'Нет подключенных репозиториев';
+  String get urlHttpPrefixValidation => 'Введите полный адрес вида https://';
 
   @override
-  String get addRepositoryUrlHint =>
-      'Добавьте ссылку на GitLab, Dropbox или CDN с манифестом repository.json';
+  String get noCatalogItemsFound =>
+      'Попробуйте другое название или смените фильтр';
 
   @override
-  String get addRepositoryDialogTitle => 'Добавить репозиторий';
+  String get installedBadge => 'Установлено';
 
   @override
-  String get editRepositoryDialogTitle => 'Редактировать репозиторий';
-
-  @override
-  String manageRepositoriesTitle(int count) {
-    return 'Управление репозиториями ($count)';
-  }
-
-  @override
-  String get repositoryUrlLabel =>
-      'URL репозитория (GitLab / Dropbox / HTTP / JSON)';
-
-  @override
-  String get repositoryNameOptionalLabel => 'Название (опционально)';
-
-  @override
-  String get repositoryNameHint => 'Извлечётся из манифеста, если пусто';
-
-  @override
-  String get repositoryDescOptionalLabel => 'Описание (опционально)';
-
-  @override
-  String get enterRepositoryUrl => 'Введите URL репозитория';
-
-  @override
-  String get urlHttpPrefixValidation =>
-      'URL должен начинаться с http:// или https://';
-
-  @override
-  String get enterRepositoryName => 'Введите название репозитория';
-
-  @override
-  String get repositoryUpdated => 'Репозиторий успешно обновлен';
-
-  @override
-  String get noConnectedRepositories => 'Нет подключенных репозиториев.';
-
-  @override
-  String get noCatalogItemsFound => 'Элементы не найдены по вашему запросу.';
-
-  @override
-  String get installedBadge => 'Загружено';
-
-  @override
-  String get noDescription => 'Без описания';
+  String get noDescription => 'Нет описания';
 
   @override
   String scenesCount(int count) {
-    return '$count сцен';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сцены',
+      many: '$count сцен',
+      few: '$count сцены',
+      one: '$count сцена',
+    );
+    return '$_temp0';
   }
 
   @override
   String tracksCount(int count) {
-    return '$count треков';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count трека',
+      many: '$count треков',
+      few: '$count трека',
+      one: '$count трек',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -706,190 +390,115 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String repositoryLabel(String name) {
-    return 'Репозиторий: $name';
+    return 'Источник: $name';
   }
 
   @override
-  String get scenesInPack => 'Сцены в коллекции';
+  String get scenesInPack => 'Сцены в наборе';
 
   @override
-  String get mediaSetContent => 'Состав медиа-набора';
+  String get mediaSetContent => 'Состав медиапака';
 
   @override
   String get sceneContent => 'Состав сцены';
 
   @override
-  String get tracksMissingInManifest =>
-      'Список треков отсутствует в манифесте.';
+  String get tracksMissingInManifest => 'В манифесте нет списка треков';
 
   @override
-  String get scenesMissingInManifest => 'Список сцен отсутствует в манифесте.';
+  String get scenesMissingInManifest => 'В манифесте нет списка сцен';
 
   @override
-  String channelLabel(String channel) {
-    return 'Канал: $channel';
-  }
+  String get removeFromApp => 'Удалить из приложения';
 
   @override
-  String downloadingAndImporting(String percent) {
-    return 'Скачивание и импорт... $percent%';
-  }
-
-  @override
-  String removeFromApp(String type) {
-    return 'Удалить $type';
-  }
-
-  @override
-  String get installing => 'Установка...';
-
-  @override
-  String installItem(String type) {
-    return 'Установить $type';
-  }
-
-  @override
-  String deleteItemConfirmTitle(String name) {
-    return 'Удалить $name?';
-  }
-
-  @override
-  String deleteItemConfirmMessage(String type, String name) {
-    return 'Вы уверены, что хотите удалить $type \"$name\" и связанные файлы из приложения?';
-  }
-
-  @override
-  String itemUninstalled(String type, String name) {
-    return '$type \"$name\" успешно удален(а) из приложения.';
-  }
-
-  @override
-  String itemUninstallError(String type) {
-    return 'Ошибка при удалении $type.';
-  }
-
-  @override
-  String itemInstalled(String type, String name) {
-    return '$type \"$name\" успешно установлен(а)!';
-  }
-
-  @override
-  String itemInstallError(String type) {
-    return 'Ошибка при скачивании $type.';
-  }
-
-  @override
-  String get catalogStorageTitle => 'Каталог и хранилище аудиофайлов';
+  String get installItem => 'Установить';
 
   @override
   String get catalogStorageDesc =>
-      'Папка для загрузки и распаковки аудиофайлов из онлайн-каталога репозиториев:';
+      'Папка для аудиофайлов, скачанных из каталога';
 
   @override
-  String get customDirectory => 'Пользовательская директория';
+  String get customDirectory => 'Своя папка';
 
   @override
-  String get defaultDirectory => 'Директория по умолчанию';
+  String get defaultDirectory => 'Папка по умолчанию';
 
   @override
-  String get defaultStoragePath => 'По умолчанию: Documents/audio_library';
+  String get defaultStoragePath => 'Documents/audio_library';
 
   @override
-  String get resetDefaultDirTooltip => 'Сбросить к значению по умолчанию';
+  String get resetDefaultDirTooltip => 'Вернуть по умолчанию';
 
   @override
   String get chooseFolderBtn => 'Выбрать папку';
 
   @override
-  String get chooseFolderDialogTitle =>
-      'Выберите папку для сохранения аудиофайлов каталога';
+  String get chooseFolderDialogTitle => 'Выберите папку для аудио из каталога';
 
   @override
-  String get storagePathReset =>
-      'Путь сохранения сброшен к значению по умолчанию.';
+  String get shortcutPlayPauseTitle => 'Пуск / пауза';
 
   @override
-  String storagePathUpdated(String path) {
-    return 'Папка сохранения каталога обновлена: $path';
-  }
+  String get shortcutPlayPauseDesc => 'Текущий трек музыки';
 
   @override
-  String get shortcutPlayPauseTitle => 'Воспроизведение / Пауза';
-
-  @override
-  String get shortcutPlayPauseDesc =>
-      'Старт или пауза текущего музыкального трека';
-
-  @override
-  String get shortcutIntensityCalmTitle => 'Интенсивность: Спокойствие';
+  String get shortcutIntensityCalmTitle => 'Спокойно';
 
   @override
   String get shortcutIntensityCalmDesc =>
       'Переключить режим музыки на Спокойствие';
 
   @override
-  String get shortcutIntensitySuspenseTitle => 'Интенсивность: Напряжение';
+  String get shortcutIntensitySuspenseTitle => 'Тревога';
 
   @override
   String get shortcutIntensitySuspenseDesc =>
       'Переключить режим музыки на Напряжение';
 
   @override
-  String get shortcutIntensityBattleTitle => 'Интенсивность: Битва';
+  String get shortcutIntensityBattleTitle => 'Бой';
 
   @override
   String get shortcutIntensityBattleDesc => 'Переключить режим музыки на Битву';
 
   @override
-  String get shortcutIntensityBossTitle => 'Интенсивность: Босс';
+  String get shortcutIntensityBossTitle => 'Босс';
 
   @override
   String get shortcutIntensityBossDesc => 'Переключить режим музыки на Босса';
 
   @override
   String shortcutSfxTitle(int index) {
-    return 'SFX Слот $index';
+    return 'Слот SFX $index';
   }
 
   @override
   String shortcutSfxDesc(int index) {
-    return 'Воспроизвести звуковой эффект $index';
+    return 'Запустить эффект $index';
   }
 
   @override
-  String get shortcutMasterMuteTitle => 'Глушение звука (Mute)';
+  String get shortcutMasterMuteTitle => 'Выключить звук';
 
   @override
-  String get shortcutMasterMuteDesc =>
-      'Быстрое глушение или включение общего звука';
+  String get shortcutMasterMuteDesc => 'Быстро выключить или включить звук';
 
   @override
-  String get shortcutManualDuckingTitle => 'Ручной Ducking';
+  String get shortcutFullscreenTitle => 'Полный экран';
 
   @override
-  String get shortcutManualDuckingDesc =>
-      'Принудительное приглушение музыки на время речи';
+  String get shortcutFullscreenDesc =>
+      'Включить или выключить полноэкранный режим';
 
   @override
-  String get shortcutFullscreenTitle => 'Полноэкранный режим';
+  String get intensityCalm => 'Спокойно';
 
   @override
-  String get shortcutFullscreenDesc => 'Переключение отображения во весь экран';
+  String get intensitySuspense => 'Тревога';
 
   @override
-  String get deleteFromApp => 'Удалить из приложения';
-
-  @override
-  String get repositoryNameLabel => 'Название';
-
-  @override
-  String get intensityCalm => 'Спокойная';
-
-  @override
-  String get intensitySuspense => 'Напряжение';
-
-  @override
-  String get intensityBattle => 'Битва';
+  String get intensityBattle => 'Бой';
 
   @override
   String get intensityBoss => 'Босс';
@@ -916,114 +525,46 @@ class AppLocalizationsRu extends AppLocalizations {
   String get packTitle => 'Коллекция';
 
   @override
-  String get catalogSceneBadge => '🎭 Сцена';
+  String get catalogSceneBadge => 'Сцена';
 
   @override
-  String get catalogMediaBadge => '🎵 Медиа';
+  String get catalogMediaBadge => 'Медиапак';
 
   @override
-  String get catalogPackBadge => '📦 Коллекция';
+  String get catalogPackBadge => 'Набор';
 
   @override
   String get filterAll => 'Все';
 
   @override
-  String get filterScenes => '🎭 Сцены';
+  String get filterScenes => 'Сцены';
 
   @override
-  String get filterMedia => '🎵 Медиа';
+  String get filterMedia => 'Медиа';
 
   @override
-  String get filterPacks => '📦 Коллекции';
+  String get filterPacks => 'Наборы';
 
   @override
-  String repoStats(int scenes, int media, int packs) {
-    return 'Сцен: $scenes | Медиа: $media | Коллекций: $packs';
-  }
+  String get playTooltip => 'Воспроизвести';
 
   @override
-  String get addRepositoryTooltip => 'Добавить репозиторий';
+  String get pauseTooltip => 'Пауза';
 
   @override
-  String get repositoryUrlHint => 'https://gitlab.com/user/repo';
-
-  @override
-  String get playTooltip => 'Воспроизведение [Space]';
-
-  @override
-  String get pauseTooltip => 'Пауза [Space]';
-
-  @override
-  String get loopingBadge => 'ЦИКЛ';
-
-  @override
-  String get tagsPrefix => 'Теги: ';
-
-  @override
-  String get colorNamePrimary => 'Основной';
-
-  @override
-  String get colorNameSecondary => 'Вторичный';
+  String get colorNamePrimary => 'Акцент';
 
   @override
   String get colorNameBackground => 'Фон';
 
   @override
-  String get colorNameSurface => 'Поверхность';
+  String get colorNameSurface => 'Панели';
 
   @override
-  String get colorNameCard => 'Карточка';
-
-  @override
-  String get colorNameAccent => 'Акцент';
-
-  @override
-  String get colorNameTextPrimary => 'Основной текст';
-
-  @override
-  String get colorNameTextSecondary => 'Вторичный текст';
-
-  @override
-  String get colorNameDuckingBadge => 'Индикатор Ducking';
-
-  @override
-  String get colorNameBattleIntensity => 'Интенсивность боя';
-
-  @override
-  String get colorNameBossIntensity => 'Интенсивность босса';
-
-  @override
-  String get seconds => 'сек';
+  String get seconds => 'с';
 
   @override
   String get milliseconds => 'мс';
-
-  @override
-  String get sfxQuickTrigger => 'Быстрые эффекты SFX';
-
-  @override
-  String get activeMusicMode => 'Режим музыки';
-
-  @override
-  String get musicModeOff => 'Выкл';
-
-  @override
-  String get musicModeExplore => 'Исследование';
-
-  @override
-  String get musicModeCombat => 'Бой';
-
-  @override
-  String get musicModeVictory => 'Победа';
-
-  @override
-  String get optionsTooltip => 'Настройки';
-
-  @override
-  String get scenesQuickPicker => 'Сцены';
-
-  @override
-  String get sessionAudioDeck => 'Сессионная аудиопанель';
 
   @override
   String get collapseSidebarTooltip => 'Свернуть панель';
@@ -1032,12 +573,493 @@ class AppLocalizationsRu extends AppLocalizations {
   String get expandSidebarTooltip => 'Развернуть панель';
 
   @override
-  String get aboutTitle => 'О приложении DnDisc';
-
-  @override
-  String get aboutDesc =>
-      'Атмосферный аудиоплеер, микшер сцен и саундборд для мастеров НРИ.';
+  String get aboutDesc => 'Аудиопульт для мастеров настольных игр';
 
   @override
   String get appVersion => 'Версия 1.0.0';
+
+  @override
+  String get master => 'Общая';
+
+  @override
+  String get close => 'Закрыть';
+
+  @override
+  String get moreActions => 'Ещё';
+
+  @override
+  String get showScenes => 'Показать сцены';
+
+  @override
+  String get openNavigation => 'Открыть навигацию';
+
+  @override
+  String get channelVolumes => 'Громкость каналов';
+
+  @override
+  String get noScenesTitle => 'Сцен пока нет';
+
+  @override
+  String get noScenesFoundTitle => 'Сцены не найдены';
+
+  @override
+  String get clearSearch => 'Очистить поиск';
+
+  @override
+  String get editDetails => 'Изменить';
+
+  @override
+  String get exportAction => 'Экспортировать';
+
+  @override
+  String ambientCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count слоя',
+      many: '$count слоёв',
+      few: '$count слоя',
+      one: '$count слой',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sfxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count эффекта',
+      many: '$count эффектов',
+      few: '$count эффекта',
+      one: '$count эффект',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sceneMeta(String intensity, String layers, String sfx) {
+    return '$intensity · $layers · $sfx';
+  }
+
+  @override
+  String get deleteSceneTitle => 'Удалить сцену?';
+
+  @override
+  String deleteSceneMessage(String name) {
+    return 'Сцена «$name» и её раскладка будут удалены. Аудиофайлы останутся в медиатеке.';
+  }
+
+  @override
+  String get exportBundleTooltip => 'Экспортировать все сцены набором';
+
+  @override
+  String get toastSceneExported => 'Сцена экспортирована';
+
+  @override
+  String get toastBundleExported => 'Набор экспортирован';
+
+  @override
+  String get toastExportFailed => 'Не удалось экспортировать';
+
+  @override
+  String ambientOnCount(int on, int total) {
+    return 'Включено $on из $total';
+  }
+
+  @override
+  String get stopAllLayers => 'Остановить все слои';
+
+  @override
+  String get noAmbientTitle => 'Фоновых слоёв нет';
+
+  @override
+  String get noAmbientHint =>
+      'Добавьте слой, чтобы под музыку звучали дождь, ветер или толпа';
+
+  @override
+  String get addAmbientLayer => 'Добавить слой';
+
+  @override
+  String get pinEverywhere => 'Закрепить во всех сценах';
+
+  @override
+  String get removeLayer => 'Убрать слой';
+
+  @override
+  String get addAmbientDialogDesc => 'Выберите трек из медиатеки или файл';
+
+  @override
+  String get fromLibrary => 'Из медиатеки';
+
+  @override
+  String get chooseLocalFile => 'Выбрать файл';
+
+  @override
+  String get soundIcon => 'Значок';
+
+  @override
+  String get persistentLayerDesc => 'Слой продолжит звучать при смене сцены';
+
+  @override
+  String get filterLibrary => 'Фильтр по медиатеке';
+
+  @override
+  String get addSfxSlot => 'Добавить эффект';
+
+  @override
+  String get addSfxDialogDesc => 'Выберите звук из медиатеки или файл';
+
+  @override
+  String get persistentSfxDesc => 'Плитка останется на пульте при смене сцены';
+
+  @override
+  String get loopModeDesc =>
+      'Звук повторяется, пока вы снова не нажмёте плитку';
+
+  @override
+  String get createSceneDesc =>
+      'Название, обложка, стартовая интенсивность и звуки';
+
+  @override
+  String get coverLabel => 'Обложка';
+
+  @override
+  String get coverHint =>
+      'Если пропустить, выберется случайная. Своё изображение её заменит.';
+
+  @override
+  String get uploadCover => 'Загрузить';
+
+  @override
+  String get startingIntensity => 'Стартовая интенсивность';
+
+  @override
+  String soundsSelected(int count) {
+    return 'Звуки · выбрано $count';
+  }
+
+  @override
+  String get soundsHint => 'Музыка, фоновые слои и плитки SFX';
+
+  @override
+  String get noSoundsFound => 'Звуки не найдены';
+
+  @override
+  String get everythingEditableLater => 'Всё можно изменить позже';
+
+  @override
+  String get saveBtn => 'Сохранить';
+
+  @override
+  String get discardChangesTitle => 'Отменить изменения?';
+
+  @override
+  String get discardChangesMessage => 'В форме есть несохранённые изменения.';
+
+  @override
+  String get discard => 'Отменить';
+
+  @override
+  String get keepEditing => 'Продолжить';
+
+  @override
+  String get importBtn => 'Импорт';
+
+  @override
+  String get noTracksFound => 'Ничего не найдено';
+
+  @override
+  String get noTracksFoundHint => 'Попробуйте другое название или тег';
+
+  @override
+  String get previewTrack => 'Прослушать';
+
+  @override
+  String get stopPreview => 'Остановить';
+
+  @override
+  String get locateFile => 'Указать файл';
+
+  @override
+  String get fileMissing => 'Файл не найден';
+
+  @override
+  String get deleteTrackTitle => 'Удалить трек?';
+
+  @override
+  String deleteTrackMessage(String title) {
+    return 'Трек «$title» исчезнет из медиатеки. Аудиофайл останется на диске.';
+  }
+
+  @override
+  String get importDialogTitle => 'Импорт аудио';
+
+  @override
+  String get importDialogDesc => 'Выберите канал и добавьте файлы';
+
+  @override
+  String get importTarget => 'Канал';
+
+  @override
+  String get dropFilesTitle => 'Перетащите аудиофайлы сюда';
+
+  @override
+  String get dropFilesHint =>
+      'MP3, WAV, OGG, FLAC или M4A, либо нажмите для выбора';
+
+  @override
+  String get releaseToImport => 'Отпустите для импорта';
+
+  @override
+  String importNFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Импортировать $count файла',
+      many: 'Импортировать $count файлов',
+      few: 'Импортировать $count файла',
+      one: 'Импортировать $count файл',
+      zero: 'Импортировать',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get removeFromList => 'Убрать из списка';
+
+  @override
+  String toastImported(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Импортировано $count файла',
+      many: 'Импортировано $count файлов',
+      few: 'Импортировано $count файла',
+      one: 'Импортирован $count файл',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String toastImportSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Пропущено $count файла: не аудиоформат',
+      many: 'Пропущено $count файлов: не аудиоформат',
+      few: 'Пропущено $count файла: не аудиоформат',
+      one: 'Пропущен $count файл: не аудиоформат',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trackTypeLabel => 'Тип';
+
+  @override
+  String get intensityLabel => 'Интенсивность';
+
+  @override
+  String get filePathLabel => 'Файл';
+
+  @override
+  String get toastMediaPackageExported => 'Набор экспортирован';
+
+  @override
+  String get addSourceBtn => 'Добавить источник';
+
+  @override
+  String get downloadingLabel => 'Загрузка';
+
+  @override
+  String get viewDetails => 'Подробнее';
+
+  @override
+  String removeItemTitle(String name) {
+    return 'Удалить «$name»?';
+  }
+
+  @override
+  String get removeItemMessage =>
+      'Он и установленные им файлы будут удалены из приложения.';
+
+  @override
+  String get toastInstalled => 'Установлено';
+
+  @override
+  String get toastInstallFailed => 'Не удалось установить';
+
+  @override
+  String get toastInstallFailedHint => 'Проверьте соединение и повторите';
+
+  @override
+  String get toastRemoved => 'Удалено';
+
+  @override
+  String get toastRemoveFailed => 'Не удалось удалить';
+
+  @override
+  String get sourcesDialogTitle => 'Источники';
+
+  @override
+  String get sourcesDialogDesc => 'Репозитории, из которых читается каталог';
+
+  @override
+  String get addSourceTitle => 'Добавление источника';
+
+  @override
+  String get editSourceTitle => 'Изменение источника';
+
+  @override
+  String get sourceUrlLabel => 'Адрес';
+
+  @override
+  String get sourceUrlHint => 'https://gitlab.com/user/repo';
+
+  @override
+  String get sourceNameLabel => 'Название';
+
+  @override
+  String get sourceNameHint => 'Если пусто, возьмётся из манифеста';
+
+  @override
+  String get sourceDescLabel => 'Описание';
+
+  @override
+  String get enterSourceUrl => 'Введите адрес источника';
+
+  @override
+  String get enterSourceName => 'Введите название';
+
+  @override
+  String sourceStats(int scenes, int media, int packs) {
+    return 'Сцены $scenes · Медиа $media · Наборы $packs';
+  }
+
+  @override
+  String get deleteSourceTitle => 'Удалить источник?';
+
+  @override
+  String deleteSourceMessage(String name) {
+    return '«$name» исчезнет из каталога. Установленное останется.';
+  }
+
+  @override
+  String get noSourcesTitle => 'Источников нет';
+
+  @override
+  String get noSourcesHint =>
+      'Добавьте ссылку на GitLab, Dropbox или веб-сервер с манифестом repository.json';
+
+  @override
+  String get sourceUnavailableTitle => 'Источник недоступен';
+
+  @override
+  String get sourceUnavailableHint => 'Проверьте соединение и повторите';
+
+  @override
+  String get retry => 'Повторить';
+
+  @override
+  String get noCatalogItemsTitle => 'Ничего не найдено';
+
+  @override
+  String get appearanceTitle => 'Оформление';
+
+  @override
+  String get appearanceDesc =>
+      'Тема применяется ко всем экранам. Свои темы проверяются на контраст в редакторе.';
+
+  @override
+  String get customThemeTag => 'Своя';
+
+  @override
+  String get deleteThemeTitle => 'Удалить тему?';
+
+  @override
+  String deleteThemeMessage(String name) {
+    return 'Тема «$name» будет удалена. Если она активна, приложение вернётся к Deep Dark.';
+  }
+
+  @override
+  String get audioTitle => 'Звук';
+
+  @override
+  String get duckingDesc => 'Музыка тише, пока играет звуковой эффект';
+
+  @override
+  String get storageTitle => 'Хранение';
+
+  @override
+  String get toastStoragePathUpdated => 'Папка хранения обновлена';
+
+  @override
+  String get toastStoragePathReset => 'Папка хранения сброшена';
+
+  @override
+  String get shortcutGroupPlayback => 'Воспроизведение';
+
+  @override
+  String get shortcutGroupIntensity => 'Интенсивность';
+
+  @override
+  String get shortcutGroupSfx => 'Слоты SFX';
+
+  @override
+  String get shortcutSfxSlotsDesc => 'Слоты 2–9 работают так же';
+
+  @override
+  String get openLogs => 'Открыть логи';
+
+  @override
+  String get toastSettingsReset => 'Настройки сброшены';
+
+  @override
+  String get themeEditorDesc => 'Выберите восемь цветов, остальное вычислится';
+
+  @override
+  String get colorNameText => 'Текст';
+
+  @override
+  String get hexLabel => 'Цвет в hex';
+
+  @override
+  String get hexInvalid => 'Введите цвет вида #D4A373';
+
+  @override
+  String get contrastChecksTitle => 'Проверка контраста';
+
+  @override
+  String get contrastTextBg => 'Текст на фоне';
+
+  @override
+  String get contrastTextSurface => 'Текст на панелях';
+
+  @override
+  String get contrastPrimaryBg => 'Акцент на фоне';
+
+  @override
+  String get contrastPrimarySurface => 'Акцент на панелях';
+
+  @override
+  String contrastIntensityOnSurface(String name) {
+    return '«$name» на панелях';
+  }
+
+  @override
+  String get contrastFix => 'Исправить';
+
+  @override
+  String get contrastWarning =>
+      'Некоторые пары ниже читаемого минимума. Тему всё равно можно сохранить.';
+
+  @override
+  String get contrastOk => 'Норма';
+
+  @override
+  String get orWord => 'или';
+
+  @override
+  String get choosePreset => 'Выберите пресет';
 }
