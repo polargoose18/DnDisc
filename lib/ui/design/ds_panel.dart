@@ -12,6 +12,9 @@ class DsPanel extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
 
+  /// Fill the height of the parent; [child] then gets all the space left.
+  final bool expand;
+
   const DsPanel({
     super.key,
     this.title,
@@ -19,6 +22,7 @@ class DsPanel extends StatelessWidget {
     this.trailing,
     required this.child,
     this.padding = const EdgeInsets.all(Spacing.s5),
+    this.expand = false,
   });
 
   @override
@@ -33,6 +37,7 @@ class DsPanel extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
         children: [
           if (title != null)
             Padding(
@@ -48,7 +53,7 @@ class DsPanel extends StatelessWidget {
                 ],
               ),
             ),
-          child,
+          if (expand) Expanded(child: child) else child,
         ],
       ),
     );

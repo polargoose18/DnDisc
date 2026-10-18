@@ -87,6 +87,9 @@ abstract class DnDiscIcons {
 
   static bool contains(String? key) => key != null && paths.containsKey(key);
 
+  /// [key] when it is in the icon set, else [fallback] (the default of the channel).
+  static String resolve(String? key, String fallback) => contains(key) ? key! : fallback;
+
   /// Asset path of [key]; unknown or null keys show the default icon.
   static String pathOf(String? key) => paths[contains(key) ? key : defaultKey]!;
 }

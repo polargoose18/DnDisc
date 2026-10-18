@@ -84,7 +84,7 @@ class DsDialog extends StatelessWidget {
                       ],
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(top: Spacing.s1 + 2),
+                          padding: const EdgeInsets.only(top: Spacing.s1h),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

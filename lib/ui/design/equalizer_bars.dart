@@ -127,7 +127,7 @@ class _BarsPainter extends CustomPainter {
       final h = size.height * _level(i);
       final x = i * (barWidth + gap);
       canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromLTWH(x, size.height - h, barWidth, h), const Radius.circular(1)),
+        RRect.fromRectAndRadius(Rect.fromLTWH(x, size.height - h, barWidth, h), const Radius.circular(Sizes.equalizerRadius)),
         paint,
       );
     }

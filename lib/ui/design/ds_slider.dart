@@ -14,7 +14,8 @@ class _DsThumbShape extends SliderComponentShape {
   const _DsThumbShape({required this.fill, required this.ring});
 
   @override
-  Size getPreferredSize(bool isEnabled, bool isDiscrete) => const Size.square(Sizes.sliderThumb);
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) =>
+      const Size.square(Sizes.sliderThumb);
 
   @override
   void paint(
@@ -55,6 +56,9 @@ class DsSlider extends StatefulWidget {
   /// Colour of the thumb ring; the panel the slider sits on.
   final Color? ringColor;
 
+  /// Width reserved for the value text; wider for values with a unit.
+  final double valueWidth;
+
   const DsSlider({
     super.key,
     required this.value,
@@ -67,6 +71,7 @@ class DsSlider extends StatefulWidget {
     this.showValue = true,
     this.format,
     this.ringColor,
+    this.valueWidth = Sizes.sliderValueWidth,
   });
 
   @override
@@ -74,7 +79,29 @@ class DsSlider extends StatefulWidget {
 }
 
 class _DsSliderState extends State<DsSlider> {
-  final FocusNode _focus = FocusNode();
+  late final FocusNode _focus = FocusNode(onKeyEvent: _onKey);
+
+  /// Arrows change the value by 1% of the range, Shift+arrows by 10%. Runs
+  /// before the Material slider's own shortcuts, which use another step.
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    final onChanged = widget.onChanged;
+    if (onChanged == null || event is KeyUpEvent) return KeyEventResult.ignored;
+    final step = (widget.max - widget.min) /
+        100 *
+        (HardwareKeyboard.instance.isShiftPressed ? 10 : 1);
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowRight ||
+        key == LogicalKeyboardKey.arrowUp) {
+      onChanged((widget.value + step).clamp(widget.min, widget.max));
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowLeft ||
+        key == LogicalKeyboardKey.arrowDown) {
+      onChanged((widget.value - step).clamp(widget.min, widget.max));
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
 
   @override
   void dispose() {
@@ -92,38 +119,22 @@ class _DsSliderState extends State<DsSlider> {
   @override
   Widget build(BuildContext context) {
     final ds = context.ds;
-    final span = widget.max - widget.min;
-    final step = span / 100;
     final onChanged = widget.onChanged;
 
     final slider = SliderTheme(
       data: SliderTheme.of(context).copyWith(
-        thumbShape: _DsThumbShape(fill: ds.primary, ring: widget.ringColor ?? ds.surface),
+        thumbShape: _DsThumbShape(
+            fill: ds.primary, ring: widget.ringColor ?? ds.surface),
         overlayShape: SliderComponentShape.noOverlay,
         trackShape: const RoundedRectSliderTrackShape(),
       ),
-      child: Focus(
-        onKeyEvent: (node, event) {
-          if (onChanged == null || event is KeyUpEvent) return KeyEventResult.ignored;
-          final big = HardwareKeyboard.instance.isShiftPressed ? 10 : 1;
-          if (event.logicalKey == LogicalKeyboardKey.arrowRight || event.logicalKey == LogicalKeyboardKey.arrowUp) {
-            onChanged((widget.value + step * big).clamp(widget.min, widget.max));
-            return KeyEventResult.handled;
-          }
-          if (event.logicalKey == LogicalKeyboardKey.arrowLeft || event.logicalKey == LogicalKeyboardKey.arrowDown) {
-            onChanged((widget.value - step * big).clamp(widget.min, widget.max));
-            return KeyEventResult.handled;
-          }
-          return KeyEventResult.ignored;
-        },
-        child: Slider(
-          focusNode: _focus,
-          value: widget.value.clamp(widget.min, widget.max),
-          min: widget.min,
-          max: widget.max,
-          onChanged: onChanged,
-          semanticFormatterCallback: (_) => '${widget.semanticLabel}, ${_text()}',
-        ),
+      child: Slider(
+        focusNode: _focus,
+        value: widget.value.clamp(widget.min, widget.max),
+        min: widget.min,
+        max: widget.max,
+        onChanged: onChanged,
+        semanticFormatterCallback: (_) => '${widget.semanticLabel}, ${_text()}',
       ),
     );
 
@@ -139,12 +150,15 @@ class _DsSliderState extends State<DsSlider> {
             Text(widget.label!, style: ds.caption),
             const SizedBox(width: Spacing.s2),
           ],
-          Expanded(child: DsFocusRing(radius: Radii.smAll, focusNode: _focus, child: slider)),
+          Expanded(
+              child: DsFocusRing(
+                  radius: Radii.smAll, focusNode: _focus, child: slider)),
           if (widget.showValue) ...[
             const SizedBox(width: Spacing.s2),
             SizedBox(
-              width: Sizes.sliderValueWidth,
-              child: Text(_text(), textAlign: TextAlign.right, style: ds.tabular(ds.caption)),
+              width: widget.valueWidth,
+              child: Text(_text(),
+                  textAlign: TextAlign.right, style: ds.tabular(ds.caption)),
             ),
           ],
         ],

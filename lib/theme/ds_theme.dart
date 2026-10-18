@@ -40,6 +40,9 @@ class DsTheme extends ThemeExtension<DsTheme> {
   final TextStyle bodyStrong;
   final TextStyle label;
   final TextStyle caption;
+
+  /// Caption weight 500 for badges and chips (12px, no new size).
+  final TextStyle captionStrong;
   final TextStyle code;
 
   const DsTheme({
@@ -73,6 +76,7 @@ class DsTheme extends ThemeExtension<DsTheme> {
     required this.bodyStrong,
     required this.label,
     required this.caption,
+    required this.captionStrong,
     required this.code,
   });
 
@@ -115,6 +119,7 @@ class DsTheme extends ThemeExtension<DsTheme> {
       bodyStrong: sans(14, 20, FontWeight.w600, m.textPrimary),
       label: sans(13, 16, FontWeight.w500, m.textPrimary),
       caption: sans(12, 16, FontWeight.w400, m.textSecondary),
+      captionStrong: sans(12, 16, FontWeight.w500, m.textPrimary),
       code: TextStyle(
         fontFamily: monoFamily,
         fontSize: 12,

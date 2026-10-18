@@ -105,7 +105,8 @@ class _DsFocusRingState extends State<DsFocusRing> {
 class DsInteractive extends StatefulWidget {
   final Widget Function(BuildContext context, DsStates states) builder;
   final VoidCallback? onTap;
-  final VoidCallback? onSecondaryTap;
+  final GestureTapUpCallback? onSecondaryTapUp;
+  final VoidCallback? onLongPress;
   final BorderRadius focusRadius;
   final String? semanticLabel;
   final bool? toggled;
@@ -116,7 +117,8 @@ class DsInteractive extends StatefulWidget {
     super.key,
     required this.builder,
     this.onTap,
-    this.onSecondaryTap,
+    this.onSecondaryTapUp,
+    this.onLongPress,
     this.focusRadius = Radii.mdAll,
     this.semanticLabel,
     this.toggled,
@@ -143,6 +145,7 @@ class _DsInteractiveState extends State<DsInteractive> {
     Widget content = widget.builder(context, states);
     content = Stack(
       clipBehavior: Clip.none,
+      fit: StackFit.passthrough,
       children: [
         content,
         if (_focused && _enabled)
@@ -191,7 +194,8 @@ class _DsInteractiveState extends State<DsInteractive> {
           onTapDown: _enabled ? (_) => setState(() => _pressed = true) : null,
           onTapUp: _enabled ? (_) => setState(() => _pressed = false) : null,
           onTapCancel: _enabled ? () => setState(() => _pressed = false) : null,
-          onSecondaryTap: widget.onSecondaryTap,
+          onSecondaryTapUp: widget.onSecondaryTapUp,
+          onLongPress: widget.onLongPress,
           child: content,
         ),
       ),

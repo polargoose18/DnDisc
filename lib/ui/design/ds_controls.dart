@@ -33,13 +33,13 @@ class DsBadge extends StatelessWidget {
         children: [
           if (dot) ...[
             Container(
-              width: Spacing.s2 - 2,
-              height: Spacing.s2 - 2,
+              width: Spacing.s1h,
+              height: Spacing.s1h,
               decoration: BoxDecoration(color: foreground, shape: BoxShape.circle),
             ),
-            const SizedBox(width: Spacing.s2 - 2),
+            const SizedBox(width: Spacing.s1h),
           ],
-          Text(label, style: ds.label.copyWith(fontSize: 12, color: foreground)),
+          Text(label, style: ds.captionStrong.copyWith(color: foreground)),
         ],
       ),
     );
@@ -61,7 +61,7 @@ class DsChip extends StatelessWidget {
     final toggle = onTap != null;
     final text = Text(
       label,
-      style: ds.label.copyWith(fontSize: 12, color: selected ? ds.text : ds.textMuted),
+      style: ds.captionStrong.copyWith(color: selected ? ds.text : ds.textMuted),
     );
     final remove = onRemove == null
         ? null
@@ -181,7 +181,7 @@ class DsCheckbox extends StatelessWidget {
       builder: (context, s) => ConstrainedBox(
         constraints: const BoxConstraints(minHeight: Sizes.targetMin),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: Spacing.s2 + 2),
+          padding: const EdgeInsets.symmetric(vertical: Spacing.s2h),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -194,7 +194,7 @@ class DsCheckbox extends StatelessWidget {
                   borderRadius: Radii.smAll,
                   border: Border.all(
                     color: !enabled ? ds.border : (value ? ds.primary : ds.borderStrong),
-                    width: 1.5,
+                    width: Sizes.checkboxBorder,
                   ),
                 ),
                 child: value ? Center(child: DsIcon('check', size: Sizes.iconSm, color: ds.onPrimary)) : null,
@@ -206,7 +206,7 @@ class DsCheckbox extends StatelessWidget {
                   children: [
                     Text(label, style: ds.body.copyWith(color: enabled ? ds.text : ds.textDisabled)),
                     if (description != null) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: Spacing.s0),
                       Text(description!, style: ds.caption),
                     ],
                   ],
@@ -343,7 +343,7 @@ class DsProgressBar extends StatefulWidget {
 }
 
 class _DsProgressBarState extends State<DsProgressBar> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+  late final AnimationController _controller = AnimationController(vsync: this, duration: Durations.indeterminate);
 
   @override
   void dispose() {
@@ -408,7 +408,7 @@ class _DsProgressBarState extends State<DsProgressBar> with SingleTickerProvider
       children: [
         if (widget.label != null || (determinate && widget.showValue))
           Padding(
-            padding: const EdgeInsets.only(bottom: Spacing.s1 + 2),
+            padding: const EdgeInsets.only(bottom: Spacing.s1h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -421,7 +421,7 @@ class _DsProgressBarState extends State<DsProgressBar> with SingleTickerProvider
         track,
         if (widget.caption != null)
           Padding(
-            padding: const EdgeInsets.only(top: Spacing.s1 + 2),
+            padding: const EdgeInsets.only(top: Spacing.s1h),
             child: Text(widget.caption!, style: ds.caption),
           ),
       ],

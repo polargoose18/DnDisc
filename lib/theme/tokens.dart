@@ -10,6 +10,12 @@ abstract class Spacing {
   static const double s5 = 24;
   static const double s6 = 32;
   static const double s7 = 48;
+
+  // Half steps taken from the web reference (2, 6, 10 and 14px gaps).
+  static const double s0 = 2;
+  static const double s1h = 6;
+  static const double s2h = 10;
+  static const double s3h = 14;
 }
 
 /// `radius-*` tokens. [full] is only for the switch, slider thumb and the
@@ -45,6 +51,11 @@ abstract class Sizes {
   static const double iconLayer = 22;
   static const double sceneThumb = 40;
   static const double catalogCover = 112;
+  static const double catalogFooter = 72;
+  static const double themePreviewHeight = 88;
+  static const double themeCardMin = 180;
+  static const double shortcutRow = 52;
+  static const double catalogCardHeight = 320;
   static const double catalogCardMax = 320;
   static const double catalogCardMin = 240;
   static const double settingsMaxWidth = 880;
@@ -54,6 +65,7 @@ abstract class Sizes {
   static const double sliderTrack = 4;
   static const double sliderThumb = 16;
   static const double sliderValueWidth = 36;
+  static const double sliderValueWide = 64;
   static const double switchWidth = 40;
   static const double switchHeight = 24;
   static const double checkbox = 20;
@@ -69,6 +81,10 @@ abstract class Sizes {
   static const double toastWidth = 360;
   static const double equalizerBar = 3;
   static const double equalizerGap = 2;
+  static const double equalizerRadius = 1;
+  static const double checkboxBorder = 1.5;
+  static const double iconMenu = 18;
+  static const double progressLine = 3;
 }
 
 /// `duration-*` tokens.
@@ -78,6 +94,7 @@ abstract class Durations {
   static const Duration slow = Duration(milliseconds: 320);
   static const Duration tooltipDelay = Duration(milliseconds: 400);
   static const Duration toast = Duration(seconds: 5);
+  static const Duration indeterminate = Duration(milliseconds: 1200);
 }
 
 /// `easing-*` tokens. Named `Easings` to not clash with Flutter's `Curves`.

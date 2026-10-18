@@ -217,19 +217,19 @@ class DsToast extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: Spacing.s2 + 2),
+                padding: const EdgeInsets.only(top: Spacing.s2h),
                 child: DsIcon(icon, color: color),
               ),
               const SizedBox(width: Spacing.s3),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: Spacing.s2 + 2),
+                  padding: const EdgeInsets.symmetric(vertical: Spacing.s2h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(data.title, style: ds.body.copyWith(fontWeight: FontWeight.w500)),
                       if (data.message != null) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: Spacing.s0),
                         Text(data.message!, style: ds.caption),
                       ],
                       if (data.progress != null) ...[

@@ -31,14 +31,14 @@ class _FieldFrame extends StatelessWidget {
       children: [
         if (label != null) ...[
           Text(label!, style: ds.label.copyWith(color: enabled ? ds.text : ds.textDisabled)),
-          const SizedBox(height: Spacing.s1 + 2),
+          const SizedBox(height: Spacing.s1h),
         ],
         child,
         if (error != null) ...[
-          const SizedBox(height: Spacing.s1 + 2),
+          const SizedBox(height: Spacing.s1h),
           Text(error!, style: ds.caption.copyWith(color: ds.danger)),
         ] else if (hint != null) ...[
-          const SizedBox(height: Spacing.s1 + 2),
+          const SizedBox(height: Spacing.s1h),
           Text(hint!, style: ds.caption),
         ],
       ],

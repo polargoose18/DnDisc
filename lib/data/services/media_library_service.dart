@@ -20,6 +20,9 @@ class MediaLibraryService extends ChangeNotifier {
   String _searchQuery = '';
 
   List<LibraryTrack> get tracks => List.unmodifiable(_filteredTracks());
+
+  /// The whole library, ignoring the bus filter and the search (for counts).
+  List<LibraryTrack> get allTracks => List.unmodifiable(_tracks);
   bool get isLoading => _isLoading;
   AudioBusType? get activeBusFilter => _activeBusFilter;
   String get searchQuery => _searchQuery;
@@ -89,23 +92,40 @@ class MediaLibraryService extends ChangeNotifier {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
-      allowedExtensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a'],
+      allowedExtensions: supportedExtensions,
     );
 
     if (result == null || result.files.isEmpty) return [];
 
+    return importPaths(
+      busType: busType,
+      paths: [for (final file in result.files) if (file.path != null) file.path!],
+      defaultTags: defaultTags,
+    );
+  }
+
+  /// Audio file extensions the library accepts.
+  static const List<String> supportedExtensions = ['mp3', 'wav', 'ogg', 'flac', 'm4a'];
+
+  static bool isSupportedFile(String path) =>
+      supportedExtensions.contains(p.extension(path).replaceFirst('.', '').toLowerCase());
+
+  /// Adds files by path (picker result or drag and drop) to the library.
+  Future<List<LibraryTrack>> importPaths({
+    required AudioBusType busType,
+    required List<String> paths,
+    List<String> defaultTags = const [],
+  }) async {
     final importedTracks = <LibraryTrack>[];
 
-    for (final file in result.files) {
-      if (file.path == null) continue;
-
-      final title = p.basenameWithoutExtension(file.path!);
-      final durationMs = await AudioDurationHelper.getDurationMs(file.path!);
+    for (final path in paths) {
+      final title = p.basenameWithoutExtension(path);
+      final durationMs = await AudioDurationHelper.getDurationMs(path);
 
       final track = LibraryTrack(
         id: _uuid.v4(),
         title: title,
-        filePath: file.path!,
+        filePath: path,
         busType: busType,
         tags: List.from(defaultTags),
         colorHex: _getDefaultColorForBus(busType),

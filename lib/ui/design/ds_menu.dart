@@ -88,9 +88,9 @@ class _DsMenuEntryState extends State<_DsMenuEntry> {
             child: Row(
               children: [
                 if (item.icon != null)
-                  DsIcon(item.icon!, size: 18, color: iconColor)
+                  DsIcon(item.icon!, size: Sizes.iconMenu, color: iconColor)
                 else if (widget.reserveIcon)
-                  const SizedBox(width: 18),
+                  const SizedBox(width: Sizes.iconMenu),
                 const SizedBox(width: Spacing.s3),
                 Expanded(child: Text(item.label, style: ds.body.copyWith(color: color), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 if (item.hotkey != null) ...[
@@ -99,7 +99,7 @@ class _DsMenuEntryState extends State<_DsMenuEntry> {
                 ],
                 if (item.checked) ...[
                   const SizedBox(width: Spacing.s3),
-                  DsIcon('check', size: 18, color: ds.primary),
+                  DsIcon('check', size: Sizes.iconMenu, color: ds.primary),
                 ],
               ],
             ),
@@ -153,7 +153,11 @@ class DsMoreButton extends StatelessWidget {
   final ValueChanged<String> onSelected;
   final String label;
 
-  const DsMoreButton({super.key, required this.items, required this.onSelected, required this.label});
+  /// Called with true when the menu opens and false when it closes, so a
+  /// row that shows the button only on hover can keep it while the menu is open.
+  final ValueChanged<bool>? onOpenChanged;
+
+  const DsMoreButton({super.key, required this.items, required this.onSelected, required this.label, this.onOpenChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +167,9 @@ class DsMoreButton extends StatelessWidget {
         iconOnly: true,
         label: label,
         onPressed: () async {
+          onOpenChanged?.call(true);
           final id = await showDsMenuFor(buttonContext, items);
+          onOpenChanged?.call(false);
           if (id != null) onSelected(id);
         },
       ),

@@ -21,10 +21,12 @@ class DsKbd extends StatelessWidget {
     return Container(
       height: Sizes.icon,
       constraints: const BoxConstraints(minWidth: Sizes.icon),
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.s2 - 2),
-      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.s1h),
       decoration: BoxDecoration(color: background ?? ds.surfaceHover, borderRadius: Radii.smAll),
-      child: Text(text, style: ds.caption.copyWith(color: foreground ?? ds.textMuted)),
+      child: Center(
+        widthFactor: 1,
+        child: Text(text, style: ds.caption.copyWith(color: foreground ?? ds.textMuted)),
+      ),
     );
   }
 }
@@ -147,7 +149,7 @@ class DsButton extends StatelessWidget {
           height: height,
           width: onlyIcon ? height : null,
           padding: onlyIcon ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: large ? Spacing.s5 : Spacing.s4),
-          alignment: Alignment.center,
+          alignment: onlyIcon ? Alignment.center : null,
           decoration: BoxDecoration(
             color: _background(ds, states),
             borderRadius: radius,

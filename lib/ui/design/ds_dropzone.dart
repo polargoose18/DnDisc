@@ -61,7 +61,7 @@ class _DsDropzoneState extends State<DsDropzone> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(over ? widget.overTitle : widget.title, style: ds.body.copyWith(fontWeight: FontWeight.w500)),
-            const SizedBox(height: 2),
+            const SizedBox(height: Spacing.s0),
             Text(widget.hint, style: ds.caption, textAlign: widget.compact ? TextAlign.start : TextAlign.center),
           ],
         );
