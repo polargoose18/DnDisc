@@ -326,11 +326,11 @@ void main() {
       themeService.dispose();
     });
 
-    testWidgets('should adapt scene dialog colors and swatches when theme palette is custom preset like emerald forest', (WidgetTester tester) async {
+    testWidgets('should adapt scene dialog colors and swatches when theme palette is custom preset like ancient parchment', (WidgetTester tester) async {
       // Arrange
       final library = MediaLibraryService(autoLoad: false);
-      final themeService = ThemeService(autoLoad: false, initialThemeId: AppThemes.emeraldForestId);
-      themeService.selectTheme(AppThemes.emeraldForestId);
+      final themeService = ThemeService(autoLoad: false, initialThemeId: AppThemes.ancientParchmentId);
+      themeService.selectTheme(AppThemes.ancientParchmentId);
 
       await tester.pumpWidget(
         createM3TestableWidget(
@@ -358,13 +358,13 @@ void main() {
       final dialogFinder = find.byType(Dialog);
       expect(dialogFinder, findsOneWidget);
       final dialogWidget = tester.widget<Dialog>(dialogFinder);
-      expect(dialogWidget.backgroundColor, equals(AppThemes.emeraldForest.surface));
+      expect(dialogWidget.backgroundColor, equals(AppThemes.ancientParchment.surface));
 
       final l10n = AppLocalizationsEn();
       final nameFieldFinder = find.widgetWithText(TextField, l10n.sceneNameLabel);
       expect(nameFieldFinder, findsOneWidget);
       final nameFieldWidget = tester.widget<TextField>(nameFieldFinder);
-      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.emeraldForest.card));
+      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.ancientParchment.card));
 
       library.dispose();
       themeService.dispose();

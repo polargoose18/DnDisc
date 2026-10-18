@@ -57,7 +57,12 @@ class ThemeService extends ChangeNotifier {
     if (db == null) return;
     try {
       final saved = await db.getSetting(_kActiveThemeKey);
-      if (saved != null && saved.isNotEmpty) {
+      if (saved != null && AppThemes.removedPresetIds.contains(saved)) {
+        _activeThemeId = AppThemes.deepDarkId;
+        LoggerService().info('ThemeService: Saved theme "$saved" was removed, falling back to Deep Dark');
+        await db.setSetting(_kActiveThemeKey, _activeThemeId);
+        notifyListeners();
+      } else if (saved != null && saved.isNotEmpty) {
         _activeThemeId = saved;
         LoggerService().info('ThemeService: Restored active theme "$saved" from storage');
         notifyListeners();

@@ -131,7 +131,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get themesTitle => 'Темы оформления (Themes)';
 
   @override
-  String get builtinThemes => 'Встроенные пресеты (5 вариантов)';
+  String get builtinThemes => 'Встроенные пресеты (3 варианта)';
 
   @override
   String get customThemes => 'Пользовательские темы';

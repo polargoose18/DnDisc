@@ -159,8 +159,8 @@ void main() {
       expect(viewModel.currentThemeData, isNotNull);
 
       // Act & Assert - Theme selection
-      viewModel.selectTheme(AppThemes.emeraldForestId);
-      expect(viewModel.activeTheme.id, equals(AppThemes.emeraldForestId));
+      viewModel.selectTheme(AppThemes.ancientParchmentId);
+      expect(viewModel.activeTheme.id, equals(AppThemes.ancientParchmentId));
     });
 
     test('should reflect active theme updates when ThemeService is injected into ThemeViewModel', () async {
@@ -172,11 +172,11 @@ void main() {
       viewModel.addListener(() => notifyCount++);
 
       // Act
-      service.selectTheme(AppThemes.crimsonDungeonId);
+      service.selectTheme(AppThemes.cleanLightId);
 
       // Assert
       expect(notifyCount, greaterThan(0));
-      expect(viewModel.activeThemeId, equals(AppThemes.crimsonDungeonId));
+      expect(viewModel.activeThemeId, equals(AppThemes.cleanLightId));
     });
   });
 }
