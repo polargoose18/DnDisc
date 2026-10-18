@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../l10n/app_localizations.dart';
-import '../../domain/models/scene_repository_model.dart';
 import '../../data/services/scene_repository_network_service.dart';
+import '../../domain/models/scene_repository_model.dart';
+import '../../l10n/app_localizations.dart';
+import '../../theme/ds_theme.dart';
+import '../../theme/tokens.dart';
+import '../design/ds_button.dart';
+import '../design/ds_controls.dart';
+import '../design/ds_dialog.dart';
+import '../design/ds_icon.dart';
+import '../design/scene_cover.dart';
+import '../design/toast.dart';
+import '../screens/repository_catalog_screen.dart';
 import '../view_models/media_library_view_model.dart';
 import '../view_models/repository_view_model.dart';
 import '../view_models/scene_view_model.dart';
-import '../screens/repository_catalog_screen.dart';
+import 'catalog_card.dart';
 
+/// Details of a catalog item: cover, description, what it contains and the
+/// install or remove action. Results are reported with toasts.
 class SceneRepositoryDetailsDialog extends StatelessWidget {
   final CatalogItem catalogItem;
   final SceneRepositoryModel repo;
@@ -17,433 +28,201 @@ class SceneRepositoryDetailsDialog extends StatelessWidget {
     CatalogItem? item,
     RepositorySceneItem? legacySceneItem,
     required this.repo,
-  })  : catalogItem = item ?? CatalogItem.fromScene(legacySceneItem!);
+  }) : catalogItem = item ?? CatalogItem.fromScene(legacySceneItem!);
 
-  String _formatDuration(int? durationMs) {
-    if (durationMs == null) return '--:--';
-    final duration = Duration(milliseconds: durationMs);
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    if (duration.inHours > 0) {
-      return '${duration.inHours}:$minutes:$seconds';
-    }
-    return '$minutes:$seconds';
+  String _duration(int? durationMs) {
+    if (durationMs == null || durationMs <= 0) return '';
+    final d = Duration(milliseconds: durationMs);
+    return '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
-  String _formatSize(int? bytes, AppLocalizations? l10n) {
-    if (bytes == null || bytes <= 0) return l10n?.sizeUnknown ?? 'Size unknown';
-    final mb = bytes / (1024 * 1024);
-    return l10n?.sizeMb(mb.toStringAsFixed(1)) ?? '${mb.toStringAsFixed(1)} MB';
-  }
+  String _busIcon(String bus) => switch (bus.toLowerCase()) {
+        'music' => 'music',
+        'ambient' => 'waves',
+        'sfx' => 'bolt',
+        _ => 'music',
+      };
 
-  IconData _getBusIcon(String busType) {
-    switch (busType.toLowerCase()) {
-      case 'music':
-        return Icons.music_note_rounded;
-      case 'ambient':
-        return Icons.nature_people_rounded;
-      case 'sfx':
-        return Icons.graphic_eq_rounded;
-      default:
-        return Icons.audiotrack_rounded;
-    }
-  }
-
-  Color _getBusColor(String busType, ThemeData theme) {
-    switch (busType.toLowerCase()) {
-      case 'music':
-        return Colors.purpleAccent;
-      case 'ambient':
-        return Colors.tealAccent;
-      case 'sfx':
-        return Colors.orangeAccent;
-      default:
-        return theme.colorScheme.primary;
-    }
-  }
-
-  Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    final typeName = catalogItem.type.getLocalizedAccusativeName(l10n);
-
-    return showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n?.deleteItemConfirmTitle(typeName) ?? 'Delete $typeName?'),
-        content: Text(
-          l10n?.deleteItemConfirmMessage(typeName, catalogItem.name) ??
-              'Are you sure you want to delete $typeName "${catalogItem.name}" and associated files from the application?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n?.cancel ?? 'Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.error,
-              foregroundColor: theme.colorScheme.onError,
-            ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n?.delete ?? 'Delete'),
-          ),
-        ],
-      ),
-    );
-  }
+  String _busLabel(AppLocalizations l10n, String bus) => switch (bus.toLowerCase()) {
+        'music' => l10n.music,
+        'ambient' => l10n.ambient,
+        'sfx' => l10n.sfx,
+        _ => bus,
+      };
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
     final vm = context.watch<RepositoryViewModel>();
     final sceneVm = context.watch<SceneViewModel>();
     final mediaVm = context.watch<MediaLibraryViewModel>();
+    final toasts = context.read<ToastController?>();
 
-    final isDownloading = vm.downloadingSceneIds.contains(catalogItem.id);
+    final downloading = vm.downloadingSceneIds.contains(catalogItem.id);
     final progress = vm.downloadProgress[catalogItem.id] ?? 0.0;
-
-    final isInstalled = isCatalogItemInstalled(
-      item: catalogItem,
-      sceneVm: sceneVm,
-      mediaVm: mediaVm,
-    );
-
-    final typeName = catalogItem.type.getLocalizedAccusativeName(l10n);
-    final typeDisplayName = catalogItem.type.getLocalizedName(l10n);
-
-    final headerColor = catalogItem.colorHex != null ? Color(catalogItem.colorHex!) : theme.colorScheme.primary;
+    final installed = isCatalogItemInstalled(item: catalogItem, sceneVm: sceneVm, mediaVm: mediaVm);
 
     final coverUrl = catalogItem.coverUrl != null && catalogItem.coverUrl!.isNotEmpty
         ? SceneRepositoryNetworkService.resolveUrl(repo.url, catalogItem.coverUrl!)
         : null;
 
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
-        child: Column(
-          children: [
-            // Header Banner
-            Container(
-              height: 140,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: headerColor,
-                gradient: coverUrl == null
-                    ? LinearGradient(
-                        colors: [headerColor.withValues(alpha: 0.8), headerColor],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                    : null,
-              ),
-              child: Stack(
-                children: [
-                  if (coverUrl != null)
-                    Positioned.fill(
-                      child: Image.network(
-                        coverUrl,
-                        fit: BoxFit.cover,
-                        color: Colors.black.withValues(alpha: 0.55),
-                        colorBlendMode: BlendMode.darken,
-                        errorBuilder: (ctx, err, stack) => const SizedBox.shrink(),
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.black45,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                catalogItem.type.getLocalizedBadge(l10n),
-                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                catalogItem.name,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close, color: Colors.white),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          l10n?.repositoryLabel(repo.name) ?? 'Repository: ${repo.name}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.85),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    final tracks = catalogItem.type == CatalogItemType.scene
+        ? catalogItem.sceneItem?.tracks
+        : (catalogItem.type == CatalogItemType.media ? catalogItem.mediaItem?.tracks : null);
+    final scenes = catalogItem.type == CatalogItemType.pack ? catalogItem.packItem?.scenes : null;
 
-            // Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+    final contentTitle = switch (catalogItem.type) {
+      CatalogItemType.pack => l10n.scenesInPack,
+      CatalogItemType.media => l10n.mediaSetContent,
+      CatalogItemType.scene => l10n.sceneContent,
+    };
+
+    Widget row(String icon, String title, String meta) => Container(
+          constraints: const BoxConstraints(minHeight: Sizes.rowMin),
+          padding: const EdgeInsets.symmetric(vertical: Spacing.s2),
+          child: Row(
+            children: [
+              Container(
+                width: Sizes.sceneThumb,
+                height: Sizes.sceneThumb,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: ds.surfaceRaised,
+                  borderRadius: Radii.mdAll,
+                  border: Border.all(color: ds.border, width: Sizes.borderWidth),
+                ),
+                child: DsIcon(icon),
+              ),
+              const SizedBox(width: Spacing.s3),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (catalogItem.description != null && catalogItem.description!.isNotEmpty) ...[
-                      Text(
-                        catalogItem.description!,
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Chip(
-                          avatar: const Icon(Icons.folder_zip_outlined, size: 18),
-                          label: Text(_formatSize(catalogItem.sizeBytes, l10n)),
-                        ),
-                        if (catalogItem.type == CatalogItemType.pack) ...[
-                          Chip(
-                            avatar: const Icon(Icons.style_rounded, size: 18),
-                            label: Text(
-                              l10n?.scenesCount(catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0) ??
-                                  '${catalogItem.packItem?.scenesCount ?? catalogItem.packItem?.scenes.length ?? 0} scenes',
-                            ),
-                          ),
-                          Chip(
-                            avatar: const Icon(Icons.audiotrack, size: 18),
-                            label: Text(l10n?.tracksCount(catalogItem.tracksCount) ?? '${catalogItem.tracksCount} tracks'),
-                          ),
-                        ] else ...[
-                          Chip(
-                            avatar: const Icon(Icons.audiotrack, size: 18),
-                            label: Text(l10n?.tracksCount(catalogItem.tracksCount) ?? '${catalogItem.tracksCount} tracks'),
-                          ),
-                        ],
-                        if (isInstalled)
-                          Chip(
-                            avatar: const Icon(Icons.check_circle_rounded, size: 18, color: Colors.tealAccent),
-                            label: Text(l10n?.installedBadge ?? 'Installed', style: const TextStyle(color: Colors.tealAccent)),
-                            backgroundColor: Colors.teal,
-                          ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-                    Text(
-                      catalogItem.type == CatalogItemType.pack
-                          ? (l10n?.scenesInPack ?? 'Scenes in Pack')
-                          : (catalogItem.type == CatalogItemType.media
-                              ? (l10n?.mediaSetContent ?? 'Media Package Content')
-                              : (l10n?.sceneContent ?? 'Scene Content')),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Divider(),
-
-                    if (catalogItem.type == CatalogItemType.scene && (catalogItem.sceneItem?.tracks.isEmpty ?? true))
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Text(l10n?.tracksMissingInManifest ?? 'Track list is missing from manifest.'),
-                      )
-                    else if (catalogItem.type == CatalogItemType.scene)
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: catalogItem.sceneItem!.tracks.length,
-                        itemBuilder: (context, index) {
-                          final track = catalogItem.sceneItem!.tracks[index];
-                          final busColor = _getBusColor(track.busType, theme);
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: CircleAvatar(
-                              backgroundColor: busColor.withValues(alpha: 0.2),
-                              child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
-                            ),
-                            title: Text(track.title),
-                            subtitle: Text(l10n?.channelLabel(track.busType.toUpperCase()) ?? 'Channel: ${track.busType.toUpperCase()}'),
-                            trailing: Text(_formatDuration(track.durationMs)),
-                          );
-                        },
-                      )
-                    else if (catalogItem.type == CatalogItemType.media && (catalogItem.mediaItem?.tracks.isEmpty ?? true))
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Text(l10n?.tracksMissingInManifest ?? 'Track list is missing from manifest.'),
-                      )
-                    else if (catalogItem.type == CatalogItemType.media)
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: catalogItem.mediaItem!.tracks.length,
-                        itemBuilder: (context, index) {
-                          final track = catalogItem.mediaItem!.tracks[index];
-                          final busColor = _getBusColor(track.busType, theme);
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: CircleAvatar(
-                              backgroundColor: busColor.withValues(alpha: 0.2),
-                              child: Icon(_getBusIcon(track.busType), color: busColor, size: 20),
-                            ),
-                            title: Text(track.title),
-                            subtitle: Text(l10n?.channelLabel(track.busType.toUpperCase()) ?? 'Channel: ${track.busType.toUpperCase()}'),
-                            trailing: Text(_formatDuration(track.durationMs)),
-                          );
-                        },
-                      )
-                    else if (catalogItem.type == CatalogItemType.pack && (catalogItem.packItem?.scenes.isEmpty ?? true))
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Text(l10n?.scenesMissingInManifest ?? 'Scene list is missing from manifest.'),
-                      )
-                    else if (catalogItem.type == CatalogItemType.pack)
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: catalogItem.packItem!.scenes.length,
-                        itemBuilder: (context, index) {
-                          final sceneSummary = catalogItem.packItem!.scenes[index];
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const CircleAvatar(
-                              child: Icon(Icons.theater_comedy_rounded, size: 20),
-                            ),
-                            title: Text(sceneSummary.name),
-                            subtitle: Text(l10n?.tracksCount(sceneSummary.tracksCount ?? 0) ?? '${sceneSummary.tracksCount ?? 0} tracks'),
-                          );
-                        },
-                      ),
+                    Text(title, style: ds.body.copyWith(fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(meta, style: ds.tabular(ds.caption), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
-            ),
+            ],
+          ),
+        );
 
-            // Footer (Install / Delete Actions)
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                border: Border(top: BorderSide(color: theme.dividerColor)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (isDownloading) ...[
-                    LinearProgressIndicator(value: progress > 0 ? progress : null),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n?.downloadingAndImporting((progress * 100).toStringAsFixed(0)) ??
-                          'Downloading and importing... ${(progress * 100).toStringAsFixed(0)}%',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: isInstalled
-                        ? ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.error,
-                              foregroundColor: theme.colorScheme.onError,
-                            ),
-                            onPressed: isDownloading
-                                ? null
-                                : () async {
-                                    final confirm = await _showDeleteConfirmationDialog(context);
-                                    if (confirm == true) {
-                                      final success = await vm.uninstallCatalogItem(
-                                        item: catalogItem,
-                                        sceneVm: sceneVm,
-                                        mediaVm: mediaVm,
-                                      );
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              success
-                                                  ? (l10n?.itemUninstalled(typeDisplayName, catalogItem.name) ??
-                                                      '$typeDisplayName "${catalogItem.name}" was successfully removed from the application.')
-                                                  : (l10n?.itemUninstallError(typeDisplayName) ??
-                                                      'Error removing ${typeDisplayName.toLowerCase()}.'),
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  },
-                            icon: const Icon(Icons.delete_outline_rounded),
-                            label: Text(l10n?.removeFromApp(typeName) ?? 'Delete $typeName'),
-                          )
-                        : ElevatedButton.icon(
-                            onPressed: isDownloading
-                                ? null
-                                : () async {
-                                    final success = await vm.downloadAndInstallCatalogItem(
-                                      item: catalogItem,
-                                      repo: repo,
-                                      onInstalled: () async {
-                                        await sceneVm.loadScenes(force: true);
-                                        await mediaVm.loadTracks(force: true);
-                                      },
-                                    );
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            success
-                                                ? (l10n?.itemInstalled(typeDisplayName, catalogItem.name) ??
-                                                    '$typeDisplayName "${catalogItem.name}" was successfully installed!')
-                                                : (l10n?.itemInstallError(typeDisplayName) ??
-                                                    'Error downloading ${typeDisplayName.toLowerCase()}.'),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
-                            icon: Icon(
-                              isDownloading
-                                  ? Icons.hourglass_top_rounded
-                                  : Icons.download_rounded,
-                            ),
-                            label: Text(
-                              isDownloading
-                                  ? (l10n?.installing ?? 'Installing...')
-                                  : (l10n?.installItem(typeName) ?? 'Install $typeName'),
-                            ),
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+    final List<Widget> content;
+    if ((tracks == null && scenes == null) || (tracks?.isEmpty ?? scenes!.isEmpty)) {
+      content = [
+        Text(
+          scenes != null ? l10n.scenesMissingInManifest : l10n.tracksMissingInManifest,
+          style: ds.body.copyWith(color: ds.textMuted),
         ),
+      ];
+    } else if (tracks != null) {
+      content = [
+        for (final t in tracks)
+          row(_busIcon(t.busType), t.title, [_busLabel(l10n, t.busType), _duration(t.durationMs)].where((e) => e.isNotEmpty).join(' · ')),
+      ];
+    } else {
+      content = [
+        for (final s in scenes!) row('scene', s.name, l10n.tracksCount(s.tracksCount ?? 0)),
+      ];
+    }
+
+    return DsDialog(
+      title: catalogItem.name,
+      description: l10n.repositoryLabel(repo.name),
+      icon: catalogKindIcon(catalogItem.type),
+      closeLabel: l10n.close,
+      actions: [
+        DsButton.ghost(label: l10n.close, onPressed: () => Navigator.of(context).pop()),
+        if (installed)
+          DsButton.danger(
+            key: const ValueKey('details_remove_btn'),
+            label: l10n.removeFromApp,
+            icon: 'trash',
+            onPressed: downloading
+                ? null
+                : () async {
+                    final confirmed = await confirmDelete(
+                      context,
+                      title: l10n.removeItemTitle(catalogItem.name),
+                      message: l10n.removeItemMessage,
+                      confirmLabel: l10n.delete,
+                      cancelLabel: l10n.cancel,
+                      closeLabel: l10n.close,
+                    );
+                    if (!confirmed) return;
+                    final ok = await vm.uninstallCatalogItem(item: catalogItem, sceneVm: sceneVm, mediaVm: mediaVm);
+                    if (ok) {
+                      toasts?.show(title: l10n.toastRemoved, message: catalogItem.name);
+                    } else {
+                      toasts?.error(l10n.toastRemoveFailed, message: catalogItem.name);
+                    }
+                  },
+          )
+        else
+          DsButton.primary(
+            key: const ValueKey('details_install_btn'),
+            label: l10n.installItem,
+            icon: 'download',
+            onPressed: downloading
+                ? null
+                : () async {
+                    final ok = await vm.downloadAndInstallCatalogItem(
+                      item: catalogItem,
+                      repo: repo,
+                      onInstalled: () async {
+                        await sceneVm.loadScenes(force: true);
+                        await mediaVm.loadTracks(force: true);
+                      },
+                    );
+                    if (ok) {
+                      toasts?.success(l10n.toastInstalled, message: catalogItem.name);
+                    } else {
+                      toasts?.error(l10n.toastInstallFailed, message: l10n.toastInstallFailedHint);
+                    }
+                  },
+          ),
+      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ClipRRect(
+            borderRadius: Radii.mdAll,
+            child: coverUrl == null
+                ? SceneCover(seed: catalogItem.name, height: Sizes.catalogCover)
+                : SizedBox(
+                    height: Sizes.catalogCover,
+                    child: Image.network(
+                      coverUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => SceneCover(seed: catalogItem.name, height: Sizes.catalogCover),
+                    ),
+                  ),
+          ),
+          if (catalogItem.description != null && catalogItem.description!.isNotEmpty) ...[
+            const SizedBox(height: Spacing.s4),
+            Text(catalogItem.description!, style: ds.body),
+          ],
+          const SizedBox(height: Spacing.s4),
+          Wrap(
+            spacing: Spacing.s2,
+            runSpacing: Spacing.s2,
+            children: [
+              DsChip(formatMegabytes(l10n, catalogItem.sizeBytes)),
+              DsChip(catalogCountLabel(l10n, catalogItem)),
+              if (catalogItem.type == CatalogItemType.pack) DsChip(l10n.tracksCount(catalogItem.tracksCount)),
+              if (installed) DsBadge(l10n.installedBadge, tone: DsTone.success),
+            ],
+          ),
+          if (downloading) ...[
+            const SizedBox(height: Spacing.s4),
+            DsProgressBar(value: progress > 0 ? progress : null, label: l10n.downloadingLabel),
+          ],
+          const SizedBox(height: Spacing.s5),
+          Text(contentTitle, style: ds.title),
+          const SizedBox(height: Spacing.s2),
+          ...content,
+        ],
       ),
     );
   }

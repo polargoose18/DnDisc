@@ -1,290 +1,267 @@
-import '../../theme/ds_theme.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart' hide Durations;
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../../l10n/app_localizations.dart';
 import '../../audio/sfx_bus_controller.dart';
-import '../../domain/models/sfx_trigger.dart';
 import '../../domain/models/library_track.dart';
-import '../../ui/view_models/media_library_view_model.dart';
-import '../../ui/view_models/theme_view_model.dart';
-import '../../domain/models/custom_theme_model.dart';
-import '../../theme/app_themes.dart';
+import '../../domain/models/sfx_trigger.dart';
+import '../../l10n/app_localizations.dart';
+import '../../theme/ds_theme.dart';
+import '../../theme/icons.dart';
+import '../../theme/tokens.dart';
+import '../design/ds_button.dart';
+import '../design/ds_controls.dart';
+import '../design/ds_dashed.dart';
+import '../design/ds_dialog.dart';
+import '../design/ds_icon.dart';
+import '../design/ds_icon_picker.dart';
+import '../design/ds_interactive.dart';
+import '../design/ds_menu.dart';
+import '../design/ds_panel.dart';
+import '../design/ds_tooltip.dart';
+import '../design/equalizer_bars.dart';
+import '../view_models/media_library_view_model.dart';
+import 'track_pick_list.dart';
 
+/// SFX panel: a grid of square tiles filling the column, an empty slot to add
+/// a sound as the last tile. Tile `n` (1-9) answers to the key `n`.
 class SoundboardGrid extends StatelessWidget {
   const SoundboardGrid({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
-      (vm) => vm?.activeTheme ?? AppThemes.deepDark,
+    final l10n = AppLocalizations.of(context)!;
+    final sfx = context.watch<SfxBusController>();
+    final library = context.watch<MediaLibraryViewModel>();
+    final triggers = sfx.triggers;
+
+    Duration durationOf(SfxTrigger t) {
+      for (final track in library.tracks) {
+        if (track.id == t.id) return Duration(milliseconds: track.durationMs);
+      }
+      return Duration.zero;
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bounded = constraints.hasBoundedHeight;
+        return DsPanel(
+          expand: bounded,
+          title: l10n.soundboardTitle,
+          icon: 'bolt',
+          trailing: const DsKbd('1–9'),
+          child: LayoutBuilder(
+            builder: (context, c) {
+              const gap = Spacing.s2;
+              final columns = ((c.maxWidth + gap) / (Sizes.sfxTileMin + gap)).floor().clamp(1, 12);
+              final tiles = <Widget>[
+                for (final (index, trigger) in triggers.indexed)
+                  SfxTile(
+                    key: ValueKey('sfx_btn_${trigger.id}'),
+                    trigger: trigger,
+                    hotkey: index < 9 ? '${index + 1}' : null,
+                    duration: durationOf(trigger),
+                    sfx: sfx,
+                  ),
+                _EmptySlot(
+                  key: const ValueKey('add_sfx_trigger_btn'),
+                  label: l10n.addSfxSlot,
+                  onTap: () => showAddSfxDialog(context, sfx),
+                ),
+              ];
+              return GridView.count(
+                crossAxisCount: columns,
+                mainAxisSpacing: gap,
+                crossAxisSpacing: gap,
+                shrinkWrap: !bounded,
+                physics: bounded ? null : const NeverScrollableScrollPhysics(),
+                children: tiles,
+              );
+            },
+          ),
+        );
+      },
     );
-    final l10n = AppLocalizations.of(context);
+  }
+}
 
-    return Consumer<SfxBusController>(
-      builder: (context, sfx, _) {
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with Add SFX Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Icon(Icons.campaign_rounded, color: activeTheme.primary),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              l10n?.soundboardTitle ?? 'Soundboard (SFX Effects)',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.2,
-                                color: activeTheme.textPrimary,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      key: const ValueKey('add_sfx_trigger_btn'),
-                      icon: const Icon(Icons.add_rounded, size: 20),
-                      tooltip: l10n?.addSfxTooltip ?? 'Add SFX / Persistent Button',
-                      color: activeTheme.primary,
-                      onPressed: () => _showAddSfxDialog(context, sfx),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
+/// One-shot sound tile. While a sound plays the tile shows `primary-subtle`,
+/// a progress line and an equalizer in place of the key.
+class SfxTile extends StatefulWidget {
+  final SfxTrigger trigger;
+  final String? hotkey;
+  final Duration duration;
+  final SfxBusController sfx;
 
-                // Volume slider for SFX
-                Row(
-                  children: [
-                    Icon(Icons.volume_down, size: 16, color: activeTheme.textSecondary),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n?.sfxVolume ?? 'SFX Volume: ',
-                      style: TextStyle(fontSize: 12, color: activeTheme.textSecondary),
-                    ),
-                    Expanded(
-                      child: Slider(
-                        value: sfx.rawVolume,
-                        activeColor: activeTheme.primary,
-                        onChanged: (val) => sfx.setVolume(val),
-                      ),
-                    ),
-                    Text(
-                      '${(sfx.rawVolume * 100).toInt()}%',
-                      style: TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 12, color: activeTheme.textSecondary),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
+  const SfxTile({super.key, required this.trigger, required this.hotkey, required this.duration, required this.sfx});
 
-                if (sfx.triggers.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: activeTheme.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
-                      ),
-                    ),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            l10n?.soundboardEmpty ?? 'Soundboard is empty. Add SFX or persistent quick buttons.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-                          ),
-                          const SizedBox(height: 8),
-                          TextButton.icon(
-                            icon: const Icon(Icons.add_circle_outline, size: 16),
-                            label: Text(l10n?.addPersistentSfx ?? 'Add Persistent SFX'),
-                            onPressed: () => _showAddSfxDialog(context, sfx),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 1.0,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: sfx.triggers.length,
-                    itemBuilder: (context, index) {
-                      final trigger = sfx.triggers[index];
-                      final sfxIcon = _getSfxIcon(trigger.title, index);
+  @override
+  State<SfxTile> createState() => _SfxTileState();
+}
 
-                      return InkWell(
-                        key: ValueKey('sfx_btn_${trigger.id}'),
-                        onTap: () => sfx.triggerSfx(trigger.id),
-                        onLongPress: () => sfx.togglePersistent(trigger.id),
-                        onSecondaryTap: () => _showTriggerOptions(context, sfx, trigger),
-                        borderRadius: BorderRadius.circular(12),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: activeTheme.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: trigger.isPersistent
-                                  ? Colors.amberAccent.withValues(alpha: 0.6)
-                                  : (activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08)),
-                              width: trigger.isPersistent ? 1.5 : 1.0,
-                            ),
-                            boxShadow: trigger.isPersistent
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.amberAccent.withValues(alpha: 0.12),
-                                      blurRadius: 6,
-                                      spreadRadius: 1,
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                sfxIcon,
-                                size: 32,
-                                color: trigger.isPersistent
-                                    ? Colors.amberAccent
-                                    : activeTheme.primary,
-                              ),
-                              const SizedBox(height: 8),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: Text(
-                                  trigger.title,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                    color: activeTheme.textPrimary,
-                                    letterSpacing: -0.1,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
+class _SfxTileState extends State<SfxTile> with SingleTickerProviderStateMixin {
+  late final AnimationController _progress = AnimationController(vsync: this);
+  bool _playing = false;
+
+  @override
+  void dispose() {
+    _progress.dispose();
+    super.dispose();
+  }
+
+  // The bus does not report playback of a single tile, so the tile follows
+  // the length of the file (or runs until the next press for a loop).
+  void _trigger() {
+    widget.sfx.triggerSfx(widget.trigger.id);
+    if (widget.trigger.isLoop) {
+      setState(() => _playing = !_playing);
+      return;
+    }
+    final length = widget.duration > Durations.slow ? widget.duration : Durations.slow;
+    setState(() => _playing = true);
+    _progress.duration = length;
+    _progress.forward(from: 0).whenComplete(() {
+      if (mounted && _progress.isCompleted) setState(() => _playing = false);
+    });
+  }
+
+  List<DsMenuItem> _items(AppLocalizations l10n) => [
+        DsMenuItem(id: 'pin', label: widget.trigger.isPersistent ? l10n.unpinSfx : l10n.pinSfx, icon: 'pin', checked: widget.trigger.isPersistent),
+        DsMenuItem(id: 'loop', label: l10n.loopModeCheckbox, icon: 'loop', checked: widget.trigger.isLoop),
+        const DsMenuItem.separator(),
+        DsMenuItem(id: 'remove', label: l10n.deleteSfxButton, icon: 'trash', danger: true),
+      ];
+
+  void _select(String id) {
+    switch (id) {
+      case 'pin':
+        widget.sfx.togglePersistent(widget.trigger.id);
+      case 'loop':
+        widget.sfx.toggleTriggerLoop(widget.trigger.id);
+        if (widget.trigger.isLoop) setState(() => _playing = false);
+      case 'remove':
+        widget.sfx.removeTrigger(widget.trigger.id);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
+    final trigger = widget.trigger;
+
+    return DsInteractive(
+      onTap: _trigger,
+      semanticLabel: trigger.title,
+      onLongPress: () async {
+        final id = await showDsMenuFor(context, _items(l10n));
+        if (id != null) _select(id);
+      },
+      onSecondaryTapUp: (d) async {
+        final id = await showDsMenuAt(context, d.globalPosition, _items(l10n));
+        if (id != null) _select(id);
+      },
+      builder: (context, s) {
+        final background = _playing || s.pressed ? ds.primarySubtle : (s.hovered ? ds.surfaceHover : ds.surfaceRaised);
+        return DsTooltip(
+          hoverOnly: true,
+          label: trigger.title,
+          child: AnimatedContainer(
+            duration: Durations.fast,
+            curve: Curves.easeOut,
+            constraints: const BoxConstraints(minWidth: Sizes.sfxTileMin, minHeight: Sizes.sfxTileMin),
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: Radii.mdAll,
+              border: Border.all(color: _playing || s.pressed ? ds.primary : ds.border, width: Sizes.borderWidth),
+            ),
+            child: ClipRRect(
+              borderRadius: Radii.mdAll,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(Spacing.s3),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            DsIcon(DnDiscIcons.resolve(trigger.iconName, DnDiscIcons.defaultSfx), size: Sizes.iconLg, color: _playing ? ds.primary : ds.textMuted),
+                            const Spacer(),
+                            if (trigger.isPersistent) ...[
+                              DsIcon('pin', size: Sizes.iconSm, color: ds.primary),
+                              const SizedBox(width: Spacing.s1),
                             ],
+                            if (_playing)
+                              const EqualizerBars(active: true, bars: 3, height: Spacing.s3)
+                            else if (widget.hotkey != null)
+                              DsKbd(widget.hotkey!),
+                          ],
+                        ),
+                        const Spacer(),
+                        Text(trigger.title, style: ds.label, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  if (_playing && !trigger.isLoop)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: AnimatedBuilder(
+                        animation: _progress,
+                        builder: (context, _) => Align(
+                          alignment: Alignment.centerLeft,
+                          child: FractionallySizedBox(
+                            widthFactor: _progress.value,
+                            child: Container(height: Sizes.progressLine, color: ds.primary),
                           ),
                         ),
-                      );
-                    },
-                  ),
-              ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
+}
 
-  void _showTriggerOptions(BuildContext context, SfxBusController sfx, SfxTrigger trigger) {
-    final l10n = AppLocalizations.of(context);
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(trigger.isPersistent ? Icons.push_pin_rounded : Icons.push_pin_outlined, color: Colors.amberAccent),
-              title: Text(trigger.isPersistent
-                  ? (l10n?.unpinSfx ?? 'Unpin (make temporary)')
-                  : (l10n?.pinSfx ?? 'Pin as persistent SFX')),
-              onTap: () {
-                sfx.togglePersistent(trigger.id);
-                Navigator.of(ctx).pop();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              title: Text(l10n?.deleteSfxButton ?? 'Delete SFX button', style: const TextStyle(color: Colors.redAccent)),
-              onTap: () {
-                sfx.removeTrigger(trigger.id);
-                Navigator.of(ctx).pop();
-              },
-            ),
-          ],
+class _EmptySlot extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _EmptySlot({super.key, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final ds = context.ds;
+    return DsInteractive(
+      onTap: onTap,
+      semanticLabel: label,
+      builder: (context, s) => DecoratedBox(
+        decoration: DsDashedDecoration(
+          color: s.hovered ? ds.surfaceRaised : Palette.transparent,
+          border: ds.borderStrong,
+          dashed: true,
+          radius: Radii.md,
         ),
+        child: Center(child: DsIcon('plus', size: Sizes.iconLg, color: s.hovered ? ds.text : ds.textMuted)),
       ),
-    );
-  }
-
-  IconData _getSfxIcon(String title, int index) {
-    final lower = title.toLowerCase();
-    if (lower.contains('sword') || lower.contains('attack') || lower.contains('hit') || lower.contains('slash') || lower.contains('clash')) {
-      return Icons.hardware_rounded;
-    }
-    if (lower.contains('coin') || lower.contains('gold') || lower.contains('chest')) {
-      return Icons.monetization_on_rounded;
-    }
-    if (lower.contains('roar') || lower.contains('monster') || lower.contains('dragon') || lower.contains('beast')) {
-      return Icons.pets_rounded;
-    }
-    if (lower.contains('spell') || lower.contains('magic') || lower.contains('cast') || lower.contains('fire')) {
-      return Icons.auto_awesome_rounded;
-    }
-    if (lower.contains('foot') || lower.contains('walk') || lower.contains('step')) {
-      return Icons.directions_walk_rounded;
-    }
-    if (lower.contains('shield') || lower.contains('defend') || lower.contains('block')) {
-      return Icons.shield_rounded;
-    }
-    if (lower.contains('horn') || lower.contains('trumpet') || lower.contains('alarm')) {
-      return Icons.campaign_rounded;
-    }
-    if (lower.contains('potion') || lower.contains('heal') || lower.contains('drink')) {
-      return Icons.local_drink_rounded;
-    }
-    if (lower.contains('dice') || lower.contains('roll')) {
-      return Icons.casino_rounded;
-    }
-    const icons = [
-      Icons.flash_on_rounded,
-      Icons.auto_awesome,
-      Icons.hardware_rounded,
-      Icons.shield_rounded,
-      Icons.campaign_rounded,
-      Icons.casino_rounded,
-    ];
-    return icons[index % icons.length];
-  }
-
-  void _showAddSfxDialog(BuildContext context, SfxBusController sfx) {
-    showDialog(
-      context: context,
-      builder: (ctx) => _AddSfxTriggerDialog(sfx: sfx),
     );
   }
 }
 
+Future<void> showAddSfxDialog(BuildContext context, SfxBusController sfx) {
+  return showDsDialog<void>(context: context, builder: (_) => _AddSfxTriggerDialog(sfx: sfx));
+}
+
 class _AddSfxTriggerDialog extends StatefulWidget {
   final SfxBusController sfx;
+
   const _AddSfxTriggerDialog({required this.sfx});
 
   @override
@@ -292,144 +269,113 @@ class _AddSfxTriggerDialog extends StatefulWidget {
 }
 
 class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
-  LibraryTrack? _selectedTrack;
-  String _customPath = '';
-  String _customTitle = '';
-  double _volume = 1.0;
-  bool _isPersistent = true;
-  String? _hotkey;
+  LibraryTrack? _track;
+  String _path = '';
+  String _title = '';
+  String _icon = DnDiscIcons.defaultSfx;
+  bool _persistent = true;
+  bool _loop = false;
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['wav', 'mp3', 'ogg', 'flac', 'm4a'],
+    );
+    final file = result?.files.single;
+    if (file?.path == null) return;
+    setState(() {
+      _track = null;
+      _path = file!.path!;
+      _title = file.name.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
     final library = context.watch<MediaLibraryViewModel>();
-    final themeViewModel = context.watch<ThemeViewModel?>();
-    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
-    final sfxTracks = library.tracks.where((t) => t.busType == AudioBusType.sfx).toList();
+    final tracks = library.tracks.where((t) => t.busType == AudioBusType.sfx).toList();
 
-    final l10n = AppLocalizations.of(context);
-
-    return AlertDialog(
-      title: Row(
-        children: [
-          const Icon(Icons.campaign_rounded, color: Colors.amberAccent),
-          const SizedBox(width: 8),
-          Text(l10n?.addSfxDialogTitle ?? 'Add SFX Button', style: const TextStyle(fontSize: 16)),
-        ],
-      ),
-      content: SizedBox(
-        width: 420,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n?.selectSoundFromLibrary ?? 'Select a sound from library:', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-              const SizedBox(height: 8),
-              if (sfxTracks.isNotEmpty)
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 180),
-                  decoration: BoxDecoration(
-                    color: activeTheme.surface,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white12),
-                  ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: sfxTracks.length,
-                    itemBuilder: (context, index) {
-                      final track = sfxTracks[index];
-                      final isSelected = _selectedTrack?.id == track.id;
-                      return ListTile(
-                        dense: true,
-                        selected: isSelected,
-                        selectedTileColor: activeTheme.primary.withValues(alpha: 0.2),
-                        leading: Icon(Icons.volume_up, color: isSelected ? activeTheme.primary : Colors.white38, size: 18),
-                        title: Text(track.title, style: const TextStyle(fontSize: 13)),
-                        onTap: () {
-                          setState(() {
-                            _selectedTrack = track;
-                            _customPath = track.filePath;
-                            _customTitle = track.title;
-                          });
-                        },
-                      );
-                    },
-                  ),
-                ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.folder_open_rounded, size: 16),
-                label: Text(l10n?.selectLocalAudioFile ?? 'Choose local audio file...'),
-                onPressed: () async {
-                  final result = await FilePicker.platform.pickFiles(
-                    type: FileType.custom,
-                    allowedExtensions: ['wav', 'mp3', 'ogg', 'flac', 'm4a'],
-                  );
-                  if (result != null && result.files.single.path != null) {
-                    final path = result.files.single.path!;
-                    final name = result.files.single.name.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
-                    setState(() {
-                      _selectedTrack = null;
-                      _customPath = path;
-                      _customTitle = name;
-                    });
-                  }
-                },
-              ),
-              if (_customTitle.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text('${l10n?.selected ?? 'Selected: '}$_customTitle', style: TextStyle(color: activeTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
-              ],
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Text(l10n != null ? '${l10n.volume}:' : 'Volume:', style: const TextStyle(fontSize: 12)),
-                  Expanded(
-                    child: Slider(
-                      value: _volume,
-                      onChanged: (v) => setState(() => _volume = v),
-                    ),
-                  ),
-                  Text('${(_volume * 100).toInt()}%', style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n?.persistentSfxCheckbox ?? 'Persistent SFX (do not reset on scene change)', style: const TextStyle(fontSize: 13)),
-                value: _isPersistent,
-                activeTrackColor: activeTheme.primary,
-                onChanged: (v) => setState(() => _isPersistent = v),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return DsDialog(
+      title: l10n.addSfxDialogTitle,
+      description: l10n.addSfxDialogDesc,
+      icon: 'bolt',
+      closeLabel: l10n.close,
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n?.cancel ?? 'Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _customPath.isEmpty
+        DsButton.ghost(label: l10n.cancel, onPressed: () => Navigator.of(context).pop()),
+        DsButton.primary(
+          key: const ValueKey('add_sfx_confirm_btn'),
+          label: l10n.addSfxBtn,
+          icon: 'plus',
+          onPressed: _path.isEmpty
               ? null
               : () {
-                  final sfxId = _selectedTrack?.id ?? const Uuid().v4();
                   widget.sfx.addTrigger(
                     SfxTrigger(
-                      id: sfxId,
-                      title: _customTitle.isNotEmpty ? _customTitle : 'SFX',
-                       filePath: _customPath,
-                      volume: _volume,
-                      isPersistent: _isPersistent,
-                      isLoop: false,
-                      hotkey: _hotkey,
+                      id: _track?.id ?? const Uuid().v4(),
+                      title: _title.isNotEmpty ? _title : l10n.sfx,
+                      filePath: _path,
+                      isPersistent: _persistent,
+                      isLoop: _loop,
+                      iconName: _icon,
                     ),
                   );
                   Navigator.of(context).pop();
                 },
-          child: Text(l10n?.addSfxBtn ?? 'Add SFX'),
         ),
       ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.fromLibrary, style: ds.label),
+          const SizedBox(height: Spacing.s2),
+          if (tracks.isEmpty)
+            Text(l10n.noSfxTracksInLibrary, style: ds.body.copyWith(color: ds.textMuted))
+          else
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: Sizes.rowMin * 3),
+              child: SingleChildScrollView(
+                child: TrackPickList(
+                  tracks: tracks,
+                  selected: {if (_track != null) _track!.id},
+                  onTap: (t) => setState(() {
+                    _track = t;
+                    _path = t.filePath;
+                    _title = t.title;
+                    _icon = DnDiscIcons.resolve(t.iconName, DnDiscIcons.defaultSfx);
+                  }),
+                ),
+              ),
+            ),
+          const SizedBox(height: Spacing.s3),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: DsButton(icon: 'upload', label: l10n.chooseLocalFile, onPressed: _pickFile),
+          ),
+          if (_track == null && _title.isNotEmpty) ...[
+            const SizedBox(height: Spacing.s2),
+            Text('${l10n.selected}: $_title', style: ds.caption),
+          ],
+          const SizedBox(height: Spacing.s5),
+          Text(l10n.soundIcon, style: ds.label),
+          const SizedBox(height: Spacing.s2),
+          DsIconPicker(keys: DnDiscIcons.sfx, selected: _icon, onChanged: (k) => setState(() => _icon = k)),
+          const SizedBox(height: Spacing.s3),
+          DsCheckbox(
+            value: _loop,
+            onChanged: (v) => setState(() => _loop = v),
+            label: l10n.loopModeCheckbox,
+            description: l10n.loopModeDesc,
+          ),
+          DsCheckbox(
+            value: _persistent,
+            onChanged: (v) => setState(() => _persistent = v),
+            label: l10n.persistentSfxCheckbox,
+            description: l10n.persistentSfxDesc,
+          ),
+        ],
+      ),
     );
   }
 }

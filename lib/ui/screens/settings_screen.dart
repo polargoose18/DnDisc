@@ -1,956 +1,437 @@
-import '../../theme/ds_theme.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
-import '../../l10n/app_localizations.dart';
 import '../../data/services/settings_service.dart';
-import '../../services/shortcut_service.dart';
-import '../../ui/view_models/theme_view_model.dart';
 import '../../domain/models/custom_theme_model.dart';
+import '../../l10n/app_localizations.dart';
+import '../../services/shortcut_service.dart';
 import '../../theme/app_themes.dart';
+import '../../theme/ds_theme.dart';
+import '../../theme/tokens.dart';
+import '../design/ds_button.dart';
+import '../design/ds_controls.dart';
+import '../design/ds_dialog.dart';
+import '../design/ds_field.dart';
+import '../design/ds_panel.dart';
+import '../design/ds_slider.dart';
+import '../design/toast.dart';
+import '../shell/shell_scope.dart';
+import '../shell/top_bar.dart';
+import '../view_models/theme_view_model.dart';
 import '../widgets/custom_theme_editor_dialog.dart';
 import '../widgets/dndisc_logo.dart';
+import '../widgets/theme_card.dart';
 
+/// Settings: one column up to 880px wide with the panels Appearance, Audio,
+/// Storage, Shortcuts and About.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _editTheme(BuildContext context, ThemeViewModel? vm, {CustomThemeModel? theme}) async {
+    final result = await showDsDialog<CustomThemeModel>(
+      context: context,
+      builder: (_) => CustomThemeEditorDialog(initialTheme: theme),
+    );
+    if (result != null) await vm?.saveCustomTheme(result);
+  }
+
+  Future<void> _deleteTheme(BuildContext context, ThemeViewModel? vm, CustomThemeModel theme) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await confirmDelete(
+      context,
+      title: l10n.deleteThemeTitle,
+      message: l10n.deleteThemeMessage(theme.name),
+      confirmLabel: l10n.delete,
+      cancelLabel: l10n.cancel,
+      closeLabel: l10n.close,
+    );
+    if (confirmed) await vm?.deleteCustomTheme(theme.id);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
     final settings = context.watch<SettingsService>();
-    final themeViewModel = context.watch<ThemeViewModel?>();
-    final shortcutService = context.watch<ShortcutService?>();
-    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
-    final l10n = AppLocalizations.of(context);
+    final themes = context.watch<ThemeViewModel?>();
+    final shortcuts = context.watch<ShortcutService?>();
+    final toasts = context.read<ToastController?>();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 860),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Header Card
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: activeTheme.primary,
-                        child: const Icon(Icons.tune_rounded, color: Colors.white, size: 28),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n?.settingsTitle ?? 'Audio Engine Settings',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: activeTheme.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              l10n?.settingsSubtitle ?? 'Themes, shortcuts, audio engine and preset management',
-                              style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
+    String seconds(int ms) => '${(ms / 1000).toStringAsFixed(1)} ${l10n.seconds}';
+    String millis(int ms) => '$ms ${l10n.milliseconds}';
 
-              // Section 1: Themes & Styling (Presets + Custom Themes)
-              _buildThemesSection(context, themeViewModel, activeTheme, l10n),
-              const SizedBox(height: 16),
+    final presets = themes?.builtInPresets ?? AppThemes.presets;
+    final customs = themes?.customThemes ?? const <CustomThemeModel>[];
 
-              // Section 2: Centralized Hotkeys Reference
-              _buildHotkeysSection(context, shortcutService, activeTheme, l10n),
-              const SizedBox(height: 16),
-
-              // Section 3: Fade Engine Settings
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.graphic_eq_rounded, color: activeTheme.primary),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n?.fadeEngineTitle ?? 'Fade Engine',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: activeTheme.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 24),
-
-                      // Music Fade
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.musicFadeTitle ?? 'Music fade in/out duration', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.musicFadeMs} ${l10n?.milliseconds ?? 'ms'} (${(settings.musicFadeMs / 1000).toStringAsFixed(1)} ${l10n?.seconds ?? 's'})', style: TextStyle(color: activeTheme.textSecondary)),
-                        trailing: SizedBox(
-                          width: 250,
-                          child: Slider(
-                            value: settings.musicFadeMs.toDouble(),
-                            min: 0,
-                            max: 5000,
-                            divisions: 50,
-                            label: '${settings.musicFadeMs} ${l10n?.milliseconds ?? 'ms'}',
-                            onChanged: (val) => settings.setMusicFadeMs(val.toInt()),
-                          ),
-                        ),
-                      ),
-
-                      // Ambient Fade
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.ambientFadeTitle ?? 'Ambient fade in/out duration', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.ambientFadeMs} ${l10n?.milliseconds ?? 'ms'} (${(settings.ambientFadeMs / 1000).toStringAsFixed(1)} ${l10n?.seconds ?? 's'})', style: TextStyle(color: activeTheme.textSecondary)),
-                        trailing: SizedBox(
-                          width: 250,
-                          child: Slider(
-                            value: settings.ambientFadeMs.toDouble(),
-                            min: 0,
-                            max: 5000,
-                            divisions: 50,
-                            label: '${settings.ambientFadeMs} ${l10n?.milliseconds ?? 'ms'}',
-                            onChanged: (val) => settings.setAmbientFadeMs(val.toInt()),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Section 4: Ducking Settings
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.volume_down_rounded, color: activeTheme.textSecondary),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n?.duckingTitle ?? 'Auto-ducking music during SFX (Ducking)',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: activeTheme.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 24),
-
-                      // Duck Attack
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.duckAttackTitle ?? 'Duck Attack Time', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.duckAttackMs} ${l10n?.milliseconds ?? 'ms'} — ${l10n?.duckAttackSubtitle ?? 'music fade-down speed when SFX triggers'}', style: TextStyle(color: activeTheme.textSecondary)),
-                        trailing: SizedBox(
-                          width: 250,
-                          child: Slider(
-                            value: settings.duckAttackMs.toDouble(),
-                            min: 50,
-                            max: 1000,
-                            divisions: 19,
-                            label: '${settings.duckAttackMs} ${l10n?.milliseconds ?? 'ms'}',
-                            onChanged: (val) => settings.setDuckAttackMs(val.toInt()),
-                          ),
-                        ),
-                      ),
-
-                      // Duck Release
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.duckReleaseTitle ?? 'Duck Release Time', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${settings.duckReleaseMs} ${l10n?.milliseconds ?? 'ms'} — ${l10n?.duckReleaseSubtitle ?? 'music fade-up speed to full volume'}', style: TextStyle(color: activeTheme.textSecondary)),
-                        trailing: SizedBox(
-                          width: 250,
-                          child: Slider(
-                            value: settings.duckReleaseMs.toDouble(),
-                            min: 200,
-                            max: 4000,
-                            divisions: 38,
-                            label: '${settings.duckReleaseMs} ${l10n?.milliseconds ?? 'ms'}',
-                            onChanged: (val) => settings.setDuckReleaseMs(val.toInt()),
-                          ),
-                        ),
-                      ),
-
-                      // Duck Multiplier
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.duckMultiplierTitle ?? 'Ducking Depth', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text('${(settings.duckMultiplier * 100).toInt()}% ${l10n?.duckMultiplierSubtitle ?? 'of original music volume'}', style: TextStyle(color: activeTheme.textSecondary)),
-                        trailing: SizedBox(
-                          width: 250,
-                          child: Slider(
-                            value: settings.duckMultiplier,
-                            min: 0.0,
-                            max: 1.0,
-                            divisions: 20,
-                            label: '${(settings.duckMultiplier * 100).toInt()}%',
-                            onChanged: (val) => settings.setDuckMultiplier(val),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Section 5: Catalog & Download Directory Settings
-              Card(
-                key: const ValueKey('catalog_storage_settings_card'),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.folder_special_rounded, color: activeTheme.primary),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n?.catalogStorageTitle ?? 'Catalog & Audio File Storage',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: activeTheme.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 24),
-                      Text(
-                        l10n?.catalogStorageDesc ?? 'Folder for downloading and unpacking audio files from online repository catalog:',
-                        style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: activeTheme.surface,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: activeTheme.textSecondary.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              settings.customDownloadDirectory != null
-                                  ? Icons.folder_open_rounded
-                                  : Icons.folder_shared_rounded,
-                              color: settings.customDownloadDirectory != null
-                                  ? activeTheme.primary
-                                  : activeTheme.textSecondary,
-                              size: 28,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    settings.customDownloadDirectory != null
-                                        ? (l10n?.customDirectory ?? 'Custom Directory')
-                                        : (l10n?.defaultDirectory ?? 'Default Directory'),
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: settings.customDownloadDirectory != null
-                                          ? activeTheme.primary
-                                          : activeTheme.textSecondary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    settings.customDownloadDirectory ?? (l10n?.defaultStoragePath ?? 'Default: Documents/audio_library'),
-                                    key: const ValueKey('download_directory_display_path'),
-                                    style: TextStyle(fontFamily: DsTheme.monoFamily, 
-                                      color: activeTheme.textPrimary,
-                                      fontSize: 13,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            if (settings.customDownloadDirectory != null)
-                              IconButton(
-                                key: const ValueKey('reset_download_dir_button'),
-                                icon: const Icon(Icons.restore_rounded, size: 20),
-                                tooltip: l10n?.resetDefaultDirTooltip ?? 'Reset to default',
-                                onPressed: () {
-                                  settings.resetCustomDownloadDirectory();
-                                  _showNotification(context, l10n?.storagePathReset ?? 'Download path reset to default.');
-                                },
-                              ),
-                            ElevatedButton.icon(
-                              key: const ValueKey('select_download_dir_button'),
-                              icon: const Icon(Icons.folder_open_rounded, size: 18),
-                              label: Text(l10n?.chooseFolderBtn ?? 'Choose Folder'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: activeTheme.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                              ),
-                              onPressed: () async {
-                                final selectedDirectory = await FilePicker.platform.getDirectoryPath(
-                                  dialogTitle: l10n?.chooseFolderDialogTitle ?? 'Select folder to store catalog audio files',
-                                );
-                                if (selectedDirectory != null && selectedDirectory.isNotEmpty) {
-                                  settings.setCustomDownloadDirectory(selectedDirectory);
-                                  if (context.mounted) {
-                                    _showNotification(context, l10n?.storagePathUpdated(selectedDirectory) ?? 'Catalog download directory updated: $selectedDirectory');
-                                  }
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.language_rounded, color: activeTheme.primary),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n?.language ?? 'Interface Language',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: activeTheme.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 24),
-                      DropdownButtonFormField<String>(
-                        key: const ValueKey('language_selector_dropdown'),
-                        initialValue: settings.appLanguage,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          filled: true,
-                          fillColor: activeTheme.surface,
-                        ),
-                        dropdownColor: activeTheme.surface,
-                        style: TextStyle(color: activeTheme.textPrimary),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'system',
-                            child: Text(l10n?.languageSystem ?? 'System', style: TextStyle(color: activeTheme.textPrimary)),
-                          ),
-                          DropdownMenuItem(
-                            value: 'ru',
-                            child: Text(l10n?.languageRussian ?? 'Russian', style: TextStyle(color: activeTheme.textPrimary)),
-                          ),
-                          DropdownMenuItem(
-                            value: 'en',
-                            child: Text(l10n?.languageEnglish ?? 'English', style: TextStyle(color: activeTheme.textPrimary)),
-                          ),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) {
-                            settings.setAppLanguage(val);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Icon(Icons.display_settings_rounded, color: activeTheme.primary),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n?.interfaceTitle ?? 'Interface & Control Panel',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: activeTheme.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 24),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.showLogConsoleTitle ?? 'Show log console icon', style: TextStyle(color: activeTheme.textPrimary)),
-                        subtitle: Text(
-                          l10n?.showLogConsoleSubtitle ?? 'Show quick toggle button for log console in top header',
-                          style: TextStyle(color: activeTheme.textSecondary),
-                        ),
-                        value: settings.showLogConsoleIcon,
-                        onChanged: (val) => settings.setShowLogConsoleIcon(val),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Section 7: Defaults
-              Center(
-                child: TextButton.icon(
-                  icon: Icon(Icons.restore_rounded, color: activeTheme.textSecondary),
-                  label: Text(l10n?.resetDefaultsBtn ?? 'Reset all settings to defaults', style: TextStyle(color: activeTheme.textSecondary)),
-                  onPressed: () {
-                    settings.resetToDefaults();
-                    _showNotification(context, l10n?.settingsResetToast ?? 'Audio engine settings reset.');
-                  },
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // About DnDisc Card
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: activeTheme.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 1.0),
-                        ),
-                        child: const DnDiscLogo(size: 36),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  l10n?.aboutTitle ?? 'About DnDisc',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: activeTheme.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: activeTheme.surface,
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                                  ),
-                                  child: Text(
-                                    l10n?.appVersion ?? 'Version 1.0.0',
-                                    style: TextStyle(fontSize: 10, color: activeTheme.textSecondary),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              l10n?.aboutDesc ?? 'Atmospheric audio engine, scene mixer, and soundboard player for TTRPG Game Masters.',
-                              style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-            ],
-          ),
+    final themeCards = <Widget>[
+      for (final theme in [...presets, ...customs])
+        ThemeCard(
+          key: ValueKey('theme_card_${theme.id}'),
+          theme: theme,
+          selected: themes?.activeThemeId == theme.id,
+          onSelect: () => themes?.selectTheme(theme.id),
+          onEdit: () => _editTheme(context, themes, theme: theme),
+          onDuplicate: () => themes?.duplicateCustomTheme(theme.id),
+          onDelete: () => _deleteTheme(context, themes, theme),
         ),
-      ),
-    );
-  }
-
-  void _showNotification(BuildContext context, String message) {
-    try {
-      if (context.mounted && Scaffold.maybeOf(context) != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (_) {}
-  }
-
-  Widget _buildThemesSection(
-    BuildContext context,
-    ThemeViewModel? themeService,
-    CustomThemeModel activeTheme,
-    AppLocalizations? l10n,
-  ) {
-    final presets = themeService?.builtInPresets ?? AppThemes.presets;
-    final activeThemeId = themeService?.activeThemeId ?? AppThemes.deepDarkId;
-    final customThemes = themeService?.customThemes ?? [];
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.palette_rounded, color: activeTheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  l10n?.themesTitle ?? 'App Themes',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: activeTheme.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-
-            // Subsection 1: Built-in Presets
-            Text(
-              l10n?.builtinThemes ?? 'Built-in Presets (3 variants)',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: activeTheme.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: presets.map((preset) {
-                final isSelected = activeThemeId == preset.id;
-                return InkWell(
-                  onTap: () => themeService?.selectTheme(preset.id),
-                  borderRadius: BorderRadius.circular(10),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 155,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Color(preset.surfaceColor),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isSelected
-                            ? Color(preset.primaryColor)
-                            : (activeTheme.isDark ? Colors.white12 : Colors.black12),
-                        width: isSelected ? 1.8 : 1.0,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: Color(preset.primaryColor).withValues(alpha: 0.15),
-                                blurRadius: 4,
-                                spreadRadius: 0,
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(
-                                color: Color(preset.primaryColor),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(
-                                color: Color(preset.surfaceRaisedColor),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(
-                                color: Color(preset.primaryColor),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const Spacer(),
-                            if (isSelected)
-                              Icon(Icons.check_circle_rounded, size: 16, color: Color(preset.primaryColor)),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          preset.name,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Color(preset.textPrimaryColor),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-
-            // Subsection 2: Visual Divider & Custom Themes Header
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(child: Divider(color: activeTheme.textSecondary.withValues(alpha: 0.2))),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        Icon(Icons.brush_rounded, size: 16, color: activeTheme.primary),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${l10n?.customThemes ?? "Custom Themes"} (${customThemes.length})',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: activeTheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(child: Divider(color: activeTheme.textSecondary.withValues(alpha: 0.2))),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            // Custom Themes List or Empty State + "+ Create Theme" Button
-            if (customThemes.isEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                decoration: BoxDecoration(
-                  color: activeTheme.surface,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: activeTheme.textSecondary.withValues(alpha: 0.15)),
-                ),
-                child: Center(
-                  child: Text(
-                    l10n?.noCustomThemes ?? 'You don\'t have custom themes yet. Create your own theme with a custom palette!',
-                    style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
-                  ),
-                ),
-              )
-            else
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: customThemes.map((custom) {
-                  final isSelected = activeThemeId == custom.id;
-                  return InkWell(
-                    onTap: () => themeService?.selectTheme(custom.id),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      width: 190,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Color(custom.surfaceColor),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isSelected
-                              ? Color(custom.primaryColor)
-                              : (activeTheme.isDark ? Colors.white12 : Colors.black12),
-                          width: isSelected ? 1.8 : 1.0,
-                        ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: Color(custom.primaryColor).withValues(alpha: 0.15),
-                                  blurRadius: 4,
-                                  spreadRadius: 0,
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: Color(custom.primaryColor),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: Color(custom.surfaceRaisedColor),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined, size: 16),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                tooltip: l10n?.edit ?? 'Edit',
-                                onPressed: () async {
-                                  final edited = await showDialog<CustomThemeModel>(
-                                    context: context,
-                                    builder: (_) => CustomThemeEditorDialog(initialTheme: custom),
-                                  );
-                                  if (edited != null) {
-                                    await themeService?.saveCustomTheme(edited);
-                                  }
-                                },
-                              ),
-                              const SizedBox(width: 6),
-                              IconButton(
-                                icon: const Icon(Icons.copy_rounded, size: 16),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                tooltip: l10n?.duplicate ?? 'Duplicate',
-                                onPressed: () async {
-                                  await themeService?.duplicateCustomTheme(custom.id);
-                                },
-                              ),
-                              const SizedBox(width: 6),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                tooltip: l10n?.delete ?? 'Delete',
-                                onPressed: () async {
-                                  await themeService?.deleteCustomTheme(custom.id);
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            custom.name,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Color(custom.textPrimaryColor),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.add_rounded, size: 18),
-              label: Text(l10n?.createThemeBtn ?? '+ Create new theme'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: activeTheme.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              ),
-              onPressed: () async {
-                final newTheme = await showDialog<CustomThemeModel>(
-                  context: context,
-                  builder: (_) => const CustomThemeEditorDialog(),
-                );
-                if (newTheme != null) {
-                  await themeService?.saveCustomTheme(newTheme);
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHotkeysSection(
-    BuildContext context,
-    ShortcutService? shortcutService,
-    CustomThemeModel activeTheme,
-    AppLocalizations? l10n,
-  ) {
-    final shortcuts = shortcutService?.allDefinitions ?? const [
-      ShortcutDefinition(
-        action: AppShortcutAction.playPauseMusic,
-        title: 'Play / Pause',
-        description: 'Start or pause current music track',
-        keyDisplay: 'Space',
-      ),
-      ShortcutDefinition(
-        action: AppShortcutAction.masterMute,
-        title: 'Mute',
-        description: 'Quick mute or unmute master volume',
-        keyDisplay: 'M',
-      ),
-      ShortcutDefinition(
-        action: AppShortcutAction.toggleFullscreen,
-        title: 'Fullscreen',
-        description: 'Toggle fullscreen display mode',
-        keyDisplay: 'F11',
-      ),
+      ThemeAddCard(key: const ValueKey('create_theme_button'), onTap: () => _editTheme(context, themes)),
     ];
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.keyboard_rounded, color: activeTheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  l10n?.hotkeysTitle ?? 'Centralized Shortcuts',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: activeTheme.textPrimary,
-                  ),
-                ),
-                const Spacer(),
-                Switch(
-                  value: shortcutService?.isEnabled ?? true,
-                  activeTrackColor: activeTheme.primary,
-                  onChanged: (val) => shortcutService?.setEnabled(val),
-                ),
+    final appearance = DsPanel(
+      title: l10n.appearanceTitle,
+      icon: 'palette',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.appearanceDesc, style: ds.caption),
+          const SizedBox(height: Spacing.s4),
+          LayoutBuilder(
+            builder: (context, c) {
+              const gap = Spacing.s3;
+              final columns = ((c.maxWidth + gap) / (Sizes.themeCardMin + gap)).floor().clamp(1, 5);
+              final width = (c.maxWidth - gap * (columns - 1)) / columns;
+              return Wrap(
+                spacing: gap,
+                runSpacing: gap,
+                children: [
+                  for (final card in themeCards)
+                    SizedBox(width: width, height: Sizes.themePreviewHeight + Sizes.targetMin + Spacing.s3, child: card),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: Spacing.s5),
+          SizedBox(
+            width: Sizes.dialogSm,
+            child: DsSelect<String>(
+              key: const ValueKey('language_selector_dropdown'),
+              label: l10n.language,
+              value: settings.appLanguage,
+              options: [
+                DsOption('system', l10n.languageSystem),
+                DsOption('ru', l10n.languageRussian),
+                DsOption('en', l10n.languageEnglish),
               ],
-            ),
-            const Divider(height: 24),
-            Text(
-              l10n?.hotkeysSubtitle ?? 'Control soundscape during game session without distraction:',
-              style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-
-            // Hotkeys Table
-            Table(
-              columnWidths: const {
-                0: FlexColumnWidth(2),
-                1: FlexColumnWidth(4),
-                2: FlexColumnWidth(2),
+              onChanged: (v) {
+                if (v != null) settings.setAppLanguage(v);
               },
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final audio = DsPanel(
+      title: l10n.audioTitle,
+      icon: 'volume',
+      trailing: DsButton(
+        key: const ValueKey('reset_settings_button'),
+        label: l10n.resetDefaultsBtn,
+        icon: 'refresh',
+        onPressed: () {
+          settings.resetToDefaults();
+          toasts?.show(title: l10n.toastSettingsReset);
+        },
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _SliderSetting(
+            title: l10n.musicFadeTitle,
+            value: settings.musicFadeMs.toDouble(),
+            max: 5000,
+            text: seconds(settings.musicFadeMs),
+            onChanged: (v) => settings.setMusicFadeMs(v.round()),
+            sliderKey: const ValueKey('music_fade_slider'),
+          ),
+          _SliderSetting(
+            title: l10n.ambientFadeTitle,
+            value: settings.ambientFadeMs.toDouble(),
+            max: 5000,
+            text: seconds(settings.ambientFadeMs),
+            onChanged: (v) => settings.setAmbientFadeMs(v.round()),
+            sliderKey: const ValueKey('ambient_fade_slider'),
+          ),
+          const SizedBox(height: Spacing.s3),
+          Text(l10n.duckingTitle, style: ds.label),
+          Text(l10n.duckingDesc, style: ds.caption),
+          const SizedBox(height: Spacing.s2),
+          _SliderSetting(
+            title: l10n.duckAttackTitle,
+            description: l10n.duckAttackSubtitle,
+            value: settings.duckAttackMs.toDouble(),
+            max: 2000,
+            text: millis(settings.duckAttackMs),
+            onChanged: (v) => settings.setDuckAttackMs(v.round()),
+            sliderKey: const ValueKey('duck_attack_slider'),
+          ),
+          _SliderSetting(
+            title: l10n.duckReleaseTitle,
+            description: l10n.duckReleaseSubtitle,
+            value: settings.duckReleaseMs.toDouble(),
+            max: 5000,
+            text: millis(settings.duckReleaseMs),
+            onChanged: (v) => settings.setDuckReleaseMs(v.round()),
+            sliderKey: const ValueKey('duck_release_slider'),
+          ),
+          _SliderSetting(
+            title: l10n.duckMultiplierTitle,
+            description: l10n.duckMultiplierSubtitle,
+            value: settings.duckMultiplier * 100,
+            max: 100,
+            text: '${(settings.duckMultiplier * 100).round()}%',
+            onChanged: (v) => settings.setDuckMultiplier(v / 100),
+            sliderKey: const ValueKey('duck_depth_slider'),
+          ),
+        ],
+      ),
+    );
+
+    final hasCustomDir = settings.customDownloadDirectory != null;
+    final storage = DsPanel(
+      title: l10n.storageTitle,
+      icon: 'download',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.catalogStorageDesc, style: ds.caption),
+          const SizedBox(height: Spacing.s3),
+          Container(
+            padding: const EdgeInsets.all(Spacing.s3),
+            decoration: BoxDecoration(
+              color: ds.surfaceRaised,
+              borderRadius: Radii.mdAll,
+              border: Border.all(color: ds.border, width: Sizes.borderWidth),
+            ),
+            child: Row(
               children: [
-                TableRow(
-                  decoration: BoxDecoration(
-                    color: activeTheme.surface,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(l10n?.actionCol ?? 'Action', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(l10n?.descriptionCol ?? 'Description', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(l10n?.keyCol ?? 'Key', style: TextStyle(fontWeight: FontWeight.bold, color: activeTheme.textPrimary, fontSize: 12)),
-                    ),
-                  ],
-                ),
-                ...shortcuts.map((sc) {
-                  return TableRow(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                        child: Text(sc.getLocalizedTitle(l10n), style: TextStyle(color: activeTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                        child: Text(sc.getLocalizedDescription(l10n), style: TextStyle(color: activeTheme.textSecondary, fontSize: 11)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: activeTheme.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4)),
-                          ),
-                          child: Text(
-                            sc.keyDisplay,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: activeTheme.primary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
+                      Text(hasCustomDir ? l10n.customDirectory : l10n.defaultDirectory, style: ds.label),
+                      Text(settings.customDownloadDirectory ?? l10n.defaultStoragePath, style: ds.code),
                     ],
-                  );
-                }),
+                  ),
+                ),
+                const SizedBox(width: Spacing.s3),
+                if (hasCustomDir)
+                  DsButton.ghost(
+                    key: const ValueKey('reset_download_dir_button'),
+                    icon: 'refresh',
+                    iconOnly: true,
+                    label: l10n.resetDefaultDirTooltip,
+                    onPressed: () {
+                      settings.resetCustomDownloadDirectory();
+                      toasts?.show(title: l10n.toastStoragePathReset);
+                    },
+                  ),
+                DsButton(
+                  key: const ValueKey('select_download_dir_button'),
+                  label: l10n.chooseFolderBtn,
+                  icon: 'edit',
+                  onPressed: () async {
+                    final dir = await FilePicker.platform.getDirectoryPath(dialogTitle: l10n.chooseFolderDialogTitle);
+                    if (dir != null && dir.isNotEmpty) {
+                      settings.setCustomDownloadDirectory(dir);
+                      toasts?.success(l10n.toastStoragePathUpdated, message: dir);
+                    }
+                  },
+                ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+
+    final shortcutsPanel = DsPanel(
+      title: l10n.hotkeysTitle,
+      icon: 'keyboard',
+      trailing: DsSwitch(
+        key: const ValueKey('shortcuts_switch'),
+        value: shortcuts?.isEnabled ?? true,
+        onChanged: shortcuts?.setEnabled,
+        label: l10n.hotkeysTitle,
+      ),
+      child: _ShortcutsTable(shortcuts: shortcuts),
+    );
+
+    final about = DsPanel(
+      child: Wrap(
+        spacing: Spacing.s4,
+        runSpacing: Spacing.s3,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const DnDiscLogo(size: Sizes.targetMin, wordmark: true),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: Sizes.dialogSm),
+            child: Text('${l10n.appVersion} · ${l10n.aboutDesc}', style: ds.caption),
+          ),
+          DsButton(
+            key: const ValueKey('open_logs_button'),
+            label: l10n.openLogs,
+            icon: 'terminal',
+            onPressed: ShellScope.maybeOf(context)?.openLogs ?? () => Scaffold.maybeOf(context)?.openEndDrawer(),
+          ),
+        ],
+      ),
+    );
+
+    return Scaffold(
+      backgroundColor: Palette.transparent,
+      body: Column(
+        children: [
+          TopBar(title: l10n.tabSettings, navigationLabel: l10n.openNavigation),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(Spacing.s4),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: Sizes.settingsMaxWidth),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      appearance,
+                      const SizedBox(height: Spacing.s4),
+                      audio,
+                      const SizedBox(height: Spacing.s4),
+                      storage,
+                      const SizedBox(height: Spacing.s4),
+                      shortcutsPanel,
+                      const SizedBox(height: Spacing.s4),
+                      about,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Title, optional description and a slider with its value on the right.
+class _SliderSetting extends StatelessWidget {
+  final String title;
+  final String? description;
+  final double value;
+  final double max;
+  final String text;
+  final ValueChanged<double> onChanged;
+  final Key? sliderKey;
+
+  const _SliderSetting({
+    required this.title,
+    this.description,
+    required this.value,
+    required this.max,
+    required this.text,
+    required this.onChanged,
+    this.sliderKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ds = context.ds;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: Spacing.s1),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final labels = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: ds.body),
+              if (description != null) Text(description!, style: ds.caption),
+            ],
+          );
+          final slider = SizedBox(
+            width: c.maxWidth >= Sizes.dialogMd ? Sizes.dialogSm / 2 + Spacing.s7 : null,
+            child: DsSlider(
+              key: sliderKey,
+              value: value.clamp(0, max),
+              max: max,
+              onChanged: onChanged,
+              semanticLabel: title,
+              format: (_) => text,
+              valueWidth: Sizes.sliderValueWide,
+            ),
+          );
+          if (c.maxWidth >= Sizes.dialogMd) {
+            return Row(children: [Expanded(child: labels), const SizedBox(width: Spacing.s4), slider]);
+          }
+          return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [labels, slider]);
+        },
+      ),
+    );
+  }
+}
+
+/// Shortcut rows in the groups Playback, Intensity and SFX slots.
+class _ShortcutsTable extends StatelessWidget {
+  final ShortcutService? shortcuts;
+
+  const _ShortcutsTable({required this.shortcuts});
+
+  static const _playback = {AppShortcutAction.playPauseMusic, AppShortcutAction.masterMute, AppShortcutAction.toggleFullscreen};
+  static const _intensity = {
+    AppShortcutAction.intensityCalm,
+    AppShortcutAction.intensitySuspense,
+    AppShortcutAction.intensityBattle,
+    AppShortcutAction.intensityBoss,
+  };
+
+  List<String> _keys(String display) => display.split(' / ');
+
+  @override
+  Widget build(BuildContext context) {
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
+    final definitions = shortcuts?.allDefinitions ?? const <ShortcutDefinition>[];
+
+    Widget group(String title, List<Widget> rows) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: Spacing.s4, bottom: Spacing.s1),
+              child: Text(title.toUpperCase(), style: ds.caption),
+            ),
+            ...rows,
+          ],
+        );
+
+    List<Widget> rowsFor(Set<AppShortcutAction> actions) {
+      final defs = definitions.where((d) => actions.contains(d.action)).toList();
+      return [
+        for (final (i, d) in defs.indexed)
+          ShortcutRow(
+            action: d.getLocalizedTitle(l10n),
+            description: _playback.contains(d.action) ? d.getLocalizedDescription(l10n) : null,
+            keys: _keys(d.keyDisplay),
+            last: i == defs.length - 1,
+          ),
+      ];
+    }
+
+    final sfx = definitions.where((d) => d.action == AppShortcutAction.sfx1).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.hotkeysSubtitle, style: ds.caption),
+        group(l10n.shortcutGroupPlayback, rowsFor(_playback)),
+        group(l10n.shortcutGroupIntensity, rowsFor(_intensity)),
+        if (sfx.isNotEmpty)
+          group(l10n.shortcutGroupSfx, [
+            ShortcutRow(
+              action: sfx.first.getLocalizedTitle(l10n),
+              description: l10n.shortcutSfxSlotsDesc,
+              keys: _keys(sfx.first.keyDisplay),
+              last: true,
+            ),
+          ]),
+      ],
     );
   }
 }

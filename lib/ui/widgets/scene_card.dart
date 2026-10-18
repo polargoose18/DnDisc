@@ -1,18 +1,22 @@
-import '../../theme/ds_theme.dart';
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart' hide Durations;
 import '../../l10n/app_localizations.dart';
-import '../../domain/models/scene_model.dart';
 import '../../domain/models/audio_track.dart';
-import '../../ui/view_models/theme_view_model.dart';
+import '../../domain/models/scene_model.dart';
+import '../../theme/ds_theme.dart';
+import '../../theme/tokens.dart';
+import '../design/ds_interactive.dart';
+import '../design/ds_menu.dart';
+import '../design/ds_tooltip.dart';
+import '../design/equalizer_bars.dart';
+import '../design/scene_cover.dart';
 
-import '../../domain/models/custom_theme_model.dart';
-import '../../theme/app_themes.dart';
-
-class SceneCard extends StatelessWidget {
+/// Row of the scene list: thumbnail, name, one line of metadata. The active
+/// scene gets `primary-subtle` and an equalizer; the menu opens by right
+/// click, long press or the `more` button that shows on hover.
+class SceneCard extends StatefulWidget {
   final SceneModel scene;
   final bool isActive;
+  final bool playing;
   final VoidCallback onActivate;
   final VoidCallback onEdit;
   final VoidCallback onDuplicate;
@@ -23,6 +27,7 @@ class SceneCard extends StatelessWidget {
     super.key,
     required this.scene,
     required this.isActive,
+    this.playing = true,
     required this.onActivate,
     required this.onEdit,
     required this.onDuplicate,
@@ -31,326 +36,107 @@ class SceneCard extends StatelessWidget {
   });
 
   @override
+  State<SceneCard> createState() => _SceneCardState();
+}
+
+class _SceneCardState extends State<SceneCard> {
+  bool _menuOpen = false;
+
+  SceneModel get scene => widget.scene;
+  bool get isActive => widget.isActive;
+
+  List<DsMenuItem> _items(AppLocalizations l10n) => [
+        DsMenuItem(id: 'edit', label: l10n.editDetails, icon: 'edit'),
+        DsMenuItem(id: 'duplicate', label: l10n.duplicate),
+        if (widget.onExport != null) DsMenuItem(id: 'export', label: l10n.exportAction, icon: 'archive'),
+        const DsMenuItem.separator(),
+        DsMenuItem(id: 'delete', label: l10n.delete, icon: 'trash', danger: true),
+      ];
+
+  void _select(String id) {
+    switch (id) {
+      case 'edit':
+        widget.onEdit();
+      case 'duplicate':
+        widget.onDuplicate();
+      case 'export':
+        widget.onExport?.call();
+      case 'delete':
+        widget.onDelete();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
-      (vm) => vm?.activeTheme ?? AppThemes.deepDark,
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
+    final intensity = (scene.musicIntensity ?? MusicIntensity.calm).getLocalizedName(l10n);
+    final meta = l10n.sceneMeta(
+      intensity,
+      l10n.ambientCount(scene.ambientLayerVolumes.length),
+      l10n.sfxCount(scene.soundboardSfxIds.length),
     );
-    final sceneColor = Color(scene.colorHex);
-    final l10n = AppLocalizations.of(context);
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-      decoration: BoxDecoration(
-        color: activeTheme.surfaceRaised,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isActive ? activeTheme.primary : (activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08)),
-          width: isActive ? 2.0 : 1.0,
-        ),
-        boxShadow: isActive
-            ? [
-                BoxShadow(
-                  color: activeTheme.primary.withValues(alpha: 0.25),
-                  blurRadius: 8,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onActivate,
-            child: Stack(
-              children: [
-                // Background Image or atmospheric gradient
-                if (scene.imagePath != null && scene.imagePath!.isNotEmpty && File(scene.imagePath!).existsSync())
-                  Positioned.fill(
-                    child: Image.file(
-                      File(scene.imagePath!),
-                      fit: BoxFit.cover,
-                      color: Colors.black.withValues(alpha: 0.6),
-                      colorBlendMode: BlendMode.darken,
-                    ),
-                  )
-                else
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            sceneColor.withValues(alpha: 0.35),
-                            activeTheme.surfaceRaised.withValues(alpha: 0.95),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                // Card Content
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
+    return DsInteractive(
+      onTap: widget.onActivate,
+      selected: isActive,
+      semanticLabel: scene.name,
+      onLongPress: () async {
+        final id = await showDsMenuFor(context, _items(l10n));
+        if (id != null) _select(id);
+      },
+      onSecondaryTapUp: (details) async {
+        final id = await showDsMenuAt(context, details.globalPosition, _items(l10n));
+        if (id != null) _select(id);
+      },
+      builder: (context, s) {
+        final background = isActive ? ds.primarySubtle : (s.hovered ? ds.surfaceHover : Palette.transparent);
+        return AnimatedContainer(
+          duration: Durations.fast,
+          curve: Curves.easeOut,
+          height: Sizes.rowMin,
+          padding: const EdgeInsets.all(Spacing.s2),
+          decoration: BoxDecoration(color: background, borderRadius: Radii.mdAll),
+          child: Row(
+            children: [
+              SceneThumb(cover: scene.cover, src: scene.imagePath, seed: scene.id),
+              const SizedBox(width: Spacing.s3),
+              Expanded(
+                child: DsTooltip(
+                  hoverOnly: true,
+                  label: scene.name,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  // Top Row: Icon, Title, Active Badge, Actions Menu
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: sceneColor.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          _getIcon(scene.iconName),
-                          size: 18,
-                          color: Colors.white,
-                        ),
+                      Text(
+                        scene.name,
+                        style: (isActive ? ds.bodyStrong : ds.body.copyWith(fontWeight: FontWeight.w500)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          scene.name,
-                          style: TextStyle(
-                            color: activeTheme.textPrimary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                            letterSpacing: -0.1,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (isActive)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          margin: const EdgeInsets.only(right: 4),
-                          decoration: BoxDecoration(
-                            color: activeTheme.primary,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            l10n?.activeBadge ?? 'ACTIVE',
-                            style: const TextStyle(fontFamily: DsTheme.monoFamily, 
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert, size: 18, color: activeTheme.textSecondary),
-                        padding: EdgeInsets.zero,
-                        color: activeTheme.surface,
-                        onSelected: (action) {
-                          if (action == 'edit') onEdit();
-                          if (action == 'duplicate') onDuplicate();
-                          if (action == 'export' && onExport != null) onExport!();
-                          if (action == 'delete') onDelete();
-                        },
-                        itemBuilder: (ctx) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_outlined, size: 16, color: activeTheme.textPrimary),
-                                const SizedBox(width: 8),
-                                Text(l10n?.edit ?? 'Edit', style: TextStyle(color: activeTheme.textPrimary)),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'duplicate',
-                            child: Row(
-                              children: [
-                                Icon(Icons.copy_rounded, size: 16, color: activeTheme.textPrimary),
-                                const SizedBox(width: 8),
-                                Text(l10n?.duplicate ?? 'Duplicate', style: TextStyle(color: activeTheme.textPrimary)),
-                              ],
-                            ),
-                          ),
-                          if (onExport != null)
-                            PopupMenuItem(
-                              value: 'export',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.archive_outlined, size: 16, color: activeTheme.textPrimary),
-                                  const SizedBox(width: 8),
-                                  Text(l10n?.exportSceneMenu ?? 'Export (.scene.zip)', style: TextStyle(color: activeTheme.textPrimary)),
-                                ],
-                              ),
-                            ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
-                                const SizedBox(width: 8),
-                                Text(l10n?.delete ?? 'Delete', style: const TextStyle(color: Colors.redAccent)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      Text(meta, style: ds.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
                     ],
                   ),
-
-                  // Description
-                    if (scene.description.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      scene.description,
-                      style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-
-                  const SizedBox(height: 10),
-
-                  // Bottom Row: Summary Badges and Activate Button
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            if (scene.musicTrackId != null)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: _getIntensityColor(scene.musicIntensity, activeTheme).withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: _getIntensityColor(scene.musicIntensity, activeTheme),
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.music_note, size: 12, color: _getIntensityColor(scene.musicIntensity, activeTheme)),
-                                    const SizedBox(width: 2),
-                                    ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 95),
-                                      child: Text(
-                                        (scene.musicIntensity?.getLocalizedName(l10n) ?? l10n?.intensityCalm ?? 'Calm').toUpperCase(),
-                                        style: TextStyle(fontFamily: DsTheme.monoFamily, 
-                                          color: _getIntensityColor(scene.musicIntensity, activeTheme),
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          if (scene.ambientLayerVolumes.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.teal.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: Colors.teal, width: 0.8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.waves, size: 12, color: Colors.tealAccent),
-                                  const SizedBox(width: 2),
-                                  ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 95),
-                                    child: Text(
-                                      '${scene.ambientLayerVolumes.length} ${l10n?.ambient ?? "ambient"}',
-                                      style: const TextStyle(fontFamily: DsTheme.monoFamily, 
-                                        color: Colors.tealAccent,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 130),
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isActive ? Colors.teal : activeTheme.primary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          minimumSize: const Size(0, 30),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        icon: Icon(isActive ? Icons.volume_up_rounded : Icons.play_arrow_rounded, size: 14),
-                        label: Text(
-                          isActive ? (l10n?.activeBadge ?? 'ACTIVE') : (l10n?.enableSceneBtn ?? 'Enable'),
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        onPressed: onActivate,
-                      ),
-                    ),
-                  ],
                 ),
-                ],
               ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  ),
-);
-  }
-
-  Color _getIntensityColor(MusicIntensity? intensity, dynamic activeTheme) {
-    switch (intensity) {
-      case MusicIntensity.suspense:
-        return Colors.amberAccent;
-      case MusicIntensity.battle:
-        return activeTheme.battleIntensity;
-      case MusicIntensity.boss:
-        return activeTheme.bossIntensity;
-      case MusicIntensity.calm:
-      default:
-        return activeTheme.primary;
-    }
-  }
-
-  IconData _getIcon(String? iconName) {
-    switch (iconName) {
-      case 'castle':
-        return Icons.fort_rounded;
-      case 'forest':
-        return Icons.forest_rounded;
-      case 'dungeon':
-        return Icons.shield_rounded;
-      case 'tavern':
-        return Icons.sports_bar_rounded;
-      case 'combat':
-        return Icons.local_fire_department_rounded;
-      default:
-        return Icons.auto_awesome_mosaic_rounded;
-    }
+              if (isActive) ...[
+                const SizedBox(width: Spacing.s2),
+                EqualizerBars(active: widget.playing, bars: 3, height: Spacing.s3),
+              ],
+              if (s.hovered || s.focused || _menuOpen)
+                DsMoreButton(
+                  items: _items(l10n),
+                  onSelected: _select,
+                  label: l10n.moreActions,
+                  onOpenChanged: (open) {
+                    if (mounted) setState(() => _menuOpen = open);
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

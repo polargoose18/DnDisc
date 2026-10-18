@@ -17,6 +17,7 @@ import 'ui/view_models/theme_view_model.dart';
 import 'ui/view_models/media_library_view_model.dart';
 import 'ui/view_models/scene_view_model.dart';
 import 'ui/view_models/repository_view_model.dart';
+import 'ui/design/toast.dart';
 import 'ui/screens/main_dashboard_screen.dart';
 
 void main() {
@@ -32,6 +33,7 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<LoggerService>(create: (_) => LoggerService()),
+        ChangeNotifierProvider<ToastController>(create: (_) => ToastController()),
         ChangeNotifierProvider<SettingsService>(
           create: (_) {
             final svc = SettingsService(dbService: DatabaseService(), autoLoad: true);
@@ -113,6 +115,10 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
                     }
                     return const Locale('ru');
                   },
+                  builder: (context, child) => ToastHost(
+                    closeLabel: AppLocalizations.of(context)?.close ?? 'Close',
+                    child: child ?? const SizedBox.shrink(),
+                  ),
                   home: const MainDashboardScreen(),
                 );
               },

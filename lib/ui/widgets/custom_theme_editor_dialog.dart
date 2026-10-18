@@ -1,10 +1,83 @@
-import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import '../../l10n/app_localizations.dart';
+import '../../domain/models/audio_track.dart';
 import '../../domain/models/custom_theme_model.dart';
+import '../../l10n/app_localizations.dart';
 import '../../theme/app_themes.dart';
+import '../../theme/color_math.dart' as cm;
+import '../../theme/ds_theme.dart';
+import '../../theme/swatches.dart';
+import '../../theme/tokens.dart';
+import '../design/ds_button.dart';
+import '../design/ds_controls.dart';
+import '../design/ds_dialog.dart';
+import '../design/ds_field.dart';
+import '../design/ds_icon.dart';
+import '../design/ds_interactive.dart';
+import '../design/ds_slider.dart';
 
+/// Colours the user sets in the editor; everything else is derived.
+class _Palette {
+  int background;
+  int surface;
+  int text;
+  int primary;
+  int calm;
+  int suspense;
+  int battle;
+  int boss;
+
+  _Palette({
+    required this.background,
+    required this.surface,
+    required this.text,
+    required this.primary,
+    required this.calm,
+    required this.suspense,
+    required this.battle,
+    required this.boss,
+  });
+
+  factory _Palette.of(CustomThemeModel m) => _Palette(
+        background: m.backgroundColor,
+        surface: m.surfaceColor,
+        text: m.textPrimaryColor,
+        primary: m.primaryColor,
+        calm: m.calmIntensityColor,
+        suspense: m.suspenseIntensityColor,
+        battle: m.battleIntensityColor,
+        boss: m.bossIntensityColor,
+      );
+
+  CustomThemeModel derive({String id = 'editor', String name = '', DateTime? createdAt}) => CustomThemeModel.derive(
+        id: id,
+        name: name,
+        background: background,
+        surface: surface,
+        text: text,
+        primary: primary,
+        calm: calm,
+        suspense: suspense,
+        battle: battle,
+        boss: boss,
+        createdAt: createdAt,
+      );
+}
+
+/// One "colour on background" pair with its minimum contrast and a way to
+/// move the colour until the minimum is met.
+class _Check {
+  final String label;
+  final int Function(_Palette) fg;
+  final int Function(_Palette) bg;
+  final double min;
+  final void Function(_Palette, int) apply;
+
+  const _Check(this.label, this.fg, this.bg, this.min, this.apply);
+}
+
+/// Create or edit a custom theme: eight colours, a live preview and a
+/// contrast check list. A theme with warnings can still be saved.
 class CustomThemeEditorDialog extends StatefulWidget {
   final CustomThemeModel? initialTheme;
 
@@ -15,460 +88,429 @@ class CustomThemeEditorDialog extends StatefulWidget {
 }
 
 class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
-  late TextEditingController _nameController;
-  late bool _isDark;
-  late Color _primary;
-  late Color _calm;
-  late Color _suspense;
-  late Color _background;
-  late Color _surface;
-  late Color _textPrimary;
-  late Color _textSecondary;
-  late Color _battleIntensity;
-  late Color _bossIntensity;
-
-  final _formKey = GlobalKey<FormState>();
-
-  final List<Color> _swatchPalette = const [
-    Color(0xFF7C4DFF), // Purple
-    Color(0xFF2563EB), // Blue
-    Color(0xFF10B981), // Emerald
-    Color(0xFFE11D48), // Crimson
-    Color(0xFFD4A373), // Ochre
-    Color(0xFFFF9800), // Orange
-    Color(0xFF00E5FF), // Cyan
-    Color(0xFF9333EA), // Violet
-    Color(0xFFEC4899), // Pink
-    Color(0xFF64748B), // Slate
-    Color(0xFF121218), // Dark
-    Color(0xFF181824), // Surface dark
-    Color(0xFF1E1E2A), // Card dark
-    Color(0xFF091E16), // Dark emerald
-    Color(0xFF140B0E), // Dark crimson
-    Color(0xFF1C1917), // Dark parchment
-    Color(0xFFF8FAFC), // Light bg
-    Color(0xFFFFFFFF), // White
-    Color(0xFFB0B0C0), // Muted text
-    Color(0xFFFAEDCD), // Warm text
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    final base = widget.initialTheme ?? AppThemes.deepDark;
-    _nameController = TextEditingController();
-    _isDark = base.isDark;
-    _primary = base.primary;
-    _calm = base.calmIntensity;
-    _suspense = base.suspenseIntensity;
-    _background = base.background;
-    _surface = base.surface;
-    _textPrimary = base.textPrimary;
-    _textSecondary = base.textSecondary;
-    _battleIntensity = base.battleIntensity;
-    _bossIntensity = base.bossIntensity;
-  }
+  late final TextEditingController _name = TextEditingController(text: widget.initialTheme?.name ?? '');
+  late _Palette _palette = _Palette.of(widget.initialTheme ?? AppThemes.deepDark);
+  bool _nameError = false;
+  double _previewVolume = 0.6;
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _name.dispose();
     super.dispose();
   }
 
-  void _applyPresetTemplate(CustomThemeModel preset) {
-    setState(() {
-      _isDark = preset.isDark;
-      _primary = preset.primary;
-      _calm = preset.calmIntensity;
-      _suspense = preset.suspenseIntensity;
-      _background = preset.background;
-      _surface = preset.surface;
-      _textPrimary = preset.textPrimary;
-      _textSecondary = preset.textSecondary;
-      _battleIntensity = preset.battleIntensity;
-      _bossIntensity = preset.bossIntensity;
-    });
+  void _applyPreset(CustomThemeModel preset) => setState(() => _palette = _Palette.of(preset));
+
+  Future<void> _pick(String title, int current, ValueChanged<int> onPicked) async {
+    final picked = await showDsDialog<int>(
+      context: context,
+      builder: (_) => _ColorPickerDialog(title: title, initial: current),
+    );
+    if (picked != null) setState(() => onPicked(picked));
   }
 
-  void _pickColor(String title, Color currentColor, ValueChanged<Color> onSelected) {
-    final l10n = AppLocalizations.of(context);
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E28),
-          title: Text(l10n?.colorPickTitle(title) ?? 'Color Choice: $title', style: const TextStyle(color: Colors.white, fontSize: 16)),
-          content: SizedBox(
-            width: 320,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _swatchPalette.map((c) {
-                final isSelected = c.toARGB32() == currentColor.toARGB32();
-                return GestureDetector(
-                  onTap: () {
-                    onSelected(c);
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: c,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected ? Colors.white : Colors.white24,
-                        width: isSelected ? 3 : 1,
-                      ),
-                      boxShadow: isSelected
-                          ? [BoxShadow(color: c.withValues(alpha: 0.6), blurRadius: 8, spreadRadius: 1)]
-                          : null,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l10n?.cancel ?? 'Cancel'),
-            ),
-          ],
-        );
-      },
+  void _save() {
+    final name = _name.text.trim();
+    if (name.isEmpty) {
+      setState(() => _nameError = true);
+      return;
+    }
+    Navigator.of(context).pop(
+      _palette.derive(
+        id: widget.initialTheme?.id ?? const Uuid().v4(),
+        name: name,
+        createdAt: widget.initialTheme?.createdAt ?? DateTime.now(),
+      ),
     );
   }
 
+  List<_Check> _checks(AppLocalizations l10n) => [
+        _Check(l10n.contrastTextBg, (p) => p.text, (p) => p.background, 4.5, (p, c) => p.text = c),
+        _Check(l10n.contrastTextSurface, (p) => p.text, (p) => p.surface, 4.5, (p, c) => p.text = c),
+        _Check(l10n.contrastPrimaryBg, (p) => p.primary, (p) => p.background, 4.5, (p, c) => p.primary = c),
+        _Check(l10n.contrastPrimarySurface, (p) => p.primary, (p) => p.surface, 4.5, (p, c) => p.primary = c),
+        for (final level in MusicIntensity.values)
+          _Check(
+            l10n.contrastIntensityOnSurface(level.getLocalizedName(l10n)),
+            (p) => switch (level) {
+                  MusicIntensity.calm => p.calm,
+                  MusicIntensity.suspense => p.suspense,
+                  MusicIntensity.battle => p.battle,
+                  MusicIntensity.boss => p.boss,
+                },
+            (p) => p.surface,
+            3,
+            (p, c) {
+              switch (level) {
+                case MusicIntensity.calm:
+                  p.calm = c;
+                case MusicIntensity.suspense:
+                  p.suspense = c;
+                case MusicIntensity.battle:
+                  p.battle = c;
+                case MusicIntensity.boss:
+                  p.boss = c;
+              }
+            },
+          ),
+      ];
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Dialog(
-      backgroundColor: _surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        width: 760,
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
+    final editing = widget.initialTheme != null;
+    final derived = _palette.derive(name: _name.text);
+    final checks = _checks(l10n);
+    final failing = checks.where((c) => cm.contrastRatio(c.fg(_palette), c.bg(_palette)) < c.min).length;
+
+    Widget colorRow(String key, String label, int value, ValueChanged<int> onPicked) => DsInteractive(
+          key: ValueKey('theme_color_$key'),
+          onTap: () => _pick(label, value, onPicked),
+          semanticLabel: label,
+          builder: (context, s) => Container(
+            constraints: const BoxConstraints(minHeight: Sizes.targetMin),
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.s2),
+            decoration: BoxDecoration(
+              color: s.hovered ? ds.surfaceHover : Palette.transparent,
+              borderRadius: Radii.mdAll,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: Spacing.s5,
+                  height: Spacing.s5,
+                  decoration: BoxDecoration(
+                    color: Color(value),
+                    borderRadius: Radii.smAll,
+                    border: Border.all(color: ds.borderStrong, width: Sizes.borderWidth),
+                  ),
+                ),
+                const SizedBox(width: Spacing.s3),
+                Expanded(child: Text(label, style: ds.body)),
+                Text('#${(value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}', style: ds.code),
+              ],
+            ),
+          ),
+        );
+
+    final editor = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DsTextField(
+          key: const ValueKey('theme_name_field'),
+          label: l10n.themeNameLabel,
+          controller: _name,
+          autofocus: !editing,
+          error: _nameError && _name.text.trim().isEmpty ? l10n.themeNameRequired : null,
+          onChanged: (_) => setState(() {}),
+        ),
+        const SizedBox(height: Spacing.s4),
+        DsSelect<String>(
+          key: const ValueKey('theme_preset_select'),
+          label: l10n.baseOnPreset,
+          options: [for (final p in AppThemes.presets) DsOption(p.id, p.name)],
+          value: null,
+          placeholder: l10n.choosePreset,
+          onChanged: (id) {
+            if (id != null) _applyPreset(AppThemes.getPresetById(id));
+          },
+        ),
+        const SizedBox(height: Spacing.s4),
+        colorRow('background', l10n.colorNameBackground, _palette.background, (c) => _palette.background = c),
+        colorRow('surface', l10n.colorNameSurface, _palette.surface, (c) => _palette.surface = c),
+        colorRow('text', l10n.colorNameText, _palette.text, (c) => _palette.text = c),
+        colorRow('primary', l10n.colorNamePrimary, _palette.primary, (c) => _palette.primary = c),
+        colorRow('calm', l10n.intensityCalm, _palette.calm, (c) => _palette.calm = c),
+        colorRow('suspense', l10n.intensitySuspense, _palette.suspense, (c) => _palette.suspense = c),
+        colorRow('battle', l10n.intensityBattle, _palette.battle, (c) => _palette.battle = c),
+        colorRow('boss', l10n.intensityBoss, _palette.boss, (c) => _palette.boss = c),
+      ],
+    );
+
+    final preview = Theme(
+      data: derived.toThemeData(),
+      child: Builder(
+        builder: (context) {
+          final p = context.ds;
+          return Container(
+            padding: const EdgeInsets.all(Spacing.s4),
+            decoration: BoxDecoration(
+              color: p.bg,
+              borderRadius: Radii.lgAll,
+              border: Border.all(color: p.border, width: Sizes.borderWidth),
+            ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: _primary,
-                      child: const Icon(Icons.palette_rounded, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        widget.initialTheme == null
-                            ? (l10n?.createCustomThemeTitle ?? 'Create Custom Theme')
-                            : (l10n?.editCustomThemeTitle ?? 'Edit Theme'),
-                        style: TextStyle(color: _textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.close, color: _textSecondary),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Name & Template Preset Selector
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: TextFormField(
-                        controller: _nameController,
-                        style: TextStyle(color: _textPrimary),
-                        decoration: InputDecoration(
-                          hintText: l10n?.themeNameLabel ?? 'Theme Name',
-                          labelStyle: TextStyle(color: _textSecondary),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: _textSecondary.withValues(alpha: 0.3)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: _primary),
-                          ),
-                        ),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? (l10n?.themeNameRequired ?? 'Please specify theme name') : null,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: PopupMenuButton<CustomThemeModel>(
-                        tooltip: l10n?.baseOnPresetTooltip ?? 'Use preset as template',
-                        onSelected: _applyPresetTemplate,
-                        itemBuilder: (ctx) => AppThemes.presets.map((preset) {
-                          return PopupMenuItem(
-                            value: preset,
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 14,
-                                  height: 14,
-                                  decoration: BoxDecoration(
-                                    color: preset.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(preset.name),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: _textSecondary.withValues(alpha: 0.3)),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(l10n?.baseOnPreset ?? 'Base on Preset', style: TextStyle(color: _textPrimary, fontSize: 13)),
-                              Icon(Icons.arrow_drop_down, color: _textSecondary),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Live Preview Mockup Card
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(Spacing.s3),
                   decoration: BoxDecoration(
-                    color: _background,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _primary.withValues(alpha: 0.4)),
+                    color: p.surface,
+                    borderRadius: Radii.mdAll,
+                    border: Border.all(color: p.border, width: Sizes.borderWidth),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            l10n?.themePreviewTitle ?? 'Theme Preview',
-                            style: TextStyle(color: _textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: _primary.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: _primary),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.volume_down, size: 14, color: _primary),
-                                const SizedBox(width: 4),
-                                Text(
-                                  l10n?.duckingActive ?? 'Ducking Active',
-                                  style: TextStyle(fontFamily: DsTheme.monoFamily, color: _primary, fontSize: 11, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      Text(_name.text.trim().isEmpty ? l10n.newThemeDefaultName : _name.text.trim(), style: p.title),
+                      const SizedBox(height: Spacing.s3),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DsSegmentedControl<MusicIntensity>(
+                          label: l10n.musicIntensityLabel,
+                          compact: true,
+                          value: MusicIntensity.suspense,
+                          onChanged: (_) {},
+                          options: [
+                            for (final (i, level) in MusicIntensity.values.indexed)
+                              DsSegment(id: level, label: level.getLocalizedName(l10n), color: p.intensityColor(level.name), key: '${i + 1}'),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: Spacing.s3),
                       Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: _surface,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: _isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
+                        padding: const EdgeInsets.symmetric(horizontal: Spacing.s3),
+                        decoration: BoxDecoration(
+                          color: p.surfaceRaised,
+                          borderRadius: Radii.mdAll,
+                          border: Border.all(color: p.border, width: Sizes.borderWidth),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: Sizes.targetMin,
+                              height: Sizes.targetMin,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: p.primarySubtle,
+                                borderRadius: Radii.mdAll,
+                                border: Border.all(color: p.primary, width: Sizes.borderWidth),
                               ),
+                              child: DsIcon('waves', color: p.primary),
+                            ),
+                            const SizedBox(width: Spacing.s3),
+                            Text(l10n.ambient, style: p.body.copyWith(fontWeight: FontWeight.w500)),
+                            Expanded(
+                              child: DsSlider(
+                                value: _previewVolume,
+                                onChanged: (v) => setState(() => _previewVolume = v),
+                                semanticLabel: l10n.ambient,
+                                ringColor: p.surfaceRaised,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: Spacing.s3),
+                      Row(
+                        children: [
+                          Container(
+                            width: Sizes.sfxTileMin,
+                            height: Sizes.sfxTileMin - Spacing.s4,
+                            padding: const EdgeInsets.all(Spacing.s3),
+                            decoration: BoxDecoration(
+                              color: p.primarySubtle,
+                              borderRadius: Radii.mdAll,
+                              border: Border.all(color: p.primary, width: Sizes.borderWidth),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _nameController.text.isEmpty ? (l10n?.cardExampleTitle ?? 'Sample Card') : _nameController.text,
-                                  style: TextStyle(color: _textPrimary, fontWeight: FontWeight.w600, fontSize: 15),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  l10n?.cardExampleDesc ?? 'Scene or track description in the selected color palette.',
-                                  style: TextStyle(color: _textSecondary, fontSize: 12),
-                                ),
-                                const SizedBox(height: 10),
-                                Wrap(
-                                  spacing: 8,
-                                  children: [
-                                    _buildIntensityChip(l10n?.intensityCalm ?? 'Calm', _calm, true),
-                                    _buildIntensityChip(l10n?.intensityBattle ?? 'Battle', _battleIntensity, false),
-                                    _buildIntensityChip(l10n?.intensityBoss ?? 'Boss', _bossIntensity, false),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: _primary,
-                                        foregroundColor: Colors.white,
-                                        elevation: 0,
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      ),
-                                      icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                                      label: Text(l10n?.play ?? 'Play', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                      onPressed: () {},
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: SliderTheme(
-                                        data: SliderThemeData(
-                                          activeTrackColor: _primary,
-                                          thumbColor: _primary,
-                                          inactiveTrackColor: _primary.withValues(alpha: 0.2),
-                                        ),
-                                        child: Slider(value: 0.65, onChanged: (_) {}),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                DsIcon('bolt', size: Sizes.iconLg, color: p.primary),
+                                const Spacer(),
+                                Text(l10n.sfx, style: p.label),
                               ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                const SizedBox(height: 20),
-
-                // Color Configuration Grid
-                Text(
-                  l10n?.colorPaletteConfig ?? 'Color Palette Settings',
-                  style: TextStyle(color: _textPrimary, fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    _buildColorButton(l10n?.colorNamePrimary ?? 'Primary', _primary, (c) => setState(() => _primary = c)),
-                    _buildColorButton(l10n?.intensityCalm ?? 'Calm', _calm, (c) => setState(() => _calm = c)),
-                    _buildColorButton(l10n?.colorNameBackground ?? 'Background', _background, (c) => setState(() => _background = c)),
-                    _buildColorButton(l10n?.colorNameSurface ?? 'Surface', _surface, (c) => setState(() => _surface = c)),
-                    _buildColorButton(l10n?.colorNameTextPrimary ?? 'Text Primary', _textPrimary, (c) => setState(() => _textPrimary = c)),
-                    _buildColorButton(l10n?.colorNameTextSecondary ?? 'Text Secondary', _textSecondary, (c) => setState(() => _textSecondary = c)),
-                    _buildColorButton(l10n?.colorNameBattleIntensity ?? 'Battle Intensity', _battleIntensity, (c) => setState(() => _battleIntensity = c)),
-                    _buildColorButton(l10n?.colorNameBossIntensity ?? 'Boss Intensity', _bossIntensity, (c) => setState(() => _bossIntensity = c)),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(l10n?.cancel ?? 'Cancel', style: TextStyle(color: _textSecondary)),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      const SizedBox(height: Spacing.s3),
+                      Wrap(
+                        spacing: Spacing.s2,
+                        runSpacing: Spacing.s2,
+                        children: [
+                          DsButton.primary(label: l10n.playTooltip, icon: 'play', onPressed: () {}),
+                          DsButton(label: l10n.cancel, onPressed: () {}),
+                        ],
                       ),
-                      icon: const Icon(Icons.check_rounded),
-                      label: Text(l10n?.saveThemeBtn ?? 'Save Theme'),
-                      onPressed: () {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          final newTheme = CustomThemeModel.derive(
-                            id: widget.initialTheme?.id ?? const Uuid().v4(),
-                            name: _nameController.text.trim(),
-                            background: _background.toARGB32(),
-                            surface: _surface.toARGB32(),
-                            text: _textPrimary.toARGB32(),
-                            primary: _primary.toARGB32(),
-                            calm: _calm.toARGB32(),
-                            suspense: _suspense.toARGB32(),
-                            battle: _battleIntensity.toARGB32(),
-                            boss: _bossIntensity.toARGB32(),
-                            createdAt: widget.initialTheme?.createdAt ?? DateTime.now(),
-                          );
-                          Navigator.of(context).pop(newTheme);
-                        }
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
-  }
 
-  Widget _buildIntensityChip(String label, Color color, bool selected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: selected ? color.withValues(alpha: 0.3) : Colors.transparent,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-
-  Widget _buildColorButton(String label, Color color, ValueChanged<Color> onChanged) {
-    return SizedBox(
-      width: 220,
-      child: InkWell(
-        onTap: () => _pickColor(label, color, onChanged),
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: _surface,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: _textSecondary.withValues(alpha: 0.2)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white38),
+    final checksList = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.contrastChecksTitle, style: ds.title),
+        const SizedBox(height: Spacing.s2),
+        for (final (index, check) in checks.indexed)
+          Builder(
+            builder: (context) {
+              final ratio = cm.contrastRatio(check.fg(_palette), check.bg(_palette));
+              final ok = ratio >= check.min;
+              return Container(
+                key: ValueKey('contrast_check_$index'),
+                constraints: const BoxConstraints(minHeight: Sizes.targetMin),
+                child: Row(
+                  children: [
+                    Expanded(child: Text(check.label, style: ds.body.copyWith(color: ok ? ds.text : ds.danger))),
+                    Text('${ratio.toStringAsFixed(1)}:1', style: ds.tabular(ds.caption.copyWith(color: ok ? ds.textMuted : ds.danger))),
+                    const SizedBox(width: Spacing.s2),
+                    if (ok)
+                      DsBadge(l10n.contrastOk, tone: DsTone.success)
+                    else
+                      DsButton.ghost(
+                        key: ValueKey('contrast_fix_$index'),
+                        label: l10n.contrastFix,
+                        onPressed: () => setState(() {
+                          final fixed = cm.adjustToContrast(
+                            check.fg(_palette),
+                            [check.bg(_palette)],
+                            check.min,
+                            lighter: derived.isDark,
+                          );
+                          check.apply(_palette, fixed);
+                        }),
+                      ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 8),
+              );
+            },
+          ),
+        if (failing > 0) ...[
+          const SizedBox(height: Spacing.s2),
+          Text(l10n.contrastWarning, style: ds.caption.copyWith(color: ds.danger)),
+        ],
+      ],
+    );
+
+    return DsDialog(
+      title: editing ? l10n.editCustomThemeTitle : l10n.createCustomThemeTitle,
+      description: l10n.themeEditorDesc,
+      icon: 'palette',
+      size: DsDialogSize.lg,
+      closeLabel: l10n.close,
+      actions: [
+        DsButton.ghost(label: l10n.cancel, onPressed: () => Navigator.of(context).pop()),
+        DsButton.primary(key: const ValueKey('save_theme_btn'), label: l10n.saveThemeBtn, icon: 'check', onPressed: _save),
+      ],
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final wide = c.maxWidth >= Sizes.dialogMd;
+          if (!wide) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [editor, const SizedBox(height: Spacing.s5), preview, const SizedBox(height: Spacing.s5), checksList],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: editor),
+              const SizedBox(width: Spacing.s5),
               Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(color: _textPrimary, fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [preview, const SizedBox(height: Spacing.s5), checksList],
                 ),
               ),
             ],
-          ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Hex field and swatches for one colour.
+class _ColorPickerDialog extends StatefulWidget {
+  final String title;
+  final int initial;
+
+  const _ColorPickerDialog({required this.title, required this.initial});
+
+  @override
+  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<_ColorPickerDialog> {
+  late final TextEditingController _hex = TextEditingController(
+    text: '#${(widget.initial & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}',
+  );
+
+  int? get _value {
+    final text = _hex.text.trim().replaceFirst('#', '');
+    if (!RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(text)) return null;
+    return 0xFF000000 | int.parse(text, radix: 16);
+  }
+
+  @override
+  void dispose() {
+    _hex.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
+    final value = _value;
+
+    return DsDialog(
+      title: l10n.colorPickTitle(widget.title),
+      size: DsDialogSize.sm,
+      closeLabel: l10n.close,
+      actions: [
+        DsButton.ghost(label: l10n.cancel, onPressed: () => Navigator.of(context).pop()),
+        DsButton.primary(
+          key: const ValueKey('apply_color_btn'),
+          label: l10n.saveBtn,
+          icon: 'check',
+          onPressed: value == null ? null : () => Navigator.of(context).pop(value),
         ),
+      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          DsTextField(
+            key: const ValueKey('color_hex_field'),
+            label: l10n.hexLabel,
+            controller: _hex,
+            autofocus: true,
+            error: value == null ? l10n.hexInvalid : null,
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: Spacing.s4),
+          Wrap(
+            spacing: Spacing.s2,
+            runSpacing: Spacing.s2,
+            children: [
+              for (final swatch in ThemeSwatches.all)
+                DsInteractive(
+                  onTap: () => setState(() => _hex.text = '#${(swatch & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}'),
+                  semanticLabel: '#${(swatch & 0xFFFFFF).toRadixString(16)}',
+                  builder: (context, s) => Container(
+                    width: Sizes.targetMin,
+                    height: Sizes.targetMin,
+                    decoration: BoxDecoration(
+                      color: Color(swatch),
+                      borderRadius: Radii.mdAll,
+                      border: Border.all(
+                        color: value == swatch ? ds.primary : ds.borderStrong,
+                        width: value == swatch ? Sizes.focusRing : Sizes.borderWidth,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }
