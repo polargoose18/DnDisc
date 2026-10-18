@@ -451,7 +451,7 @@ class SettingsScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 1.0),
                         ),
-                        child: DnDiscLogo(size: 36, color: activeTheme.primary),
+                        child: const DnDiscLogo(size: 36),
                       ),
                       const SizedBox(width: 16),
                       Expanded(

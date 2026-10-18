@@ -133,7 +133,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                                       width: 0.8,
                                     ),
                                   ),
-                                  child: DnDiscLogo(size: 18, color: activeTheme.primary),
+                                  child: const DnDiscLogo(size: 18),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -483,7 +483,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 0.8),
                 ),
-                child: DnDiscLogo(size: 20, color: activeTheme.primary),
+                child: const DnDiscLogo(size: 20),
               ),
               const SizedBox(width: 8),
               Text(

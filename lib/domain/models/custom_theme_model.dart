@@ -373,9 +373,9 @@ class CustomThemeModel {
         suffixIconColor: textSecondary,
         border: fieldBorder(borderStrong),
         enabledBorder: fieldBorder(borderStrong),
-        focusedBorder: fieldBorder(focusRing, Sizes.focusRing),
+        focusedBorder: fieldBorder(borderStrong),
         errorBorder: fieldBorder(danger),
-        focusedErrorBorder: fieldBorder(danger, Sizes.focusRing),
+        focusedErrorBorder: fieldBorder(danger),
         disabledBorder: fieldBorder(border),
       ),
       textSelectionTheme: TextSelectionThemeData(
