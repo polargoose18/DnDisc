@@ -20,6 +20,9 @@ class MusicBusController extends ChangeNotifier {
   final FadeController _fadeController = FadeController();
   final FadeController _outgoingFadeController = FadeController();
   Duration? _currentTrackDuration;
+
+  /// Playback position of the current track; updated by the player without notifying listeners.
+  final ValueNotifier<Duration> position = ValueNotifier(Duration.zero);
   bool _loopTransitioning = false;
 
   MusicBusController({
@@ -35,6 +38,7 @@ class MusicBusController extends ChangeNotifier {
   double get effectiveVolume => (_volume * _masterVolume * _duckingMultiplier * _fadeMultiplier).clamp(0.0, 1.0);
   bool get isPlaying => _isPlaying;
   MusicIntensity get currentIntensity => _currentIntensity;
+  Duration? get trackDuration => _currentTrackDuration;
 
   void setDefaultFadeDuration(Duration duration) {
     _defaultFadeDuration = duration;
@@ -56,6 +60,7 @@ class MusicBusController extends ChangeNotifier {
     _currentIntensity = track.intensity;
     _loopTransitioning = false;
     _currentTrackDuration = null;
+    position.value = Duration.zero;
 
     LoggerService().info('MusicBus: Start playing track "${track.title}"', details: 'Path: ${track.filePath}');
 
@@ -116,6 +121,7 @@ class MusicBusController extends ChangeNotifier {
 
       _player!.onPositionChanged.listen(
         (pos) {
+          position.value = pos;
           final total = _currentTrackDuration;
           if (total != null && total.inMilliseconds > 4000) {
             final transitionDuration = total.inMilliseconds > 8000
@@ -211,6 +217,7 @@ class MusicBusController extends ChangeNotifier {
 
       nextPlayer.onPositionChanged.listen(
         (pos) {
+          position.value = pos;
           final total = _currentTrackDuration;
           if (total != null && total.inMilliseconds > 4000) {
             final nextTransition = total.inMilliseconds > 8000
@@ -294,6 +301,7 @@ class MusicBusController extends ChangeNotifier {
     _isPlaying = false;
     _loopTransitioning = false;
     _currentTrackDuration = null;
+    position.value = Duration.zero;
     await _stopCurrentAudio();
     LoggerService().info('MusicBus: Prepared track "${track.title}" (waiting for GM playback)', details: 'Path: ${track.filePath}');
     notifyListeners();

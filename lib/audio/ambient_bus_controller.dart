@@ -14,6 +14,7 @@ class AmbientBusController extends ChangeNotifier {
   final Map<String, AudioPlayer> _outgoingAmbientPlayers = {};
   final Map<String, FadeController> _outgoingAmbientFadeControllers = {};
   double _masterAmbientVolume = 1.0;
+  double _channelVolume = 1.0;
   Duration _defaultFadeDuration;
 
   AmbientBusController({
@@ -22,6 +23,11 @@ class AmbientBusController extends ChangeNotifier {
 
   List<AmbientLayer> get layers => List.unmodifiable(_layers);
   double get masterVolume => _masterAmbientVolume;
+
+  /// Volume of the whole Ambient channel (the mixer slider); layers keep their own volume.
+  double get channelVolume => _channelVolume;
+
+  double get _gain => _masterAmbientVolume * _channelVolume;
   Duration get defaultFadeDuration => _defaultFadeDuration;
 
   void setDefaultFadeDuration(Duration duration) {
@@ -88,11 +94,11 @@ class AmbientBusController extends ChangeNotifier {
 
       final player = _activePlayers[layerId];
       if (player != null) {
-        final targetVol = clampedVol * _masterAmbientVolume;
+        final targetVol = clampedVol * _gain;
         if (fadeDuration.inMilliseconds > 0) {
           final fader = _fadeControllers.putIfAbsent(layerId, () => FadeController());
           fader.startFade(
-            from: layer.volume * _masterAmbientVolume,
+            from: layer.volume * _gain,
             to: targetVol,
             duration: fadeDuration,
             onUpdate: (val) {
@@ -118,6 +124,27 @@ class AmbientBusController extends ChangeNotifier {
     }
   }
 
+  void setChannelVolume(double volume) {
+    _channelVolume = volume.clamp(0.0, 1.0);
+    _applyGainToActiveLayers();
+    notifyListeners();
+  }
+
+  void _applyGainToActiveLayers() {
+    for (final layer in _layers) {
+      if (layer.isActive) {
+        final player = _activePlayers[layer.id];
+        if (player != null) {
+          try {
+            player.setVolume(layer.volume * _gain);
+          } catch (e) {
+            LoggerService().error('AmbientBus: Error setting channel volume', details: '$e');
+          }
+        }
+      }
+    }
+  }
+
   void setMasterVolume(double volume) {
     _masterAmbientVolume = volume.clamp(0.0, 1.0);
     LoggerService().info('AmbientBus: Master volume set to $_masterAmbientVolume');
@@ -126,7 +153,7 @@ class AmbientBusController extends ChangeNotifier {
         final player = _activePlayers[layer.id];
         if (player != null) {
           try {
-            player.setVolume(layer.volume * _masterAmbientVolume);
+            player.setVolume(layer.volume * _gain);
           } catch (e) {
             LoggerService().error('AmbientBus: Error setting master ambient volume', details: '$e');
           }
@@ -168,7 +195,7 @@ class AmbientBusController extends ChangeNotifier {
       await _stopLayerAudio(layer.id, fadeDuration: Duration.zero);
 
       player = AudioPlayer();
-      final targetVolume = layer.volume * _masterAmbientVolume;
+      final targetVolume = layer.volume * _gain;
       final startVolume = effectiveFade.inMilliseconds > 0 ? 0.0 : targetVolume;
       _layerLoopTransitioning[layer.id] = false;
 
@@ -268,7 +295,7 @@ class AmbientBusController extends ChangeNotifier {
     try {
       final oldPlayer = _activePlayers[layer.id];
       final currentLayer = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer);
-      final targetVolume = currentLayer.volume * _masterAmbientVolume;
+      final targetVolume = currentLayer.volume * _gain;
 
       final outgoingFader = _outgoingAmbientFadeControllers.putIfAbsent(layer.id, () => FadeController());
       outgoingFader.stop();
@@ -403,7 +430,7 @@ class AmbientBusController extends ChangeNotifier {
         (l) => l.id == layerId,
         orElse: () => AmbientLayer(id: layerId, title: '', filePath: ''),
       );
-      final currentVol = currentLayer.volume * _masterAmbientVolume;
+      final currentVol = currentLayer.volume * _gain;
 
       stopFader.startFade(
         from: currentVol,
