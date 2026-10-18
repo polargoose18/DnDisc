@@ -158,7 +158,7 @@ void main() {
           version: 5,
           onCreate: (db, _) async {
             await db.execute('CREATE TABLE library_tracks (id TEXT PRIMARY KEY, title TEXT, bus_type TEXT)');
-            await db.execute('CREATE TABLE scenes (id TEXT PRIMARY KEY, created_at TEXT)');
+            await db.execute('CREATE TABLE scenes (id TEXT PRIMARY KEY, name TEXT, image_path TEXT, created_at TEXT)');
             await db.execute('''
               CREATE TABLE custom_themes (
                 id TEXT PRIMARY KEY, name TEXT NOT NULL, is_dark INTEGER NOT NULL,

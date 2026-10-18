@@ -6,6 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../../domain/models/library_track.dart';
 import '../../domain/models/scene_model.dart';
 import '../../domain/models/custom_theme_model.dart';
+import '../../theme/covers.dart';
 import '../../domain/models/scene_repository_model.dart';
 
 class DatabaseService {
@@ -36,7 +37,7 @@ class DatabaseService {
 
     return await openDatabase(
       dbPath,
-      version: 6,
+      version: 7,
       onConfigure: (db) async {
         await db.execute('PRAGMA journal_mode = WAL;');
         await db.execute('PRAGMA synchronous = NORMAL;');
@@ -66,6 +67,9 @@ class DatabaseService {
         }
         if (oldVersion < 6) {
           await _migrateCustomThemesToDesignSystem(db);
+        }
+        if (oldVersion < 7) {
+          await _migrateScenesAddCover(db);
         }
         await _createIndexes(db);
       },
@@ -115,6 +119,7 @@ class DatabaseService {
         ambient_layer_volumes TEXT,
         soundboard_sfx_ids TEXT,
         image_path TEXT,
+        cover TEXT,
         created_at TEXT NOT NULL
       )
     ''');
@@ -153,6 +158,27 @@ class DatabaseService {
         created_at TEXT NOT NULL
       )
     ''');
+  }
+
+  /// v7: scenes get a `cover` key. Existing scenes without their own image are
+  /// assigned a default cover by a hash of the id, so they keep it across restarts.
+  static Future<void> _migrateScenesAddCover(Database db) async {
+    try {
+      await db.execute('ALTER TABLE scenes ADD COLUMN cover TEXT DEFAULT NULL;');
+    } catch (_) {
+      // Column already exists (fresh install created it with the table).
+    }
+    final rows = await db.query('scenes', columns: ['id', 'image_path', 'cover']);
+    for (final row in rows) {
+      final image = row['image_path'] as String?;
+      if (row['cover'] != null || (image != null && image.isNotEmpty)) continue;
+      await db.update(
+        'scenes',
+        {'cover': SceneCovers.forSeed(row['id'] as String)},
+        where: 'id = ?',
+        whereArgs: [row['id']],
+      );
+    }
   }
 
   /// v6: themes follow the design-system tokens. Old rows hold only the base
