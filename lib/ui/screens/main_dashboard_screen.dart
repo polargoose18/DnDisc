@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../audio/audio_engine_service.dart';
@@ -142,7 +142,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                                     alignment: Alignment.centerLeft,
                                     child: Text(
                                       l10n?.appTitle ?? 'DnDisc',
-                                      style: GoogleFonts.plusJakartaSans(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                         letterSpacing: -0.2,
@@ -313,7 +313,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
           const SizedBox(width: 8),
           Text(
             _getDesktopSectionTitle(l10n),
-            style: GoogleFonts.plusJakartaSans(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               letterSpacing: -0.1,
@@ -356,7 +356,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                   ),
                   Text(
                     '${(engine.masterVolume * 100).toInt()}%',
-                    style: GoogleFonts.jetBrainsMono(
+                    style: TextStyle(fontFamily: DsTheme.monoFamily, 
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: activeTheme.textSecondary,
@@ -436,7 +436,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
                     Expanded(
                       child: Text(
                         label,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                           color: isSelected ? activeTheme.textPrimary : activeTheme.textSecondary,
@@ -488,7 +488,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               const SizedBox(width: 8),
               Text(
                 l10n?.appTitle ?? 'DnDisc',
-                style: GoogleFonts.plusJakartaSans(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   letterSpacing: -0.2,
@@ -512,8 +512,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> with SingleTi
               indicatorWeight: 2.5,
               labelColor: activeTheme.primary,
               unselectedLabelColor: activeTheme.textSecondary,
-              labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13),
-              unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.normal, fontSize: 13),
+              labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
               tabs: [
                 Tab(icon: const Icon(Icons.dashboard_rounded, size: 18), text: l10n?.tabGmDashboard ?? 'GM Dashboard'),
                 Tab(icon: const Icon(Icons.library_music_rounded, size: 18), text: l10n?.tabLibrary ?? 'Media Library'),

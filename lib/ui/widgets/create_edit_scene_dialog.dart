@@ -1,6 +1,6 @@
+import '../../theme/ds_theme.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -106,19 +106,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
         return preset;
       }
     }
-    return CustomThemeModel(
-      id: isDark ? AppThemes.deepDarkId : AppThemes.cleanLightId,
-      name: isDark ? 'Dark Theme' : 'Light Theme',
-      isDark: isDark,
-      primaryColor: themeData.colorScheme.primary.toARGB32(),
-      secondaryColor: themeData.colorScheme.secondary.toARGB32(),
-      backgroundColor: themeData.scaffoldBackgroundColor.toARGB32(),
-      surfaceColor: themeData.colorScheme.surface.toARGB32(),
-      cardColor: themeData.cardColor.toARGB32(),
-      accentColor: themeData.colorScheme.primary.toARGB32(),
-      textPrimaryColor: (themeData.textTheme.bodyLarge?.color ?? themeData.colorScheme.onSurface).toARGB32(),
-      textSecondaryColor: (themeData.textTheme.bodyMedium?.color ?? (isDark ? Colors.white70 : Colors.black54)).toARGB32(),
-    );
+    return isDark ? AppThemes.deepDark : AppThemes.cleanLight;
   }
 
   @override
@@ -300,10 +288,8 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
 
     final availableColorOptions = <int>{
       activeTheme.primaryColor,
-      activeTheme.accentColor,
-      activeTheme.secondaryColor,
       activeTheme.battleIntensityColor,
-      activeTheme.duckingBadgeColor,
+      activeTheme.suspenseIntensityColor,
       if (widget.scene != null) widget.scene!.colorHex,
       ..._colorOptions,
     }.toList();
@@ -338,7 +324,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                   widget.scene == null
                       ? (l10n?.createSceneTitle ?? 'Create New Scene')
                       : (l10n?.editSceneTitle ?? 'Edit Scene'),
-                  style: GoogleFonts.plusJakartaSans(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: activeTheme.textPrimary,
@@ -363,14 +349,14 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     // Scene Name
                     TextField(
                       controller: _nameController,
-                      style: GoogleFonts.inter(color: activeTheme.textPrimary, fontSize: 14),
+                      style: TextStyle(color: activeTheme.textPrimary, fontSize: 14),
                       decoration: InputDecoration(
                         labelText: l10n?.sceneNameLabel ?? 'Scene Name *',
-                        labelStyle: GoogleFonts.inter(color: activeTheme.textSecondary),
+                        labelStyle: TextStyle(color: activeTheme.textSecondary),
                         hintText: l10n?.sceneNameHint ?? 'e.g. Tavern "The Drunken Dragon"',
-                        hintStyle: GoogleFonts.inter(color: activeTheme.textSecondary.withValues(alpha: 0.6)),
+                        hintStyle: TextStyle(color: activeTheme.textSecondary.withValues(alpha: 0.6)),
                         filled: true,
-                        fillColor: activeTheme.card,
+                        fillColor: activeTheme.surfaceRaised,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
@@ -397,14 +383,14 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     // Scene Description
                     TextField(
                       controller: _descController,
-                      style: GoogleFonts.inter(color: activeTheme.textPrimary, fontSize: 14),
+                      style: TextStyle(color: activeTheme.textPrimary, fontSize: 14),
                       decoration: InputDecoration(
                         labelText: l10n?.sceneDescLabel ?? 'Atmosphere Description / GM Notes',
-                        labelStyle: GoogleFonts.inter(color: activeTheme.textSecondary),
+                        labelStyle: TextStyle(color: activeTheme.textSecondary),
                         hintText: l10n?.sceneDescHint ?? 'Warm fireplace, clinking mugs, quiet lute...',
-                        hintStyle: GoogleFonts.inter(color: activeTheme.textSecondary.withValues(alpha: 0.6)),
+                        hintStyle: TextStyle(color: activeTheme.textSecondary.withValues(alpha: 0.6)),
                         filled: true,
-                        fillColor: activeTheme.card,
+                        fillColor: activeTheme.surfaceRaised,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
@@ -435,14 +421,14 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                         Expanded(
                           child: TextField(
                             controller: _imagePathController,
-                            style: GoogleFonts.inter(color: activeTheme.textPrimary, fontSize: 14),
+                            style: TextStyle(color: activeTheme.textPrimary, fontSize: 14),
                             decoration: InputDecoration(
                               labelText: l10n?.sceneCoverLabel ?? 'Image / Cover Art Path',
-                              labelStyle: GoogleFonts.inter(color: activeTheme.textSecondary),
+                              labelStyle: TextStyle(color: activeTheme.textSecondary),
                               hintText: 'C:/images/tavern.jpg',
-                              hintStyle: GoogleFonts.inter(color: activeTheme.textSecondary.withValues(alpha: 0.6)),
+                              hintStyle: TextStyle(color: activeTheme.textSecondary.withValues(alpha: 0.6)),
                               filled: true,
-                              fillColor: activeTheme.card,
+                              fillColor: activeTheme.surfaceRaised,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
@@ -484,7 +470,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                           icon: const Icon(Icons.image_rounded, size: 18),
                           label: Text(
                             l10n?.browseBtn ?? 'Browse',
-                            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                           onPressed: () async {
                             final result = await FilePicker.platform.pickFiles(
@@ -505,7 +491,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     // Color Choice
                     Text(
                       l10n?.colorAccent ?? 'Color Accent:',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: activeTheme.textPrimary,
                       ),
@@ -577,7 +563,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Text(
                                 l10n?.nothingFound ?? 'Nothing found',
-                                style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 12),
+                                style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
                               ),
                             )
                           else
@@ -599,7 +585,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                             children: [
                                               Text(
                                                 '${l10n?.musicIntensityLabel ?? "Intensity"}:',
-                                                style: GoogleFonts.inter(fontSize: 12, color: activeTheme.textSecondary),
+                                                style: TextStyle(fontSize: 12, color: activeTheme.textSecondary),
                                               ),
                                               const SizedBox(width: 8),
                                               Expanded(
@@ -611,7 +597,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                                       showCheckmark: false,
                                                       label: Text(
                                                         intensity.name.toUpperCase(),
-                                                        style: GoogleFonts.jetBrainsMono(
+                                                        style: TextStyle(fontFamily: DsTheme.monoFamily, 
                                                           fontSize: 10,
                                                           fontWeight: isIntSelected ? FontWeight.bold : FontWeight.normal,
                                                           color: isIntSelected
@@ -623,7 +609,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                                       ),
                                                       selected: isIntSelected,
                                                       selectedColor: sceneAccentColor,
-                                                      backgroundColor: activeTheme.card,
+                                                      backgroundColor: activeTheme.surfaceRaised,
                                                       side: BorderSide(
                                                         color: isIntSelected
                                                             ? sceneAccentColor
@@ -666,7 +652,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                       child: allAmbientTracks.isEmpty
                           ? Text(
                               l10n?.noAmbientTracksInLibrary ?? 'No ambient tracks in the library.',
-                              style: GoogleFonts.inter(color: activeTheme.textSecondary),
+                              style: TextStyle(color: activeTheme.textSecondary),
                             )
                           : Column(
                               children: [
@@ -675,7 +661,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                     padding: const EdgeInsets.symmetric(vertical: 8),
                                     child: Text(
                                       l10n?.nothingFound ?? 'Nothing found',
-                                      style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 12),
+                                      style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
                                     ),
                                   )
                                 else
@@ -742,7 +728,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                                     ),
                                                     Text(
                                                       '${(vol * 100).toInt()}%',
-                                                      style: GoogleFonts.jetBrainsMono(fontSize: 12, color: activeTheme.textSecondary),
+                                                      style: TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 12, color: activeTheme.textSecondary),
                                                     ),
                                                   ],
                                                 ),
@@ -774,7 +760,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                       child: allSfxTracks.isEmpty
                           ? Text(
                               l10n?.noSfxTracksInLibrary ?? 'No SFX tracks in the library.',
-                              style: GoogleFonts.inter(color: activeTheme.textSecondary),
+                              style: TextStyle(color: activeTheme.textSecondary),
                             )
                           : Column(
                               children: [
@@ -783,7 +769,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                                     padding: const EdgeInsets.symmetric(vertical: 8),
                                     child: Text(
                                       l10n?.nothingFound ?? 'Nothing found',
-                                      style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 12),
+                                      style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
                                     ),
                                   )
                                 else
@@ -850,7 +836,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                   ),
                   child: Text(
                     l10n?.cancel ?? 'Cancel',
-                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -858,7 +844,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                   icon: const Icon(Icons.check),
                   label: Text(
                     widget.scene == null ? (l10n?.create ?? 'Create') : (l10n?.save ?? 'Save'),
-                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: sceneAccentColor,
@@ -873,10 +859,10 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     if (name.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          backgroundColor: activeTheme.card,
+                          backgroundColor: activeTheme.surfaceRaised,
                           content: Text(
                             l10n?.specifySceneName ?? 'Please specify scene name',
-                            style: GoogleFonts.inter(color: activeTheme.textPrimary),
+                            style: TextStyle(color: activeTheme.textPrimary),
                           ),
                         ),
                       );
@@ -930,7 +916,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
 
     return Container(
       decoration: BoxDecoration(
-        color: activeTheme.card,
+        color: activeTheme.surfaceRaised,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
@@ -946,7 +932,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: GoogleFonts.plusJakartaSans(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                   color: activeTheme.textPrimary,
@@ -962,7 +948,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                 ),
                 child: Text(
                   badgeText,
-                  style: GoogleFonts.jetBrainsMono(
+                  style: TextStyle(fontFamily: DsTheme.monoFamily, 
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: effectiveBadgeTextColor,
@@ -978,11 +964,11 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
             controller: searchController,
             onChanged: onSearchChanged,
             onSubmitted: onSearchSubmitted,
-            style: GoogleFonts.inter(color: activeTheme.textPrimary, fontSize: 13),
+            style: TextStyle(color: activeTheme.textPrimary, fontSize: 13),
             decoration: InputDecoration(
               isDense: true,
               hintText: searchHint,
-              hintStyle: GoogleFonts.inter(
+              hintStyle: TextStyle(
                 color: activeTheme.textSecondary.withValues(alpha: 0.7),
                 fontSize: 13,
               ),
@@ -1077,7 +1063,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                     children: [
                       Text(
                         title,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                           fontSize: 13,
                           color: activeTheme.textPrimary,
@@ -1087,7 +1073,7 @@ class _CreateEditSceneDialogState extends State<CreateEditSceneDialog> {
                         const SizedBox(height: 2),
                         Text(
                           subtitle,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: 11,
                             color: activeTheme.textSecondary,
                           ),

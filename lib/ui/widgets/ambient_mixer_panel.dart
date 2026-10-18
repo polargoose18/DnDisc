@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -42,7 +42,7 @@ class AmbientMixerPanel extends StatelessWidget {
                           Flexible(
                             child: Text(
                               l10n?.ambientLayers ?? 'Ambient Layers (Background Sounds)',
-                              style: GoogleFonts.plusJakartaSans(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -0.2,
@@ -62,7 +62,7 @@ class AmbientMixerPanel extends StatelessWidget {
                               ),
                               child: Text(
                                 '${ambient.layers.where((l) => l.isActive).length}/${ambient.layers.length}',
-                                style: GoogleFonts.jetBrainsMono(
+                                style: TextStyle(fontFamily: DsTheme.monoFamily, 
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: activeTheme.primary,
@@ -89,7 +89,7 @@ class AmbientMixerPanel extends StatelessWidget {
                             icon: const Icon(Icons.stop_rounded, size: 16),
                             label: Text(
                               l10n?.stopAll ?? 'Stop All',
-                              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600),
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                             ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.redAccent,

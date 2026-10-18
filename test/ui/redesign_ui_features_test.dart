@@ -130,16 +130,16 @@ void main() {
   });
 
   group('Theme Palette Specification Tests', () {
-    test('should provide warm espresso background and antique gold primary in deepDark preset', () {
+    test('should provide the design-system tokens in the deepDark preset', () {
       // Arrange & Act
       const theme = AppThemes.deepDark;
 
       // Assert
-      expect(theme.backgroundColor, equals(0xFF151210));
-      expect(theme.surfaceColor, equals(0xFF1E1916));
-      expect(theme.cardColor, equals(0xFF29221D));
+      expect(theme.backgroundColor, equals(0xFF14110F));
+      expect(theme.surfaceColor, equals(0xFF1C1815));
+      expect(theme.surfaceRaisedColor, equals(0xFF261F1B));
       expect(theme.primaryColor, equals(0xFFD4A373));
-      expect(theme.textPrimaryColor, equals(0xFFF5EFE6));
+      expect(theme.textPrimaryColor, equals(0xFFF3ECE2));
       expect(theme.isDark, isTrue);
     });
   });

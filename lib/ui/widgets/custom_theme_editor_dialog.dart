@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 import '../../l10n/app_localizations.dart';
 import '../../domain/models/custom_theme_model.dart';
@@ -18,14 +18,12 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
   late TextEditingController _nameController;
   late bool _isDark;
   late Color _primary;
-  late Color _secondary;
+  late Color _calm;
+  late Color _suspense;
   late Color _background;
   late Color _surface;
-  late Color _card;
-  late Color _accent;
   late Color _textPrimary;
   late Color _textSecondary;
-  late Color _duckingBadge;
   late Color _battleIntensity;
   late Color _bossIntensity;
 
@@ -61,14 +59,12 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
     _nameController = TextEditingController();
     _isDark = base.isDark;
     _primary = base.primary;
-    _secondary = base.secondary;
+    _calm = base.calmIntensity;
+    _suspense = base.suspenseIntensity;
     _background = base.background;
     _surface = base.surface;
-    _card = base.card;
-    _accent = base.accent;
     _textPrimary = base.textPrimary;
     _textSecondary = base.textSecondary;
-    _duckingBadge = base.duckingBadge;
     _battleIntensity = base.battleIntensity;
     _bossIntensity = base.bossIntensity;
   }
@@ -83,14 +79,12 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
     setState(() {
       _isDark = preset.isDark;
       _primary = preset.primary;
-      _secondary = preset.secondary;
+      _calm = preset.calmIntensity;
+      _suspense = preset.suspenseIntensity;
       _background = preset.background;
       _surface = preset.surface;
-      _card = preset.card;
-      _accent = preset.accent;
       _textPrimary = preset.textPrimary;
       _textSecondary = preset.textSecondary;
-      _duckingBadge = preset.duckingBadge;
       _battleIntensity = preset.battleIntensity;
       _bossIntensity = preset.bossIntensity;
     });
@@ -268,23 +262,23 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                         children: [
                           Text(
                             l10n?.themePreviewTitle ?? 'Theme Preview',
-                            style: GoogleFonts.plusJakartaSans(color: _textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+                            style: TextStyle(color: _textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: _duckingBadge.withValues(alpha: 0.2),
+                              color: _primary.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: _duckingBadge),
+                              border: Border.all(color: _primary),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.volume_down, size: 14, color: _duckingBadge),
+                                Icon(Icons.volume_down, size: 14, color: _primary),
                                 const SizedBox(width: 4),
                                 Text(
                                   l10n?.duckingActive ?? 'Ducking Active',
-                                  style: GoogleFonts.jetBrainsMono(color: _duckingBadge, fontSize: 11, fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontFamily: DsTheme.monoFamily, color: _primary, fontSize: 11, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -295,7 +289,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                       Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: _card,
+                              color: _surface,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: _isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08),
@@ -306,18 +300,18 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                               children: [
                                 Text(
                                   _nameController.text.isEmpty ? (l10n?.cardExampleTitle ?? 'Sample Card') : _nameController.text,
-                                  style: GoogleFonts.plusJakartaSans(color: _textPrimary, fontWeight: FontWeight.w600, fontSize: 15),
+                                  style: TextStyle(color: _textPrimary, fontWeight: FontWeight.w600, fontSize: 15),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   l10n?.cardExampleDesc ?? 'Scene or track description in the selected color palette.',
-                                  style: GoogleFonts.inter(color: _textSecondary, fontSize: 12),
+                                  style: TextStyle(color: _textSecondary, fontSize: 12),
                                 ),
                                 const SizedBox(height: 10),
                                 Wrap(
                                   spacing: 8,
                                   children: [
-                                    _buildIntensityChip(l10n?.intensityCalm ?? 'Calm', _secondary, true),
+                                    _buildIntensityChip(l10n?.intensityCalm ?? 'Calm', _calm, true),
                                     _buildIntensityChip(l10n?.intensityBattle ?? 'Battle', _battleIntensity, false),
                                     _buildIntensityChip(l10n?.intensityBoss ?? 'Boss', _bossIntensity, false),
                                   ],
@@ -333,7 +327,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       ),
                                       icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                                      label: Text(l10n?.play ?? 'Play', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600)),
+                                      label: Text(l10n?.play ?? 'Play', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                                       onPressed: () {},
                                     ),
                                     const SizedBox(width: 12),
@@ -368,14 +362,11 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                   runSpacing: 12,
                   children: [
                     _buildColorButton(l10n?.colorNamePrimary ?? 'Primary', _primary, (c) => setState(() => _primary = c)),
-                    _buildColorButton(l10n?.colorNameSecondary ?? 'Secondary', _secondary, (c) => setState(() => _secondary = c)),
+                    _buildColorButton(l10n?.intensityCalm ?? 'Calm', _calm, (c) => setState(() => _calm = c)),
                     _buildColorButton(l10n?.colorNameBackground ?? 'Background', _background, (c) => setState(() => _background = c)),
                     _buildColorButton(l10n?.colorNameSurface ?? 'Surface', _surface, (c) => setState(() => _surface = c)),
-                    _buildColorButton(l10n?.colorNameCard ?? 'Card', _card, (c) => setState(() => _card = c)),
-                    _buildColorButton(l10n?.colorNameAccent ?? 'Accent', _accent, (c) => setState(() => _accent = c)),
                     _buildColorButton(l10n?.colorNameTextPrimary ?? 'Text Primary', _textPrimary, (c) => setState(() => _textPrimary = c)),
                     _buildColorButton(l10n?.colorNameTextSecondary ?? 'Text Secondary', _textSecondary, (c) => setState(() => _textSecondary = c)),
-                    _buildColorButton(l10n?.colorNameDuckingBadge ?? 'Ducking Badge', _duckingBadge, (c) => setState(() => _duckingBadge = c)),
                     _buildColorButton(l10n?.colorNameBattleIntensity ?? 'Battle Intensity', _battleIntensity, (c) => setState(() => _battleIntensity = c)),
                     _buildColorButton(l10n?.colorNameBossIntensity ?? 'Boss Intensity', _bossIntensity, (c) => setState(() => _bossIntensity = c)),
                   ],
@@ -401,22 +392,17 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
                       label: Text(l10n?.saveThemeBtn ?? 'Save Theme'),
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
-                          final newTheme = CustomThemeModel(
+                          final newTheme = CustomThemeModel.derive(
                             id: widget.initialTheme?.id ?? const Uuid().v4(),
                             name: _nameController.text.trim(),
-                            isDark: _isDark,
-                            primaryColor: _primary.toARGB32(),
-                            secondaryColor: _secondary.toARGB32(),
-                            backgroundColor: _background.toARGB32(),
-                            surfaceColor: _surface.toARGB32(),
-                            cardColor: _card.toARGB32(),
-                            accentColor: _accent.toARGB32(),
-                            textPrimaryColor: _textPrimary.toARGB32(),
-                            textSecondaryColor: _textSecondary.toARGB32(),
-                            duckingBadgeColor: _duckingBadge.toARGB32(),
-                            battleIntensityColor: _battleIntensity.toARGB32(),
-                            bossIntensityColor: _bossIntensity.toARGB32(),
-                            isBuiltIn: false,
+                            background: _background.toARGB32(),
+                            surface: _surface.toARGB32(),
+                            text: _textPrimary.toARGB32(),
+                            primary: _primary.toARGB32(),
+                            calm: _calm.toARGB32(),
+                            suspense: _suspense.toARGB32(),
+                            battle: _battleIntensity.toARGB32(),
+                            boss: _bossIntensity.toARGB32(),
                             createdAt: widget.initialTheme?.createdAt ?? DateTime.now(),
                           );
                           Navigator.of(context).pop(newTheme);
@@ -457,7 +443,7 @@ class _CustomThemeEditorDialogState extends State<CustomThemeEditorDialog> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: _card,
+            color: _surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: _textSecondary.withValues(alpha: 0.2)),
           ),

@@ -1,6 +1,6 @@
+import '../../theme/ds_theme.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../ui/view_models/scene_view_model.dart';
@@ -27,7 +27,7 @@ class SceneBackdropHeader extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: activeTheme.card,
+          color: activeTheme.surfaceRaised,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -105,7 +105,7 @@ class SceneBackdropHeader extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [
                           sceneColor.withValues(alpha: 0.35),
-                          activeTheme.card.withValues(alpha: 0.95),
+                          activeTheme.surfaceRaised.withValues(alpha: 0.95),
                           activeTheme.surface,
                         ],
                       ),
@@ -125,7 +125,7 @@ class SceneBackdropHeader extends StatelessWidget {
                     child: Text(
                       activeScene.name,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cinzel(
+                      style: TextStyle(
                         color: activeTheme.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 26,
@@ -146,7 +146,7 @@ class SceneBackdropHeader extends StatelessWidget {
                       child: Text(
                         activeScene.description,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           color: activeTheme.textSecondary,
                           fontSize: 13,
                           shadows: [
@@ -187,7 +187,7 @@ class SceneBackdropHeader extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               '${l10n?.intensityLevel ?? 'Intensity Level'}:',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 color: activeTheme.textSecondary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -205,7 +205,7 @@ class SceneBackdropHeader extends StatelessWidget {
                               title: MusicIntensity.calm.englishName,
                               subtitle: null,
                               isSelected: musicBus.currentIntensity == MusicIntensity.calm,
-                              selectedColor: activeTheme.secondary,
+                              selectedColor: activeTheme.primary,
                               activeTheme: activeTheme,
                               onTap: () {
                                 musicBus.setIntensity(MusicIntensity.calm);
@@ -277,7 +277,7 @@ class SceneBackdropHeader extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? selectedColor.withValues(alpha: 0.22) : activeTheme.card,
+          color: isSelected ? selectedColor.withValues(alpha: 0.22) : activeTheme.surfaceRaised,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
@@ -291,7 +291,7 @@ class SceneBackdropHeader extends StatelessWidget {
           children: [
             Text(
               title,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 color: isSelected ? Colors.white : activeTheme.textPrimary,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
@@ -301,7 +301,7 @@ class SceneBackdropHeader extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 '·',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   color: isSelected ? Colors.white60 : activeTheme.textSecondary.withValues(alpha: 0.5),
                   fontSize: 10,
                 ),
@@ -309,7 +309,7 @@ class SceneBackdropHeader extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 subtitle,
-                style: GoogleFonts.jetBrainsMono(
+                style: TextStyle(fontFamily: DsTheme.monoFamily, 
                   color: isSelected ? Colors.white70 : activeTheme.textSecondary,
                   fontSize: 11,
                 ),

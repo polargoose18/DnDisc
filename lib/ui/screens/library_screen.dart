@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../domain/models/library_track.dart';
@@ -37,10 +37,10 @@ class LibraryScreen extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         key: const ValueKey('library_search_input'),
-                        style: GoogleFonts.inter(fontSize: 13, color: textPrimary),
+                        style: TextStyle(fontSize: 13, color: textPrimary),
                         decoration: InputDecoration(
                           hintText: l10n?.searchPlaceholder ?? 'Search by title or tags (e.g. Tavern, Battle)...',
-                          hintStyle: GoogleFonts.inter(fontSize: 13, color: textSecondary.withValues(alpha: 0.6)),
+                          hintStyle: TextStyle(fontSize: 13, color: textSecondary.withValues(alpha: 0.6)),
                           prefixIcon: const Icon(Icons.search),
                           border: const OutlineInputBorder(),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -64,7 +64,7 @@ class LibraryScreen extends StatelessWidget {
                       icon: const Icon(Icons.file_upload_rounded, color: Colors.white),
                       label: Text(
                         l10n?.importFilesBtn ?? 'Import Files',
-                        style: GoogleFonts.inter(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                           fontSize: 14,
@@ -86,7 +86,7 @@ class LibraryScreen extends StatelessWidget {
                       icon: const Icon(Icons.archive_outlined),
                       label: Text(
                         l10n?.exportMediaPackageBtn ?? 'Export Set',
-                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -130,18 +130,18 @@ class LibraryScreen extends StatelessWidget {
                                   const SizedBox(height: 12),
                                   Text(
                                     l10n?.libraryEmpty ?? 'Media library is empty',
-                                    style: GoogleFonts.plusJakartaSans(fontSize: 18, color: textSecondary, fontWeight: FontWeight.w600),
+                                    style: TextStyle(fontSize: 18, color: textSecondary, fontWeight: FontWeight.w600),
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
                                     l10n?.libraryEmptyHint ?? 'Click "Import Files" to add music, ambient or SFX.',
-                                    style: GoogleFonts.inter(color: textSecondary.withValues(alpha: 0.8)),
+                                    style: TextStyle(color: textSecondary.withValues(alpha: 0.8)),
                                   ),
                                   const SizedBox(height: 16),
                                   ElevatedButton.icon(
                                     onPressed: () => _handleImport(context, library),
                                     icon: const Icon(Icons.file_upload_outlined),
-                                    label: Text(l10n?.importFilesBtn ?? 'Import Files', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                                    label: Text(l10n?.importFilesBtn ?? 'Import Files', style: const TextStyle(fontWeight: FontWeight.w600)),
                                   ),
                                 ],
                               ),
@@ -168,7 +168,7 @@ class LibraryScreen extends StatelessWidget {
                                         Expanded(
                                           child: Text(
                                             track.title,
-                                            style: GoogleFonts.plusJakartaSans(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 14,
                                               color: textPrimary,
@@ -190,7 +190,7 @@ class LibraryScreen extends StatelessWidget {
                                               const SizedBox(width: 4),
                                               Text(
                                                 _formatDuration(track.durationMs),
-                                                style: GoogleFonts.jetBrainsMono(
+                                                style: TextStyle(fontFamily: DsTheme.monoFamily, 
                                                   fontSize: 11,
                                                   color: textSecondary,
                                                   fontWeight: FontWeight.w600,
@@ -209,7 +209,7 @@ class LibraryScreen extends StatelessWidget {
                                               'Bus: ${track.busType.displayName} | Duration: ${_formatDuration(track.durationMs)} | Path: ${track.filePath}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.inter(fontSize: 11, color: textSecondary),
+                                          style: TextStyle(fontSize: 11, color: textSecondary),
                                         ),
                                         if (track.tags.isNotEmpty) ...[
                                           const SizedBox(height: 4),
@@ -224,7 +224,7 @@ class LibraryScreen extends StatelessWidget {
                                                 ),
                                                 child: Text(
                                                   '#$tag',
-                                                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: textSecondary),
+                                                  style: TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 10, color: textSecondary),
                                                 ),
                                               );
                                             }).toList(),

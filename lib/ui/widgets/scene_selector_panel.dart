@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../domain/models/scene_model.dart';
@@ -67,7 +66,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 Expanded(
                   child: Text(
                     l10n?.scenesTitle ?? 'Atmospheric Scenes',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.1,
@@ -87,7 +86,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                 const SizedBox(width: 6),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.add_rounded, size: 14),
-                  label: Text(l10n?.createSceneBtn ?? 'Create Scene', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600)),
+                  label: Text(l10n?.createSceneBtn ?? 'Create Scene', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: activeTheme.primary,
                     foregroundColor: Colors.white,
@@ -112,10 +111,10 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
               const SizedBox(height: 10),
               TextField(
                 controller: _searchController,
-                style: GoogleFonts.inter(color: activeTheme.textPrimary, fontSize: 13),
+                style: TextStyle(color: activeTheme.textPrimary, fontSize: 13),
                 decoration: InputDecoration(
                   hintText: l10n?.searchScenesPlaceholder ?? 'Search scenes...',
-                  hintStyle: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 13),
+                  hintStyle: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                   prefixIcon: Icon(Icons.search, size: 18, color: activeTheme.textSecondary),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
@@ -154,7 +153,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
                         ? (l10n?.noScenesHint ?? 'No scenes created yet. Click "Create Scene" to combine music and ambients.')
                         : (l10n?.noScenesMatching ?? 'No scenes found matching your search.'),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 13),
+                    style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                   ),
                 ),
               )

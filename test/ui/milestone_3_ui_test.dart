@@ -276,7 +276,7 @@ void main() {
       final nameFieldFinder = find.widgetWithText(TextField, l10n.sceneNameLabel);
       expect(nameFieldFinder, findsOneWidget);
       final nameFieldWidget = tester.widget<TextField>(nameFieldFinder);
-      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.cleanLight.card));
+      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.cleanLight.surfaceRaised));
 
       library.dispose();
       themeService.dispose();
@@ -320,7 +320,7 @@ void main() {
       final nameFieldFinder = find.widgetWithText(TextField, l10n.sceneNameLabel);
       expect(nameFieldFinder, findsOneWidget);
       final nameFieldWidget = tester.widget<TextField>(nameFieldFinder);
-      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.deepDark.card));
+      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.deepDark.surfaceRaised));
 
       library.dispose();
       themeService.dispose();
@@ -364,7 +364,7 @@ void main() {
       final nameFieldFinder = find.widgetWithText(TextField, l10n.sceneNameLabel);
       expect(nameFieldFinder, findsOneWidget);
       final nameFieldWidget = tester.widget<TextField>(nameFieldFinder);
-      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.ancientParchment.card));
+      expect(nameFieldWidget.decoration?.fillColor, equals(AppThemes.ancientParchment.surfaceRaised));
 
       library.dispose();
       themeService.dispose();

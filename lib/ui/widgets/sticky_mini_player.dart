@@ -58,7 +58,7 @@ class StickyMiniPlayer extends StatelessWidget {
                                 width: 36,
                                 height: 36,
                                 decoration: BoxDecoration(
-                                  color: activeTheme.card,
+                                  color: activeTheme.surfaceRaised,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 1.0),
                                 ),
@@ -147,7 +147,7 @@ class StickyMiniPlayer extends StatelessWidget {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: activeTheme.card,
+                                  color: activeTheme.surfaceRaised,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(color: activeTheme.primary.withValues(alpha: 0.4), width: 1.0),
                                 ),

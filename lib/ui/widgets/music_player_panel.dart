@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../audio/music_bus_controller.dart';
@@ -38,7 +38,7 @@ class MusicPlayerPanel extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           l10n?.musicTrack ?? 'Music Track',
-                          style: GoogleFonts.plusJakartaSans(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.2,
@@ -66,7 +66,7 @@ class MusicPlayerPanel extends StatelessWidget {
                         track != null
                             ? '${l10n?.nowPlaying ?? "Now playing"}: ${track.title} ${music.isPlaying ? '' : (l10n?.pausedSuffix ?? '(Paused)')}'
                             : (l10n?.musicNotPlaying ?? 'Music is not playing'),
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           color: track != null ? activeTheme.textPrimary : activeTheme.textSecondary,
                           fontWeight: track != null ? FontWeight.w500 : FontWeight.normal,
                           fontSize: 13,
@@ -119,7 +119,7 @@ class MusicPlayerPanel extends StatelessWidget {
                           ),
                           Text(
                             '${(music.rawVolume * 100).toInt()}%',
-                            style: GoogleFonts.jetBrainsMono(
+                            style: TextStyle(fontFamily: DsTheme.monoFamily, 
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: activeTheme.textSecondary,

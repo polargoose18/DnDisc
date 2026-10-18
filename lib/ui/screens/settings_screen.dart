@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../l10n/app_localizations.dart';
@@ -149,7 +149,7 @@ class SettingsScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.volume_down_rounded, color: activeTheme.duckingBadge),
+                          Icon(Icons.volume_down_rounded, color: activeTheme.textSecondary),
                           const SizedBox(width: 8),
                           Text(
                             l10n?.duckingTitle ?? 'Auto-ducking music during SFX (Ducking)',
@@ -291,7 +291,7 @@ class SettingsScreen extends StatelessWidget {
                                   Text(
                                     settings.customDownloadDirectory ?? (l10n?.defaultStoragePath ?? 'Default: Documents/audio_library'),
                                     key: const ValueKey('download_directory_display_path'),
-                                    style: GoogleFonts.jetBrainsMono(
+                                    style: TextStyle(fontFamily: DsTheme.monoFamily, 
                                       color: activeTheme.textPrimary,
                                       fontSize: 13,
                                     ),
@@ -396,7 +396,7 @@ class SettingsScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       Row(
                         children: [
-                          Icon(Icons.display_settings_rounded, color: activeTheme.secondary),
+                          Icon(Icons.display_settings_rounded, color: activeTheme.primary),
                           const SizedBox(width: 8),
                           Text(
                             l10n?.interfaceTitle ?? 'Interface & Control Panel',
@@ -607,7 +607,7 @@ class SettingsScreen extends StatelessWidget {
                               width: 14,
                               height: 14,
                               decoration: BoxDecoration(
-                                color: Color(preset.secondaryColor),
+                                color: Color(preset.surfaceRaisedColor),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -616,7 +616,7 @@ class SettingsScreen extends StatelessWidget {
                               width: 14,
                               height: 14,
                               decoration: BoxDecoration(
-                                color: Color(preset.duckingBadgeColor),
+                                color: Color(preset.primaryColor),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -628,7 +628,7 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           preset.name,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: Color(preset.textPrimaryColor),
@@ -654,14 +654,14 @@ class SettingsScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Row(
                       children: [
-                        Icon(Icons.brush_rounded, size: 16, color: activeTheme.secondary),
+                        Icon(Icons.brush_rounded, size: 16, color: activeTheme.primary),
                         const SizedBox(width: 6),
                         Text(
                           '${l10n?.customThemes ?? "Custom Themes"} (${customThemes.length})',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: activeTheme.secondary,
+                            color: activeTheme.primary,
                           ),
                         ),
                       ],
@@ -739,7 +739,7 @@ class SettingsScreen extends StatelessWidget {
                                 width: 12,
                                 height: 12,
                                 decoration: BoxDecoration(
-                                  color: Color(custom.secondaryColor),
+                                  color: Color(custom.surfaceRaisedColor),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -784,7 +784,7 @@ class SettingsScreen extends StatelessWidget {
                           const SizedBox(height: 6),
                           Text(
                             custom.name,
-                            style: GoogleFonts.plusJakartaSans(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: Color(custom.textPrimaryColor),
@@ -859,7 +859,7 @@ class SettingsScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.keyboard_rounded, color: activeTheme.secondary),
+                Icon(Icons.keyboard_rounded, color: activeTheme.primary),
                 const SizedBox(width: 8),
                 Text(
                   l10n?.hotkeysTitle ?? 'Centralized Shortcuts',

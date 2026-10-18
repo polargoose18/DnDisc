@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
 import 'package:ttrpg_audio_player/audio/audio_engine_service.dart';
 import 'package:ttrpg_audio_player/audio/music_bus_controller.dart';
@@ -16,6 +15,7 @@ import 'package:ttrpg_audio_player/data/services/database_service.dart';
 import 'package:ttrpg_audio_player/services/logger_service.dart';
 import 'package:ttrpg_audio_player/services/shortcut_service.dart';
 import 'package:ttrpg_audio_player/theme/app_themes.dart';
+import 'package:ttrpg_audio_player/theme/ds_theme.dart';
 import 'package:ttrpg_audio_player/ui/view_models/theme_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/media_library_view_model.dart';
 import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
@@ -104,7 +104,6 @@ Widget _buildMinimalistTestApp({
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  GoogleFonts.config.allowRuntimeFetching = false;
 
   late Directory tempDir;
   late DatabaseService dbService;
@@ -218,19 +217,19 @@ void main() {
 
       // Act & Assert
       expect(deepDark.primaryColor, 0xFFD4A373);
-      expect(deepDark.backgroundColor, 0xFF151210);
+      expect(deepDark.backgroundColor, 0xFF14110F);
       expect(cleanLight.primaryColor, 0xFF2563EB);
       expect(cleanLight.backgroundColor, 0xFFF8FAFC);
       expect(parchment.primaryColor, 0xFFD4A373);
-      expect(parchment.backgroundColor, 0xFF1C1917);
+      expect(parchment.backgroundColor, 0xFF17120E);
 
       final themeData = deepDark.toThemeData();
       expect(themeData.brightness, Brightness.dark);
-      expect(themeData.scaffoldBackgroundColor, const Color(0xFF151210));
+      expect(themeData.scaffoldBackgroundColor, const Color(0xFF14110F));
       expect(themeData.cardTheme.elevation, 0);
     });
 
-    testWidgets('should provide GoogleFonts typography styles across textTheme hierarchy', (tester) async {
+    testWidgets('should provide a single IBM Plex Sans family across the textTheme hierarchy', (tester) async {
       // Arrange
       const theme = AppThemes.deepDark;
 
@@ -238,12 +237,12 @@ void main() {
       final themeData = theme.toThemeData();
 
       // Assert
-      expect(themeData.textTheme.titleLarge?.fontFamily, contains('PlusJakartaSans'));
-      expect(themeData.textTheme.bodyMedium?.fontFamily, contains('Inter'));
-      expect(themeData.textTheme.displayLarge?.fontFamily, contains('Outfit'));
+      expect(themeData.textTheme.titleLarge?.fontFamily, DsTheme.sansFamily);
+      expect(themeData.textTheme.bodyMedium?.fontFamily, DsTheme.sansFamily);
+      expect(themeData.textTheme.displayLarge?.fontFamily, DsTheme.sansFamily);
     });
 
-    testWidgets('should render library track cards with theme-adaptive colors and GoogleFonts under Clean Light theme', (tester) async {
+    testWidgets('should render library track cards with theme-adaptive colors under Clean Light theme', (tester) async {
       // Arrange
       final engine = AudioEngineService();
       late MediaLibraryService libraryService;
@@ -310,13 +309,12 @@ void main() {
       expect(titleFinder, findsOneWidget);
       final titleWidget = tester.widget<Text>(titleFinder);
       expect(titleWidget.style?.color, AppThemes.cleanLight.textPrimary);
-      expect(titleWidget.style?.fontFamily, contains('PlusJakartaSans'));
 
       final durationTextFinder = find.text('02:00');
       expect(durationTextFinder, findsOneWidget);
       final durationWidget = tester.widget<Text>(durationTextFinder);
       expect(durationWidget.style?.color, AppThemes.cleanLight.textSecondary);
-      expect(durationWidget.style?.fontFamily, contains('JetBrainsMono'));
+      expect(durationWidget.style?.fontFamily, DsTheme.monoFamily);
 
       libraryService.dispose();
       engine.dispose();
@@ -332,7 +330,7 @@ void main() {
       // Assert
       expect(themeData.cardTheme.elevation, 0);
       expect(themeData.cardTheme.shadowColor, Colors.transparent);
-      expect(themeData.tabBarTheme.labelStyle?.fontFamily, contains('Inter'));
+      expect(themeData.tabBarTheme.labelStyle?.fontFamily, DsTheme.sansFamily);
       expect(themeData.tabBarTheme.dividerColor, Colors.transparent);
       expect(themeData.dividerTheme.thickness, 1.0);
     });

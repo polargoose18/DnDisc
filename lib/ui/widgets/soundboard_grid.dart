@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -43,7 +43,7 @@ class SoundboardGrid extends StatelessWidget {
                           Flexible(
                             child: Text(
                               l10n?.soundboardTitle ?? 'Soundboard (SFX Effects)',
-                              style: GoogleFonts.plusJakartaSans(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -0.2,
@@ -73,7 +73,7 @@ class SoundboardGrid extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       l10n?.sfxVolume ?? 'SFX Volume: ',
-                      style: GoogleFonts.inter(fontSize: 12, color: activeTheme.textSecondary),
+                      style: TextStyle(fontSize: 12, color: activeTheme.textSecondary),
                     ),
                     Expanded(
                       child: Slider(
@@ -84,7 +84,7 @@ class SoundboardGrid extends StatelessWidget {
                     ),
                     Text(
                       '${(sfx.rawVolume * 100).toInt()}%',
-                      style: GoogleFonts.jetBrainsMono(fontSize: 12, color: activeTheme.textSecondary),
+                      style: TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 12, color: activeTheme.textSecondary),
                     ),
                   ],
                 ),
@@ -107,7 +107,7 @@ class SoundboardGrid extends StatelessWidget {
                           Text(
                             l10n?.soundboardEmpty ?? 'Soundboard is empty. Add SFX or persistent quick buttons.',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 13),
+                            style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
                           ),
                           const SizedBox(height: 8),
                           TextButton.icon(
@@ -179,7 +179,7 @@ class SoundboardGrid extends StatelessWidget {
                                 child: Text(
                                   trigger.title,
                                   textAlign: TextAlign.center,
-                                  style: GoogleFonts.plusJakartaSans(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 13,
                                     color: activeTheme.textPrimary,
@@ -378,7 +378,7 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
               ),
               if (_customTitle.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text('${l10n?.selected ?? 'Selected: '}$_customTitle', style: TextStyle(color: activeTheme.accent, fontWeight: FontWeight.bold, fontSize: 12)),
+                Text('${l10n?.selected ?? 'Selected: '}$_customTitle', style: TextStyle(color: activeTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
               ],
               const SizedBox(height: 14),
               Row(
@@ -397,7 +397,7 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n?.persistentSfxCheckbox ?? 'Persistent SFX (do not reset on scene change)', style: const TextStyle(fontSize: 13)),
                 value: _isPersistent,
-                activeTrackColor: activeTheme.accent,
+                activeTrackColor: activeTheme.primary,
                 onChanged: (v) => setState(() => _isPersistent = v),
               ),
             ],

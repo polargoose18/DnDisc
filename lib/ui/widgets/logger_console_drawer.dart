@@ -1,5 +1,5 @@
+import '../../theme/ds_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../services/logger_service.dart';
@@ -20,7 +20,7 @@ class LoggerConsoleDrawer extends StatelessWidget {
               AppBar(
                 title: Text(
                   l10n?.logConsoleTitle ?? 'Log Console',
-                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 16),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                 ),
                 automaticallyImplyLeading: false,
                 actions: [
@@ -37,7 +37,7 @@ class LoggerConsoleDrawer extends StatelessWidget {
               ),
               Expanded(
                 child: logger.logs.isEmpty
-                    ? Center(child: Text(l10n?.noLogs ?? 'No logs', style: GoogleFonts.inter(color: Colors.grey)))
+                    ? Center(child: Text(l10n?.noLogs ?? 'No logs', style: const TextStyle(color: Colors.grey)))
                     : ListView.builder(
                         padding: const EdgeInsets.all(8),
                         itemCount: logger.logs.length,
@@ -57,7 +57,7 @@ class LoggerConsoleDrawer extends StatelessWidget {
                                     children: [
                                       Text(
                                         '[${log.formattedTime}]',
-                                        style: GoogleFonts.jetBrainsMono(fontSize: 10, color: Colors.grey),
+                                        style: const TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 10, color: Colors.grey),
                                       ),
                                       const SizedBox(width: 8),
                                       Container(
@@ -68,7 +68,7 @@ class LoggerConsoleDrawer extends StatelessWidget {
                                         ),
                                         child: Text(
                                           log.level.name.toUpperCase(),
-                                          style: GoogleFonts.jetBrainsMono(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+                                          style: TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 10, color: color, fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                     ],
@@ -76,13 +76,13 @@ class LoggerConsoleDrawer extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   SelectableText(
                                     log.message,
-                                    style: GoogleFonts.jetBrainsMono(fontSize: 12),
+                                    style: const TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 12),
                                   ),
                                   if (log.details != null) ...[
                                     const SizedBox(height: 4),
                                     SelectableText(
                                       log.details!,
-                                      style: GoogleFonts.jetBrainsMono(fontSize: 11, color: Colors.redAccent),
+                                      style: const TextStyle(fontFamily: DsTheme.monoFamily, fontSize: 11, color: Colors.redAccent),
                                     ),
                                   ],
                                 ],

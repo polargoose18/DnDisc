@@ -1,6 +1,6 @@
+import '../../theme/ds_theme.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../domain/models/scene_model.dart';
@@ -42,7 +42,7 @@ class SceneCard extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
       decoration: BoxDecoration(
-        color: activeTheme.card,
+        color: activeTheme.surfaceRaised,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isActive ? activeTheme.primary : (activeTheme.isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08)),
@@ -85,7 +85,7 @@ class SceneCard extends StatelessWidget {
                           end: Alignment.bottomRight,
                           colors: [
                             sceneColor.withValues(alpha: 0.35),
-                            activeTheme.card.withValues(alpha: 0.95),
+                            activeTheme.surfaceRaised.withValues(alpha: 0.95),
                           ],
                         ),
                       ),
@@ -117,7 +117,7 @@ class SceneCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           scene.name,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: TextStyle(
                             color: activeTheme.textPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
@@ -137,7 +137,7 @@ class SceneCard extends StatelessWidget {
                           ),
                           child: Text(
                             l10n?.activeBadge ?? 'ACTIVE',
-                            style: GoogleFonts.jetBrainsMono(
+                            style: const TextStyle(fontFamily: DsTheme.monoFamily, 
                               color: Colors.white,
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
@@ -207,7 +207,7 @@ class SceneCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       scene.description,
-                      style: GoogleFonts.inter(color: activeTheme.textSecondary, fontSize: 12),
+                      style: TextStyle(color: activeTheme.textSecondary, fontSize: 12),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -244,7 +244,7 @@ class SceneCard extends StatelessWidget {
                                       constraints: const BoxConstraints(maxWidth: 95),
                                       child: Text(
                                         (scene.musicIntensity?.getLocalizedName(l10n) ?? l10n?.intensityCalm ?? 'Calm').toUpperCase(),
-                                        style: GoogleFonts.jetBrainsMono(
+                                        style: TextStyle(fontFamily: DsTheme.monoFamily, 
                                           color: _getIntensityColor(scene.musicIntensity, activeTheme),
                                           fontSize: 9,
                                           fontWeight: FontWeight.bold,
@@ -273,7 +273,7 @@ class SceneCard extends StatelessWidget {
                                     constraints: const BoxConstraints(maxWidth: 95),
                                     child: Text(
                                       '${scene.ambientLayerVolumes.length} ${l10n?.ambient ?? "ambient"}',
-                                      style: GoogleFonts.jetBrainsMono(
+                                      style: const TextStyle(fontFamily: DsTheme.monoFamily, 
                                         color: Colors.tealAccent,
                                         fontSize: 9,
                                         fontWeight: FontWeight.bold,
@@ -303,7 +303,7 @@ class SceneCard extends StatelessWidget {
                         icon: Icon(isActive ? Icons.volume_up_rounded : Icons.play_arrow_rounded, size: 14),
                         label: Text(
                           isActive ? (l10n?.activeBadge ?? 'ACTIVE') : (l10n?.enableSceneBtn ?? 'Enable'),
-                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600),
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -333,7 +333,7 @@ class SceneCard extends StatelessWidget {
         return activeTheme.bossIntensity;
       case MusicIntensity.calm:
       default:
-        return activeTheme.secondary;
+        return activeTheme.primary;
     }
   }
 
