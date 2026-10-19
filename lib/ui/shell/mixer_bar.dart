@@ -169,17 +169,48 @@ class MixerBar extends StatelessWidget {
         color: ds.surface,
         border: Border(top: BorderSide(color: ds.border, width: Sizes.borderWidth)),
       ),
-      child: Row(
+      child: CustomMultiChildLayout(
+        delegate: _MixerLayout(),
         children: [
-          Expanded(child: now),
-          const SizedBox(width: Spacing.s4),
-          transport,
-          const SizedBox(width: Spacing.s5),
-          if (layout == ShellLayout.compact) Flexible(flex: 0, child: channels) else channels,
+          LayoutId(id: _MixerZone.now, child: now),
+          LayoutId(id: _MixerZone.transport, child: transport),
+          LayoutId(id: _MixerZone.channels, child: channels),
         ],
       ),
     );
   }
+}
+
+enum _MixerZone { now, transport, channels }
+
+/// Three zones: the track on the left, transport in the centre of the bar,
+/// channels on the right. When the channels reach past the centre (they
+/// are wide below ~1400px) the transport moves left just enough to keep its
+/// gap; the track takes what is left.
+class _MixerLayout extends MultiChildLayoutDelegate {
+  static const double transportGap = Spacing.s5;
+  static const double nowGap = Spacing.s4;
+
+  _MixerLayout();
+
+  @override
+  void performLayout(Size size) {
+    final loose = BoxConstraints.loose(size);
+    final channels = layoutChild(_MixerZone.channels, loose);
+    final transport = layoutChild(_MixerZone.transport, loose);
+    final latest = size.width - channels.width - transportGap - transport.width;
+    final transportX = ((size.width - transport.width) / 2).clamp(0.0, latest < 0 ? 0.0 : latest);
+    final now = layoutChild(
+      _MixerZone.now,
+      BoxConstraints(maxWidth: (transportX - nowGap).clamp(0.0, size.width), maxHeight: size.height),
+    );
+    positionChild(_MixerZone.channels, Offset(size.width - channels.width, (size.height - channels.height) / 2));
+    positionChild(_MixerZone.transport, Offset(transportX, (size.height - transport.height) / 2));
+    positionChild(_MixerZone.now, Offset(0, (size.height - now.height) / 2));
+  }
+
+  @override
+  bool shouldRelayout(_MixerLayout oldDelegate) => false;
 }
 
 /// Music, Ambient and SFX sliders in a popover (medium and compact windows).
