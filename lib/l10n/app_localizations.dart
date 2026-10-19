@@ -1976,12 +1976,6 @@ abstract class AppLocalizations {
   /// **'System default'**
   String get outputDeviceDefault;
 
-  /// No description provided for @outputDeviceHint.
-  ///
-  /// In en, this message translates to:
-  /// **'M4A files always play on the system default device'**
-  String get outputDeviceHint;
-
   /// No description provided for @outputDeviceMissing.
   ///
   /// In en, this message translates to:
@@ -1999,6 +1993,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not switch the output device'**
   String get toastOutputDeviceFailed;
+
+  /// No description provided for @toastCannotPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not play {name}'**
+  String toastCannotPlay(String name);
+
+  /// No description provided for @toastCannotPlayHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The file is damaged or its format is not supported'**
+  String get toastCannotPlayHint;
+
+  /// No description provided for @toastM4aNeedsFfmpeg.
+  ///
+  /// In en, this message translates to:
+  /// **'M4A on Linux needs the FFmpeg libraries (libavcodec, libavformat)'**
+  String get toastM4aNeedsFfmpeg;
 }
 
 class _AppLocalizationsDelegate

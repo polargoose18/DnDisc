@@ -23,7 +23,10 @@ class SoLoudBusPlayer implements BusPlayer {
   StreamSubscription<StreamSoundEvent>? _events;
   Timer? _ticker;
 
-  SoLoudBusPlayer({SoLoudEngine? engine}) : _engine = engine ?? SoLoudEngine.instance;
+  /// Mixing bus the voice plays through; null plays on the main mix.
+  final String? bus;
+
+  SoLoudBusPlayer({this.bus, SoLoudEngine? engine}) : _engine = engine ?? SoLoudEngine.instance;
 
   SoLoud get _soloud => SoLoud.instance;
 
@@ -70,17 +73,10 @@ class SoLoudBusPlayer implements BusPlayer {
     _events = source.soundEvents.listen((event) {
       if (event.event == SoundEventType.handleIsNoMoreValid && event.handle == _handle) _finished();
     });
-    _handle = await _soloud.play(source, volume: _volume, looping: _looping);
-    // Stopped or disposed while the voice was starting.
-    if (_disposed || _path != path) {
-      final handle = _handle!;
-      _handle = null;
-      try {
-        await _soloud.stop(handle);
-      } catch (_) {}
-      if (_path == path) _detach();
-      return;
-    }
+    final through = bus == null ? null : _engine.bus(bus!);
+    _handle = through != null
+        ? through.play(source, volume: _volume, looping: _looping)
+        : _soloud.play(source, volume: _volume, looping: _looping);
     _paused = false;
     if (!_duration.isClosed) _duration.add(_soloud.getLength(source));
     _ticker = Timer.periodic(positionInterval, (_) => _tick());

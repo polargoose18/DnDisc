@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../data/services/database_service.dart';
 import '../services/logger_service.dart';
-import 'playback/pulse_output.dart';
 import 'playback/soloud_engine.dart';
 
 /// Output device: [id] is stored and passed to the backend, [label] is shown.
@@ -33,8 +32,8 @@ abstract class OutputDeviceBackend {
   Future<void> changeDevice(String? deviceId);
 }
 
-/// Devices of the SoLoud engine (WASAPI endpoints on Windows; ALSA devices
-/// on Linux without a sound server).
+/// Devices of the SoLoud engine: WASAPI endpoints on Windows, the outputs
+/// of the sound server (PulseAudio or PipeWire) on Linux.
 class SoLoudOutputBackend implements OutputDeviceBackend {
   final SoLoudEngine _engine;
 
@@ -88,15 +87,9 @@ class AudioOutputService extends ChangeNotifier {
   /// The saved device is not connected now; sound goes to the default.
   bool get selectedIsMissing => _missing;
 
-  /// Linux uses the sound server when there is one, else SoLoud's devices.
-  static Future<OutputDeviceBackend> _defaultBackend() async {
-    if (!kIsWeb && Platform.isLinux && await PulseOutputBackend.isAvailable()) return PulseOutputBackend();
-    return SoLoudOutputBackend();
-  }
-
   /// Restores the saved device and starts the output on it.
   Future<void> init() async {
-    final backend = _backend ??= await _defaultBackend();
+    final backend = _backend ??= SoLoudOutputBackend();
     if (isSupported) {
       try {
         final saved = await _db?.getSetting(settingKey);

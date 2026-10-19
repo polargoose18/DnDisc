@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart' hide Durations;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ttrpg_audio_player/audio/playback/soloud_engine.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
 import 'package:ttrpg_audio_player/theme/tokens.dart';
 import 'package:ttrpg_audio_player/ui/screens/library_screen.dart';
@@ -80,6 +81,22 @@ void main() {
       await settle(tester);
       expect(find.byType(NavRail), findsNothing);
       expect(find.byType(LibraryScreen), findsOneWidget);
+    });
+  });
+
+  group('Playback errors', () {
+    testWidgets('a file that cannot be loaded shows an error toast with the reason', (tester) async {
+      await env.pump(tester, const MainDashboardScreen());
+
+      SoLoudEngine.instance.debugReportLoadFailure('/music/Tavern.m4a');
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text(l10n.toastCannotPlay('Tavern.m4a')), findsOneWidget);
+      final reason = Platform.isLinux ? l10n.toastM4aNeedsFfmpeg : l10n.toastCannotPlayHint;
+      expect(find.text(reason), findsOneWidget);
+      env.toasts.dismiss(env.toasts.toasts.single.id);
+      await tester.pump();
     });
   });
 

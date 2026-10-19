@@ -489,7 +489,6 @@
   "choosePreset": "Choose a preset",
   "outputDeviceLabel": "Output device",
   "outputDeviceDefault": "System default",
-  "outputDeviceHint": "M4A files always play on the system default device",
   "outputDeviceMissing": "{name} is not connected, sound goes to the system default",
   "@outputDeviceMissing": {
     "placeholders": {
@@ -499,5 +498,15 @@
     }
   },
   "refreshDevices": "Refresh device list",
-  "toastOutputDeviceFailed": "Could not switch the output device"
+  "toastOutputDeviceFailed": "Could not switch the output device",
+  "toastCannotPlay": "Could not play {name}",
+  "@toastCannotPlay": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toastCannotPlayHint": "The file is damaged or its format is not supported",
+  "toastM4aNeedsFfmpeg": "M4A on Linux needs the FFmpeg libraries (libavcodec, libavformat)"
 }

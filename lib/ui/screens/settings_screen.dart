@@ -470,7 +470,7 @@ class _OutputDeviceSetting extends StatelessWidget {
       key: const ValueKey('output_device_select'),
       label: l10n.outputDeviceLabel,
       icon: 'volume',
-      hint: output.selectedIsMissing && selected != null ? l10n.outputDeviceMissing(output.selectedLabel ?? selected) : l10n.outputDeviceHint,
+      hint: output.selectedIsMissing && selected != null ? l10n.outputDeviceMissing(output.selectedLabel ?? selected) : null,
       value: output.selectedIsMissing ? _systemDefault : (selected ?? _systemDefault),
       options: [
         DsOption(_systemDefault, l10n.outputDeviceDefault),

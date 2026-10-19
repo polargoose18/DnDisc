@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ttrpg_audio_player/audio/audio_output_service.dart';
 import 'package:ttrpg_audio_player/audio/playback/bus_player.dart';
-import 'package:ttrpg_audio_player/audio/playback/legacy_bus_player.dart';
 import 'package:ttrpg_audio_player/audio/playback/soloud_bus_player.dart';
 import 'package:ttrpg_audio_player/data/services/database_service.dart';
 import '../helpers/fakes.dart';
@@ -85,12 +84,11 @@ void main() {
   });
 
   group('BusPlayer', () {
-    test('plays the formats SoLoud decodes on SoLoud and M4A on the system player', () {
-      for (final path in ['/a/x.mp3', '/a/x.WAV', '/a/x.ogg', '/a/x.flac']) {
+    test('plays every format, M4A included, on SoLoud', () {
+      for (final path in ['/a/x.mp3', '/a/x.WAV', '/a/x.ogg', '/a/x.flac', '/a/x.m4a']) {
         expect(BusPlayer.forFile(path), isA<SoLoudBusPlayer>(), reason: path);
       }
-      final m4a = BusPlayer.forFile('/a/x.m4a');
-      expect(m4a, isA<LegacyBusPlayer>());
+      expect((BusPlayer.forFile('/a/x.m4a', bus: 'music') as SoLoudBusPlayer).bus, 'music');
     });
   });
 }

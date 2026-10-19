@@ -4,6 +4,7 @@ import '../domain/models/ambient_layer.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
 import 'playback/bus_player.dart';
+import 'playback/soloud_engine.dart';
 
 class AmbientBusController extends ChangeNotifier {
   final List<AmbientLayer> _layers = [];
@@ -200,7 +201,7 @@ class AmbientBusController extends ChangeNotifier {
     try {
       await _stopLayerAudio(layer.id, fadeDuration: Duration.zero);
 
-      player = BusPlayer.forFile(file.path);
+      player = BusPlayer.forFile(file.path, bus: SoLoudEngine.ambientBus(layer.id));
       final targetVolume = layer.volume * _gain;
       final startVolume = effectiveFade.inMilliseconds > 0 ? 0.0 : targetVolume;
       _layerLoopTransitioning[layer.id] = false;
@@ -314,9 +315,9 @@ class AmbientBusController extends ChangeNotifier {
       final outgoingFader = _outgoingAmbientFadeControllers.putIfAbsent(layer.id, () => FadeController());
       outgoingFader.stop();
       _outgoingAmbientPlayers[layer.id]?.dispose();
-      _outgoingAmbientPlayers[layer.id] = oldPlayer ?? BusPlayer.forFile(file.path);
+      _outgoingAmbientPlayers[layer.id] = oldPlayer ?? BusPlayer.forFile(file.path, bus: SoLoudEngine.ambientBus(layer.id));
 
-      nextPlayer = BusPlayer.forFile(file.path);
+      nextPlayer = BusPlayer.forFile(file.path, bus: SoLoudEngine.ambientBus(layer.id));
       _activePlayers[layer.id] = nextPlayer;
 
       await nextPlayer.setVolume(0.0);

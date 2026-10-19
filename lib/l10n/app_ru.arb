@@ -489,7 +489,6 @@
   "choosePreset": "Выберите пресет",
   "outputDeviceLabel": "Устройство вывода",
   "outputDeviceDefault": "Системное по умолчанию",
-  "outputDeviceHint": "Файлы M4A всегда играют на системном устройстве по умолчанию",
   "outputDeviceMissing": "{name} не подключено, звук идёт на системное устройство",
   "@outputDeviceMissing": {
     "placeholders": {
@@ -499,5 +498,15 @@
     }
   },
   "refreshDevices": "Обновить список устройств",
-  "toastOutputDeviceFailed": "Не удалось переключить устройство вывода"
+  "toastOutputDeviceFailed": "Не удалось переключить устройство вывода",
+  "toastCannotPlay": "Не удалось воспроизвести {name}",
+  "@toastCannotPlay": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toastCannotPlayHint": "Файл повреждён или его формат не поддерживается",
+  "toastM4aNeedsFfmpeg": "Для M4A в Linux нужны библиотеки FFmpeg (libavcodec, libavformat)"
 }

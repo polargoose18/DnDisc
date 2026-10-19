@@ -193,7 +193,6 @@ void main() {
 
       expect(find.text(l10n.outputDeviceLabel), findsOneWidget);
       expect(find.text(l10n.outputDeviceDefault), findsOneWidget);
-      expect(find.text(l10n.outputDeviceHint), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('output_device_select')));
       await settle(tester);

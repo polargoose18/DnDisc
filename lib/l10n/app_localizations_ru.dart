@@ -1070,10 +1070,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get outputDeviceDefault => 'Системное по умолчанию';
 
   @override
-  String get outputDeviceHint =>
-      'Файлы M4A всегда играют на системном устройстве по умолчанию';
-
-  @override
   String outputDeviceMissing(String name) {
     return '$name не подключено, звук идёт на системное устройство';
   }
@@ -1084,4 +1080,17 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get toastOutputDeviceFailed =>
       'Не удалось переключить устройство вывода';
+
+  @override
+  String toastCannotPlay(String name) {
+    return 'Не удалось воспроизвести $name';
+  }
+
+  @override
+  String get toastCannotPlayHint =>
+      'Файл повреждён или его формат не поддерживается';
+
+  @override
+  String get toastM4aNeedsFfmpeg =>
+      'Для M4A в Linux нужны библиотеки FFmpeg (libavcodec, libavformat)';
 }

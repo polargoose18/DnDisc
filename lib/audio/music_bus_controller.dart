@@ -4,6 +4,7 @@ import '../domain/models/audio_track.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
 import 'playback/bus_player.dart';
+import 'playback/soloud_engine.dart';
 
 class MusicBusController extends ChangeNotifier {
   AudioTrack? _currentTrack;
@@ -85,7 +86,7 @@ class MusicBusController extends ChangeNotifier {
     _playerPaused = false;
     notifyListeners();
 
-    final player = BusPlayer.forFile(file.path);
+    final player = BusPlayer.forFile(file.path, bus: SoLoudEngine.musicBus);
     try {
       // If we already have an active player, initiate crossfade
       if (wasAudible && effectiveFade.inMilliseconds > 0) {
@@ -229,7 +230,7 @@ class MusicBusController extends ChangeNotifier {
       _outgoingPlayer?.dispose();
       _outgoingPlayer = oldPlayer;
 
-      nextPlayer = BusPlayer.forFile(file.path);
+      nextPlayer = BusPlayer.forFile(file.path, bus: SoLoudEngine.musicBus);
       _player = nextPlayer;
 
       await nextPlayer.setVolume(0.0);

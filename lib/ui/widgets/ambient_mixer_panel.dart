@@ -19,7 +19,7 @@ import '../design/ds_menu.dart';
 import '../design/ds_panel.dart';
 import '../design/ds_slider.dart';
 import '../design/ds_tooltip.dart';
-import '../design/equalizer_bars.dart';
+import 'bus_equalizer.dart';
 import '../view_models/media_library_view_model.dart';
 import 'track_pick_list.dart';
 
@@ -151,7 +151,7 @@ class AmbientRow extends StatelessWidget {
                   ),
                   if (on) ...[
                     const SizedBox(width: Spacing.s2),
-                    const EqualizerBars(active: true, bars: 3, height: Spacing.s3),
+                    AmbientEqualizer(layerId: layer.id, height: Spacing.s3),
                   ],
                 ],
               ),

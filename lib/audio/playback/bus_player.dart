@@ -1,29 +1,24 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:path/path.dart' as p;
-import 'legacy_bus_player.dart';
 import 'soloud_bus_player.dart';
 
 /// One voice of a bus: plays a file, reports its length, position and end.
 /// The bus controllers drive fades, crossfades and ducking through
 /// [setVolume]; the player only follows.
 abstract class BusPlayer {
-  /// Picks the backend for [path]: SoLoud (follows the chosen output device)
-  /// for the formats it decodes, the system player for the rest (M4A/AAC).
-  factory BusPlayer.forFile(String path) {
+  /// A SoLoud voice for [path] (MP3, WAV, OGG, FLAC and, through the
+  /// system decoders, M4A/AAC). With [bus] it plays through that mixing bus
+  /// of the engine, whose spectrum the visualizers read (see
+  /// [SoLoudEngine.musicBus] and [SoLoudEngine.ambientBus]).
+  factory BusPlayer.forFile(String path, {String? bus}) {
     final override = debugFactory;
     if (override != null) return override(path);
-    return LegacyBusPlayer.handles(path) ? LegacyBusPlayer() : SoLoudBusPlayer();
+    return SoLoudBusPlayer(bus: bus);
   }
 
-  /// Replaces the backends in tests (there is no audio output there).
+  /// Replaces the backend in tests (there is no audio output there).
   @visibleForTesting
   static BusPlayer Function(String path)? debugFactory;
-
-  /// Extensions SoLoud decodes; others go to [LegacyBusPlayer].
-  static const List<String> soloudExtensions = ['mp3', 'wav', 'ogg', 'flac'];
-
-  static String extensionOf(String path) => p.extension(path).replaceFirst('.', '').toLowerCase();
 
   Stream<Duration> get onDurationChanged;
   Stream<Duration> get onPositionChanged;

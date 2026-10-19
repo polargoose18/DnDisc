@@ -1,9 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
+import '../../audio/playback/soloud_engine.dart';
 import '../../data/services/settings_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/ds_theme.dart';
 import '../../theme/tokens.dart';
+import '../design/toast.dart';
 import '../shell/mixer_bar.dart';
 import '../shell/nav_rail.dart';
 import '../shell/shell_scope.dart';
@@ -29,6 +35,31 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   AppScreen _screen = AppScreen.dashboard;
   final Set<AppScreen> _visited = {AppScreen.dashboard};
+  StreamSubscription<String>? _loadFailures;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFailures = SoLoudEngine.instance.loadFailures.listen(_onLoadFailure);
+  }
+
+  @override
+  void dispose() {
+    _loadFailures?.cancel();
+    super.dispose();
+  }
+
+  /// A file that could not be played says why, once per attempt.
+  void _onLoadFailure(String path) {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    final m4a = p.extension(path).toLowerCase() == '.m4a';
+    final linux = !kIsWeb && Platform.isLinux;
+    context.read<ToastController?>()?.error(
+          l10n.toastCannotPlay(p.basename(path)),
+          message: m4a && linux ? l10n.toastM4aNeedsFfmpeg : l10n.toastCannotPlayHint,
+        );
+  }
 
   void _select(AppScreen screen) {
     setState(() {

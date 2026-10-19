@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
+import '../analysis/bus_spectrum.dart';
 import '../../services/logger_service.dart';
 
 /// The single SoLoud engine of the app: starts it on the chosen output
-/// device, switches devices on the fly and shares loaded files between
-/// voices (a crossfade plays the same file twice).
+/// device, switches devices on the fly, shares loaded files between voices
+/// (a crossfade plays the same file twice) and keeps the mixing buses the
+/// visualizers read: one for music and one per ambient layer.
 class SoLoudEngine {
   SoLoudEngine._();
 
@@ -15,12 +18,30 @@ class SoLoudEngine {
   /// delay); longer ones are streamed from disk.
   static const int memoryLoadLimitBytes = 2 * 1024 * 1024;
 
+  /// Bus of the music voices.
+  static const String musicBus = 'music';
+
+  /// Bus of the voices of ambient layer [layerId].
+  static String ambientBus(String layerId) => 'ambient:$layerId';
+
   Future<bool>? _starting;
+  final Map<String, Bus> _buses = {};
+  final StreamController<String> _loadFailures = StreamController.broadcast();
+
+  /// Paths of files that could not be loaded (unsupported or broken file,
+  /// or on Linux an M4A without the system FFmpeg libraries).
+  Stream<String> get loadFailures => _loadFailures.stream;
+
+  @visibleForTesting
+  void debugReportLoadFailure(String path) => _loadFailures.add(path);
   String? _deviceName;
   final Map<String, _LoadedSource> _sources = {};
   final Map<String, Future<void>> _disposing = {};
 
-  bool get isReady => _soloud.isInitialized;
+  bool _started = false;
+
+  /// The engine has started (never in tests, which have no native library).
+  bool get isReady => _started && _soloud.isInitialized;
 
   SoLoud get _soloud => SoLoud.instance;
 
@@ -31,17 +52,28 @@ class SoLoudEngine {
   /// Device to open on start, matched by name (ids change between runs).
   void preferDevice(String? name) => _deviceName = name;
 
-  // Starts on the system default and then moves to the preferred device:
-  // listing devices before init() crashes flutter_soloud 2.1.7 (the native
-  // player does not exist yet), and init(device:) needs the list.
+  // Starts on the system default and then moves to the preferred device
+  // (ids change between runs, so the device is matched by name). On Linux
+  // the sound server (PulseAudio, or PipeWire through it) lists the real
+  // outputs, Bluetooth included; ALSA alone lists its plugins.
   Future<bool> _start() async {
     try {
-      await _soloud.init();
+      if (!kIsWeb && Platform.isLinux) {
+        try {
+          await _soloud.init(linuxAudioBackend: LinuxAudioBackend.pulseAudio);
+        } catch (e) {
+          LoggerService().warning('SoLoudEngine: No sound server, using ALSA', details: '$e');
+          await _soloud.init();
+        }
+      } else {
+        await _soloud.init();
+      }
     } catch (e) {
       LoggerService().error('SoLoudEngine: Could not start the audio output', details: '$e');
       _starting = null;
       return false;
     }
+    _started = true;
     LoggerService().info('SoLoudEngine: Started on the system default device');
     final name = _deviceName;
     if (name != null) {
@@ -53,6 +85,21 @@ class SoLoudEngine {
     }
     return true;
   }
+
+  /// The bus [key], created and started on first use. Null before the
+  /// engine has started.
+  Bus? bus(String key) {
+    if (!isReady) return null;
+    final existing = _buses[key];
+    if (existing != null) return existing;
+    final created = Bus(name: key);
+    created.playOnEngine();
+    BusSpectrumNative.enable(created.busId);
+    return _buses[key] = created;
+  }
+
+  /// Id of the bus [key] if something has played through it.
+  int? busId(String key) => isReady ? _buses[key]?.busId : null;
 
   /// Output devices of the system; empty until the engine has started.
   List<PlaybackDevice> listDevices() {
@@ -80,7 +127,7 @@ class SoLoudEngine {
     if (!isReady) return;
     final device = _findDevice(name);
     if (name != null && device == null) throw StateError('Output device "$name" is not available');
-    _soloud.changeDevice(newDevice: device);
+    await _soloud.changeDevice(newDevice: device);
     LoggerService().info('SoLoudEngine: Output moved to ${name ?? 'the system default device'}');
   }
 
@@ -94,6 +141,7 @@ class SoLoudEngine {
       return await entry.source;
     } catch (_) {
       _release(path, entry, dispose: false);
+      _loadFailures.add(path);
       rethrow;
     }
   }

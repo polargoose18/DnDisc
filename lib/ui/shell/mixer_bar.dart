@@ -10,7 +10,7 @@ import '../../theme/tokens.dart';
 import '../design/ds_button.dart';
 import '../design/ds_icon.dart';
 import '../design/ds_slider.dart';
-import '../widgets/music_equalizer.dart';
+import '../widgets/bus_equalizer.dart';
 import 'shell_scope.dart';
 
 /// Bottom mixer: current track, transport and the volume of every channel.

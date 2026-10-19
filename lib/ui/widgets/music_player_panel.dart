@@ -7,7 +7,7 @@ import '../../theme/tokens.dart';
 import '../design/ds_button.dart';
 import '../design/ds_controls.dart';
 import '../design/ds_panel.dart';
-import 'music_equalizer.dart';
+import 'bus_equalizer.dart';
 
 String formatDuration(Duration d) {
   final minutes = d.inMinutes;
