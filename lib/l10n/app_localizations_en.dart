@@ -1075,4 +1075,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get toastOutputDeviceFailedHint =>
       'Sound is not reaching the output device. Pick another device in Settings or check the system sound settings';
+
+  @override
+  String get toastSystemMuted => 'DnDisc is muted in the system mixer';
+
+  @override
+  String get toastSystemMutedHint =>
+      'Raise its volume in the system sound settings or in pavucontrol';
 }

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../data/services/database_service.dart';
 import '../services/logger_service.dart';
+import 'playback/linux_stream_volume.dart';
 import 'playback/soloud_engine.dart';
 
 /// Output device: [id] is stored and passed to the backend, [label] is shown.
@@ -53,10 +55,35 @@ class SoLoudOutputBackend implements OutputDeviceBackend {
   Future<void> changeDevice(String? deviceId) => _engine.changeDevice(deviceId);
 }
 
+/// The volume the sound server keeps for this app's stream (Linux).
+abstract class StreamVolume {
+  Future<List<({int index, bool silent})>> ownStreams();
+  Future<bool> restore(int index);
+}
+
+class PactlStreamVolume implements StreamVolume {
+  const PactlStreamVolume();
+
+  @override
+  Future<List<({int index, bool silent})>> ownStreams() => LinuxStreamVolume.ownStreams();
+
+  @override
+  Future<bool> restore(int index) => LinuxStreamVolume.restore(index);
+}
+
 /// Choice of the output device on Linux and Windows (Android has a single
 /// output). The choice is stored by device name; null is the system default.
 class AudioOutputService extends ChangeNotifier {
   static const String settingKey = 'output_device';
+
+  /// Set once the silenced stream volume left by builds before SoLoud has
+  /// been reset; later a silenced stream is the user's choice and is only
+  /// reported.
+  static const String streamVolumeResetKey = 'stream_volume_reset_v1';
+
+  /// How long to wait for the engine's stream to appear on the server.
+  static const Duration streamLookup = Duration(milliseconds: 200);
+  static const int streamLookupTries = 10;
 
   OutputDeviceBackend? _backend;
   final DatabaseService? _db;
@@ -66,10 +93,18 @@ class AudioOutputService extends ChangeNotifier {
   String? _selected;
   bool _missing = false;
 
-  AudioOutputService({OutputDeviceBackend? backend, DatabaseService? db, bool? supported})
+  final StreamVolume? _streamVolume;
+  final StreamController<void> _silenced = StreamController.broadcast();
+
+  AudioOutputService({OutputDeviceBackend? backend, DatabaseService? db, bool? supported, StreamVolume? streamVolume})
       : _backend = backend,
         _db = db,
+        // The real sound server only with the real backend (not in tests).
+        _streamVolume = streamVolume ?? (backend == null && !kIsWeb && Platform.isLinux ? const PactlStreamVolume() : null),
         isSupported = supported ?? (!kIsWeb && (Platform.isLinux || Platform.isWindows));
+
+  /// The system mixer has this app at 0 % or muted: playback is inaudible.
+  Stream<void> get systemSilenced => _silenced.stream;
 
   List<OutputDevice> get devices => _devices;
 
@@ -101,6 +136,39 @@ class AudioOutputService extends ChangeNotifier {
     // SoLoud lists its devices only once the output has started.
     await backend.start(deviceId: _selected);
     await refresh();
+    await checkStreamVolume();
+  }
+
+  /// Looks at the volume the sound server gives this app's stream: the
+  /// first time, a silenced stream (left by builds before SoLoud) is reset
+  /// to 100 %; after that it is reported on [systemSilenced].
+  Future<void> checkStreamVolume() async {
+    final volume = _streamVolume;
+    if (volume == null) return;
+    var streams = await volume.ownStreams();
+    for (var i = 1; i < streamLookupTries && streams.isEmpty; i++) {
+      await Future<void>.delayed(streamLookup);
+      streams = await volume.ownStreams();
+    }
+    if (streams.isEmpty) return;
+    final silenced = [for (final s in streams) if (s.silent) s.index];
+    var resetDone = false;
+    try {
+      resetDone = await _db?.getSetting(streamVolumeResetKey) == '1';
+    } catch (_) {}
+    if (silenced.isNotEmpty && !resetDone) {
+      for (final index in silenced) {
+        final ok = await volume.restore(index);
+        LoggerService().info('AudioOutputService: Stream volume was 0 %, ${ok ? 'reset to 100 %' : 'could not reset it'}');
+        if (!ok && !_silenced.isClosed) _silenced.add(null);
+      }
+    } else if (silenced.isNotEmpty) {
+      LoggerService().warning('AudioOutputService: The system mixer has this app at 0 % or muted');
+      if (!_silenced.isClosed) _silenced.add(null);
+    }
+    try {
+      await _db?.setSetting(streamVolumeResetKey, '1');
+    } catch (_) {}
   }
 
   /// Reads the device list again (a headset was plugged in).
@@ -118,6 +186,8 @@ class AudioOutputService extends ChangeNotifier {
     if (!isSupported || backend == null) return;
     await backend.changeDevice(id);
     _selected = id;
+    // A new device gets a new stream, with the volume the server keeps.
+    unawaited(checkStreamVolume());
     _missing = false;
     try {
       await _db?.setSetting(settingKey, id ?? '');

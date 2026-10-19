@@ -83,6 +83,62 @@ void main() {
     });
   });
 
+  group('Stream volume on the sound server (Linux)', () {
+    late Directory tempDir;
+
+    setUp(() async => tempDir = await setUpUiTestDb());
+    tearDown(() => tearDownUiTestDb(tempDir));
+
+    AudioOutputService service(FakeStreamVolume volume, {DatabaseService? db}) =>
+        AudioOutputService(backend: FakeOutputBackend([speakers]), supported: true, db: db, streamVolume: volume);
+
+    test('the first start resets a stream left at 0 % by older builds and remembers it did', () async {
+      final db = DatabaseService();
+      final volume = FakeStreamVolume([(index: 7, silent: true)]);
+      final events = <void>[];
+      final output = service(volume, db: db);
+      output.systemSilenced.listen(events.add);
+
+      await output.init();
+      await Future<void>.delayed(Duration.zero);
+      expect(volume.restored, [7]);
+      expect(events, isEmpty);
+      expect(await db.getSetting(AudioOutputService.streamVolumeResetKey), '1');
+    });
+
+    test('later a silenced stream is the user\'s choice: it is reported, not changed', () async {
+      final db = DatabaseService();
+      await db.setSetting(AudioOutputService.streamVolumeResetKey, '1');
+      final volume = FakeStreamVolume([(index: 7, silent: true)]);
+      final events = <void>[];
+      final output = service(volume, db: db);
+      output.systemSilenced.listen(events.add);
+
+      await output.init();
+      await Future<void>.delayed(Duration.zero);
+      expect(volume.restored, isEmpty);
+      expect(events, hasLength(1));
+    });
+
+    test('an audible stream is left alone', () async {
+      final volume = FakeStreamVolume([(index: 3, silent: false)]);
+      final events = <void>[];
+      final output = service(volume);
+      output.systemSilenced.listen(events.add);
+
+      await output.init();
+      expect(volume.restored, isEmpty);
+      expect(events, isEmpty);
+    });
+
+    test('waits for the engine\'s stream to appear on the server', () async {
+      final volume = FakeStreamVolume([(index: 9, silent: true)], appearsAfter: 3);
+      await service(volume).init();
+      expect(volume.lookups, 4);
+      expect(volume.restored, [9]);
+    });
+  });
+
   group('BusPlayer', () {
     test('plays every format, M4A included, on SoLoud', () {
       for (final path in ['/a/x.mp3', '/a/x.WAV', '/a/x.ogg', '/a/x.flac', '/a/x.m4a']) {
@@ -91,4 +147,22 @@ void main() {
       expect((BusPlayer.forFile('/a/x.m4a', bus: 'music') as SoLoudBusPlayer).bus, 'music');
     });
   });
+}
+
+class FakeStreamVolume implements StreamVolume {
+  final List<({int index, bool silent})> streams;
+  final int appearsAfter;
+  final List<int> restored = [];
+  int lookups = 0;
+
+  FakeStreamVolume(this.streams, {this.appearsAfter = 0});
+
+  @override
+  Future<List<({int index, bool silent})>> ownStreams() async => lookups++ < appearsAfter ? const [] : streams;
+
+  @override
+  Future<bool> restore(int index) async {
+    restored.add(index);
+    return true;
+  }
 }

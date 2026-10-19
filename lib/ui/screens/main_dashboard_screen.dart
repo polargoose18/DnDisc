@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
+import '../../audio/audio_output_service.dart';
 import '../../audio/playback/soloud_engine.dart';
 import '../../data/services/settings_service.dart';
 import '../../l10n/app_localizations.dart';
@@ -37,11 +38,17 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   final Set<AppScreen> _visited = {AppScreen.dashboard};
   StreamSubscription<String>? _loadFailures;
   StreamSubscription<void>? _deviceFailures;
+  StreamSubscription<void>? _systemSilenced;
 
   @override
   void initState() {
     super.initState();
     _loadFailures = SoLoudEngine.instance.loadFailures.listen(_onLoadFailure);
+    _systemSilenced = context.read<AudioOutputService?>()?.systemSilenced.listen((_) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      context.read<ToastController?>()?.error(l10n.toastSystemMuted, message: l10n.toastSystemMutedHint);
+    });
     _deviceFailures = SoLoudEngine.instance.deviceFailures.listen((_) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -53,6 +60,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   void dispose() {
     _loadFailures?.cancel();
     _deviceFailures?.cancel();
+    _systemSilenced?.cancel();
     super.dispose();
   }
 

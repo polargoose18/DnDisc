@@ -2017,6 +2017,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sound is not reaching the output device. Pick another device in Settings or check the system sound settings'**
   String get toastOutputDeviceFailedHint;
+
+  /// No description provided for @toastSystemMuted.
+  ///
+  /// In en, this message translates to:
+  /// **'DnDisc is muted in the system mixer'**
+  String get toastSystemMuted;
+
+  /// No description provided for @toastSystemMutedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise its volume in the system sound settings or in pavucontrol'**
+  String get toastSystemMutedHint;
 }
 
 class _AppLocalizationsDelegate

@@ -1097,4 +1097,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get toastOutputDeviceFailedHint =>
       'Звук не доходит до устройства вывода. Выберите другое устройство в настройках или проверьте системные настройки звука';
+
+  @override
+  String get toastSystemMuted => 'DnDisc заглушён в системном микшере';
+
+  @override
+  String get toastSystemMutedHint =>
+      'Поднимите его громкость в системных настройках звука или в pavucontrol';
 }
