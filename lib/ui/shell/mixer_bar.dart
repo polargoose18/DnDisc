@@ -4,6 +4,7 @@ import '../../audio/ambient_bus_controller.dart';
 import '../../audio/audio_engine_service.dart';
 import '../../audio/music_bus_controller.dart';
 import '../../audio/sfx_bus_controller.dart';
+import '../../domain/models/audio_track.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/ds_theme.dart';
 import '../../theme/tokens.dart';
@@ -24,15 +25,17 @@ class MixerBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final ds = context.ds;
     final l10n = AppLocalizations.of(context)!;
-    final music = context.watch<MusicBusController>();
+    // The music bus also notifies on every ducking step; the bar does not
+    // show the ducking multiplier, so it listens only to what it draws.
+    final music = context.read<MusicBusController>();
+    final (track, playing, musicVolume) =
+        context.select<MusicBusController, (AudioTrack?, bool, double)>((m) => (m.currentTrack, m.isPlaying, m.rawVolume));
     final ambient = context.watch<AmbientBusController>();
     final sfx = context.watch<SfxBusController>();
-    final engine = context.watch<AudioEngineService>();
+    final engine = context.read<AudioEngineService>();
+    final (isMuted, masterVolume) = context.select<AudioEngineService, (bool, double)>((e) => (e.isMuted, e.masterVolume));
     final layout = ShellScope.maybeOf(context)?.layout ?? ShellLayout.of(MediaQuery.sizeOf(context).width);
     final wide = layout == ShellLayout.wide;
-
-    final track = music.currentTrack;
-    final playing = music.isPlaying;
 
     final now = Row(
       children: [
@@ -114,9 +117,9 @@ class MixerBar extends StatelessWidget {
       children: [
         DsButton.ghost(
           key: const ValueKey('mixer_mute_button'),
-          icon: engine.isMuted ? 'mute' : 'volume',
+          icon: isMuted ? 'mute' : 'volume',
           iconOnly: true,
-          label: engine.isMuted ? l10n.unmuteTooltip : l10n.muteTooltip,
+          label: isMuted ? l10n.unmuteTooltip : l10n.muteTooltip,
           hotkey: 'M',
           onPressed: engine.toggleMute,
         ),
@@ -124,7 +127,7 @@ class MixerBar extends StatelessWidget {
           width: _channelWidth - Sizes.icon - Spacing.s2,
           child: DsSlider(
             key: const ValueKey('mixer_master_slider'),
-            value: engine.masterVolume,
+            value: masterVolume,
             onChanged: engine.setMasterVolume,
             semanticLabel: l10n.master,
           ),
@@ -136,7 +139,7 @@ class MixerBar extends StatelessWidget {
         ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              channel('music', l10n.music, music.rawVolume, music.setVolume, key: const ValueKey('mixer_music_slider')),
+              channel('music', l10n.music, musicVolume, music.setVolume, key: const ValueKey('mixer_music_slider')),
               const SizedBox(width: Spacing.s3),
               channel('waves', l10n.ambient, ambient.channelVolume, ambient.setChannelVolume,
                   key: const ValueKey('mixer_ambient_slider')),
@@ -272,7 +275,8 @@ class _ChannelsEntryState extends State<_ChannelsEntry> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final music = context.watch<MusicBusController>();
+    final music = context.read<MusicBusController>();
+    final musicVolume = context.select<MusicBusController, double>((m) => m.rawVolume);
     final ambient = context.watch<AmbientBusController>();
     final sfx = context.watch<SfxBusController>();
     return Padding(
@@ -280,7 +284,7 @@ class _ChannelsEntryState extends State<_ChannelsEntry> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          DsSlider(icon: 'music', value: music.rawVolume, onChanged: music.setVolume, semanticLabel: l10n.music),
+          DsSlider(icon: 'music', value: musicVolume, onChanged: music.setVolume, semanticLabel: l10n.music),
           DsSlider(
             icon: 'waves',
             value: ambient.channelVolume,
