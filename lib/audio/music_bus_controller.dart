@@ -241,8 +241,8 @@ class MusicBusController extends ChangeNotifier {
 
   void updateDuckingMultiplier(double multiplier) {
     _duckingMultiplier = multiplier.clamp(0.0, 1.0);
+    // Changes every ~30 ms and no screen shows it, so listeners are not told.
     _applyPlayerVolume();
-    notifyListeners();
   }
 
   // Pause, resume and stop change the state (and the play/pause icon) at
