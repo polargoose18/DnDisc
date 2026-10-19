@@ -45,6 +45,10 @@ class SoLoudEngine {
 
   bool _started = false;
 
+  /// Keep the output device running while idle (desktop) instead of
+  /// letting SoLoud stop it (mobile, to save battery).
+  static bool get keepDeviceOpen => !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
+
   /// The engine has started (never in tests, which have no native library).
   bool get isReady => _started && _soloud.isInitialized;
 
@@ -81,8 +85,9 @@ class SoLoudEngine {
     _started = true;
     // SoLoud stops an idle device after 500 ms and restarts it off the UI
     // thread on the next play, reporting a failed restart only on a stream.
-    // A desktop mixer keeps its output open instead.
-    _soloud.setAudioDeviceIdleTimeout(null);
+    // A desktop mixer keeps its output open instead; on Android the idle stop
+    // releases the audio wakelock, so it stays.
+    if (keepDeviceOpen) _soloud.setAudioDeviceIdleTimeout(null);
     _soloud.audioDeviceStartFailures.listen((failure) {
       LoggerService().error('SoLoudEngine: The output device did not start', details: failure.name);
       _deviceFailures.add(null);

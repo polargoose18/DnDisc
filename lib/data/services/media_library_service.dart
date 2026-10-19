@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as p;
@@ -9,6 +8,7 @@ import '../../domain/models/ambient_layer.dart';
 import '../../domain/models/sfx_trigger.dart';
 import '../../audio/audio_engine_service.dart';
 import '../../services/audio_duration_helper.dart';
+import 'audio_file_picker.dart';
 
 class MediaLibraryService extends ChangeNotifier {
   final MediaLibraryRepository _repository;
@@ -89,19 +89,9 @@ class MediaLibraryService extends ChangeNotifier {
     required AudioBusType busType,
     List<String> defaultTags = const [],
   }) async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: supportedExtensions,
-    );
-
-    if (result == null || result.files.isEmpty) return [];
-
-    return importPaths(
-      busType: busType,
-      paths: [for (final file in result.files) if (file.path != null) file.path!],
-      defaultTags: defaultTags,
-    );
+    final picked = await AudioFilePicker.pick(multiple: true);
+    if (picked.paths.isEmpty) return [];
+    return importPaths(busType: busType, paths: picked.paths, defaultTags: defaultTags);
   }
 
   /// Audio file extensions the library accepts.

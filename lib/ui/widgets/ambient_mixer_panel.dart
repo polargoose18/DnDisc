@@ -1,8 +1,9 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' hide Durations;
+import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../audio/ambient_bus_controller.dart';
+import '../../data/services/audio_file_picker.dart';
 import '../../domain/models/ambient_layer.dart';
 import '../../domain/models/library_track.dart';
 import '../../l10n/app_localizations.dart';
@@ -19,8 +20,8 @@ import '../design/ds_menu.dart';
 import '../design/ds_panel.dart';
 import '../design/ds_slider.dart';
 import '../design/ds_tooltip.dart';
-import 'bus_equalizer.dart';
 import '../view_models/media_library_view_model.dart';
+import 'bus_equalizer.dart';
 import 'track_pick_list.dart';
 
 /// Ambient layers panel: a row per layer with its toggle button, name,
@@ -211,16 +212,13 @@ class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
   bool _persistent = true;
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a'],
-    );
-    final file = result?.files.single;
-    if (file?.path == null) return;
+    final picked = await AudioFilePicker.pick();
+    if (picked.paths.isEmpty) return;
+    final path = picked.paths.single;
     setState(() {
       _track = null;
-      _path = file!.path!;
-      _title = file.name.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+      _path = path;
+      _title = p.basenameWithoutExtension(path);
     });
   }
 

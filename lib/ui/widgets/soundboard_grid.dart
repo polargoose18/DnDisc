@@ -1,8 +1,9 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' hide Durations;
+import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../audio/sfx_bus_controller.dart';
+import '../../data/services/audio_file_picker.dart';
 import '../../domain/models/library_track.dart';
 import '../../domain/models/sfx_trigger.dart';
 import '../../l10n/app_localizations.dart';
@@ -309,16 +310,13 @@ class _AddSfxTriggerDialogState extends State<_AddSfxTriggerDialog> {
   bool _loop = false;
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['wav', 'mp3', 'ogg', 'flac', 'm4a'],
-    );
-    final file = result?.files.single;
-    if (file?.path == null) return;
+    final picked = await AudioFilePicker.pick();
+    if (picked.paths.isEmpty) return;
+    final path = picked.paths.single;
     setState(() {
       _track = null;
-      _path = file!.path!;
-      _title = file.name.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+      _path = path;
+      _title = p.basenameWithoutExtension(path);
     });
   }
 

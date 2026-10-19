@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../audio/ambient_bus_controller.dart';
 import '../../audio/audio_engine_service.dart';
 import '../../audio/music_bus_controller.dart';
+import '../../data/services/audio_file_picker.dart';
 import '../../data/services/media_library_service.dart';
 import '../../data/services/media_package_service.dart';
 import '../../domain/models/library_track.dart';
@@ -118,9 +119,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
 
   Future<void> _locate(LibraryTrack track, MediaLibraryViewModel library) async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: MediaLibraryService.supportedExtensions);
-    final path = result?.files.single.path;
-    if (path != null) await library.updateTrack(track.copyWith(filePath: path));
+    final picked = await AudioFilePicker.pick();
+    if (picked.paths.isNotEmpty) await library.updateTrack(track.copyWith(filePath: picked.paths.single));
   }
 
   Future<void> _exportSet(MediaLibraryViewModel library) async {

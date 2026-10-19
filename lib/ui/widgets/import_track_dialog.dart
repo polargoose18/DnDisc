@@ -1,13 +1,13 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
+import '../../data/services/audio_file_picker.dart';
 import '../../data/services/media_library_service.dart';
 import '../../domain/models/audio_track.dart';
 import '../../domain/models/library_track.dart';
 import '../../l10n/app_localizations.dart';
-import '../../theme/icons.dart';
 import '../../theme/ds_theme.dart';
+import '../../theme/icons.dart';
 import '../../theme/tokens.dart';
 import '../design/ds_button.dart';
 import '../design/ds_controls.dart';
@@ -50,12 +50,8 @@ class _ImportAudioDialogState extends State<ImportAudioDialog> {
   }
 
   Future<void> _browse() async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: MediaLibraryService.supportedExtensions,
-    );
-    if (result != null) _add([for (final f in result.files) if (f.path != null) f.path!]);
+    final picked = await AudioFilePicker.pick(multiple: true);
+    _add(picked.paths);
   }
 
   @override
