@@ -180,8 +180,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
     final ds = context.ds;
     final l10n = AppLocalizations.of(context)!;
     final library = context.watch<MediaLibraryViewModel>();
-    final engine = context.watch<AudioEngineService>();
-    final music = context.watch<MusicBusController>();
+    final engine = context.read<AudioEngineService>();
+    // Ducking makes the music bus notify every ~30 ms; only the playing
+    // state and the current track matter here.
+    final (musicPlaying, musicTrackId) =
+        context.select<MusicBusController, (bool, String?)>((m) => (m.isPlaying, m.currentTrack?.id));
     final ambient = context.watch<AmbientBusController>();
 
     final all = library.allTracks;
@@ -191,7 +194,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     int count(AudioBusType? bus) => bus == null ? all.length : all.where((t) => t.busType == bus).length;
 
     bool isPlaying(LibraryTrack t) => switch (t.busType) {
-          AudioBusType.music => music.isPlaying && music.currentTrack?.id == t.id,
+          AudioBusType.music => musicPlaying && musicTrackId == t.id,
           AudioBusType.ambient => ambient.layers.any((l) => l.id == t.id && l.isActive),
           AudioBusType.sfx => false,
         };

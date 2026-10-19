@@ -41,7 +41,7 @@ class AudioEngineService extends ChangeNotifier {
       onSfxTriggered: _handleSfxDucking,
     );
 
-    musicBus.addListener(notifyListeners);
+    musicBus.addListener(_onMusicChanged);
     ambientBus.addListener(notifyListeners);
     sfxBus.addListener(notifyListeners);
     _settings?.addListener(_onSettingsChanged);
@@ -92,10 +92,24 @@ class AudioEngineService extends ChangeNotifier {
     }
   }
 
+  /// True while the ducking multiplier is being pushed to the music bus. The
+  /// multiplier changes every ~30 ms and no screen shows it, so those
+  /// notifications are not forwarded to the engine's listeners.
+  bool _applyingDucking = false;
+
+  void _onMusicChanged() {
+    if (!_applyingDucking) notifyListeners();
+  }
+
   void _handleSfxDucking() {
     duckingController.triggerDuck(
       onVolumeUpdate: (multiplier) {
-        musicBus.updateDuckingMultiplier(multiplier);
+        _applyingDucking = true;
+        try {
+          musicBus.updateDuckingMultiplier(multiplier);
+        } finally {
+          _applyingDucking = false;
+        }
       },
     );
   }
@@ -106,7 +120,7 @@ class AudioEngineService extends ChangeNotifier {
   void dispose() {
     _isDisposed = true;
     _settings?.removeListener(_onSettingsChanged);
-    musicBus.removeListener(notifyListeners);
+    musicBus.removeListener(_onMusicChanged);
     ambientBus.removeListener(notifyListeners);
     sfxBus.removeListener(notifyListeners);
 

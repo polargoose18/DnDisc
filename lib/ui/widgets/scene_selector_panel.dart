@@ -59,7 +59,7 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
   Widget build(BuildContext context) {
     final scenes = context.watch<SceneViewModel>();
     final library = context.watch<MediaLibraryViewModel>();
-    final engine = context.watch<AudioEngineService>();
+    final engine = context.read<AudioEngineService>();
     final l10n = AppLocalizations.of(context)!;
 
     final all = scenes.scenes;
