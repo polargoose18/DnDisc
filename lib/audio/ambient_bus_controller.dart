@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../domain/models/ambient_layer.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
+import 'fading_voices.dart';
 import 'playback/bus_player.dart';
 import 'playback/soloud_engine.dart';
 
@@ -12,7 +13,7 @@ class AmbientBusController extends ChangeNotifier {
   final Map<String, FadeController> _fadeControllers = {};
 
   /// Players of turned-off layers that are still fading out.
-  final Map<BusPlayer, FadeController> _fadingOut = {};
+  final FadingVoices _fadingOut = FadingVoices('AmbientBus');
   double _masterAmbientVolume = 1.0;
   double _channelVolume = 1.0;
   Duration _defaultFadeDuration;
@@ -279,41 +280,13 @@ class AmbientBusController extends ChangeNotifier {
     _activePlayers.remove(layerId);
 
     if (fadeDuration.inMilliseconds > 0) {
-      final stopFader = FadeController();
-      _fadingOut[player] = stopFader;
       final currentLayer = _layers.firstWhere(
         (l) => l.id == layerId,
         orElse: () => AmbientLayer(id: layerId, title: '', filePath: ''),
       );
-      final currentVol = currentLayer.volume * _gain;
-
-      stopFader.startFade(
-        from: currentVol,
-        to: 0.0,
-        duration: fadeDuration,
-        onUpdate: (val) {
-          try {
-            player.setVolume(val);
-          } catch (_) {}
-        },
-        onComplete: () async {
-          _fadingOut.remove(player);
-          stopFader.dispose();
-          try {
-            await player.stop();
-            await player.dispose();
-          } catch (e) {
-            LoggerService().error('AmbientBus: Error disposing player for $layerId', details: '$e');
-          }
-        },
-      );
+      _fadingOut.fadeOutAndRelease(player, from: currentLayer.volume * _gain, duration: fadeDuration);
     } else {
-      try {
-        await player.stop();
-        await player.dispose();
-      } catch (e) {
-        LoggerService().error('AmbientBus: Error disposing player for $layerId', details: '$e');
-      }
+      await _fadingOut.release(player);
     }
   }
 
@@ -327,14 +300,7 @@ class AmbientBusController extends ChangeNotifier {
     }
     _fadeControllers.clear();
 
-    for (final entry in _fadingOut.entries) {
-      entry.value.dispose();
-      try {
-        entry.key.stop();
-        entry.key.dispose();
-      } catch (_) {}
-    }
-    _fadingOut.clear();
+    _fadingOut.releaseAll();
 
     for (final player in _activePlayers.values) {
       try {

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../domain/models/audio_track.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
+import 'fading_voices.dart';
 import 'playback/bus_player.dart';
 import 'playback/soloud_engine.dart';
 
@@ -17,9 +18,8 @@ class MusicBusController extends ChangeNotifier {
   Duration _defaultFadeDuration;
 
   BusPlayer? _player;
-  BusPlayer? _outgoingPlayer; // For crossfading
+  final FadingVoices _outgoing = FadingVoices('MusicBus');
   final FadeController _fadeController = FadeController();
-  final FadeController _outgoingFadeController = FadeController();
   Duration? _currentTrackDuration;
 
   /// Playback position of the current track; updated by the player without notifying listeners.
@@ -89,32 +89,9 @@ class MusicBusController extends ChangeNotifier {
       // If we already have an active player, initiate crossfade
       if (wasAudible && effectiveFade.inMilliseconds > 0) {
         _fadeController.stop();
-        _outgoingFadeController.stop();
-        _outgoingPlayer?.dispose();
-        _outgoingPlayer = _player;
+        final outgoing = _player!;
         _player = null;
-
-        final oldPlayer = _outgoingPlayer;
-        final currentVol = effectiveVolume;
-        _outgoingFadeController.startFade(
-          from: currentVol,
-          to: 0.0,
-          duration: effectiveFade,
-          onUpdate: (val) {
-            try {
-              oldPlayer?.setVolume(val);
-            } catch (_) {}
-          },
-          onComplete: () {
-            try {
-              oldPlayer?.stop();
-              oldPlayer?.dispose();
-            } catch (_) {}
-            if (_outgoingPlayer == oldPlayer) {
-              _outgoingPlayer = null;
-            }
-          },
-        );
+        _outgoing.fadeOutAndRelease(outgoing, from: effectiveVolume, duration: effectiveFade, replaceOthers: true);
       } else {
         // A paused player stops; a track fading out after stop() keeps fading.
         _fadeController.stop();
@@ -241,7 +218,7 @@ class MusicBusController extends ChangeNotifier {
     notifyListeners();
 
     if (player != null && effectiveFade.inMilliseconds > 0 && audible > 0) {
-      _fadeOutAndRelease(player, from: audible, duration: effectiveFade);
+      _outgoing.fadeOutAndRelease(player, from: audible, duration: effectiveFade, replaceOthers: true);
     } else {
       await _stopCurrentAudio();
       if (player != null) await _release(player);
@@ -399,43 +376,14 @@ class MusicBusController extends ChangeNotifier {
       return;
     }
     if (effectiveFade.inMilliseconds > 0 && audible > 0) {
-      _fadeOutAndRelease(player, from: audible, duration: effectiveFade);
+      _outgoing.fadeOutAndRelease(player, from: audible, duration: effectiveFade, replaceOthers: true);
     } else {
       await _stopCurrentAudio();
       await _release(player);
     }
   }
 
-  /// Fades [player] out on the outgoing fader and frees it at the end.
-  void _fadeOutAndRelease(BusPlayer player, {required double from, required Duration duration}) {
-    _outgoingFadeController.stop();
-    final previous = _outgoingPlayer;
-    if (previous != null && !identical(previous, player)) _release(previous);
-    _outgoingPlayer = player;
-    _outgoingFadeController.startFade(
-      from: from,
-      to: 0.0,
-      duration: duration,
-      onUpdate: (val) {
-        try {
-          player.setVolume(val);
-        } catch (_) {}
-      },
-      onComplete: () {
-        if (identical(_outgoingPlayer, player)) _outgoingPlayer = null;
-        _release(player);
-      },
-    );
-  }
-
-  Future<void> _release(BusPlayer player) async {
-    try {
-      await player.stop();
-      await player.dispose();
-    } catch (e) {
-      LoggerService().error('MusicBus: Error disposing player', details: '$e');
-    }
-  }
+  Future<void> _release(BusPlayer player) => _outgoing.release(player);
 
   void _applyPlayerVolume() {
     if (_player != null) {
@@ -449,15 +397,7 @@ class MusicBusController extends ChangeNotifier {
 
   Future<void> _stopCurrentAudio() async {
     _fadeController.stop();
-    _outgoingFadeController.stop();
-
-    if (_outgoingPlayer != null) {
-      try {
-        await _outgoingPlayer!.stop();
-        await _outgoingPlayer!.dispose();
-      } catch (_) {}
-      _outgoingPlayer = null;
-    }
+    await _outgoing.releaseAll();
 
     if (_player != null) {
       try {
@@ -476,7 +416,6 @@ class MusicBusController extends ChangeNotifier {
   void dispose() {
     _isDisposed = true;
     _fadeController.dispose();
-    _outgoingFadeController.dispose();
     _stopCurrentAudio();
     super.dispose();
   }
