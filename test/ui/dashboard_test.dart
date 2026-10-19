@@ -74,9 +74,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(env.scenes.activeSceneId, equals('b'));
-      // The active scene shows an equalizer instead of a second badge.
-      expect(find.descendant(of: find.byKey(const ValueKey('scene_card_b')), matching: find.byType(EqualizerBars)), findsOneWidget);
-      expect(find.descendant(of: find.byKey(const ValueKey('scene_card_a')), matching: find.byType(EqualizerBars)), findsNothing);
+      // The active scene is marked by its background only: no equalizer next
+      // to the more button.
+      expect(find.descendant(of: find.byKey(const ValueKey('scene_card_b')), matching: find.byType(EqualizerBars)), findsNothing);
     });
 
     testWidgets('filters scenes by search and offers to clear the search when nothing matches', (tester) async {
@@ -436,6 +436,29 @@ void main() {
       expect(find.descendant(of: find.byKey(const ValueKey('sfx_btn_s1')), matching: find.byType(EqualizerBars)), findsOneWidget);
       expect(find.descendant(of: find.byKey(const ValueKey('sfx_btn_s1')), matching: find.text('1')), findsNothing);
       await tester.pump(const Duration(seconds: 2));
+      expect(find.descendant(of: find.byKey(const ValueKey('sfx_btn_s1')), matching: find.byType(EqualizerBars)), findsNothing);
+    });
+
+    testWidgets('draws the progress as a ring along the tile border that grows while the sound plays', (tester) async {
+      env.sfx.addTrigger(const SfxTrigger(id: 's1', title: 'Door', filePath: '/missing/s1.mp3'));
+      await env.pump(tester, panel(const SoundboardGrid()));
+
+      Finder ring() => find.descendant(
+            of: find.byKey(const ValueKey('sfx_btn_s1')),
+            matching: find.byWidgetPredicate((w) => w is CustomPaint && w.foregroundPainter is SfxProgressRingPainter),
+          );
+      double progress() => (tester.widget<CustomPaint>(ring()).foregroundPainter! as SfxProgressRingPainter).progress;
+
+      expect(ring(), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('sfx_btn_s1')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      final early = progress();
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(progress(), greaterThan(early));
+
+      await tester.pump(const Duration(seconds: 2));
+      expect(ring(), findsNothing);
       expect(find.descendant(of: find.byKey(const ValueKey('sfx_btn_s1')), matching: find.byType(EqualizerBars)), findsNothing);
     });
 

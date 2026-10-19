@@ -86,7 +86,8 @@ class SoundboardGrid extends StatelessWidget {
 }
 
 /// One-shot sound tile. While a sound plays the tile shows `primary-subtle`,
-/// a progress line and an equalizer in place of the key.
+/// a progress ring that runs clockwise along the border from the top centre,
+/// and an equalizer in place of the key. A loop has a full `primary` border.
 class SfxTile extends StatefulWidget {
   final SfxTrigger trigger;
   final String? hotkey;
@@ -163,71 +164,102 @@ class _SfxTileState extends State<SfxTile> with SingleTickerProviderStateMixin {
       },
       builder: (context, s) {
         final background = _playing || s.pressed ? ds.primarySubtle : (s.hovered ? ds.surfaceHover : ds.surfaceRaised);
+        final ring = _playing && !trigger.isLoop;
+        final borderColor = (_playing && trigger.isLoop) || (s.pressed && !ring) ? ds.primary : ds.border;
+        final tile = AnimatedContainer(
+          duration: Durations.fast,
+          curve: Curves.easeOut,
+          constraints: const BoxConstraints(minWidth: Sizes.sfxTileMin, minHeight: Sizes.sfxTileMin),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: Radii.mdAll,
+            border: Border.all(color: borderColor, width: Sizes.borderWidth),
+          ),
+          child: ClipRRect(
+            borderRadius: Radii.mdAll,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(Spacing.s3),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DsIcon(DnDiscIcons.resolve(trigger.iconName, DnDiscIcons.defaultSfx), size: Sizes.iconLg, color: _playing ? ds.primary : ds.textMuted),
+                          const Spacer(),
+                          if (trigger.isPersistent) ...[
+                            DsIcon('pin', size: Sizes.iconSm, color: ds.primary),
+                            const SizedBox(width: Spacing.s1),
+                          ],
+                          if (_playing) const EqualizerBars(active: true, bars: 3, height: Spacing.s3) else if (widget.hotkey != null) DsKbd(widget.hotkey!),
+                        ],
+                      ),
+                      const Spacer(),
+                      Text(trigger.title, style: ds.label, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
         return DsTooltip(
           hoverOnly: true,
           label: trigger.title,
-          child: AnimatedContainer(
-            duration: Durations.fast,
-            curve: Curves.easeOut,
-            constraints: const BoxConstraints(minWidth: Sizes.sfxTileMin, minHeight: Sizes.sfxTileMin),
-            decoration: BoxDecoration(
-              color: background,
-              borderRadius: Radii.mdAll,
-              border: Border.all(color: _playing || s.pressed ? ds.primary : ds.border, width: Sizes.borderWidth),
-            ),
-            child: ClipRRect(
-              borderRadius: Radii.mdAll,
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(Spacing.s3),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            DsIcon(DnDiscIcons.resolve(trigger.iconName, DnDiscIcons.defaultSfx), size: Sizes.iconLg, color: _playing ? ds.primary : ds.textMuted),
-                            const Spacer(),
-                            if (trigger.isPersistent) ...[
-                              DsIcon('pin', size: Sizes.iconSm, color: ds.primary),
-                              const SizedBox(width: Spacing.s1),
-                            ],
-                            if (_playing)
-                              const EqualizerBars(active: true, bars: 3, height: Spacing.s3)
-                            else if (widget.hotkey != null)
-                              DsKbd(widget.hotkey!),
-                          ],
-                        ),
-                        const Spacer(),
-                        Text(trigger.title, style: ds.label, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      ],
-                    ),
+          child: ring
+              ? AnimatedBuilder(
+                  animation: _progress,
+                  builder: (context, child) => CustomPaint(
+                    foregroundPainter: SfxProgressRingPainter(progress: _progress.value, color: ds.primary),
+                    child: child,
                   ),
-                  if (_playing && !trigger.isLoop)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: AnimatedBuilder(
-                        animation: _progress,
-                        builder: (context, _) => Align(
-                          alignment: Alignment.centerLeft,
-                          child: FractionallySizedBox(
-                            widthFactor: _progress.value,
-                            child: Container(height: Sizes.progressLine, color: ds.primary),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
+                  child: tile,
+                )
+              : tile,
         );
       },
     );
   }
+}
+
+/// Progress of a playing tile drawn over its border: starts at the top
+/// centre and runs clockwise until the ring is closed at 1.0.
+class SfxProgressRingPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+
+  const SfxProgressRingPainter({required this.progress, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (progress <= 0) return;
+    const inset = Sizes.progressLine / 2;
+    final rect = (Offset.zero & size).deflate(inset);
+    final r = (Radii.md - inset).clamp(0.0, rect.shortestSide / 2);
+    final path = Path()
+      ..moveTo(rect.center.dx, rect.top)
+      ..lineTo(rect.right - r, rect.top)
+      ..arcToPoint(Offset(rect.right, rect.top + r), radius: Radius.circular(r))
+      ..lineTo(rect.right, rect.bottom - r)
+      ..arcToPoint(Offset(rect.right - r, rect.bottom), radius: Radius.circular(r))
+      ..lineTo(rect.left + r, rect.bottom)
+      ..arcToPoint(Offset(rect.left, rect.bottom - r), radius: Radius.circular(r))
+      ..lineTo(rect.left, rect.top + r)
+      ..arcToPoint(Offset(rect.left + r, rect.top), radius: Radius.circular(r))
+      ..close();
+    final metric = path.computeMetrics().first;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = Sizes.progressLine
+      ..strokeCap = StrokeCap.butt;
+    canvas.drawPath(metric.extractPath(0, metric.length * progress.clamp(0.0, 1.0)), paint);
+  }
+
+  @override
+  bool shouldRepaint(SfxProgressRingPainter old) => old.progress != progress || old.color != color;
 }
 
 class _EmptySlot extends StatelessWidget {
