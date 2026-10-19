@@ -60,7 +60,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libasound2-dev \
-            pipewire pipewire-pulse wireplumber pulseaudio-utils xvfb
+            pipewire pipewire-pulse wireplumber pulseaudio-utils xvfb dbus-x11
       - run: flutter pub get
       - name: Virtual output device and signal-level test
         run: tool/ci/audio_output_test.sh
