@@ -7,16 +7,14 @@ import '../../theme/tokens.dart';
 import '../design/ds_interactive.dart';
 import '../design/ds_menu.dart';
 import '../design/ds_tooltip.dart';
-import '../design/equalizer_bars.dart';
 import '../design/scene_cover.dart';
 
 /// Row of the scene list: thumbnail, name, one line of metadata. The active
-/// scene gets `primary-subtle` and an equalizer; the menu opens by right
+/// scene gets `primary-subtle`; the menu opens by right
 /// click, long press or the `more` button that shows on hover.
 class SceneCard extends StatefulWidget {
   final SceneModel scene;
   final bool isActive;
-  final bool playing;
   final VoidCallback onActivate;
   final VoidCallback onEdit;
   final VoidCallback onDuplicate;
@@ -27,7 +25,6 @@ class SceneCard extends StatefulWidget {
     super.key,
     required this.scene,
     required this.isActive,
-    this.playing = true,
     required this.onActivate,
     required this.onEdit,
     required this.onDuplicate,
@@ -120,10 +117,6 @@ class _SceneCardState extends State<SceneCard> {
                   ),
                 ),
               ),
-              if (isActive) ...[
-                const SizedBox(width: Spacing.s2),
-                EqualizerBars(active: widget.playing, bars: 3, height: Spacing.s3),
-              ],
               if (s.hovered || s.focused || _menuOpen)
                 DsMoreButton(
                   items: _items(l10n),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../audio/audio_engine_service.dart';
-import '../../audio/music_bus_controller.dart';
 import '../../domain/models/scene_model.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -61,7 +60,6 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
     final scenes = context.watch<SceneViewModel>();
     final library = context.watch<MediaLibraryViewModel>();
     final engine = context.watch<AudioEngineService>();
-    final playing = context.select<MusicBusController, bool>((m) => m.isPlaying);
     final l10n = AppLocalizations.of(context)!;
 
     final all = scenes.scenes;
@@ -100,7 +98,6 @@ class _SceneSelectorPanelState extends State<SceneSelectorPanel> {
             key: ValueKey('scene_card_${scene.id}'),
             scene: scene,
             isActive: scene.id == scenes.activeSceneId,
-            playing: playing,
             onActivate: () => scenes.activateScene(scene, audioEngine: engine, mediaLibrary: library.service),
             onEdit: () => _edit(scenes, scene),
             onDuplicate: () => scenes.duplicateScene(scene.id),
