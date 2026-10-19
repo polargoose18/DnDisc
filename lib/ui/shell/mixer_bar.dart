@@ -10,7 +10,7 @@ import '../../theme/tokens.dart';
 import '../design/ds_button.dart';
 import '../design/ds_icon.dart';
 import '../design/ds_slider.dart';
-import '../design/equalizer_bars.dart';
+import '../widgets/music_equalizer.dart';
 import 'shell_scope.dart';
 
 /// Bottom mixer: current track, transport and the volume of every channel.
@@ -62,7 +62,7 @@ class MixerBar extends StatelessWidget {
               if (track != null)
                 Row(
                   children: [
-                    EqualizerBars(active: playing, height: Spacing.s3),
+                    const MusicEqualizer(height: Spacing.s3),
                     const SizedBox(width: Spacing.s2),
                     Text(playing ? l10n.playing : l10n.paused, style: ds.caption),
                   ],

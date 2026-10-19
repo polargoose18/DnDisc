@@ -7,7 +7,7 @@ import '../../theme/tokens.dart';
 import '../design/ds_button.dart';
 import '../design/ds_controls.dart';
 import '../design/ds_panel.dart';
-import '../design/equalizer_bars.dart';
+import 'music_equalizer.dart';
 
 String formatDuration(Duration d) {
   final minutes = d.inMinutes;
@@ -47,9 +47,9 @@ class MusicPlayerPanel extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: Spacing.s2, bottom: Spacing.s4),
-            child: EqualizerBars(active: playing, bars: 48, height: Spacing.s6, wide: true),
+          const Padding(
+            padding: EdgeInsets.only(top: Spacing.s2, bottom: Spacing.s4),
+            child: MusicEqualizer(bars: 48, height: Spacing.s6, wide: true),
           ),
           Row(
             children: [

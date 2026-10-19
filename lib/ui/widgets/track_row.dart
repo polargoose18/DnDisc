@@ -10,6 +10,7 @@ import '../design/ds_interactive.dart';
 import '../design/ds_menu.dart';
 import '../design/ds_tooltip.dart';
 import '../design/equalizer_bars.dart';
+import 'music_equalizer.dart';
 import 'track_pick_list.dart';
 
 /// Row of the media library: icon box, title, type and duration, up to three
@@ -91,7 +92,9 @@ class TrackRow extends StatelessWidget {
                 border: Border.all(color: ds.border, width: Sizes.borderWidth),
               ),
               child: playing
-                  ? const EqualizerBars(active: true, bars: 3, height: Spacing.s4)
+                  ? (track.busType == AudioBusType.music
+                      ? const MusicEqualizer(bars: 3, height: Spacing.s4)
+                      : const EqualizerBars(active: true, bars: 3, height: Spacing.s4))
                   : DsIcon(iconFor(track), color: ds.textMuted),
             ),
             const SizedBox(width: Spacing.s3),

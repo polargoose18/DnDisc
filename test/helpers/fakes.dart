@@ -197,6 +197,9 @@ class FakeBusPlayer implements BusPlayer {
   @override
   Future<void> dispose() async => disposed = true;
 
+  void emitDuration(Duration d) => _duration.add(d);
+  void emitPosition(Duration p) => _position.add(p);
+
   /// Audible: started, not paused, not stopped.
   bool get audible => playing && !paused && !stopped && !disposed;
 }

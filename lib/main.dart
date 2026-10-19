@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'audio/analysis/music_spectrum_service.dart';
 import 'audio/audio_engine_service.dart';
 import 'audio/audio_output_service.dart';
 import 'audio/music_bus_controller.dart';
@@ -71,6 +72,7 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
           return MultiProvider(
             providers: [
               ChangeNotifierProvider<MusicBusController>.value(value: audioEngine.musicBus),
+              ChangeNotifierProvider<MusicSpectrumService>(create: (_) => MusicSpectrumService(music: audioEngine.musicBus)),
               ChangeNotifierProvider<AmbientBusController>.value(value: audioEngine.ambientBus),
               ChangeNotifierProvider<SfxBusController>.value(value: audioEngine.sfxBus),
               ChangeNotifierProvider<ShortcutService>(

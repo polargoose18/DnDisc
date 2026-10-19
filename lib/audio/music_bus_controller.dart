@@ -43,6 +43,9 @@ class MusicBusController extends ChangeNotifier {
   MusicIntensity get currentIntensity => _currentIntensity;
   Duration? get trackDuration => _currentTrackDuration;
 
+  /// Sound comes out now: playing, or a pause still fading out.
+  bool get isAudible => _player != null && !_playerPaused;
+
   void setDefaultFadeDuration(Duration duration) {
     _defaultFadeDuration = duration;
   }
