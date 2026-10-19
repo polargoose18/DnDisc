@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:audioplayers/audioplayers.dart';
 import '../domain/models/audio_track.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
+import 'playback/bus_player.dart';
 
 class MusicBusController extends ChangeNotifier {
   AudioTrack? _currentTrack;
@@ -15,8 +15,8 @@ class MusicBusController extends ChangeNotifier {
   MusicIntensity _currentIntensity = MusicIntensity.calm;
   Duration _defaultFadeDuration;
 
-  AudioPlayer? _player;
-  AudioPlayer? _outgoingPlayer; // For crossfading
+  BusPlayer? _player;
+  BusPlayer? _outgoingPlayer; // For crossfading
   final FadeController _fadeController = FadeController();
   final FadeController _outgoingFadeController = FadeController();
   Duration? _currentTrackDuration;
@@ -105,10 +105,10 @@ class MusicBusController extends ChangeNotifier {
         await _stopCurrentAudio();
       }
 
-      _player = AudioPlayer();
+      _player = BusPlayer.forFile(file.path);
       _fadeMultiplier = effectiveFade.inMilliseconds > 0 ? 0.0 : 1.0;
       await _player!.setVolume(effectiveVolume);
-      await _player!.setReleaseMode(ReleaseMode.stop);
+      await _player!.setLooping(false);
 
       _player!.onDurationChanged.listen(
         (d) {
@@ -148,8 +148,8 @@ class MusicBusController extends ChangeNotifier {
         },
       );
 
-      LoggerService().info('MusicBus: Invoking AudioPlayer.play for ${file.path}');
-      await _player!.play(DeviceFileSource(file.path));
+      LoggerService().info('MusicBus: Invoking BusPlayer.play for ${file.path}');
+      await _player!.play(file.path);
 
       _isPlaying = true;
       LoggerService().info('MusicBus: Playback started successfully!');
@@ -193,18 +193,18 @@ class MusicBusController extends ChangeNotifier {
       return;
     }
 
-    AudioPlayer? nextPlayer;
+    BusPlayer? nextPlayer;
     try {
       final oldPlayer = _player;
       _outgoingFadeController.stop();
       _outgoingPlayer?.dispose();
       _outgoingPlayer = oldPlayer;
 
-      nextPlayer = AudioPlayer();
+      nextPlayer = BusPlayer.forFile(file.path);
       _player = nextPlayer;
 
       await nextPlayer.setVolume(0.0);
-      await nextPlayer.setReleaseMode(ReleaseMode.stop);
+      await nextPlayer.setLooping(false);
 
       nextPlayer.onDurationChanged.listen(
         (d) {
@@ -244,7 +244,7 @@ class MusicBusController extends ChangeNotifier {
         },
       );
 
-      await nextPlayer.play(DeviceFileSource(file.path));
+      await nextPlayer.play(file.path);
 
       // Crossfade: fade out oldPlayer, fade in nextPlayer
       if (oldPlayer != null) {

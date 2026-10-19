@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:audioplayers/audioplayers.dart';
 import '../domain/models/sfx_trigger.dart';
 import '../services/logger_service.dart';
+import 'playback/bus_player.dart';
 
 class SfxBusController extends ChangeNotifier {
   final List<SfxTrigger> _triggers = [];
-  final List<AudioPlayer> _activePlayers = [];
-  final Map<String, AudioPlayer> _loopingPlayers = {};
+  final List<BusPlayer> _activePlayers = [];
+  final Map<String, BusPlayer> _loopingPlayers = {};
   double _volume = 1.0;
   double _masterVolume = 1.0;
   final Function()? onSfxTriggered;
@@ -78,11 +78,11 @@ class SfxBusController extends ChangeNotifier {
         return;
       }
 
-      AudioPlayer? player;
+      BusPlayer? player;
       try {
-        player = AudioPlayer();
+        player = BusPlayer.forFile(file.path);
         await player.setVolume(trigger.volume * effectiveVolume);
-        await player.setReleaseMode(trigger.isLoop ? ReleaseMode.loop : ReleaseMode.stop);
+        await player.setLooping(trigger.isLoop);
 
         _activePlayers.add(player);
         if (trigger.isLoop) {
@@ -90,7 +90,7 @@ class SfxBusController extends ChangeNotifier {
         }
 
         LoggerService().info('SfxBus: Triggering SFX "${trigger.title}" (Loop: ${trigger.isLoop})');
-        await player.play(DeviceFileSource(file.path));
+        await player.play(file.path);
 
         if (!trigger.isLoop) {
           player.onPlayerComplete.listen(
@@ -140,7 +140,7 @@ class SfxBusController extends ChangeNotifier {
   Future<void> stopAll() async {
     LoggerService().info('SfxBus: Stopping all ${_activePlayers.length} active SFX players.');
     _loopingPlayers.clear();
-    final toStop = List<AudioPlayer>.from(_activePlayers);
+    final toStop = List<BusPlayer>.from(_activePlayers);
     _activePlayers.clear();
 
     for (final player in toStop) {

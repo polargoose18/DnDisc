@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:audioplayers/audioplayers.dart';
 import '../domain/models/ambient_layer.dart';
 import '../services/logger_service.dart';
 import 'fade_controller.dart';
+import 'playback/bus_player.dart';
 
 class AmbientBusController extends ChangeNotifier {
   final List<AmbientLayer> _layers = [];
-  final Map<String, AudioPlayer> _activePlayers = {};
+  final Map<String, BusPlayer> _activePlayers = {};
   final Map<String, FadeController> _fadeControllers = {};
   final Map<String, Duration> _layerDurations = {};
   final Map<String, bool> _layerLoopTransitioning = {};
-  final Map<String, AudioPlayer> _outgoingAmbientPlayers = {};
+  final Map<String, BusPlayer> _outgoingAmbientPlayers = {};
   final Map<String, FadeController> _outgoingAmbientFadeControllers = {};
   double _masterAmbientVolume = 1.0;
   double _channelVolume = 1.0;
@@ -190,17 +190,17 @@ class AmbientBusController extends ChangeNotifier {
       return;
     }
 
-    AudioPlayer? player;
+    BusPlayer? player;
     try {
       await _stopLayerAudio(layer.id, fadeDuration: Duration.zero);
 
-      player = AudioPlayer();
+      player = BusPlayer.forFile(file.path);
       final targetVolume = layer.volume * _gain;
       final startVolume = effectiveFade.inMilliseconds > 0 ? 0.0 : targetVolume;
       _layerLoopTransitioning[layer.id] = false;
 
       await player.setVolume(startVolume);
-      await player.setReleaseMode(ReleaseMode.stop);
+      await player.setLooping(false);
 
       player.onDurationChanged.listen(
         (d) {
@@ -245,7 +245,7 @@ class AmbientBusController extends ChangeNotifier {
       );
 
       LoggerService().info('AmbientBus: Starting layer "${layer.title}"');
-      await player.play(DeviceFileSource(file.path));
+      await player.play(file.path);
 
       _activePlayers[layer.id] = player;
       LoggerService().info('AmbientBus: Layer "${layer.title}" started successfully!');
@@ -291,7 +291,7 @@ class AmbientBusController extends ChangeNotifier {
       return;
     }
 
-    AudioPlayer? nextPlayer;
+    BusPlayer? nextPlayer;
     try {
       final oldPlayer = _activePlayers[layer.id];
       final currentLayer = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer);
@@ -300,13 +300,13 @@ class AmbientBusController extends ChangeNotifier {
       final outgoingFader = _outgoingAmbientFadeControllers.putIfAbsent(layer.id, () => FadeController());
       outgoingFader.stop();
       _outgoingAmbientPlayers[layer.id]?.dispose();
-      _outgoingAmbientPlayers[layer.id] = oldPlayer ?? AudioPlayer();
+      _outgoingAmbientPlayers[layer.id] = oldPlayer ?? BusPlayer.forFile(file.path);
 
-      nextPlayer = AudioPlayer();
+      nextPlayer = BusPlayer.forFile(file.path);
       _activePlayers[layer.id] = nextPlayer;
 
       await nextPlayer.setVolume(0.0);
-      await nextPlayer.setReleaseMode(ReleaseMode.stop);
+      await nextPlayer.setLooping(false);
 
       nextPlayer.onDurationChanged.listen(
         (d) {
@@ -350,7 +350,7 @@ class AmbientBusController extends ChangeNotifier {
         },
       );
 
-      await nextPlayer.play(DeviceFileSource(file.path));
+      await nextPlayer.play(file.path);
 
       // Fade out old player
       if (oldPlayer != null) {
