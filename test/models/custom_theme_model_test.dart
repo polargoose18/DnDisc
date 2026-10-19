@@ -9,21 +9,17 @@ void main() {
   group('CustomThemeModel Unit Tests', () {
     test('should return correct Color objects from hexadecimal color properties', () {
       // Arrange & Act
-      const theme = CustomThemeModel(
+      final theme = CustomThemeModel.derive(
         id: 'test_theme_1',
         name: 'Test Dark Theme',
-        isDark: true,
-        primaryColor: 0xFF7C4DFF,
-        secondaryColor: 0xFF00E5FF,
-        backgroundColor: 0xFF121218,
-        surfaceColor: 0xFF181824,
-        cardColor: 0xFF1E1E2A,
-        accentColor: 0xFFBB86FC,
-        textPrimaryColor: 0xFFFFFFFF,
-        textSecondaryColor: 0xFFB0B0C0,
-        duckingBadgeColor: 0xFFFF9800,
-        battleIntensityColor: 0xFFEF4444,
-        bossIntensityColor: 0xFF9333EA,
+        background: 0xFF121218,
+        surface: 0xFF181824,
+        text: 0xFFFFFFFF,
+        primary: 0xFF7C4DFF,
+        calm: 0xFF00E5FF,
+        suspense: 0xFFBB86FC,
+        battle: 0xFFEF4444,
+        boss: 0xFF9333EA,
       );
 
       // Assert
@@ -32,28 +28,25 @@ void main() {
       expect(theme.isDark, isTrue);
       expect(theme.primary, equals(const Color(0xFF7C4DFF)));
       expect(theme.background, equals(const Color(0xFF121218)));
-      expect(theme.duckingBadge, equals(const Color(0xFFFF9800)));
+      expect(theme.calmIntensity, equals(const Color(0xFF00E5FF)));
+      expect(theme.suspenseIntensity, equals(const Color(0xFFBB86FC)));
       expect(theme.battleIntensity, equals(const Color(0xFFEF4444)));
       expect(theme.bossIntensity, equals(const Color(0xFF9333EA)));
     });
 
     test('should correctly serialize to Map and restore identical theme from Map', () {
       // Arrange
-      const theme = CustomThemeModel(
+      final theme = CustomThemeModel.derive(
         id: 'custom_123',
         name: 'Emerald Dungeon',
-        isDark: false,
-        primaryColor: 0xFF10B981,
-        secondaryColor: 0xFF34D399,
-        backgroundColor: 0xFF091E16,
-        surfaceColor: 0xFF0F2D22,
-        cardColor: 0xFF143B2D,
-        accentColor: 0xFF6EE7B7,
-        textPrimaryColor: 0xFFECFDF5,
-        textSecondaryColor: 0xFFA7F3D0,
-        duckingBadgeColor: 0xFFF59E0B,
-        battleIntensityColor: 0xFFE11D48,
-        bossIntensityColor: 0xFF9F1239,
+        background: 0xFF091E16,
+        surface: 0xFF0F2D22,
+        text: 0xFFECFDF5,
+        primary: 0xFF10B981,
+        calm: 0xFF34D399,
+        suspense: 0xFF6EE7B7,
+        battle: 0xFFE11D48,
+        boss: 0xFF9F1239,
       );
 
       // Act
@@ -65,14 +58,20 @@ void main() {
       expect(restored.name, equals(theme.name));
       expect(restored.isDark, equals(theme.isDark));
       expect(restored.primaryColor, equals(theme.primaryColor));
-      expect(restored.secondaryColor, equals(theme.secondaryColor));
       expect(restored.backgroundColor, equals(theme.backgroundColor));
       expect(restored.surfaceColor, equals(theme.surfaceColor));
-      expect(restored.cardColor, equals(theme.cardColor));
-      expect(restored.accentColor, equals(theme.accentColor));
+      expect(restored.surfaceRaisedColor, equals(theme.surfaceRaisedColor));
+      expect(restored.surfaceHoverColor, equals(theme.surfaceHoverColor));
+      expect(restored.borderColor, equals(theme.borderColor));
+      expect(restored.borderStrongColor, equals(theme.borderStrongColor));
+      expect(restored.onPrimaryColor, equals(theme.onPrimaryColor));
+      expect(restored.primarySubtleColor, equals(theme.primarySubtleColor));
+      expect(restored.focusRingColor, equals(theme.focusRingColor));
+      expect(restored.dangerColor, equals(theme.dangerColor));
+      expect(restored.calmIntensityColor, equals(theme.calmIntensityColor));
+      expect(restored.suspenseIntensityColor, equals(theme.suspenseIntensityColor));
       expect(restored.textPrimaryColor, equals(theme.textPrimaryColor));
       expect(restored.textSecondaryColor, equals(theme.textSecondaryColor));
-      expect(restored.duckingBadgeColor, equals(theme.duckingBadgeColor));
       expect(restored.battleIntensityColor, equals(theme.battleIntensityColor));
       expect(restored.bossIntensityColor, equals(theme.bossIntensityColor));
     });

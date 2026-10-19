@@ -6,6 +6,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/data/services/database_service.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
 import 'package:ttrpg_audio_player/main.dart';
+import 'package:ttrpg_audio_player/ui/screens/main_dashboard_screen.dart';
+import 'package:ttrpg_audio_player/ui/shell/nav_rail.dart';
 
 class FakePathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin
@@ -39,13 +41,17 @@ void main() {
     tempDir.delete(recursive: true).ignore();
   });
 
-  testWidgets('should mount application widget and render title when started', (WidgetTester tester) async {
+  testWidgets('should mount application widget and show the shell when started', (WidgetTester tester) async {
     // Arrange & Act
     await tester.pumpWidget(const TtrpgAudioPlayerApp());
     await tester.pump(const Duration(milliseconds: 200));
 
     // Assert
+    // The title is no longer drawn in the shell: the app opens on the
+    // dashboard with the navigation rail.
     final l10n = AppLocalizationsEn();
-    expect(find.text(l10n.appTitle), findsOneWidget);
+    expect(find.byType(MainDashboardScreen), findsOneWidget);
+    expect(find.byType(NavRail), findsOneWidget);
+    expect(find.byTooltip(l10n.tabSettings), findsWidgets);
   });
 }

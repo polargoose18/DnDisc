@@ -12,6 +12,9 @@ class SceneModel {
   final Map<String, double> ambientLayerVolumes; // Map of trackId -> volume (0.0 - 1.0)
   final List<String> soundboardSfxIds;
   final String? imagePath;
+
+  /// Key of a default cover (`peaks`, `tower`, ...). A user's own image in [imagePath] takes priority.
+  final String? cover;
   final DateTime createdAt;
 
   SceneModel({
@@ -25,6 +28,7 @@ class SceneModel {
     this.ambientLayerVolumes = const {},
     this.soundboardSfxIds = const [],
     this.imagePath,
+    this.cover,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -39,6 +43,7 @@ class SceneModel {
     Map<String, double>? ambientLayerVolumes,
     List<String>? soundboardSfxIds,
     String? imagePath,
+    String? cover,
     DateTime? createdAt,
   }) {
     return SceneModel(
@@ -52,6 +57,7 @@ class SceneModel {
       ambientLayerVolumes: ambientLayerVolumes ?? Map.from(this.ambientLayerVolumes),
       soundboardSfxIds: soundboardSfxIds ?? List.from(this.soundboardSfxIds),
       imagePath: imagePath ?? this.imagePath,
+      cover: cover ?? this.cover,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -68,6 +74,7 @@ class SceneModel {
       'ambient_layer_volumes': jsonEncode(ambientLayerVolumes),
       'soundboard_sfx_ids': jsonEncode(soundboardSfxIds),
       'image_path': imagePath,
+      'cover': cover,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -116,6 +123,7 @@ class SceneModel {
       ambientLayerVolumes: parsedAmbients,
       soundboardSfxIds: parsedSfx,
       imagePath: map['image_path'] as String? ?? map['imagePath'] as String?,
+      cover: map['cover'] as String?,
       createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now(),
     );
   }

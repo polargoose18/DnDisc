@@ -8,6 +8,9 @@ class SfxTrigger {
   final bool isLoop;
   final bool isPersistent;
 
+  /// Key from the DnDisc icon set; unknown or null shows the default `bolt`.
+  final String? iconName;
+
   const SfxTrigger({
     required this.id,
     required this.title,
@@ -17,6 +20,7 @@ class SfxTrigger {
     this.hotkey,
     this.isLoop = false,
     this.isPersistent = false,
+    this.iconName,
   });
 
   SfxTrigger copyWith({
@@ -28,6 +32,7 @@ class SfxTrigger {
     String? hotkey,
     bool? isLoop,
     bool? isPersistent,
+    String? iconName,
   }) {
     return SfxTrigger(
       id: id ?? this.id,
@@ -38,6 +43,7 @@ class SfxTrigger {
       hotkey: hotkey ?? this.hotkey,
       isLoop: isLoop ?? this.isLoop,
       isPersistent: isPersistent ?? this.isPersistent,
+      iconName: iconName ?? this.iconName,
     );
   }
 }

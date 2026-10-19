@@ -8,6 +8,7 @@ import 'database_service.dart';
 import '../../domain/models/library_track.dart';
 import '../../domain/models/scene_model.dart';
 import '../../services/logger_service.dart';
+import 'scene_cover_service.dart';
 import '../../services/audio_duration_helper.dart';
 
 class ScenePackageImportResult {
@@ -275,7 +276,9 @@ class ScenePackageService {
       }
     }
 
-    final importedScene = SceneModel.fromMap(sceneMap);
+    final parsedScene = SceneModel.fromMap(sceneMap);
+    final importedScene =
+        parsedScene.cover == null ? parsedScene.copyWith(cover: SceneCoverService().pickRandom()) : parsedScene;
     await _sceneRepo.insertScene(importedScene);
 
     _logStdout('ScenePackageService: Successfully imported scene "${importedScene.name}" (${importedTracks.length} tracks registered)');
@@ -519,7 +522,9 @@ class ScenePackageService {
         }
       }
 
-      final importedScene = SceneModel.fromMap(sceneMap);
+      final parsedScene = SceneModel.fromMap(sceneMap);
+    final importedScene =
+        parsedScene.cover == null ? parsedScene.copyWith(cover: SceneCoverService().pickRandom()) : parsedScene;
       await _sceneRepo.insertScene(importedScene);
       importedScenes.add(importedScene);
     }

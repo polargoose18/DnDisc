@@ -1,112 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../../services/logger_service.dart';
+import '../../theme/ds_theme.dart';
+import '../../theme/tokens.dart';
+import '../design/ds_button.dart';
+import '../design/ds_controls.dart';
 
+/// Log console: one mono line per entry with time, level word and message.
 class LoggerConsoleDrawer extends StatelessWidget {
   const LoggerConsoleDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
 
     return Consumer<LoggerService>(
       builder: (context, logger, _) {
         return Drawer(
-          width: 450,
-          child: Column(
-            children: [
-              AppBar(
-                title: Text(
-                  l10n?.logConsoleTitle ?? 'Log Console',
-                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 16),
-                ),
-                automaticallyImplyLeading: false,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    tooltip: l10n?.clearLogs ?? 'Clear logs',
-                    onPressed: () => logger.clear(),
+          width: Sizes.dialogSm,
+          backgroundColor: ds.surface,
+          shape: const RoundedRectangleBorder(),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(Spacing.s5, Spacing.s3, Spacing.s3, Spacing.s3),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: ds.border, width: Sizes.borderWidth)),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: logger.logs.isEmpty
-                    ? Center(child: Text(l10n?.noLogs ?? 'No logs', style: GoogleFonts.inter(color: Colors.grey)))
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(8),
-                        itemCount: logger.logs.length,
-                        itemBuilder: (context, index) {
-                          final log = logger.logs[index];
-                          final color = _getColor(log.level);
-
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            color: Theme.of(context).cardColor,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        '[${log.formattedTime}]',
-                                        style: GoogleFonts.jetBrainsMono(fontSize: 10, color: Colors.grey),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: color.withAlpha(40),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          log.level.name.toUpperCase(),
-                                          style: GoogleFonts.jetBrainsMono(fontSize: 10, color: color, fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  SelectableText(
-                                    log.message,
-                                    style: GoogleFonts.jetBrainsMono(fontSize: 12),
-                                  ),
-                                  if (log.details != null) ...[
-                                    const SizedBox(height: 4),
-                                    SelectableText(
-                                      log.details!,
-                                      style: GoogleFonts.jetBrainsMono(fontSize: 11, color: Colors.redAccent),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(l10n.logConsoleTitle, style: ds.titleLg)),
+                      DsButton.ghost(
+                        icon: 'trash',
+                        iconOnly: true,
+                        label: l10n.clearLogs,
+                        onPressed: logger.logs.isEmpty ? null : logger.clear,
                       ),
-              ),
-            ],
+                      DsButton.ghost(
+                        icon: 'x',
+                        iconOnly: true,
+                        label: l10n.close,
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: logger.logs.isEmpty
+                      ? Center(child: Text(l10n.noLogs, style: ds.body.copyWith(color: ds.textMuted)))
+                      : ListView.separated(
+                          padding: const EdgeInsets.all(Spacing.s4),
+                          itemCount: logger.logs.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: Spacing.s3),
+                          itemBuilder: (context, index) {
+                            final log = logger.logs[index];
+                            final error = log.level == LogLevel.error;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(log.formattedTime, style: ds.code),
+                                    const SizedBox(width: Spacing.s2),
+                                    DsBadge(log.level.name.toUpperCase(), tone: error ? DsTone.danger : DsTone.neutral),
+                                  ],
+                                ),
+                                const SizedBox(height: Spacing.s1),
+                                SelectableText(log.message, style: ds.code.copyWith(color: ds.text)),
+                                if (log.details != null)
+                                  SelectableText(log.details!, style: ds.code.copyWith(color: error ? ds.danger : ds.textMuted)),
+                              ],
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
           ),
         );
       },
     );
-  }
-
-  Color _getColor(LogLevel level) {
-    switch (level) {
-      case LogLevel.info:
-        return Colors.blueAccent;
-      case LogLevel.warning:
-        return Colors.orangeAccent;
-      case LogLevel.error:
-        return Colors.redAccent;
-    }
   }
 }
