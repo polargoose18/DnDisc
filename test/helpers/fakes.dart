@@ -159,6 +159,9 @@ class FakeBusPlayer implements BusPlayer {
   bool paused = false;
   bool stopped = false;
   bool disposed = false;
+  bool looping = false;
+  Duration loopStart = Duration.zero;
+  Duration? loopEnd;
   Completer<void>? loading;
   final _duration = StreamController<Duration>.broadcast();
   final _position = StreamController<Duration>.broadcast();
@@ -176,9 +179,16 @@ class FakeBusPlayer implements BusPlayer {
   @override
   Future<void> setVolume(double v) async => volume = v;
   @override
-  Future<void> setLooping(bool looping) async {}
+  Future<void> setLooping(bool looping) async => this.looping = looping;
+  @override
+  Future<void> setLoopRegion({Duration start = Duration.zero, Duration? end}) async {
+    loopStart = start;
+    loopEnd = end;
+  }
+
   @override
   Future<void> play(String path) async {
+    plays++;
     await loading?.future;
     if (disposed) return;
     playing = true;
@@ -199,6 +209,10 @@ class FakeBusPlayer implements BusPlayer {
 
   void emitDuration(Duration d) => _duration.add(d);
   void emitPosition(Duration p) => _position.add(p);
+  void emitComplete() => _complete.add(null);
+
+  /// How often play() was called.
+  int plays = 0;
 
   /// Audible: started, not paused, not stopped.
   bool get audible => playing && !paused && !stopped && !disposed;

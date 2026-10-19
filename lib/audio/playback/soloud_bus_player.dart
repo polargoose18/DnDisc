@@ -16,6 +16,8 @@ class SoLoudBusPlayer implements BusPlayer {
 
   double _volume = 1;
   bool _looping = false;
+  Duration _loopStart = Duration.zero;
+  Duration? _loopEnd;
   bool _paused = false;
   bool _disposed = false;
   String? _path;
@@ -61,6 +63,12 @@ class SoLoudBusPlayer implements BusPlayer {
   }
 
   @override
+  Future<void> setLoopRegion({Duration start = Duration.zero, Duration? end}) async {
+    _loopStart = start;
+    _loopEnd = end;
+  }
+
+  @override
   Future<void> play(String path) async {
     await _endVoice();
     if (!await _engine.ensureStarted()) throw StateError('No audio output device is available');
@@ -75,8 +83,10 @@ class SoLoudBusPlayer implements BusPlayer {
     });
     final through = bus == null ? null : _engine.bus(bus!);
     _handle = through != null
-        ? through.play(source, volume: _volume, looping: _looping)
-        : _soloud.play(source, volume: _volume, looping: _looping);
+        ? through.play(source,
+            volume: _volume, looping: _looping, loopingStartAt: _loopStart, loopingEndAt: _loopEnd)
+        : _soloud.play(source,
+            volume: _volume, looping: _looping, loopingStartAt: _loopStart, loopingEndAt: _loopEnd);
     _paused = false;
     if (!_duration.isClosed) _duration.add(_soloud.getLength(source));
     _ticker = Timer.periodic(positionInterval, (_) => _tick());

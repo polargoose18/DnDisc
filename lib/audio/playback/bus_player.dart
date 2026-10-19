@@ -27,6 +27,10 @@ abstract class BusPlayer {
   Future<void> setVolume(double volume);
   Future<void> setLooping(bool looping);
 
+  /// The part of the file a looping voice repeats, [start] to [end] (null:
+  /// the end of the file), sample-exact. Applies to the next [play].
+  Future<void> setLoopRegion({Duration start = Duration.zero, Duration? end});
+
   /// Starts [path] from the beginning. Throws when the file cannot be played.
   Future<void> play(String path);
   Future<void> pause();

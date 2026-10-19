@@ -10,13 +10,9 @@ class AmbientBusController extends ChangeNotifier {
   final List<AmbientLayer> _layers = [];
   final Map<String, BusPlayer> _activePlayers = {};
   final Map<String, FadeController> _fadeControllers = {};
-  final Map<String, Duration> _layerDurations = {};
-  final Map<String, bool> _layerLoopTransitioning = {};
-  final Map<String, BusPlayer> _outgoingAmbientPlayers = {};
 
   /// Players of turned-off layers that are still fading out.
   final Map<BusPlayer, FadeController> _fadingOut = {};
-  final Map<String, FadeController> _outgoingAmbientFadeControllers = {};
   double _masterAmbientVolume = 1.0;
   double _channelVolume = 1.0;
   Duration _defaultFadeDuration;
@@ -204,54 +200,21 @@ class AmbientBusController extends ChangeNotifier {
       player = BusPlayer.forFile(file.path, bus: SoLoudEngine.ambientBus(layer.id));
       final targetVolume = layer.volume * _gain;
       final startVolume = effectiveFade.inMilliseconds > 0 ? 0.0 : targetVolume;
-      _layerLoopTransitioning[layer.id] = false;
 
       await player.setVolume(startVolume);
-      await player.setLooping(false);
+      await player.setLooping(true);
 
       // Registered before the file loads, so a stop during loading finds it.
       final started = player;
       _activePlayers[layer.id] = started;
       bool current() => identical(_activePlayers[layer.id], started);
 
-      player.onDurationChanged.listen(
-        (d) {
-          if (current()) _layerDurations[layer.id] = d;
-        },
-        onError: (e) {
-          LoggerService().warning('AmbientBus: Error in onDurationChanged for ${layer.title}', details: '$e');
-        },
-      );
-
-      player.onPositionChanged.listen(
-        (pos) {
-          if (!current()) return;
-          final total = _layerDurations[layer.id];
-          if (total != null && total.inMilliseconds > 4000) {
-            final transitionDuration = total.inMilliseconds > 8000
-                ? const Duration(milliseconds: 2000)
-                : const Duration(milliseconds: 1000);
-            final isTransitioning = _layerLoopTransitioning[layer.id] ?? false;
-            final isLayerActive = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer).isActive;
-
-            if (pos >= total - transitionDuration && !isTransitioning && isLayerActive) {
-              _triggerSeamlessLayerLoopTransition(layer, transitionDuration);
-            }
-          }
-        },
-        onError: (e) {
-          LoggerService().warning('AmbientBus: Error in onPositionChanged for ${layer.title}', details: '$e');
-        },
-      );
-
+      // The voice loops on its own; it ends only when it fails.
       player.onPlayerComplete.listen(
         (_) {
           if (!current()) return;
-          final isTransitioning = _layerLoopTransitioning[layer.id] ?? false;
           final isLayerActive = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer).isActive;
-          if (!isTransitioning && isLayerActive) {
-            _triggerSeamlessLayerLoopTransition(layer, const Duration(milliseconds: 800));
-          }
+          if (isLayerActive) _restartEndedVoice(started, file.path);
         },
         onError: (e) {
           LoggerService().warning('AmbientBus: Error in onPlayerComplete for ${layer.title}', details: '$e');
@@ -293,135 +256,12 @@ class AmbientBusController extends ChangeNotifier {
     }
   }
 
-  Future<void> _triggerSeamlessLayerLoopTransition(AmbientLayer layer, Duration transitionDuration) async {
-    final isTransitioning = _layerLoopTransitioning[layer.id] ?? false;
-    if (isTransitioning) return;
-    _layerLoopTransitioning[layer.id] = true;
-
-    LoggerService().info('AmbientBus: Seamless loop crossfade triggered for layer "${layer.title}" (${transitionDuration.inMilliseconds}ms)');
-
-    final file = File(layer.filePath).absolute;
-    if (!file.existsSync()) {
-      _layerLoopTransitioning[layer.id] = false;
-      return;
-    }
-
-    BusPlayer? nextPlayer;
+  /// A voice that should loop has ended: start the file again.
+  Future<void> _restartEndedVoice(BusPlayer player, String path) async {
     try {
-      final oldPlayer = _activePlayers[layer.id];
-      final currentLayer = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer);
-      final targetVolume = currentLayer.volume * _gain;
-
-      final outgoingFader = _outgoingAmbientFadeControllers.putIfAbsent(layer.id, () => FadeController());
-      outgoingFader.stop();
-      _outgoingAmbientPlayers[layer.id]?.dispose();
-      _outgoingAmbientPlayers[layer.id] = oldPlayer ?? BusPlayer.forFile(file.path, bus: SoLoudEngine.ambientBus(layer.id));
-
-      nextPlayer = BusPlayer.forFile(file.path, bus: SoLoudEngine.ambientBus(layer.id));
-      _activePlayers[layer.id] = nextPlayer;
-
-      await nextPlayer.setVolume(0.0);
-      await nextPlayer.setLooping(false);
-
-      final next = nextPlayer;
-      bool current() => identical(_activePlayers[layer.id], next);
-
-      next.onDurationChanged.listen(
-        (d) {
-          if (current()) _layerDurations[layer.id] = d;
-        },
-        onError: (e) {
-          LoggerService().warning('AmbientBus: Error in loop transition onDurationChanged for ${layer.title}', details: '$e');
-        },
-      );
-
-      next.onPositionChanged.listen(
-        (pos) {
-          if (!current()) return;
-          final total = _layerDurations[layer.id];
-          if (total != null && total.inMilliseconds > 4000) {
-            final nextTransition = total.inMilliseconds > 8000
-                ? const Duration(milliseconds: 2000)
-                : const Duration(milliseconds: 1000);
-            final nowTransitioning = _layerLoopTransitioning[layer.id] ?? false;
-            final isLayerActive = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer).isActive;
-
-            if (pos >= total - nextTransition && !nowTransitioning && isLayerActive) {
-              _triggerSeamlessLayerLoopTransition(layer, nextTransition);
-            }
-          }
-        },
-        onError: (e) {
-          LoggerService().warning('AmbientBus: Error in loop transition onPositionChanged for ${layer.title}', details: '$e');
-        },
-      );
-
-      next.onPlayerComplete.listen(
-        (_) {
-          if (!current()) return;
-          final nowTransitioning = _layerLoopTransitioning[layer.id] ?? false;
-          final isLayerActive = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer).isActive;
-          if (!nowTransitioning && isLayerActive) {
-            _triggerSeamlessLayerLoopTransition(layer, const Duration(milliseconds: 800));
-          }
-        },
-        onError: (e) {
-          LoggerService().warning('AmbientBus: Error in loop transition onPlayerComplete for ${layer.title}', details: '$e');
-        },
-      );
-
-      await next.play(file.path);
-      // Turned off while the next loop was loading: the stop released both.
-      if (!current()) return;
-
-      // Fade out old player
-      if (oldPlayer != null) {
-        outgoingFader.startFade(
-          from: targetVolume,
-          to: 0.0,
-          duration: transitionDuration,
-          onUpdate: (v) {
-            try {
-              oldPlayer.setVolume(v);
-            } catch (_) {}
-          },
-          onComplete: () {
-            try {
-              oldPlayer.stop();
-              oldPlayer.dispose();
-            } catch (_) {}
-            if (_outgoingAmbientPlayers[layer.id] == oldPlayer) {
-              _outgoingAmbientPlayers.remove(layer.id);
-            }
-          },
-        );
-      }
-
-      // Fade in next player
-      final inFader = _fadeControllers.putIfAbsent(layer.id, () => FadeController());
-      inFader.startFade(
-        from: 0.0,
-        to: targetVolume,
-        duration: transitionDuration,
-        onUpdate: (v) {
-          try {
-            nextPlayer?.setVolume(v);
-          } catch (_) {}
-        },
-        onComplete: () {
-          try {
-            nextPlayer?.setVolume(targetVolume);
-          } catch (_) {}
-          _layerLoopTransitioning[layer.id] = false;
-        },
-      );
-    } catch (e, stack) {
-      LoggerService().error('AmbientBus: Error during seamless loop transition for ${layer.title}', details: '$e\n$stack');
-      try {
-        await nextPlayer?.stop();
-        await nextPlayer?.dispose();
-      } catch (_) {}
-      _layerLoopTransitioning[layer.id] = false;
+      await player.play(path);
+    } catch (e) {
+      LoggerService().error('AmbientBus: Could not restart a looping layer', details: '$e');
     }
   }
 
@@ -429,20 +269,9 @@ class AmbientBusController extends ChangeNotifier {
     String layerId, {
     Duration fadeDuration = Duration.zero,
   }) async {
-    _layerLoopTransitioning[layerId] = false;
     final player = _activePlayers[layerId];
     final fader = _fadeControllers.remove(layerId);
     fader?.stop();
-
-    final outPlayer = _outgoingAmbientPlayers.remove(layerId);
-    final outFader = _outgoingAmbientFadeControllers.remove(layerId);
-    outFader?.stop();
-    if (outPlayer != null) {
-      try {
-        await outPlayer.stop();
-        await outPlayer.dispose();
-      } catch (_) {}
-    }
 
     if (player == null) return;
     // No longer the layer's player: turning the layer on again starts a new
@@ -497,19 +326,6 @@ class AmbientBusController extends ChangeNotifier {
       fader.dispose();
     }
     _fadeControllers.clear();
-
-    for (final fader in _outgoingAmbientFadeControllers.values) {
-      fader.dispose();
-    }
-    _outgoingAmbientFadeControllers.clear();
-
-    for (final player in _outgoingAmbientPlayers.values) {
-      try {
-        player.stop();
-        player.dispose();
-      } catch (_) {}
-    }
-    _outgoingAmbientPlayers.clear();
 
     for (final entry in _fadingOut.entries) {
       entry.value.dispose();

@@ -24,7 +24,6 @@ class MusicBusController extends ChangeNotifier {
 
   /// Playback position of the current track; updated by the player without notifying listeners.
   final ValueNotifier<Duration> position = ValueNotifier(Duration.zero);
-  bool _loopTransitioning = false;
 
   /// The player itself is paused (the pause fade has finished).
   bool _playerPaused = false;
@@ -65,7 +64,6 @@ class MusicBusController extends ChangeNotifier {
     final effectiveFade = fadeDuration ?? _defaultFadeDuration;
     _currentTrack = track;
     _currentIntensity = track.intensity;
-    _loopTransitioning = false;
     _currentTrackDuration = null;
     position.value = Duration.zero;
 
@@ -128,7 +126,8 @@ class MusicBusController extends ChangeNotifier {
       _player = player;
       _fadeMultiplier = effectiveFade.inMilliseconds > 0 ? 0.0 : 1.0;
       await player.setVolume(effectiveVolume);
-      await player.setLooping(false);
+      await player.setLooping(true);
+      await player.setLoopRegion(start: _loopStart(track), end: _loopEnd(track));
 
       player.onDurationChanged.listen(
         (d) {
@@ -141,30 +140,22 @@ class MusicBusController extends ChangeNotifier {
 
       player.onPositionChanged.listen(
         (pos) {
-          if (!identical(player, _player)) return;
-          position.value = pos;
-          final total = _currentTrackDuration;
-          if (total != null && total.inMilliseconds > 4000) {
-            final transitionDuration = total.inMilliseconds > 8000
-                ? const Duration(milliseconds: 2000)
-                : const Duration(milliseconds: 1000);
-            if (pos >= total - transitionDuration && !_loopTransitioning && _isPlaying) {
-              _triggerSeamlessLoopTransition(track, transitionDuration);
-            }
-          }
+          if (identical(player, _player)) position.value = pos;
         },
         onError: (e) {
           LoggerService().warning('MusicBus: Error in onPositionChanged', details: '$e');
         },
       );
 
+      // The voice loops on its own; it ends only when it fails or a pause
+      // fade ran out the file.
       player.onPlayerComplete.listen(
         (_) {
           if (!identical(player, _player)) return;
           if (!_isPlaying) {
             _endedWhilePaused(player);
-          } else if (!_loopTransitioning && _currentTrack?.id == track.id) {
-            _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
+          } else if (_currentTrack?.id == track.id) {
+            _restartEndedVoice(player, file.path);
           }
         },
         onError: (e) {
@@ -212,123 +203,21 @@ class MusicBusController extends ChangeNotifier {
     }
   }
 
-  Future<void> _triggerSeamlessLoopTransition(AudioTrack track, Duration transitionDuration) async {
-    if (_loopTransitioning || !_isPlaying) return;
-    _loopTransitioning = true;
-    LoggerService().info('MusicBus: Seamless loop crossfade triggered for "${track.title}" (${transitionDuration.inMilliseconds}ms)');
+  /// Loop region of [track] in the file; SoLoud loops it sample-exact.
+  static Duration _loopStart(AudioTrack track) => Duration(milliseconds: track.loopStartMs ?? 0);
 
-    final file = File(track.filePath).absolute;
-    if (!file.existsSync()) {
-      _loopTransitioning = false;
-      return;
-    }
+  static Duration? _loopEnd(AudioTrack track) {
+    final end = track.loopEndMs;
+    if (end == null || end <= (track.loopStartMs ?? 0)) return null;
+    return Duration(milliseconds: end);
+  }
 
-    BusPlayer? nextPlayer;
+  /// A voice that should loop has ended: start the file again.
+  Future<void> _restartEndedVoice(BusPlayer player, String path) async {
     try {
-      final oldPlayer = _player;
-      _outgoingFadeController.stop();
-      _outgoingPlayer?.dispose();
-      _outgoingPlayer = oldPlayer;
-
-      nextPlayer = BusPlayer.forFile(file.path, bus: SoLoudEngine.musicBus);
-      _player = nextPlayer;
-
-      await nextPlayer.setVolume(0.0);
-      await nextPlayer.setLooping(false);
-
-      final next = nextPlayer;
-      next.onDurationChanged.listen(
-        (d) {
-          if (identical(next, _player)) _currentTrackDuration = d;
-        },
-        onError: (e) {
-          LoggerService().warning('MusicBus: Error in loop transition onDurationChanged', details: '$e');
-        },
-      );
-
-      next.onPositionChanged.listen(
-        (pos) {
-          if (!identical(next, _player)) return;
-          position.value = pos;
-          final total = _currentTrackDuration;
-          if (total != null && total.inMilliseconds > 4000) {
-            final nextTransition = total.inMilliseconds > 8000
-                ? const Duration(milliseconds: 2000)
-                : const Duration(milliseconds: 1000);
-            if (pos >= total - nextTransition && !_loopTransitioning && _isPlaying) {
-              _triggerSeamlessLoopTransition(track, nextTransition);
-            }
-          }
-        },
-        onError: (e) {
-          LoggerService().warning('MusicBus: Error in loop transition onPositionChanged', details: '$e');
-        },
-      );
-
-      next.onPlayerComplete.listen(
-        (_) {
-          if (!identical(next, _player)) return;
-          if (!_isPlaying) {
-            _endedWhilePaused(next);
-          } else if (!_loopTransitioning && _currentTrack?.id == track.id) {
-            _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
-          }
-        },
-        onError: (e) {
-          LoggerService().warning('MusicBus: Error in loop transition onPlayerComplete', details: '$e');
-        },
-      );
-
-      await next.play(file.path);
-      // Stopped while the next loop was loading; stop() released both players.
-      if (!identical(next, _player)) return;
-
-      // Crossfade: fade out oldPlayer, fade in nextPlayer
-      if (oldPlayer != null) {
-        final currentVol = effectiveVolume;
-        _outgoingFadeController.startFade(
-          from: currentVol,
-          to: 0.0,
-          duration: transitionDuration,
-          onUpdate: (v) {
-            try {
-              oldPlayer.setVolume(v);
-            } catch (_) {}
-          },
-          onComplete: () {
-            try {
-              oldPlayer.stop();
-              oldPlayer.dispose();
-            } catch (_) {}
-            if (_outgoingPlayer == oldPlayer) {
-              _outgoingPlayer = null;
-            }
-          },
-        );
-      }
-
-      _fadeMultiplier = 0.0;
-      _fadeController.startFade(
-        from: 0.0,
-        to: 1.0,
-        duration: transitionDuration,
-        onUpdate: (v) {
-          _fadeMultiplier = v;
-          _applyPlayerVolume();
-        },
-        onComplete: () {
-          _fadeMultiplier = 1.0;
-          _applyPlayerVolume();
-          _loopTransitioning = false;
-        },
-      );
-    } catch (e, stack) {
-      LoggerService().error('MusicBus: Error during seamless loop transition', details: '$e\n$stack');
-      try {
-        await nextPlayer?.stop();
-        await nextPlayer?.dispose();
-      } catch (_) {}
-      _loopTransitioning = false;
+      await player.play(path);
+    } catch (e) {
+      LoggerService().error('MusicBus: Could not restart the looping track', details: '$e');
     }
   }
 
@@ -345,7 +234,6 @@ class MusicBusController extends ChangeNotifier {
     _currentTrack = track;
     _currentIntensity = track.intensity;
     _isPlaying = false;
-    _loopTransitioning = false;
     _fadeMultiplier = 1.0;
     _currentTrackDuration = null;
     position.value = Duration.zero;
@@ -501,7 +389,6 @@ class MusicBusController extends ChangeNotifier {
     _playerPaused = false;
     _currentTrack = null;
     _isPlaying = false;
-    _loopTransitioning = false;
     _fadeMultiplier = 1.0;
     _currentTrackDuration = null;
     position.value = Duration.zero;
