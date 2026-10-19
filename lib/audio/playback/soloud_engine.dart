@@ -27,6 +27,11 @@ class SoLoudEngine {
   Future<bool>? _starting;
   final Map<String, Bus> _buses = {};
   final StreamController<String> _loadFailures = StreamController.broadcast();
+  final StreamController<void> _deviceFailures = StreamController.broadcast();
+
+  /// The output device failed to start (it is gone, busy, or the sound
+  /// server refused the stream): the sound plays nowhere.
+  Stream<void> get deviceFailures => _deviceFailures.stream;
 
   /// Paths of files that could not be loaded (unsupported or broken file,
   /// or on Linux an M4A without the system FFmpeg libraries).
@@ -74,7 +79,20 @@ class SoLoudEngine {
       return false;
     }
     _started = true;
-    LoggerService().info('SoLoudEngine: Started on the system default device');
+    // SoLoud stops an idle device after 500 ms and restarts it off the UI
+    // thread on the next play, reporting a failed restart only on a stream.
+    // A desktop mixer keeps its output open instead.
+    _soloud.setAudioDeviceIdleTimeout(null);
+    _soloud.audioDeviceStartFailures.listen((failure) {
+      LoggerService().error('SoLoudEngine: The output device did not start', details: failure.name);
+      _deviceFailures.add(null);
+    });
+    final devices = listDevices();
+    LoggerService().info(
+      'SoLoudEngine: Started on the system default device',
+      details: 'Device state: ${_soloud.getAudioDeviceState().name}\n'
+          'Devices: ${devices.map((d) => '${d.name}${d.isDefault ? ' (default)' : ''}').join(', ')}',
+    );
     final name = _deviceName;
     if (name != null) {
       try {

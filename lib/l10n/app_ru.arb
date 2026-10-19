@@ -508,5 +508,6 @@
     }
   },
   "toastCannotPlayHint": "Файл повреждён или его формат не поддерживается",
-  "toastM4aNeedsFfmpeg": "Для M4A в Linux нужны библиотеки FFmpeg (libavcodec, libavformat)"
+  "toastM4aNeedsFfmpeg": "Для M4A в Linux нужны библиотеки FFmpeg (libavcodec, libavformat)",
+  "toastOutputDeviceFailedHint": "Звук не доходит до устройства вывода. Выберите другое устройство в настройках или проверьте системные настройки звука"
 }

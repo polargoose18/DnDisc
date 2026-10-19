@@ -2011,6 +2011,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'M4A on Linux needs the FFmpeg libraries (libavcodec, libavformat)'**
   String get toastM4aNeedsFfmpeg;
+
+  /// No description provided for @toastOutputDeviceFailedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound is not reaching the output device. Pick another device in Settings or check the system sound settings'**
+  String get toastOutputDeviceFailedHint;
 }
 
 class _AppLocalizationsDelegate

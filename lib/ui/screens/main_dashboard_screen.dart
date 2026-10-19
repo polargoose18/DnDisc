@@ -36,16 +36,23 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   AppScreen _screen = AppScreen.dashboard;
   final Set<AppScreen> _visited = {AppScreen.dashboard};
   StreamSubscription<String>? _loadFailures;
+  StreamSubscription<void>? _deviceFailures;
 
   @override
   void initState() {
     super.initState();
     _loadFailures = SoLoudEngine.instance.loadFailures.listen(_onLoadFailure);
+    _deviceFailures = SoLoudEngine.instance.deviceFailures.listen((_) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      context.read<ToastController?>()?.error(l10n.toastOutputDeviceFailed, message: l10n.toastOutputDeviceFailedHint);
+    });
   }
 
   @override
   void dispose() {
     _loadFailures?.cancel();
+    _deviceFailures?.cancel();
     super.dispose();
   }
 

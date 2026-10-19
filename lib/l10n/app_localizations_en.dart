@@ -1071,4 +1071,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get toastM4aNeedsFfmpeg =>
       'M4A on Linux needs the FFmpeg libraries (libavcodec, libavformat)';
+
+  @override
+  String get toastOutputDeviceFailedHint =>
+      'Sound is not reaching the output device. Pick another device in Settings or check the system sound settings';
 }
