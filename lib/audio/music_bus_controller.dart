@@ -25,6 +25,9 @@ class MusicBusController extends ChangeNotifier {
   final ValueNotifier<Duration> position = ValueNotifier(Duration.zero);
   bool _loopTransitioning = false;
 
+  /// The player itself is paused (the pause fade has finished).
+  bool _playerPaused = false;
+
   MusicBusController({
     Duration defaultFadeDuration = const Duration(milliseconds: 1500),
   }) : _defaultFadeDuration = defaultFadeDuration;
@@ -72,9 +75,18 @@ class MusicBusController extends ChangeNotifier {
       return;
     }
 
+    // The state changes before the file loads, so the controls answer at once.
+    // Audible: playing, or a pause still fading out.
+    final wasAudible = _player != null && !_playerPaused;
+    _isPlaying = true;
+    _playerPaused = false;
+    notifyListeners();
+
+    final player = BusPlayer.forFile(file.path);
     try {
       // If we already have an active player, initiate crossfade
-      if (_player != null && _isPlaying && effectiveFade.inMilliseconds > 0) {
+      if (wasAudible && effectiveFade.inMilliseconds > 0) {
+        _fadeController.stop();
         _outgoingFadeController.stop();
         _outgoingPlayer?.dispose();
         _outgoingPlayer = _player;
@@ -102,25 +114,30 @@ class MusicBusController extends ChangeNotifier {
           },
         );
       } else {
-        await _stopCurrentAudio();
+        // A paused player stops; a track fading out after stop() keeps fading.
+        _fadeController.stop();
+        final previous = _player;
+        _player = null;
+        if (previous != null) await _release(previous);
       }
 
-      _player = BusPlayer.forFile(file.path);
+      _player = player;
       _fadeMultiplier = effectiveFade.inMilliseconds > 0 ? 0.0 : 1.0;
-      await _player!.setVolume(effectiveVolume);
-      await _player!.setLooping(false);
+      await player.setVolume(effectiveVolume);
+      await player.setLooping(false);
 
-      _player!.onDurationChanged.listen(
+      player.onDurationChanged.listen(
         (d) {
-          _currentTrackDuration = d;
+          if (identical(player, _player)) _currentTrackDuration = d;
         },
         onError: (e) {
           LoggerService().warning('MusicBus: Error in onDurationChanged', details: '$e');
         },
       );
 
-      _player!.onPositionChanged.listen(
+      player.onPositionChanged.listen(
         (pos) {
+          if (!identical(player, _player)) return;
           position.value = pos;
           final total = _currentTrackDuration;
           if (total != null && total.inMilliseconds > 4000) {
@@ -137,9 +154,12 @@ class MusicBusController extends ChangeNotifier {
         },
       );
 
-      _player!.onPlayerComplete.listen(
+      player.onPlayerComplete.listen(
         (_) {
-          if (!_loopTransitioning && _isPlaying && _currentTrack?.id == track.id) {
+          if (!identical(player, _player)) return;
+          if (!_isPlaying) {
+            _endedWhilePaused(player);
+          } else if (!_loopTransitioning && _currentTrack?.id == track.id) {
             _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
           }
         },
@@ -149,9 +169,17 @@ class MusicBusController extends ChangeNotifier {
       );
 
       LoggerService().info('MusicBus: Invoking BusPlayer.play for ${file.path}');
-      await _player!.play(file.path);
+      await player.play(file.path);
 
-      _isPlaying = true;
+      // Stopped or replaced by another track while the file was loading.
+      if (!identical(player, _player)) return;
+      // Paused while the file was loading.
+      if (!_isPlaying) {
+        _fadeController.stop();
+        _fadeMultiplier = 1.0;
+        await _pausePlayer(player);
+        return;
+      }
       LoggerService().info('MusicBus: Playback started successfully!');
 
       if (effectiveFade.inMilliseconds > 0) {
@@ -171,15 +199,13 @@ class MusicBusController extends ChangeNotifier {
       }
     } catch (e, stack) {
       LoggerService().error('MusicBus: Exception during playback', details: '$e\n$stack');
-      _isPlaying = false;
-      try {
-        await _player?.stop();
-        await _player?.dispose();
-      } catch (_) {}
-      _player = null;
+      await _release(player);
+      if (identical(player, _player)) {
+        _player = null;
+        _isPlaying = false;
+        notifyListeners();
+      }
     }
-
-    notifyListeners();
   }
 
   Future<void> _triggerSeamlessLoopTransition(AudioTrack track, Duration transitionDuration) async {
@@ -206,17 +232,19 @@ class MusicBusController extends ChangeNotifier {
       await nextPlayer.setVolume(0.0);
       await nextPlayer.setLooping(false);
 
-      nextPlayer.onDurationChanged.listen(
+      final next = nextPlayer;
+      next.onDurationChanged.listen(
         (d) {
-          _currentTrackDuration = d;
+          if (identical(next, _player)) _currentTrackDuration = d;
         },
         onError: (e) {
           LoggerService().warning('MusicBus: Error in loop transition onDurationChanged', details: '$e');
         },
       );
 
-      nextPlayer.onPositionChanged.listen(
+      next.onPositionChanged.listen(
         (pos) {
+          if (!identical(next, _player)) return;
           position.value = pos;
           final total = _currentTrackDuration;
           if (total != null && total.inMilliseconds > 4000) {
@@ -233,9 +261,12 @@ class MusicBusController extends ChangeNotifier {
         },
       );
 
-      nextPlayer.onPlayerComplete.listen(
+      next.onPlayerComplete.listen(
         (_) {
-          if (!_loopTransitioning && _isPlaying && _currentTrack?.id == track.id) {
+          if (!identical(next, _player)) return;
+          if (!_isPlaying) {
+            _endedWhilePaused(next);
+          } else if (!_loopTransitioning && _currentTrack?.id == track.id) {
             _triggerSeamlessLoopTransition(track, const Duration(milliseconds: 800));
           }
         },
@@ -244,7 +275,9 @@ class MusicBusController extends ChangeNotifier {
         },
       );
 
-      await nextPlayer.play(file.path);
+      await next.play(file.path);
+      // Stopped while the next loop was loading; stop() released both players.
+      if (!identical(next, _player)) return;
 
       // Crossfade: fade out oldPlayer, fade in nextPlayer
       if (oldPlayer != null) {
@@ -295,16 +328,32 @@ class MusicBusController extends ChangeNotifier {
     }
   }
 
-  Future<void> prepareTrack(AudioTrack track) async {
+  /// Shows [track] as the next one without playing it (scene change). The
+  /// state changes at once; a playing track fades out with the crossfade.
+  Future<void> prepareTrack(AudioTrack track, {Duration? fadeDuration}) async {
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
+    final player = _player;
+    final audible = _isPlaying || (player != null && !_playerPaused) ? effectiveVolume : 0.0;
+
+    _fadeController.stop();
+    _player = null;
+    _playerPaused = false;
     _currentTrack = track;
     _currentIntensity = track.intensity;
     _isPlaying = false;
     _loopTransitioning = false;
+    _fadeMultiplier = 1.0;
     _currentTrackDuration = null;
     position.value = Duration.zero;
-    await _stopCurrentAudio();
     LoggerService().info('MusicBus: Prepared track "${track.title}" (waiting for GM playback)', details: 'Path: ${track.filePath}');
     notifyListeners();
+
+    if (player != null && effectiveFade.inMilliseconds > 0 && audible > 0) {
+      _fadeOutAndRelease(player, from: audible, duration: effectiveFade);
+    } else {
+      await _stopCurrentAudio();
+      if (player != null) await _release(player);
+    }
   }
 
   void setIntensity(MusicIntensity newIntensity) {
@@ -327,136 +376,173 @@ class MusicBusController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Pause, resume and stop change the state (and the play/pause icon) at
+  // once; only the sound follows the fade.
+
   Future<void> pause({Duration? fadeDuration}) async {
     if (!_isPlaying) return;
     final effectiveFade = fadeDuration ?? _defaultFadeDuration;
+    _isPlaying = false;
+    notifyListeners();
 
-    if (effectiveFade.inMilliseconds > 0 && _player != null) {
-      final startFade = _fadeMultiplier;
+    final player = _player;
+    if (player == null) return;
+    if (effectiveFade.inMilliseconds > 0) {
       _fadeController.startFade(
-        from: startFade,
+        from: _fadeMultiplier,
         to: 0.0,
         duration: effectiveFade,
         onUpdate: (val) {
           _fadeMultiplier = val;
           _applyPlayerVolume();
         },
-        onComplete: () async {
-          _isPlaying = false;
+        onComplete: () {
+          // Resumed or replaced while fading out.
+          if (_isPlaying || !identical(player, _player)) return;
           _fadeMultiplier = 1.0;
-          try {
-            await _player?.pause();
-            LoggerService().info('MusicBus: Paused smoothly');
-          } catch (e) {
-            LoggerService().error('MusicBus: Error pausing player', details: '$e');
-          }
-          notifyListeners();
-        },
-      );
-    } else {
-      _isPlaying = false;
-      if (_player != null) {
-        try {
-          await _player!.pause();
-          LoggerService().info('MusicBus: Paused');
-        } catch (e) {
-          LoggerService().error('MusicBus: Error pausing player', details: '$e');
-        }
-      }
-      notifyListeners();
-    }
-  }
-
-  Future<void> resume({Duration? fadeDuration}) async {
-    if (_currentTrack != null) {
-      final effectiveFade = fadeDuration ?? _defaultFadeDuration;
-      _isPlaying = true;
-      if (_player == null) {
-        final file = File(_currentTrack!.filePath);
-        if (file.existsSync()) {
-          await playTrack(_currentTrack!, fadeDuration: effectiveFade);
-          return;
-        }
-      }
-      if (_player != null) {
-        try {
-          if (effectiveFade.inMilliseconds > 0) {
-            _fadeMultiplier = 0.0;
-            await _player!.setVolume(0.0);
-            await _player!.resume();
-            LoggerService().info('MusicBus: Resumed with fade-in');
-
-            _fadeController.startFade(
-              from: 0.0,
-              to: 1.0,
-              duration: effectiveFade,
-              onUpdate: (val) {
-                _fadeMultiplier = val;
-                _applyPlayerVolume();
-              },
-              onComplete: () {
-                _fadeMultiplier = 1.0;
-                _applyPlayerVolume();
-              },
-            );
-          } else {
-            _fadeMultiplier = 1.0;
-            await _player!.setVolume(effectiveVolume);
-            await _player!.resume();
-            LoggerService().info('MusicBus: Resumed');
-          }
-        } catch (e) {
-          LoggerService().error('MusicBus: Error resuming player', details: '$e');
-        }
-      } else {
-        if (effectiveFade.inMilliseconds > 0) {
-          _fadeMultiplier = 0.0;
-          _fadeController.startFade(
-            from: 0.0,
-            to: 1.0,
-            duration: effectiveFade,
-            onUpdate: (val) {
-              _fadeMultiplier = val;
-            },
-            onComplete: () {
-              _fadeMultiplier = 1.0;
-            },
-          );
-        } else {
-          _fadeMultiplier = 1.0;
-        }
-      }
-      notifyListeners();
-    }
-  }
-
-  Future<void> stop({Duration? fadeDuration}) async {
-    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
-    if (effectiveFade.inMilliseconds > 0 && _player != null && _isPlaying) {
-      final startFade = _fadeMultiplier;
-      _fadeController.startFade(
-        from: startFade,
-        to: 0.0,
-        duration: effectiveFade,
-        onUpdate: (val) {
-          _fadeMultiplier = val;
-          _applyPlayerVolume();
-        },
-        onComplete: () async {
-          await _stopCurrentAudio();
-          _currentTrack = null;
-          _isPlaying = false;
-          _fadeMultiplier = 1.0;
-          notifyListeners();
+          _pausePlayer(player);
         },
       );
     } else {
       _fadeController.stop();
-      await _stopCurrentAudio();
-      _currentTrack = null;
-      _isPlaying = false;
       _fadeMultiplier = 1.0;
-      notifyListeners();
+      await _pausePlayer(player);
+    }
+  }
+
+  /// The track reached its end while a pause was fading out; resume starts
+  /// it again from the beginning.
+  void _endedWhilePaused(BusPlayer player) {
+    _player = null;
+    _playerPaused = false;
+    _release(player);
+  }
+
+  Future<void> _pausePlayer(BusPlayer player) async {
+    try {
+      await player.pause();
+      _playerPaused = true;
+      LoggerService().info('MusicBus: Paused');
+    } catch (e) {
+      LoggerService().error('MusicBus: Error pausing player', details: '$e');
+    }
+  }
+
+  Future<void> resume({Duration? fadeDuration}) async {
+    final track = _currentTrack;
+    if (track == null || _isPlaying) return;
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
+    _isPlaying = true;
+    notifyListeners();
+
+    final player = _player;
+    if (player == null) {
+      if (File(track.filePath).existsSync()) {
+        await playTrack(track, fadeDuration: effectiveFade);
+        return;
+      }
+      if (effectiveFade.inMilliseconds > 0) {
+        _fadeMultiplier = 0.0;
+        _fadeController.startFade(
+          from: 0.0,
+          to: 1.0,
+          duration: effectiveFade,
+          onUpdate: (val) => _fadeMultiplier = val,
+          onComplete: () => _fadeMultiplier = 1.0,
+        );
+      } else {
+        _fadeMultiplier = 1.0;
+      }
+      return;
+    }
+
+    try {
+      // A pause that is still fading out turns back from the current level;
+      // a paused player starts from silence.
+      if (_playerPaused) {
+        _fadeMultiplier = effectiveFade.inMilliseconds > 0 ? 0.0 : 1.0;
+        await player.setVolume(effectiveVolume);
+        await player.resume();
+        _playerPaused = false;
+      }
+      if (!identical(player, _player) || !_isPlaying) return;
+      LoggerService().info('MusicBus: Resumed');
+      _fadeController.startFade(
+        from: _fadeMultiplier,
+        to: 1.0,
+        duration: effectiveFade,
+        onUpdate: (val) {
+          _fadeMultiplier = val;
+          _applyPlayerVolume();
+        },
+        onComplete: () {
+          _fadeMultiplier = 1.0;
+          _applyPlayerVolume();
+        },
+      );
+    } catch (e) {
+      LoggerService().error('MusicBus: Error resuming player', details: '$e');
+    }
+  }
+
+  /// Clears the track at once; the playing sound fades out on its own like
+  /// the outgoing side of a crossfade, so a new track can start right away.
+  Future<void> stop({Duration? fadeDuration}) async {
+    final effectiveFade = fadeDuration ?? _defaultFadeDuration;
+    final player = _player;
+    final audible = _isPlaying || (player != null && !_playerPaused) ? effectiveVolume : 0.0;
+
+    _fadeController.stop();
+    _player = null;
+    _playerPaused = false;
+    _currentTrack = null;
+    _isPlaying = false;
+    _loopTransitioning = false;
+    _fadeMultiplier = 1.0;
+    _currentTrackDuration = null;
+    position.value = Duration.zero;
+    notifyListeners();
+
+    if (player == null) {
+      await _stopCurrentAudio();
+      return;
+    }
+    if (effectiveFade.inMilliseconds > 0 && audible > 0) {
+      _fadeOutAndRelease(player, from: audible, duration: effectiveFade);
+    } else {
+      await _stopCurrentAudio();
+      await _release(player);
+    }
+  }
+
+  /// Fades [player] out on the outgoing fader and frees it at the end.
+  void _fadeOutAndRelease(BusPlayer player, {required double from, required Duration duration}) {
+    _outgoingFadeController.stop();
+    final previous = _outgoingPlayer;
+    if (previous != null && !identical(previous, player)) _release(previous);
+    _outgoingPlayer = player;
+    _outgoingFadeController.startFade(
+      from: from,
+      to: 0.0,
+      duration: duration,
+      onUpdate: (val) {
+        try {
+          player.setVolume(val);
+        } catch (_) {}
+      },
+      onComplete: () {
+        if (identical(_outgoingPlayer, player)) _outgoingPlayer = null;
+        _release(player);
+      },
+    );
+  }
+
+  Future<void> _release(BusPlayer player) async {
+    try {
+      await player.stop();
+      await player.dispose();
+    } catch (e) {
+      LoggerService().error('MusicBus: Error disposing player', details: '$e');
     }
   }
 

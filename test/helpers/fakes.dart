@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:ttrpg_audio_player/audio/playback/bus_player.dart';
 import 'package:ttrpg_audio_player/audio/audio_output_service.dart';
 import 'package:ttrpg_audio_player/data/repositories/media_library_repository.dart';
 import 'package:ttrpg_audio_player/data/repositories/scene_repository.dart';
@@ -146,4 +148,55 @@ class FakeOutputBackend implements OutputDeviceBackend {
     if (failChange) throw StateError('Device is gone');
     changes.add(deviceId);
   }
+}
+
+/// Player without sound: records what the controllers ask for. [loading]
+/// holds play() until it completes, like a file that takes time to load.
+class FakeBusPlayer implements BusPlayer {
+  final String path;
+  double volume = 1;
+  bool playing = false;
+  bool paused = false;
+  bool stopped = false;
+  bool disposed = false;
+  Completer<void>? loading;
+  final _duration = StreamController<Duration>.broadcast();
+  final _position = StreamController<Duration>.broadcast();
+  final _complete = StreamController<void>.broadcast();
+
+  FakeBusPlayer(this.path);
+
+  @override
+  Stream<Duration> get onDurationChanged => _duration.stream;
+  @override
+  Stream<Duration> get onPositionChanged => _position.stream;
+  @override
+  Stream<void> get onPlayerComplete => _complete.stream;
+
+  @override
+  Future<void> setVolume(double v) async => volume = v;
+  @override
+  Future<void> setLooping(bool looping) async {}
+  @override
+  Future<void> play(String path) async {
+    await loading?.future;
+    if (disposed) return;
+    playing = true;
+  }
+
+  @override
+  Future<void> pause() async => paused = true;
+  @override
+  Future<void> resume() async => paused = false;
+  @override
+  Future<void> stop() async {
+    stopped = true;
+    playing = false;
+  }
+
+  @override
+  Future<void> dispose() async => disposed = true;
+
+  /// Audible: started, not paused, not stopped.
+  bool get audible => playing && !paused && !stopped && !disposed;
 }

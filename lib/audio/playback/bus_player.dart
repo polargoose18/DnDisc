@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'legacy_bus_player.dart';
 import 'soloud_bus_player.dart';
@@ -9,8 +10,15 @@ import 'soloud_bus_player.dart';
 abstract class BusPlayer {
   /// Picks the backend for [path]: SoLoud (follows the chosen output device)
   /// for the formats it decodes, the system player for the rest (M4A/AAC).
-  factory BusPlayer.forFile(String path) =>
-      LegacyBusPlayer.handles(path) ? LegacyBusPlayer() : SoLoudBusPlayer();
+  factory BusPlayer.forFile(String path) {
+    final override = debugFactory;
+    if (override != null) return override(path);
+    return LegacyBusPlayer.handles(path) ? LegacyBusPlayer() : SoLoudBusPlayer();
+  }
+
+  /// Replaces the backends in tests (there is no audio output there).
+  @visibleForTesting
+  static BusPlayer Function(String path)? debugFactory;
 
   /// Extensions SoLoud decodes; others go to [LegacyBusPlayer].
   static const List<String> soloudExtensions = ['mp3', 'wav', 'ogg', 'flac'];

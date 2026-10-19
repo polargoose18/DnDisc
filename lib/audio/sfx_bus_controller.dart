@@ -87,6 +87,8 @@ class SfxBusController extends ChangeNotifier {
         _activePlayers.add(player);
         if (trigger.isLoop) {
           _loopingPlayers[triggerId] = player;
+          // The loop counts as playing before its file loads.
+          notifyListeners();
         }
 
         LoggerService().info('SfxBus: Triggering SFX "${trigger.title}" (Loop: ${trigger.isLoop})');
@@ -128,12 +130,12 @@ class SfxBusController extends ChangeNotifier {
     final player = _loopingPlayers.remove(triggerId);
     if (player != null) {
       _activePlayers.remove(player);
+      notifyListeners();
       try {
         await player.stop();
         await player.dispose();
       } catch (_) {}
       LoggerService().info('SfxBus: Stopped looping SFX ($triggerId)');
-      notifyListeners();
     }
   }
 
@@ -142,6 +144,7 @@ class SfxBusController extends ChangeNotifier {
     _loopingPlayers.clear();
     final toStop = List<BusPlayer>.from(_activePlayers);
     _activePlayers.clear();
+    notifyListeners();
 
     for (final player in toStop) {
       try {
@@ -149,7 +152,6 @@ class SfxBusController extends ChangeNotifier {
         await player.dispose();
       } catch (_) {}
     }
-    notifyListeners();
   }
 
   void setVolume(double volume) {

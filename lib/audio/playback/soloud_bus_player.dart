@@ -71,6 +71,16 @@ class SoLoudBusPlayer implements BusPlayer {
       if (event.event == SoundEventType.handleIsNoMoreValid && event.handle == _handle) _finished();
     });
     _handle = await _soloud.play(source, volume: _volume, looping: _looping);
+    // Stopped or disposed while the voice was starting.
+    if (_disposed || _path != path) {
+      final handle = _handle!;
+      _handle = null;
+      try {
+        await _soloud.stop(handle);
+      } catch (_) {}
+      if (_path == path) _detach();
+      return;
+    }
     _paused = false;
     if (!_duration.isClosed) _duration.add(_soloud.getLength(source));
     _ticker = Timer.periodic(positionInterval, (_) => _tick());

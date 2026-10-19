@@ -12,6 +12,9 @@ class AmbientBusController extends ChangeNotifier {
   final Map<String, Duration> _layerDurations = {};
   final Map<String, bool> _layerLoopTransitioning = {};
   final Map<String, BusPlayer> _outgoingAmbientPlayers = {};
+
+  /// Players of turned-off layers that are still fading out.
+  final Map<BusPlayer, FadeController> _fadingOut = {};
   final Map<String, FadeController> _outgoingAmbientFadeControllers = {};
   double _masterAmbientVolume = 1.0;
   double _channelVolume = 1.0;
@@ -69,6 +72,8 @@ class AmbientBusController extends ChangeNotifier {
       final layer = _layers[index];
       final newActive = !layer.isActive;
       _layers[index] = layer.copyWith(isActive: newActive);
+      // The toggle answers at once; loading and the fade follow.
+      notifyListeners();
 
       if (newActive) {
         await _startLayerAudio(_layers[index], fadeDuration: effectiveFade);
@@ -175,6 +180,7 @@ class AmbientBusController extends ChangeNotifier {
         futures.add(_stopLayerAudio(id, fadeDuration: effectiveFade));
       }
     }
+    notifyListeners();
     await Future.wait(futures);
     notifyListeners();
   }
@@ -202,9 +208,14 @@ class AmbientBusController extends ChangeNotifier {
       await player.setVolume(startVolume);
       await player.setLooping(false);
 
+      // Registered before the file loads, so a stop during loading finds it.
+      final started = player;
+      _activePlayers[layer.id] = started;
+      bool current() => identical(_activePlayers[layer.id], started);
+
       player.onDurationChanged.listen(
         (d) {
-          _layerDurations[layer.id] = d;
+          if (current()) _layerDurations[layer.id] = d;
         },
         onError: (e) {
           LoggerService().warning('AmbientBus: Error in onDurationChanged for ${layer.title}', details: '$e');
@@ -213,6 +224,7 @@ class AmbientBusController extends ChangeNotifier {
 
       player.onPositionChanged.listen(
         (pos) {
+          if (!current()) return;
           final total = _layerDurations[layer.id];
           if (total != null && total.inMilliseconds > 4000) {
             final transitionDuration = total.inMilliseconds > 8000
@@ -233,6 +245,7 @@ class AmbientBusController extends ChangeNotifier {
 
       player.onPlayerComplete.listen(
         (_) {
+          if (!current()) return;
           final isTransitioning = _layerLoopTransitioning[layer.id] ?? false;
           final isLayerActive = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer).isActive;
           if (!isTransitioning && isLayerActive) {
@@ -247,7 +260,8 @@ class AmbientBusController extends ChangeNotifier {
       LoggerService().info('AmbientBus: Starting layer "${layer.title}"');
       await player.play(file.path);
 
-      _activePlayers[layer.id] = player;
+      // Turned off while the file was loading: the stop released it.
+      if (!current()) return;
       LoggerService().info('AmbientBus: Layer "${layer.title}" started successfully!');
 
       if (effectiveFade.inMilliseconds > 0) {
@@ -270,7 +284,7 @@ class AmbientBusController extends ChangeNotifier {
       }
     } catch (e, stack) {
       LoggerService().error('AmbientBus: Exception starting ${layer.title}', details: '$e\n$stack');
-      _activePlayers.remove(layer.id);
+      if (identical(_activePlayers[layer.id], player)) _activePlayers.remove(layer.id);
       try {
         await player?.stop();
         await player?.dispose();
@@ -308,17 +322,21 @@ class AmbientBusController extends ChangeNotifier {
       await nextPlayer.setVolume(0.0);
       await nextPlayer.setLooping(false);
 
-      nextPlayer.onDurationChanged.listen(
+      final next = nextPlayer;
+      bool current() => identical(_activePlayers[layer.id], next);
+
+      next.onDurationChanged.listen(
         (d) {
-          _layerDurations[layer.id] = d;
+          if (current()) _layerDurations[layer.id] = d;
         },
         onError: (e) {
           LoggerService().warning('AmbientBus: Error in loop transition onDurationChanged for ${layer.title}', details: '$e');
         },
       );
 
-      nextPlayer.onPositionChanged.listen(
+      next.onPositionChanged.listen(
         (pos) {
+          if (!current()) return;
           final total = _layerDurations[layer.id];
           if (total != null && total.inMilliseconds > 4000) {
             final nextTransition = total.inMilliseconds > 8000
@@ -337,8 +355,9 @@ class AmbientBusController extends ChangeNotifier {
         },
       );
 
-      nextPlayer.onPlayerComplete.listen(
+      next.onPlayerComplete.listen(
         (_) {
+          if (!current()) return;
           final nowTransitioning = _layerLoopTransitioning[layer.id] ?? false;
           final isLayerActive = _layers.firstWhere((l) => l.id == layer.id, orElse: () => layer).isActive;
           if (!nowTransitioning && isLayerActive) {
@@ -350,7 +369,9 @@ class AmbientBusController extends ChangeNotifier {
         },
       );
 
-      await nextPlayer.play(file.path);
+      await next.play(file.path);
+      // Turned off while the next loop was loading: the stop released both.
+      if (!current()) return;
 
       // Fade out old player
       if (oldPlayer != null) {
@@ -423,9 +444,13 @@ class AmbientBusController extends ChangeNotifier {
     }
 
     if (player == null) return;
+    // No longer the layer's player: turning the layer on again starts a new
+    // one while this one fades out.
+    _activePlayers.remove(layerId);
 
     if (fadeDuration.inMilliseconds > 0) {
       final stopFader = FadeController();
+      _fadingOut[player] = stopFader;
       final currentLayer = _layers.firstWhere(
         (l) => l.id == layerId,
         orElse: () => AmbientLayer(id: layerId, title: '', filePath: ''),
@@ -442,7 +467,7 @@ class AmbientBusController extends ChangeNotifier {
           } catch (_) {}
         },
         onComplete: () async {
-          _activePlayers.remove(layerId);
+          _fadingOut.remove(player);
           stopFader.dispose();
           try {
             await player.stop();
@@ -453,7 +478,6 @@ class AmbientBusController extends ChangeNotifier {
         },
       );
     } else {
-      _activePlayers.remove(layerId);
       try {
         await player.stop();
         await player.dispose();
@@ -485,6 +509,15 @@ class AmbientBusController extends ChangeNotifier {
       } catch (_) {}
     }
     _outgoingAmbientPlayers.clear();
+
+    for (final entry in _fadingOut.entries) {
+      entry.value.dispose();
+      try {
+        entry.key.stop();
+        entry.key.dispose();
+      } catch (_) {}
+    }
+    _fadingOut.clear();
 
     for (final player in _activePlayers.values) {
       try {

@@ -161,6 +161,7 @@ class SceneService extends ChangeNotifier {
             loopStartMs: musicTrack.loopStartMs,
             loopEndMs: musicTrack.loopEndMs,
           ),
+          fadeDuration: musicFade,
         );
       } else {
         LoggerService().warning('SceneService: Bound music track not found in library: ${scene.musicTrackId}');
