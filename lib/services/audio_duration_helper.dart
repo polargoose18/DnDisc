@@ -6,33 +6,107 @@ import 'dart:typed_data';
 class AudioDurationHelper {
   AudioDurationHelper._();
 
+  /// Number of leading bytes read from a file. Every parser only needs the
+  /// header; the file size itself comes from [File.length].
+  static const int headerReadLimit = 256 * 1024;
+
   /// Reads audio duration in milliseconds from a local file. Returns 0 if cannot be determined.
   static Future<int> getDurationMs(String filePath) async {
+    RandomAccessFile? raf;
     try {
       if (filePath.isEmpty) return 0;
       final file = File(filePath);
       if (!file.existsSync()) return 0;
-      final bytes = await file.readAsBytes();
-      return extractDurationMs(bytes, filename: filePath);
+      raf = await file.open();
+      final length = await raf.length();
+      var bytes = await raf.read(_prefixLength(length, await _peekId3(raf)));
+      if (bytes.length < length && _needsWholeFile(bytes)) {
+        await raf.setPosition(0);
+        bytes = await raf.read(length);
+      }
+      var dur = extractDurationMs(bytes, filename: filePath, totalLength: length);
+      if (dur == 0 && bytes.length < length) {
+        // Header data not at the start (e.g. M4A with moov after mdat).
+        await raf.setPosition(0);
+        bytes = await raf.read(length);
+        dur = extractDurationMs(bytes, filename: filePath);
+      }
+      return dur;
     } catch (_) {
       return 0;
+    } finally {
+      try {
+        await raf?.close();
+      } catch (_) {}
     }
   }
 
   /// Synchronous extraction if bytes or file are already loaded.
   static int getDurationMsSync(String filePath) {
+    RandomAccessFile? raf;
     try {
       final file = File(filePath);
       if (!file.existsSync()) return 0;
-      final bytes = file.readAsBytesSync();
-      return extractDurationMs(bytes, filename: filePath);
+      raf = file.openSync();
+      final length = raf.lengthSync();
+      var bytes = raf.readSync(_prefixLength(length, _peekId3Sync(raf)));
+      if (bytes.length < length && _needsWholeFile(bytes)) {
+        raf.setPositionSync(0);
+        bytes = raf.readSync(length);
+      }
+      var dur = extractDurationMs(bytes, filename: filePath, totalLength: length);
+      if (dur == 0 && bytes.length < length) {
+        raf.setPositionSync(0);
+        bytes = raf.readSync(length);
+        dur = extractDurationMs(bytes, filename: filePath);
+      }
+      return dur;
     } catch (_) {
       return 0;
+    } finally {
+      try {
+        raf?.closeSync();
+      } catch (_) {}
     }
   }
 
+  /// Size of the ID3v2 tag at the start of the file (0 if none); rewinds.
+  static Future<int> _peekId3(RandomAccessFile raf) async {
+    final head = await raf.read(10);
+    await raf.setPosition(0);
+    return _id3Size(head);
+  }
+
+  static int _peekId3Sync(RandomAccessFile raf) {
+    final head = raf.readSync(10);
+    raf.setPositionSync(0);
+    return _id3Size(head);
+  }
+
+  static int _id3Size(Uint8List head) {
+    if (head.length < 10 || !_matchesAscii(head, 0, 'ID3')) return 0;
+    return 10 +
+        (((head[6] & 0x7F) << 21) |
+            ((head[7] & 0x7F) << 14) |
+            ((head[8] & 0x7F) << 7) |
+            (head[9] & 0x7F));
+  }
+
+  /// A large ID3 tag (cover art) pushes the first MP3 frame past the limit.
+  static int _prefixLength(int fileLength, int id3Size) {
+    final want = id3Size + headerReadLimit;
+    final n = want > headerReadLimit ? want : headerReadLimit;
+    return n < fileLength ? n : fileLength;
+  }
+
+  /// OGG duration comes from the last page's granule position, at the file end.
+  static bool _needsWholeFile(Uint8List prefix) => _matchesAscii(prefix, 0, 'OggS');
+
   /// Extracts duration in milliseconds from audio bytes.
-  static int extractDurationMs(Uint8List bytes, {String filename = 'audio.mp3'}) {
+  ///
+  /// [totalLength] is the real file size when [bytes] is only a leading part of
+  /// the file; MP3 without a Xing/VBRI header is then extrapolated to it.
+  static int extractDurationMs(Uint8List bytes, {String filename = 'audio.mp3', int? totalLength}) {
     if (bytes.length < 16) return 0;
 
     final ext = filename.toLowerCase();
@@ -62,7 +136,7 @@ class AudioDurationHelper {
     }
 
     // 5. MP3
-    final mp3Dur = _parseMp3(bytes);
+    final mp3Dur = _parseMp3(bytes, totalLength: totalLength);
     if (mp3Dur > 0) return mp3Dur;
 
     return 0;
@@ -226,7 +300,7 @@ class AudioDurationHelper {
     return 0;
   }
 
-  static int _parseMp3(Uint8List data) {
+  static int _parseMp3(Uint8List data, {int? totalLength}) {
     try {
       int pos = 0;
       if (data.length >= 10 && _matchesAscii(data, 0, 'ID3')) {
@@ -236,6 +310,7 @@ class AudioDurationHelper {
             (data[9] & 0x7F);
         pos = 10 + tagSize;
       }
+      final audioStart = pos;
 
       const v1L3Bitrates = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0];
       const v2L3Bitrates = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0];
@@ -326,6 +401,10 @@ class AudioDurationHelper {
       }
 
       if (totalDurationSec > 0) {
+        if (totalLength != null && totalLength > data.length && pos > audioStart) {
+          // Only a prefix was read: scale the counted frames to the whole file.
+          totalDurationSec *= (totalLength - audioStart) / (pos - audioStart);
+        }
         return (totalDurationSec * 1000).round();
       }
     } catch (_) {}
