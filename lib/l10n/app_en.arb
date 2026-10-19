@@ -486,5 +486,18 @@
   "contrastWarning": "Some pairs are below the readable minimum. You can still save the theme.",
   "contrastOk": "Ok",
   "orWord": "or",
-  "choosePreset": "Choose a preset"
+  "choosePreset": "Choose a preset",
+  "outputDeviceLabel": "Output device",
+  "outputDeviceDefault": "System default",
+  "outputDeviceHint": "M4A files always play on the system default device",
+  "outputDeviceMissing": "{name} is not connected, sound goes to the system default",
+  "@outputDeviceMissing": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshDevices": "Refresh device list",
+  "toastOutputDeviceFailed": "Could not switch the output device"
 }

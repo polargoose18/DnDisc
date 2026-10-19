@@ -1041,4 +1041,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get choosePreset => 'Choose a preset';
+
+  @override
+  String get outputDeviceLabel => 'Output device';
+
+  @override
+  String get outputDeviceDefault => 'System default';
+
+  @override
+  String get outputDeviceHint =>
+      'M4A files always play on the system default device';
+
+  @override
+  String outputDeviceMissing(String name) {
+    return '$name is not connected, sound goes to the system default';
+  }
+
+  @override
+  String get refreshDevices => 'Refresh device list';
+
+  @override
+  String get toastOutputDeviceFailed => 'Could not switch the output device';
 }

@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:ttrpg_audio_player/audio/ambient_bus_controller.dart';
 import 'package:ttrpg_audio_player/audio/audio_engine_service.dart';
+import 'package:ttrpg_audio_player/audio/audio_output_service.dart';
 import 'package:ttrpg_audio_player/audio/music_bus_controller.dart';
 import 'package:ttrpg_audio_player/audio/sfx_bus_controller.dart';
 import 'package:ttrpg_audio_player/data/services/database_service.dart';
@@ -82,6 +83,9 @@ class UiTestEnv {
   final ToastController toasts = ToastController();
   RepositoryViewModel? repositoryViewModel;
 
+  /// Output device choice; the Audio panel hides it when null.
+  AudioOutputService? output;
+
   UiTestEnv({String themeId = AppThemes.deepDarkId, bool showToasts = true})
       : settings = SettingsService(),
         themes = ThemeService(initialThemeId: themeId),
@@ -127,6 +131,7 @@ class UiTestEnv {
         ChangeNotifierProvider<MediaLibraryViewModel>(create: (_) => MediaLibraryViewModel(service: library)),
         ChangeNotifierProvider<SceneService>.value(value: scenes),
         ChangeNotifierProvider<SceneViewModel>(create: (_) => SceneViewModel(service: scenes)),
+        if (output != null) ChangeNotifierProvider<AudioOutputService>.value(value: output!),
         ChangeNotifierProvider<RepositoryViewModel>(
           create: (_) => repositoryViewModel ?? RepositoryViewModel(sourceRepository: FakeSourceRepo([]), settingsService: settings),
         ),

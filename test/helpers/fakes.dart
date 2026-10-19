@@ -1,3 +1,4 @@
+import 'package:ttrpg_audio_player/audio/audio_output_service.dart';
 import 'package:ttrpg_audio_player/data/repositories/media_library_repository.dart';
 import 'package:ttrpg_audio_player/data/repositories/scene_repository.dart';
 import 'package:ttrpg_audio_player/data/repositories/scene_repository_source_repository.dart';
@@ -119,3 +120,30 @@ class FakeNetworkService extends SceneRepositoryNetworkService {
   }
 }
 
+
+/// Output devices in memory; records where the sound was moved.
+class FakeOutputBackend implements OutputDeviceBackend {
+  List<OutputDevice> devices;
+  final List<String?> changes = [];
+  String? startedOn;
+  bool started = false;
+  bool failChange = false;
+
+  FakeOutputBackend(this.devices);
+
+  @override
+  Future<List<OutputDevice>> listDevices() async => devices;
+
+  @override
+  Future<bool> start({String? deviceId}) async {
+    started = true;
+    startedOn = deviceId;
+    return true;
+  }
+
+  @override
+  Future<void> changeDevice(String? deviceId) async {
+    if (failChange) throw StateError('Device is gone');
+    changes.add(deviceId);
+  }
+}

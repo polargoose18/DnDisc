@@ -1062,4 +1062,26 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get choosePreset => 'Выберите пресет';
+
+  @override
+  String get outputDeviceLabel => 'Устройство вывода';
+
+  @override
+  String get outputDeviceDefault => 'Системное по умолчанию';
+
+  @override
+  String get outputDeviceHint =>
+      'Файлы M4A всегда играют на системном устройстве по умолчанию';
+
+  @override
+  String outputDeviceMissing(String name) {
+    return '$name не подключено, звук идёт на системное устройство';
+  }
+
+  @override
+  String get refreshDevices => 'Обновить список устройств';
+
+  @override
+  String get toastOutputDeviceFailed =>
+      'Не удалось переключить устройство вывода';
 }

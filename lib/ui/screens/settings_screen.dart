@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../audio/audio_output_service.dart';
 import '../../data/services/settings_service.dart';
 import '../../domain/models/custom_theme_model.dart';
 import '../../l10n/app_localizations.dart';
@@ -56,6 +57,7 @@ class SettingsScreen extends StatelessWidget {
     final themes = context.watch<ThemeViewModel?>();
     final shortcuts = context.watch<ShortcutService?>();
     final toasts = context.read<ToastController?>();
+    final output = context.watch<AudioOutputService?>();
 
     String seconds(int ms) => '${(ms / 1000).toStringAsFixed(1)} ${l10n.seconds}';
     String millis(int ms) => '$ms ${l10n.milliseconds}';
@@ -136,6 +138,10 @@ class SettingsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (output != null && output.isSupported) ...[
+            _OutputDeviceSetting(output: output),
+            const SizedBox(height: Spacing.s4),
+          ],
           _SliderSetting(
             title: l10n.musicFadeTitle,
             value: settings.musicFadeMs.toDouble(),
@@ -432,6 +438,52 @@ class _ShortcutsTable extends StatelessWidget {
             ),
           ]),
       ],
+    );
+  }
+}
+
+/// Output device (Linux and Windows): the system default or a named device,
+/// with a button that reads the list again after plugging in a headset.
+class _OutputDeviceSetting extends StatelessWidget {
+  /// Option id of the system default device.
+  static const String _systemDefault = '';
+
+  final AudioOutputService output;
+
+  const _OutputDeviceSetting({required this.output});
+
+  Future<void> _select(BuildContext context, String? id) async {
+    final l10n = AppLocalizations.of(context)!;
+    final toasts = context.read<ToastController?>();
+    try {
+      await output.select(id == null || id == _systemDefault ? null : id);
+    } catch (e) {
+      toasts?.error(l10n.toastOutputDeviceFailed, message: '$e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final selected = output.selectedDevice;
+    return DsSelect<String>(
+      key: const ValueKey('output_device_select'),
+      label: l10n.outputDeviceLabel,
+      icon: 'volume',
+      hint: output.selectedIsMissing && selected != null ? l10n.outputDeviceMissing(output.selectedLabel ?? selected) : l10n.outputDeviceHint,
+      value: output.selectedIsMissing ? _systemDefault : (selected ?? _systemDefault),
+      options: [
+        DsOption(_systemDefault, l10n.outputDeviceDefault),
+        for (final device in output.devices) DsOption(device.id, device.label),
+      ],
+      onChanged: (id) => _select(context, id),
+      trailing: DsButton.ghost(
+        key: const ValueKey('refresh_devices_button'),
+        icon: 'refresh',
+        iconOnly: true,
+        label: l10n.refreshDevices,
+        onPressed: output.refresh,
+      ),
     );
   }
 }

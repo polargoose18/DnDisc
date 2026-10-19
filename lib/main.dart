@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'audio/audio_engine_service.dart';
+import 'audio/audio_output_service.dart';
 import 'audio/music_bus_controller.dart';
 import 'audio/ambient_bus_controller.dart';
 import 'audio/sfx_bus_controller.dart';
@@ -34,6 +35,11 @@ class TtrpgAudioPlayerApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<LoggerService>(create: (_) => LoggerService()),
         ChangeNotifierProvider<ToastController>(create: (_) => ToastController()),
+        // Starts the audio output (SoLoud) on the saved device.
+        ChangeNotifierProvider<AudioOutputService>(
+          lazy: false,
+          create: (_) => AudioOutputService(db: DatabaseService())..init(),
+        ),
         ChangeNotifierProvider<SettingsService>(
           create: (_) {
             final svc = SettingsService(dbService: DatabaseService(), autoLoad: true);

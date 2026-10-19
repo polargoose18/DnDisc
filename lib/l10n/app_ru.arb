@@ -486,5 +486,18 @@
   "contrastWarning": "Некоторые пары ниже читаемого минимума. Тему всё равно можно сохранить.",
   "contrastOk": "Норма",
   "orWord": "или",
-  "choosePreset": "Выберите пресет"
+  "choosePreset": "Выберите пресет",
+  "outputDeviceLabel": "Устройство вывода",
+  "outputDeviceDefault": "Системное по умолчанию",
+  "outputDeviceHint": "Файлы M4A всегда играют на системном устройстве по умолчанию",
+  "outputDeviceMissing": "{name} не подключено, звук идёт на системное устройство",
+  "@outputDeviceMissing": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshDevices": "Обновить список устройств",
+  "toastOutputDeviceFailed": "Не удалось переключить устройство вывода"
 }

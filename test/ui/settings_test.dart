@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:ttrpg_audio_player/audio/audio_output_service.dart';
 import 'package:ttrpg_audio_player/domain/models/custom_theme_model.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations_ru.dart';
@@ -15,6 +16,7 @@ import 'package:ttrpg_audio_player/ui/screens/settings_screen.dart';
 import 'package:ttrpg_audio_player/ui/widgets/custom_theme_editor_dialog.dart';
 import 'package:ttrpg_audio_player/ui/widgets/logger_console_drawer.dart';
 import 'package:ttrpg_audio_player/ui/widgets/theme_card.dart';
+import '../helpers/fakes.dart';
 import '../helpers/ui_harness.dart';
 
 final l10n = AppLocalizationsEn();
@@ -170,6 +172,76 @@ void main() {
       await tester.tap(find.byTooltip(l10n.close));
       await settle(tester);
       expect(find.byType(LoggerConsoleDrawer), findsNothing);
+    });
+  });
+
+  group('Output device', () {
+    const speakers = OutputDevice('alsa_output.speakers', label: 'Speakers', isDefault: true);
+    const headset = OutputDevice('bluez_output.headset', label: 'Headset');
+
+    Future<FakeOutputBackend> pumpWithOutput(WidgetTester tester, {bool supported = true}) async {
+      final backend = FakeOutputBackend([speakers, headset]);
+      final output = AudioOutputService(backend: backend, supported: supported);
+      await tester.runAsync(output.init);
+      env.output = output;
+      await pumpSettings(tester);
+      return backend;
+    }
+
+    testWidgets('lists the system default and the devices by name in the Audio panel', (tester) async {
+      await pumpWithOutput(tester);
+
+      expect(find.text(l10n.outputDeviceLabel), findsOneWidget);
+      expect(find.text(l10n.outputDeviceDefault), findsOneWidget);
+      expect(find.text(l10n.outputDeviceHint), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('output_device_select')));
+      await settle(tester);
+      expect(find.text('Speakers'), findsWidgets);
+      expect(find.text('Headset'), findsWidgets);
+    });
+
+    testWidgets('moves the sound to the picked device', (tester) async {
+      final backend = await pumpWithOutput(tester);
+
+      await tester.tap(find.byKey(const ValueKey('output_device_select')));
+      await settle(tester);
+      await tester.tap(find.text('Headset').last);
+      await settle(tester);
+
+      expect(backend.changes, [headset.id]);
+      expect(env.output!.selectedDevice, headset.id);
+      expect(find.text('Headset'), findsOneWidget);
+    });
+
+    testWidgets('says when the saved device is not connected and refreshes the list', (tester) async {
+      final backend = await pumpWithOutput(tester);
+      await tester.runAsync(() => env.output!.select(headset.id));
+      backend.devices = [speakers];
+
+      await tester.tap(find.byKey(const ValueKey('refresh_devices_button')));
+      await settleIo(tester, rounds: 2);
+
+      expect(find.text(l10n.outputDeviceMissing(headset.id)), findsOneWidget);
+      expect(find.text(l10n.outputDeviceDefault), findsOneWidget);
+    });
+
+    testWidgets('shows an error toast when the device cannot be used', (tester) async {
+      final backend = await pumpWithOutput(tester);
+      backend.failChange = true;
+
+      await tester.tap(find.byKey(const ValueKey('output_device_select')));
+      await settle(tester);
+      await tester.tap(find.text('Headset').last);
+      await settle(tester);
+
+      expect(find.text(l10n.toastOutputDeviceFailed), findsOneWidget);
+      expect(env.output!.selectedDevice, isNull);
+    });
+
+    testWidgets('is hidden where the system has a single output (Android)', (tester) async {
+      await pumpWithOutput(tester, supported: false);
+      expect(find.byKey(const ValueKey('output_device_select')), findsNothing);
     });
   });
 

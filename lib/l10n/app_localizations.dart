@@ -1963,6 +1963,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose a preset'**
   String get choosePreset;
+
+  /// No description provided for @outputDeviceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Output device'**
+  String get outputDeviceLabel;
+
+  /// No description provided for @outputDeviceDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get outputDeviceDefault;
+
+  /// No description provided for @outputDeviceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'M4A files always play on the system default device'**
+  String get outputDeviceHint;
+
+  /// No description provided for @outputDeviceMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is not connected, sound goes to the system default'**
+  String outputDeviceMissing(String name);
+
+  /// No description provided for @refreshDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh device list'**
+  String get refreshDevices;
+
+  /// No description provided for @toastOutputDeviceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not switch the output device'**
+  String get toastOutputDeviceFailed;
 }
 
 class _AppLocalizationsDelegate

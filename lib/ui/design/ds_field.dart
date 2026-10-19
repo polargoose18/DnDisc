@@ -244,6 +244,10 @@ class DsSelect<T> extends StatelessWidget {
   final String? placeholder;
   final bool enabled;
 
+  /// Control next to the field (an icon button), aligned with it rather
+  /// than with the label or hint.
+  final Widget? trailing;
+
   const DsSelect({
     super.key,
     this.label,
@@ -254,6 +258,7 @@ class DsSelect<T> extends StatelessWidget {
     this.hint,
     this.placeholder,
     this.enabled = true,
+    this.trailing,
   });
 
   @override
@@ -292,7 +297,15 @@ class DsSelect<T> extends StatelessWidget {
       hint: hint,
       error: null,
       enabled: active,
-      child: DsFocusRing(child: dropdown),
+      child: trailing == null
+          ? DsFocusRing(child: dropdown)
+          : Row(
+              children: [
+                Expanded(child: DsFocusRing(child: dropdown)),
+                const SizedBox(width: Spacing.s2),
+                trailing!,
+              ],
+            ),
     );
   }
 }
