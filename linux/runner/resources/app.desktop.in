@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=DnDisc
+Comment=Audio deck for tabletop game masters
+Exec=@BINARY_NAME@
+Icon=@APPLICATION_ID@
+Categories=AudioVideo;Audio;Game;
+StartupWMClass=@APPLICATION_ID@
+Terminal=false
