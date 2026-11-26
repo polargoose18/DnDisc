@@ -1,7 +1,7 @@
 name: ttrpg_audio_player
 description: DnDisc — cross-platform audio, ambient, and soundboard player for TTRPG Game Masters.
 publish_to: 'none'
-version: 1.0.0+1
+version: 0.1.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
