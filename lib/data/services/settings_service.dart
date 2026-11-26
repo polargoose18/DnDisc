@@ -12,8 +12,10 @@ class SettingsService extends ChangeNotifier {
   bool _showLogConsoleIcon;
   String _appLanguage; // 'system', 'ru', 'en'
   String? _customDownloadDirectory;
+  bool _navRailOpen = false;
 
   static const String _kCustomDownloadDirKey = 'custom_download_directory';
+  static const String _kNavRailOpenKey = 'nav_rail_open';
 
   SettingsService({
     DatabaseService? dbService,
@@ -55,6 +57,9 @@ class SettingsService extends ChangeNotifier {
   bool get showLogConsoleIcon => _showLogConsoleIcon;
   String get appLanguage => _appLanguage;
   String? get customDownloadDirectory => _customDownloadDirectory;
+
+  /// Whether the navigation rail is expanded (224px) instead of collapsed (64px).
+  bool get navRailOpen => _navRailOpen;
   String? get catalogDownloadDirectory => _customDownloadDirectory;
   String? get audioStorageDirectory => _customDownloadDirectory;
 
@@ -80,9 +85,21 @@ class SettingsService extends ChangeNotifier {
         LoggerService().info('SettingsService: Restored custom download directory: $_customDownloadDirectory');
         notifyListeners();
       }
+      final railOpen = await db.getSetting(_kNavRailOpenKey);
+      if (railOpen != null && (railOpen == '1') != _navRailOpen) {
+        _navRailOpen = railOpen == '1';
+        notifyListeners();
+      }
     } catch (e) {
       LoggerService().warning('SettingsService: Could not restore settings from DB: $e');
     }
+  }
+
+  void setNavRailOpen(bool open) {
+    if (_navRailOpen == open) return;
+    _navRailOpen = open;
+    _dbService?.setSetting(_kNavRailOpenKey, open ? '1' : '0').catchError((_) {});
+    notifyListeners();
   }
 
   void setAppLanguage(String lang) {

@@ -121,17 +121,17 @@ void main() {
 
     test('should perform full CRUD lifecycle on CustomThemeModel via SqliteCustomThemeRepository', () async {
       // Arrange
-      const theme = CustomThemeModel(
+      final theme = CustomThemeModel.derive(
         id: 'repo-theme-1',
         name: 'Cyberpunk Red',
-        primaryColor: 0xFFFF0055,
-        secondaryColor: 0xFF00FFFF,
-        backgroundColor: 0xFF0A0A10,
-        surfaceColor: 0xFF12121C,
-        cardColor: 0xFF1A1A28,
-        accentColor: 0xFFFF0055,
-        textPrimaryColor: 0xFFFFFFFF,
-        textSecondaryColor: 0xFFA0A0B0,
+        background: 0xFF0A0A10,
+        surface: 0xFF12121C,
+        text: 0xFFFFFFFF,
+        primary: 0xFFFF0055,
+        calm: 0xFF00FFFF,
+        suspense: 0xFFFF0055,
+        battle: 0xFFE8744F,
+        boss: 0xFFE0485E,
       );
 
       // Act & Assert - Insert & GetAll

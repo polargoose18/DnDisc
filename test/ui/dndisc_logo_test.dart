@@ -1,66 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ttrpg_audio_player/ui/widgets/dndisc_logo.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ttrpg_audio_player/theme/app_themes.dart';
+import 'package:ttrpg_audio_player/ui/widgets/dndisc_logo.dart';
+
+Widget _app(Widget child, {ThemeData? theme}) => MaterialApp(
+      theme: theme ?? AppThemes.deepDark.toThemeData(),
+      home: Scaffold(body: Center(child: child)),
+    );
 
 void main() {
   group('DnDiscLogo Widget Tests', () {
-    testWidgets('should render DnDiscLogo with default symbol when instantiated', (tester) async {
-      // Arrange
-      const widget = MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: DnDiscLogo(size: 32),
-          ),
-        ),
-      );
+    testWidgets('should render the logo mark of the requested size', (tester) async {
+      await tester.pumpWidget(_app(const DnDiscLogo(size: 32)));
 
-      // Act
-      await tester.pumpWidget(widget);
-
-      // Assert
       expect(find.byType(DnDiscLogo), findsOneWidget);
-      expect(find.byType(SvgPicture), findsOneWidget);
+      final svg = tester.widget<SvgPicture>(find.byType(SvgPicture));
+      expect(svg.width, equals(32));
+      expect(svg.height, equals(32));
+      expect(find.text('DnDisc'), findsNothing);
     });
 
-    testWidgets('should render full badge logo when useSymbol is false', (tester) async {
-      // Arrange
-      const widget = MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: DnDiscLogo(size: 48, useSymbol: false),
-          ),
-        ),
-      );
+    testWidgets('should add the wordmark in IBM Plex Sans when requested', (tester) async {
+      await tester.pumpWidget(_app(const DnDiscLogo(size: 40, wordmark: true)));
 
-      // Act
-      await tester.pumpWidget(widget);
-
-      // Assert
-      expect(find.byType(DnDiscLogo), findsOneWidget);
-      expect(find.byType(SvgPicture), findsOneWidget);
+      final text = tester.widget<Text>(find.text('DnDisc'));
+      expect(text.style?.fontFamily, equals('IBMPlexSans'));
+      expect(text.style?.fontWeight, equals(FontWeight.w600));
+      expect(text.style?.fontSize, closeTo(40 * 0.8, 0.001));
     });
 
-    testWidgets('should apply custom color when color parameter is provided', (tester) async {
-      // Arrange
-      const customColor = Colors.amber;
-      const widget = MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: DnDiscLogo(size: 32, color: customColor),
-          ),
-        ),
-      );
+    testWidgets('should take outline and spindle colours from the active theme', (tester) async {
+      await tester.pumpWidget(_app(
+        const DnDiscLogo(),
+        theme: AppThemes.cleanLight.toThemeData(),
+      ));
 
-      // Act
-      await tester.pumpWidget(widget);
-
-      // Assert
-      final logoFinder = find.byType(DnDiscLogo);
-      expect(logoFinder, findsOneWidget);
-      final logoWidget = tester.widget<DnDiscLogo>(logoFinder);
-      expect(logoWidget.color, customColor);
-      expect(logoWidget.size, 32.0);
+      expect(find.byType(SvgPicture), findsOneWidget);
+      final svg = tester.widget<SvgPicture>(find.byType(SvgPicture));
+      final loader = svg.bytesLoader as SvgAssetLoader;
+      expect(loader.assetName, equals('assets/logo/logo-mark.svg'));
+      expect(loader.colorMapper, isNotNull);
     });
   });
 }

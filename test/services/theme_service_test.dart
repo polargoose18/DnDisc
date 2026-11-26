@@ -43,14 +43,14 @@ void main() {
   });
 
   group('ThemeService Unit Tests', () {
-    test('should initialize with default Deep Dark built-in theme and 5 preset themes', () {
+    test('should initialize with default Deep Dark built-in theme and 3 preset themes', () {
       // Arrange & Act
       final themeService = ThemeService(dbService: dbService);
 
       // Assert
       expect(themeService.activeThemeId, equals(AppThemes.deepDarkId));
       expect(themeService.activeTheme.name, equals('Deep Dark'));
-      expect(themeService.builtInPresets.length, equals(5));
+      expect(themeService.builtInPresets.length, equals(3));
     });
 
     test('should switch active theme when selectTheme is called with preset id', () {
@@ -69,21 +69,17 @@ void main() {
     test('should persist custom theme in database and make it the active theme', () async {
       // Arrange
       final themeService = ThemeService(dbService: dbService);
-      const custom = CustomThemeModel(
+      final custom = CustomThemeModel.derive(
         id: 'custom_dragon_lair',
         name: 'Dragon Lair',
-        isDark: true,
-        primaryColor: 0xFFFF5722,
-        secondaryColor: 0xFFFFC107,
-        backgroundColor: 0xFF1B0A0A,
-        surfaceColor: 0xFF2A1212,
-        cardColor: 0xFF3D1A1A,
-        accentColor: 0xFFFF7043,
-        textPrimaryColor: 0xFFFFF3E0,
-        textSecondaryColor: 0xFFFFAB91,
-        duckingBadgeColor: 0xFFFF9800,
-        battleIntensityColor: 0xFFD32F2F,
-        bossIntensityColor: 0xFF7B1FA2,
+        background: 0xFF1B0A0A,
+        surface: 0xFF2A1212,
+        text: 0xFFFFF3E0,
+        primary: 0xFFFF5722,
+        calm: 0xFFFFC107,
+        suspense: 0xFFFF7043,
+        battle: 0xFFD32F2F,
+        boss: 0xFF7B1FA2,
       );
 
       // Act
@@ -130,17 +126,17 @@ void main() {
     test('should remove custom theme and fallback to default Deep Dark theme on deletion', () async {
       // Arrange
       final themeService = ThemeService(dbService: dbService);
-      const custom = CustomThemeModel(
+      final custom = CustomThemeModel.derive(
         id: 'custom_to_delete',
         name: 'Temporary Theme',
-        primaryColor: 0xFF000000,
-        secondaryColor: 0xFFFFFFFF,
-        backgroundColor: 0xFF000000,
-        surfaceColor: 0xFF111111,
-        cardColor: 0xFF222222,
-        accentColor: 0xFF333333,
-        textPrimaryColor: 0xFFFFFFFF,
-        textSecondaryColor: 0xFF888888,
+        background: 0xFF000000,
+        surface: 0xFF111111,
+        text: 0xFFFFFFFF,
+        primary: 0xFF000000,
+        calm: 0xFFFFFFFF,
+        suspense: 0xFF333333,
+        battle: 0xFFE8744F,
+        boss: 0xFFE0485E,
       );
 
       await themeService.saveCustomTheme(custom);

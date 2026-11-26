@@ -20,6 +20,7 @@ class MediaLibraryViewModel extends ChangeNotifier {
   MediaLibraryService get service => _service;
 
   List<LibraryTrack> get tracks => _service.tracks;
+  List<LibraryTrack> get allTracks => _service.allTracks;
   bool get isLoading => _service.isLoading;
   AudioBusType? get activeBusFilter => _service.activeBusFilter;
   String get searchQuery => _service.searchQuery;
@@ -35,6 +36,13 @@ class MediaLibraryViewModel extends ChangeNotifier {
     List<String> defaultTags = const [],
   }) =>
       _service.importFiles(busType: busType, defaultTags: defaultTags);
+
+  Future<List<LibraryTrack>> importPaths({
+    required AudioBusType busType,
+    required List<String> paths,
+    List<String> defaultTags = const [],
+  }) =>
+      _service.importPaths(busType: busType, paths: paths, defaultTags: defaultTags);
 
   Future<void> addTrack(LibraryTrack track) => _service.addTrack(track);
 

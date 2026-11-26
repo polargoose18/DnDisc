@@ -125,21 +125,17 @@ void main() {
       expect(restoredScene.soundboardSfxIds, contains('sfx-1'));
 
       // Arrange & Act & Assert - 6. CustomThemeModel
-      const theme = CustomThemeModel(
+      final theme = CustomThemeModel.derive(
         id: 'thm-1',
         name: 'Dungeon Master Dark',
-        isDark: true,
-        primaryColor: 0xFF1E1E2E,
-        secondaryColor: 0xFF89B4FA,
-        backgroundColor: 0xFF11111B,
-        surfaceColor: 0xFF181825,
-        cardColor: 0xFF313244,
-        accentColor: 0xFFF5C2E7,
-        textPrimaryColor: 0xFFCDD6F4,
-        textSecondaryColor: 0xFFA6ADC8,
-        duckingBadgeColor: 0xFFFAB387,
-        battleIntensityColor: 0xFFF38BA8,
-        bossIntensityColor: 0xFFCBA6F7,
+        background: 0xFF11111B,
+        surface: 0xFF181825,
+        text: 0xFFCDD6F4,
+        primary: 0xFF1E1E2E,
+        calm: 0xFF89B4FA,
+        suspense: 0xFFF5C2E7,
+        battle: 0xFFF38BA8,
+        boss: 0xFFCBA6F7,
       );
       final themeMap = theme.toMap();
       final restoredTheme = CustomThemeModel.fromMap(themeMap);
@@ -184,21 +180,17 @@ void main() {
       expect(scenes.first.name, equals('Tavern Evening'));
 
       // Arrange & Act & Assert - Theme CRUD
-      const theme = CustomThemeModel(
+      final theme = CustomThemeModel.derive(
         id: 'crud-theme-1',
         name: 'Mystic Purple',
-        isDark: true,
-        primaryColor: 0xFF4A148C,
-        secondaryColor: 0xFF7C4DFF,
-        backgroundColor: 0xFF12005E,
-        surfaceColor: 0xFF1D0047,
-        cardColor: 0xFF2A0845,
-        accentColor: 0xFFBB86FC,
-        textPrimaryColor: 0xFFFFFFFF,
-        textSecondaryColor: 0xFFB0B0C0,
-        duckingBadgeColor: 0xFFFF9800,
-        battleIntensityColor: 0xFFEF4444,
-        bossIntensityColor: 0xFF9333EA,
+        background: 0xFF12005E,
+        surface: 0xFF1D0047,
+        text: 0xFFFFFFFF,
+        primary: 0xFF4A148C,
+        calm: 0xFF7C4DFF,
+        suspense: 0xFFBB86FC,
+        battle: 0xFFEF4444,
+        boss: 0xFF9333EA,
       );
       await dbService.insertCustomTheme(theme);
       final themes = await dbService.getAllCustomThemes();

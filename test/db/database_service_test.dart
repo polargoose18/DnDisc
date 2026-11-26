@@ -191,21 +191,17 @@ void main() {
 
     test('should perform full CRUD operations for CustomThemeModel in SQLite database', () async {
       // Arrange
-      const theme = CustomThemeModel(
+      final theme = CustomThemeModel.derive(
         id: 'theme-db-1',
         name: 'Crimson Abyss',
-        isDark: true,
-        primaryColor: 0xFFE11D48,
-        secondaryColor: 0xFFFB7185,
-        backgroundColor: 0xFF140B0E,
-        surfaceColor: 0xFF221116,
-        cardColor: 0xFF2D161C,
-        accentColor: 0xFFF43F5E,
-        textPrimaryColor: 0xFFFFF1F2,
-        textSecondaryColor: 0xFFFDA4AF,
-        duckingBadgeColor: 0xFFEA580C,
-        battleIntensityColor: 0xFFFF2E63,
-        bossIntensityColor: 0xFF880808,
+        background: 0xFF140B0E,
+        surface: 0xFF221116,
+        text: 0xFFFFF1F2,
+        primary: 0xFFE11D48,
+        calm: 0xFFFB7185,
+        suspense: 0xFFF43F5E,
+        battle: 0xFFFF2E63,
+        boss: 0xFF880808,
       );
 
       // Act & Assert - 1. Insert & GetAll

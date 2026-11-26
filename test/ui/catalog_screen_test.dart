@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:ttrpg_audio_player/data/repositories/media_library_repository.dart';
-import 'package:ttrpg_audio_player/data/repositories/scene_repository.dart';
-import 'package:ttrpg_audio_player/data/repositories/scene_repository_source_repository.dart';
 import 'package:ttrpg_audio_player/data/services/media_library_service.dart';
-import 'package:ttrpg_audio_player/data/services/scene_repository_network_service.dart';
 import 'package:ttrpg_audio_player/data/services/scene_service.dart';
 import 'package:ttrpg_audio_player/domain/models/library_track.dart';
 import 'package:ttrpg_audio_player/domain/models/scene_model.dart';
@@ -17,119 +13,9 @@ import 'package:ttrpg_audio_player/ui/view_models/scene_view_model.dart';
 import 'package:ttrpg_audio_player/ui/widgets/scene_repository_details_dialog.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations.dart';
 import 'package:ttrpg_audio_player/l10n/app_localizations_en.dart';
-
-class FakeSourceRepo implements SceneRepositorySourceRepository {
-  final List<SceneRepositoryModel> repos;
-
-  FakeSourceRepo(this.repos);
-
-  @override
-  Future<List<SceneRepositoryModel>> getAllRepositories() async => List.from(repos);
-
-  @override
-  Future<SceneRepositoryModel?> getRepositoryById(String id) async {
-    return repos.firstWhere((r) => r.id == id);
-  }
-
-  @override
-  Future<void> addRepository(SceneRepositoryModel repo) async => repos.add(repo);
-
-  @override
-  Future<void> updateRepository(SceneRepositoryModel repo) async {
-    final idx = repos.indexWhere((r) => r.id == repo.id);
-    if (idx != -1) {
-      repos[idx] = repo;
-    }
-  }
-
-  @override
-  Future<void> deleteRepository(String id) async => repos.removeWhere((r) => r.id == id);
-}
-
-class FakeMediaLibraryRepo implements MediaLibraryRepository {
-  final List<LibraryTrack> tracks = [];
-
-  @override
-  Future<List<LibraryTrack>> getAllTracks() async => List.from(tracks);
-
-  @override
-  Future<LibraryTrack?> getTrackById(String id) async {
-    try {
-      return tracks.firstWhere((t) => t.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  Future<void> insertTrack(LibraryTrack track) async {
-    tracks.add(track);
-  }
-
-  @override
-  Future<void> insertTracksBatch(List<LibraryTrack> newTracks) async {
-    tracks.addAll(newTracks);
-  }
-
-  @override
-  Future<void> updateTrack(LibraryTrack track) async {
-    final idx = tracks.indexWhere((t) => t.id == track.id);
-    if (idx != -1) tracks[idx] = track;
-  }
-
-  @override
-  Future<void> deleteTrack(String id) async {
-    tracks.removeWhere((t) => t.id == id);
-  }
-
-  @override
-  Future<List<LibraryTrack>> searchTracks(String query, {AudioBusType? filterBus}) async {
-    return tracks.where((t) => t.title.toLowerCase().contains(query.toLowerCase())).toList();
-  }
-}
-
-class FakeSceneRepo implements SceneRepository {
-  final List<SceneModel> scenes = [];
-
-  @override
-  Future<List<SceneModel>> getAllScenes() async => List.from(scenes);
-
-  @override
-  Future<SceneModel?> getSceneById(String id) async {
-    try {
-      return scenes.firstWhere((s) => s.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  Future<void> insertScene(SceneModel scene) async {
-    scenes.add(scene);
-  }
-
-  @override
-  Future<void> updateScene(SceneModel scene) async {
-    final idx = scenes.indexWhere((s) => s.id == scene.id);
-    if (idx != -1) scenes[idx] = scene;
-  }
-
-  @override
-  Future<void> deleteScene(String id) async {
-    scenes.removeWhere((s) => s.id == id);
-  }
-}
-
-class FakeNetworkService extends SceneRepositoryNetworkService {
-  final SceneRepositoryManifest manifest;
-
-  FakeNetworkService(this.manifest);
-
-  @override
-  Future<ManifestFetchResult> fetchManifestWithResolvedUrl(String url) async {
-    return ManifestFetchResult(manifest: manifest, resolvedUrl: url);
-  }
-}
+import 'package:ttrpg_audio_player/theme/app_themes.dart';
+import 'package:ttrpg_audio_player/ui/design/ds_button.dart';
+import '../helpers/fakes.dart';
 
 Widget createCatalogTestableWidget({
   required Widget child,
@@ -144,6 +30,7 @@ Widget createCatalogTestableWidget({
       ChangeNotifierProvider<MediaLibraryViewModel>.value(value: mediaLibraryViewModel),
     ],
     child: MaterialApp(
+      theme: AppThemes.deepDark.toThemeData(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: child),
@@ -209,11 +96,11 @@ void main() {
       final l10n = AppLocalizationsEn();
 
       // Assert - Header and Chips
-      expect(find.text(l10n.tabCatalog), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, l10n.filterAll), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, l10n.filterScenes), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, l10n.filterMedia), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, l10n.filterPacks), findsOneWidget);
+      expect(find.text(l10n.catalogTitle), findsOneWidget);
+      expect(find.text('${l10n.filterAll} · 3'), findsOneWidget);
+      expect(find.text('${l10n.filterScenes} · 1'), findsOneWidget);
+      expect(find.text('${l10n.filterMedia} · 1'), findsOneWidget);
+      expect(find.text('${l10n.filterPacks} · 1'), findsOneWidget);
 
       // Assert - All category items visible
       expect(find.text('Dragon Lair Scene'), findsOneWidget);
@@ -221,21 +108,21 @@ void main() {
       expect(find.text('Strahd Campaign Pack'), findsOneWidget);
 
       // Act & Assert - Filter Scenes
-      await tester.tap(find.widgetWithText(ChoiceChip, l10n.filterScenes));
+      await tester.tap(find.text('${l10n.filterScenes} · 1'));
       await tester.pumpAndSettle();
       expect(find.text('Dragon Lair Scene'), findsOneWidget);
       expect(find.text('Roar Effects Media'), findsNothing);
       expect(find.text('Strahd Campaign Pack'), findsNothing);
 
       // Act & Assert - Filter Media
-      await tester.tap(find.widgetWithText(ChoiceChip, l10n.filterMedia));
+      await tester.tap(find.text('${l10n.filterMedia} · 1'));
       await tester.pumpAndSettle();
       expect(find.text('Dragon Lair Scene'), findsNothing);
       expect(find.text('Roar Effects Media'), findsOneWidget);
       expect(find.text('Strahd Campaign Pack'), findsNothing);
 
       // Act & Assert - Filter Packs
-      await tester.tap(find.widgetWithText(ChoiceChip, l10n.filterPacks));
+      await tester.tap(find.text('${l10n.filterPacks} · 1'));
       await tester.pumpAndSettle();
       expect(find.text('Dragon Lair Scene'), findsNothing);
       expect(find.text('Roar Effects Media'), findsNothing);
@@ -341,21 +228,21 @@ void main() {
       await tester.tap(find.text(l10n.sourcesBtn(1)));
       await tester.pumpAndSettle();
 
-      expect(find.text(l10n.manageRepositoriesTitle(1)), findsOneWidget);
+      expect(find.text(l10n.sourcesDialogTitle), findsOneWidget);
       expect(find.text('Original Repo Name'), findsOneWidget);
 
       // Act & Assert - edit
-      final editButton = find.byIcon(Icons.edit_outlined);
+      final editButton = find.byTooltip(l10n.editDetails);
       expect(editButton, findsOneWidget);
       await tester.tap(editButton);
       await tester.pumpAndSettle();
 
-      expect(find.text(l10n.editRepositoryDialogTitle), findsOneWidget);
+      expect(find.text(l10n.editSourceTitle), findsOneWidget);
 
-      final nameField = find.widgetWithText(TextFormField, l10n.repositoryNameLabel);
-      await tester.enterText(nameField, 'Edited Repo Name');
+      await tester.enterText(find.byKey(const ValueKey('source_name_field')), 'Edited Repo Name');
+      await tester.pump();
 
-      await tester.tap(find.text(l10n.save));
+      await tester.tap(find.byKey(const ValueKey('save_source_btn')));
       await tester.pumpAndSettle();
 
       expect(find.text('Edited Repo Name'), findsOneWidget);
@@ -425,22 +312,22 @@ void main() {
       final l10n = AppLocalizationsEn();
 
       expect(find.text(l10n.installedBadge), findsOneWidget);
-      expect(find.text(l10n.removeFromApp(l10n.catalogTypePack)), findsOneWidget);
+      expect(find.text(l10n.removeFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypePack)));
+      await tester.tap(find.text(l10n.removeFromApp));
       await tester.pumpAndSettle();
 
-      expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypePack)), findsOneWidget);
-      expect(find.textContaining(l10n.deleteItemConfirmMessage(l10n.catalogTypePack, 'Strahd Pack')), findsOneWidget);
+      expect(find.text(l10n.removeItemTitle('Strahd Pack')), findsOneWidget);
+      expect(find.textContaining(l10n.removeItemMessage), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
+      await tester.tap(find.widgetWithText(DsButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert
       expect(sceneVm.scenes, isEmpty);
       expect(mediaVm.tracks, isEmpty);
-      expect(find.text(l10n.installItem(l10n.catalogTypePack)), findsOneWidget);
+      expect(find.text(l10n.installItem), findsOneWidget);
     });
 
     testWidgets('should cancel pack deletion when Cancel button is tapped in confirmation dialog', (WidgetTester tester) async {
@@ -495,19 +382,19 @@ void main() {
 
       final l10n = AppLocalizationsEn();
 
-      expect(find.text(l10n.removeFromApp(l10n.catalogTypePack)), findsOneWidget);
+      expect(find.text(l10n.removeFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypePack)));
+      await tester.tap(find.text(l10n.removeFromApp));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(TextButton, l10n.cancel));
+      await tester.tap(find.widgetWithText(DsButton, l10n.cancel));
       await tester.pumpAndSettle();
 
       // Assert
       expect(sceneVm.scenes.length, 1);
-      expect(find.text(l10n.removeFromApp(l10n.catalogTypePack)), findsOneWidget);
-      expect(find.text(l10n.installItem(l10n.catalogTypePack)), findsNothing);
+      expect(find.text(l10n.removeFromApp), findsOneWidget);
+      expect(find.text(l10n.installItem), findsNothing);
     });
 
     testWidgets('should remove media package and related tracks when delete action is confirmed', (WidgetTester tester) async {
@@ -567,19 +454,19 @@ void main() {
 
       final l10n = AppLocalizationsEn();
 
-      expect(find.text(l10n.removeFromApp(l10n.catalogTypeMedia)), findsOneWidget);
+      expect(find.text(l10n.removeFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypeMedia)));
+      await tester.tap(find.text(l10n.removeFromApp));
       await tester.pumpAndSettle();
 
-      expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypeMedia)), findsOneWidget);
-      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
+      expect(find.text(l10n.removeItemTitle('Swords Collection')), findsOneWidget);
+      await tester.tap(find.widgetWithText(DsButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert
       expect(mediaVm.tracks, isEmpty);
-      expect(find.text(l10n.installItem(l10n.catalogTypeMedia)), findsOneWidget);
+      expect(find.text(l10n.installItem), findsOneWidget);
     });
 
     testWidgets('should remove single scene and associated audio when delete is confirmed', (WidgetTester tester) async {
@@ -647,20 +534,20 @@ void main() {
 
       final l10n = AppLocalizationsEn();
 
-      expect(find.text(l10n.removeFromApp(l10n.catalogTypeScene)), findsOneWidget);
+      expect(find.text(l10n.removeFromApp), findsOneWidget);
 
       // Act
-      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypeScene)));
+      await tester.tap(find.text(l10n.removeFromApp));
       await tester.pumpAndSettle();
 
-      expect(find.text(l10n.deleteItemConfirmTitle(l10n.catalogTypeScene)), findsOneWidget);
-      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
+      expect(find.text(l10n.removeItemTitle('Tavern Scene')), findsOneWidget);
+      await tester.tap(find.widgetWithText(DsButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert
       expect(sceneVm.scenes, isEmpty);
       expect(mediaVm.tracks, isEmpty);
-      expect(find.text(l10n.installItem(l10n.catalogTypeScene)), findsOneWidget);
+      expect(find.text(l10n.installItem), findsOneWidget);
     });
 
     testWidgets('should preserve shared tracks in library when deleting pack if another scene uses them', (WidgetTester tester) async {
@@ -736,10 +623,10 @@ void main() {
       final l10n = AppLocalizationsEn();
 
       // Act
-      await tester.tap(find.text(l10n.removeFromApp(l10n.catalogTypePack)));
+      await tester.tap(find.text(l10n.removeFromApp));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(ElevatedButton, l10n.delete));
+      await tester.tap(find.widgetWithText(DsButton, l10n.delete));
       await tester.pumpAndSettle();
 
       // Assert
@@ -747,6 +634,138 @@ void main() {
       expect(sceneVm.scenes.first.id, 'sc_custom');
       expect(mediaVm.tracks.length, 1);
       expect(mediaVm.tracks.first.id, 'trk_shared');
+    });
+  });
+
+  group('RepositoryCatalogScreen states and source dialogs', () {
+    Future<(RepositoryViewModel, SceneViewModel, MediaLibraryViewModel)> pumpCatalog(
+      WidgetTester tester, {
+      List<SceneRepositoryModel> repos = const [],
+      SceneRepositoryManifest manifest = const SceneRepositoryManifest(name: 'm'),
+    }) async {
+      final repoVm = RepositoryViewModel(sourceRepository: FakeSourceRepo([...repos]), networkService: FakeNetworkService(manifest));
+      final sceneVm = SceneViewModel(service: SceneService(repository: FakeSceneRepo(), autoLoad: false), autoLoad: false);
+      final mediaVm = MediaLibraryViewModel(service: MediaLibraryService(repository: FakeMediaLibraryRepo(), autoLoad: false), autoLoad: false);
+      await tester.pumpWidget(createCatalogTestableWidget(
+        child: const RepositoryCatalogScreen(),
+        repositoryViewModel: repoVm,
+        sceneViewModel: sceneVm,
+        mediaLibraryViewModel: mediaVm,
+      ));
+      await tester.pumpAndSettle();
+      return (repoVm, sceneVm, mediaVm);
+    }
+
+    final repo = SceneRepositoryModel(id: 'r1', name: 'DnDisc', url: 'https://example.com/repo.json', createdAt: DateTime(2025));
+
+    testWidgets('shows an empty state with an add-source action when no source is connected', (tester) async {
+      await pumpCatalog(tester);
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text(l10n.noSourcesTitle), findsOneWidget);
+      expect(find.text(l10n.sourcesBtn(0)), findsOneWidget);
+      // Top bar action and the empty-state action.
+      expect(find.text(l10n.addSourceBtn), findsNWidgets(2));
+    });
+
+    testWidgets('shows a calm card per kind with size and an Install button, and a cover instead of a coloured header', (tester) async {
+      await pumpCatalog(
+        tester,
+        repos: [repo],
+        manifest: const SceneRepositoryManifest(
+          name: 'DnDisc',
+          scenes: [RepositorySceneItem(id: 's1', name: 'Test scene', description: 'A quiet tavern', downloadUrl: 'a.zip', sizeBytes: 14 * 1024 * 1024)],
+          media: [RepositoryMediaItem(id: 'm1', name: 'Pack', downloadUrl: 'b.zip')],
+        ),
+      );
+      final l10n = AppLocalizationsEn();
+
+      expect(find.text('Test scene'), findsOneWidget);
+      expect(find.text('A quiet tavern'), findsOneWidget);
+      expect(find.text('14.0 MB'), findsOneWidget);
+      expect(find.text(l10n.sizeUnknown), findsOneWidget);
+      expect(find.text(l10n.installItem), findsNWidgets(2));
+      expect(find.textContaining('${l10n.catalogSceneBadge} ·'), findsOneWidget);
+      expect(find.textContaining('${l10n.catalogMediaBadge} ·'), findsOneWidget);
+      // No emoji in kind labels.
+      expect(find.textContaining('🎭'), findsNothing);
+      expect(find.textContaining('🎵'), findsNothing);
+    });
+
+    testWidgets('opens details from a card and shows the contents of the item', (tester) async {
+      await pumpCatalog(
+        tester,
+        repos: [repo],
+        manifest: const SceneRepositoryManifest(
+          name: 'DnDisc',
+          scenes: [
+            RepositorySceneItem(
+              id: 's1',
+              name: 'Test scene',
+              description: 'A quiet tavern',
+              downloadUrl: 'a.zip',
+              tracks: [RepositorySceneTrack(title: 'Rain loop', busType: 'ambient', durationMs: 65000)],
+            ),
+          ],
+        ),
+      );
+      final l10n = AppLocalizationsEn();
+
+      await tester.tap(find.text('Test scene'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(l10n.repositoryLabel('DnDisc')), findsOneWidget);
+      expect(find.text(l10n.sceneContent), findsOneWidget);
+      expect(find.text('Rain loop'), findsOneWidget);
+      expect(find.text('Ambient · 1:05'), findsOneWidget);
+      expect(find.byKey(const ValueKey('details_install_btn')), findsOneWidget);
+    });
+
+    testWidgets('validates the address when adding a source and explains how to fix it', (tester) async {
+      await pumpCatalog(tester);
+      final l10n = AppLocalizationsEn();
+
+      await tester.tap(find.byKey(const ValueKey('catalog_add_source_button')));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.addSourceTitle), findsWidgets);
+      expect(find.byKey(const ValueKey('source_url_field')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('save_source_btn')));
+      await tester.pump();
+      expect(find.text(l10n.enterSourceUrl), findsOneWidget);
+
+      await tester.enterText(find.byKey(const ValueKey('source_url_field')), 'example.com/repo');
+      await tester.pump();
+      expect(find.text(l10n.urlHttpPrefixValidation), findsOneWidget);
+    });
+
+    testWidgets('adds a source and removes it again only after confirmation', (tester) async {
+      final (repoVm, _, _) = await pumpCatalog(tester);
+      final l10n = AppLocalizationsEn();
+
+      await tester.tap(find.byKey(const ValueKey('catalog_add_source_button')));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const ValueKey('source_url_field')), 'https://example.com/repo.json');
+      await tester.enterText(find.byKey(const ValueKey('source_name_field')), 'Fresh source');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('save_source_btn')));
+      await tester.pumpAndSettle();
+      expect(repoVm.repositories.map((r) => r.name), contains('Fresh source'));
+
+      await tester.tap(find.byKey(const ValueKey('catalog_sources_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(l10n.delete));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.deleteSourceTitle), findsOneWidget);
+      await tester.tap(find.widgetWithText(DsButton, l10n.cancel));
+      await tester.pumpAndSettle();
+      expect(repoVm.repositories, isNotEmpty);
+
+      await tester.tap(find.byTooltip(l10n.delete));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(DsButton, l10n.delete));
+      await tester.pumpAndSettle();
+      expect(repoVm.repositories, isEmpty);
     });
   });
 }

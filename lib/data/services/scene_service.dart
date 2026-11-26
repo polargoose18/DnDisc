@@ -7,6 +7,7 @@ import '../../domain/models/ambient_layer.dart';
 import '../../domain/models/sfx_trigger.dart';
 import '../../audio/audio_engine_service.dart';
 import 'media_library_service.dart';
+import 'scene_cover_service.dart';
 import '../../services/logger_service.dart';
 
 class SceneService extends ChangeNotifier {
@@ -66,7 +67,9 @@ class SceneService extends ChangeNotifier {
     }
   }
 
-  Future<void> createScene(SceneModel scene) async {
+  Future<void> createScene(SceneModel inputScene) async {
+    // The default cover is picked once, here, and stored with the scene.
+    final scene = inputScene.cover == null ? inputScene.copyWith(cover: SceneCoverService().pickRandom()) : inputScene;
     _scenes.removeWhere((s) => s.id == scene.id);
     _scenes.add(scene);
     notifyListeners();
@@ -158,6 +161,7 @@ class SceneService extends ChangeNotifier {
             loopStartMs: musicTrack.loopStartMs,
             loopEndMs: musicTrack.loopEndMs,
           ),
+          fadeDuration: musicFade,
         );
       } else {
         LoggerService().warning('SceneService: Bound music track not found in library: ${scene.musicTrackId}');
@@ -229,6 +233,7 @@ class SceneService extends ChangeNotifier {
                 filePath: sfxTrack.filePath,
                 colorHex: sfxTrack.colorHex,
                 isPersistent: false,
+                iconName: sfxTrack.iconName,
               ),
             );
           }

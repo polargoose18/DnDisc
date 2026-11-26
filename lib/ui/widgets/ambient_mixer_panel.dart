@@ -1,261 +1,202 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart' hide Durations;
+import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
-import '../../l10n/app_localizations.dart';
 import '../../audio/ambient_bus_controller.dart';
+import '../../data/services/audio_file_picker.dart';
 import '../../domain/models/ambient_layer.dart';
 import '../../domain/models/library_track.dart';
-import '../../domain/models/custom_theme_model.dart';
-import '../../ui/view_models/media_library_view_model.dart';
-import '../../ui/view_models/theme_view_model.dart';
-import '../../theme/app_themes.dart';
+import '../../l10n/app_localizations.dart';
+import '../../theme/ds_theme.dart';
+import '../../theme/icons.dart';
+import '../../theme/tokens.dart';
+import '../design/ds_button.dart';
+import '../design/ds_controls.dart';
+import '../design/ds_dialog.dart';
+import '../design/ds_icon.dart';
+import '../design/ds_icon_picker.dart';
+import '../design/ds_interactive.dart';
+import '../design/ds_menu.dart';
+import '../design/ds_panel.dart';
+import '../design/ds_slider.dart';
+import '../design/ds_tooltip.dart';
+import '../view_models/media_library_view_model.dart';
+import 'bus_equalizer.dart';
+import 'track_pick_list.dart';
 
+/// Ambient layers panel: a row per layer with its toggle button, name,
+/// volume and menu.
 class AmbientMixerPanel extends StatelessWidget {
   const AmbientMixerPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final activeTheme = context.select<ThemeViewModel?, CustomThemeModel>(
-      (vm) => vm?.activeTheme ?? AppThemes.deepDark,
-    );
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final ambient = context.watch<AmbientBusController>();
+    final layers = ambient.layers;
+    final on = layers.where((l) => l.isActive).length;
 
-    return Consumer<AmbientBusController>(
-      builder: (context, ambient, _) {
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return DsPanel(
+      title: l10n.ambientLayers,
+      icon: 'waves',
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (layers.isNotEmpty) ...[
+            DsBadge(l10n.ambientOnCount(on, layers.length), dot: on > 0),
+            const SizedBox(width: Spacing.s2),
+            DsButton.ghost(
+              key: const ValueKey('ambient_stop_all_btn'),
+              icon: 'stop',
+              iconOnly: true,
+              label: l10n.stopAllLayers,
+              onPressed: ambient.stopAllLayers,
+            ),
+          ],
+          DsButton.ghost(
+            key: const ValueKey('add_ambient_layer_btn'),
+            icon: 'plus',
+            iconOnly: true,
+            label: l10n.addAmbientTooltip,
+            onPressed: () => showAddAmbientDialog(context, ambient),
+          ),
+        ],
+      ),
+      child: layers.isEmpty
+          ? DsEmptyState(
+              icon: 'waves',
+              title: l10n.noAmbientTitle,
+              message: l10n.noAmbientHint,
+              action: DsButton(
+                label: l10n.addAmbientLayer,
+                icon: 'plus',
+                onPressed: () => showAddAmbientDialog(context, ambient),
+              ),
+            )
+          : Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Icon(Icons.waves_rounded, color: activeTheme.primary),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              l10n?.ambientLayers ?? 'Ambient Layers (Background Sounds)',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.2,
-                                color: activeTheme.textPrimary,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (ambient.layers.isNotEmpty) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: activeTheme.primary.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: activeTheme.primary.withValues(alpha: 0.3), width: 0.8),
-                              ),
-                              child: Text(
-                                '${ambient.layers.where((l) => l.isActive).length}/${ambient.layers.length}',
-                                style: GoogleFonts.jetBrainsMono(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: activeTheme.primary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          key: const ValueKey('add_ambient_layer_btn'),
-                          icon: const Icon(Icons.add_rounded, size: 20),
-                          tooltip: l10n?.addAmbientTooltip ?? 'Add Layer / Persistent Ambient',
-                          color: activeTheme.primary,
-                          onPressed: () => _showAddAmbientDialog(context, ambient),
-                        ),
-                        if (ambient.layers.isNotEmpty)
-                          OutlinedButton.icon(
-                            key: const ValueKey('ambient_stop_all_btn'),
-                            onPressed: () => ambient.stopAllLayers(),
-                            icon: const Icon(Icons.stop_rounded, size: 16),
-                            label: Text(
-                              l10n?.stopAll ?? 'Stop All',
-                              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.redAccent,
-                              side: const BorderSide(color: Colors.redAccent, width: 0.8),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              minimumSize: const Size(0, 30),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                if (ambient.layers.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: activeTheme.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-                    ),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            l10n?.noActiveAmbients ?? 'No active ambients. Click "+" to add a persistent background sound.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: activeTheme.textSecondary, fontSize: 13),
-                          ),
-                          const SizedBox(height: 8),
-                          TextButton.icon(
-                            icon: const Icon(Icons.add_circle_outline, size: 16),
-                            label: Text(l10n?.addPersistentAmbient ?? 'Add Persistent Ambient'),
-                            onPressed: () => _showAddAmbientDialog(context, ambient),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  Column(
-                    children: ambient.layers.map((layer) {
-                      return AnimatedContainer(
-                        key: ValueKey('ambient_row_${layer.id}'),
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.symmetric(vertical: 4.0),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: layer.isActive
-                              ? activeTheme.primary.withValues(alpha: 0.1)
-                              : activeTheme.surface,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: layer.isActive
-                                ? activeTheme.primary.withValues(alpha: 0.45)
-                                : (layer.isPersistent ? Colors.amberAccent.withValues(alpha: 0.35) : Colors.white.withValues(alpha: 0.05)),
-                            width: layer.isActive ? 1.4 : 1.0,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Switch(
-                              key: ValueKey('ambient_switch_${layer.id}'),
-                              value: layer.isActive,
-                              activeTrackColor: activeTheme.primary,
-                              onChanged: (_) => ambient.toggleLayer(layer.id),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          layer.title,
-                                          style: TextStyle(
-                                            fontWeight: layer.isActive ? FontWeight.bold : FontWeight.normal,
-                                            color: layer.isActive
-                                                ? activeTheme.textPrimary
-                                                : activeTheme.textSecondary,
-                                            fontSize: 13,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      if (layer.isPersistent) ...[
-                                        const SizedBox(width: 4),
-                                        const Icon(Icons.push_pin_rounded, size: 12, color: Colors.amberAccent),
-                                      ],
-                                    ],
-                                  ),
-                                  Text(
-                                    '${l10n?.volume ?? "Volume"}: ${(layer.volume * 100).toInt()}%',
-                                    style: TextStyle(fontSize: 11, color: activeTheme.textSecondary),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Slider(
-                                key: ValueKey('ambient_slider_${layer.id}'),
-                                value: layer.volume,
-                                activeColor: activeTheme.primary,
-                                onChanged: (val) => ambient.setLayerVolume(layer.id, val),
-                              ),
-                            ),
-                            // Persistent Pin Button
-                            IconButton(
-                              icon: Icon(
-                                layer.isPersistent ? Icons.push_pin_rounded : Icons.push_pin_outlined,
-                                size: 18,
-                                color: layer.isPersistent ? Colors.amberAccent : activeTheme.textSecondary,
-                              ),
-                              tooltip: layer.isPersistent
-                                  ? (l10n?.persistentLayerTooltip ?? 'Persistent layer (not reset when switching scenes)')
-                                  : (l10n?.makePersistentTooltip ?? 'Make persistent layer'),
-                              onPressed: () => ambient.togglePersistent(layer.id),
-                            ),
-                            // Solo / Mute quick action
-                            IconButton(
-                              icon: Icon(
-                                layer.isActive ? Icons.volume_up : Icons.volume_off,
-                                size: 18,
-                                color: layer.isActive ? activeTheme.primary : activeTheme.textSecondary,
-                              ),
-                              tooltip: layer.isActive
-                                  ? (l10n?.muteLayerTooltip ?? 'Mute layer')
-                                  : (l10n?.unmuteLayerTooltip ?? 'Unmute layer'),
-                              onPressed: () => ambient.toggleLayer(layer.id),
-                            ),
-                            // Remove Layer Button
-                            IconButton(
-                              icon: const Icon(Icons.close_rounded, size: 16),
-                              color: Colors.white38,
-                              tooltip: l10n?.removeLayerTooltip ?? 'Remove layer',
-                              onPressed: () => ambient.removeLayer(layer.id),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                for (final layer in layers)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: Spacing.s2),
+                    child: AmbientRow(key: ValueKey('ambient_row_${layer.id}'), layer: layer, ambient: ambient),
                   ),
               ],
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showAddAmbientDialog(BuildContext context, AmbientBusController ambient) {
-    showDialog(
-      context: context,
-      builder: (ctx) => _AddAmbientLayerDialog(ambient: ambient),
     );
   }
 }
 
+class AmbientRow extends StatelessWidget {
+  final AmbientLayer layer;
+  final AmbientBusController ambient;
+
+  const AmbientRow({super.key, required this.layer, required this.ambient});
+
+  @override
+  Widget build(BuildContext context) {
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
+    final on = layer.isActive;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: Sizes.rowMin),
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.s3, vertical: Spacing.s2),
+      decoration: BoxDecoration(
+        color: ds.surfaceRaised,
+        borderRadius: Radii.mdAll,
+        border: Border.all(color: ds.border, width: Sizes.borderWidth),
+      ),
+      child: Row(
+        children: [
+          DsInteractive(
+            key: ValueKey('ambient_toggle_${layer.id}'),
+            onTap: () => ambient.toggleLayer(layer.id),
+            toggled: on,
+            semanticLabel: layer.title,
+            builder: (context, s) => AnimatedContainer(
+              duration: Durations.fast,
+              curve: Curves.easeOut,
+              width: Sizes.targetMin,
+              height: Sizes.targetMin,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: on ? ds.primarySubtle : (s.hovered ? ds.surfaceHover : Palette.transparent),
+                borderRadius: Radii.mdAll,
+                border: Border.all(color: on ? ds.primary : ds.borderStrong, width: Sizes.borderWidth),
+              ),
+              child: DsIcon(
+                DnDiscIcons.resolve(layer.iconName, DnDiscIcons.defaultAmbient),
+                size: Sizes.iconLayer,
+                color: on ? ds.primary : (s.hovered ? ds.text : ds.textMuted),
+              ),
+            ),
+          ),
+          const SizedBox(width: Spacing.s3),
+          Expanded(
+            flex: 2,
+            child: DsTooltip(
+              label: layer.title,
+              child: Row(
+                children: [
+                  if (layer.isPersistent) ...[
+                    DsIcon('pin', size: Sizes.iconSm, color: ds.primary),
+                    const SizedBox(width: Spacing.s2),
+                  ],
+                  Flexible(
+                    child: Text(
+                      layer.title,
+                      style: ds.body.copyWith(fontWeight: FontWeight.w500, color: on ? ds.text : ds.textMuted),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (on) ...[
+                    const SizedBox(width: Spacing.s2),
+                    AmbientEqualizer(layerId: layer.id, height: Spacing.s3),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: Spacing.s3),
+          Expanded(
+            flex: 3,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200),
+              child: DsSlider(
+                key: ValueKey('ambient_slider_${layer.id}'),
+                value: layer.volume,
+                onChanged: (v) => ambient.setLayerVolume(layer.id, v),
+                semanticLabel: layer.title,
+                ringColor: ds.surfaceRaised,
+              ),
+            ),
+          ),
+          DsMoreButton(
+            label: l10n.moreActions,
+            items: [
+              DsMenuItem(id: 'pin', label: l10n.pinEverywhere, icon: 'pin', checked: layer.isPersistent),
+              const DsMenuItem.separator(),
+              DsMenuItem(id: 'remove', label: l10n.removeLayer, icon: 'trash', danger: true),
+            ],
+            onSelected: (id) {
+              if (id == 'pin') ambient.togglePersistent(layer.id);
+              if (id == 'remove') ambient.removeLayer(layer.id);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Future<void> showAddAmbientDialog(BuildContext context, AmbientBusController ambient) {
+  return showDsDialog<void>(context: context, builder: (_) => _AddAmbientLayerDialog(ambient: ambient));
+}
+
 class _AddAmbientLayerDialog extends StatefulWidget {
   final AmbientBusController ambient;
+
   const _AddAmbientLayerDialog({required this.ambient});
 
   @override
@@ -263,142 +204,110 @@ class _AddAmbientLayerDialog extends StatefulWidget {
 }
 
 class _AddAmbientLayerDialogState extends State<_AddAmbientLayerDialog> {
-  LibraryTrack? _selectedTrack;
-  String _customPath = '';
-  String _customTitle = '';
+  LibraryTrack? _track;
+  String _path = '';
+  String _title = '';
+  String _icon = DnDiscIcons.defaultAmbient;
   double _volume = 0.7;
-  bool _isPersistent = true;
+  bool _persistent = true;
+
+  Future<void> _pickFile() async {
+    final picked = await AudioFilePicker.pick();
+    if (picked.paths.isEmpty) return;
+    final path = picked.paths.single;
+    setState(() {
+      _track = null;
+      _path = path;
+      _title = p.basenameWithoutExtension(path);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final ds = context.ds;
+    final l10n = AppLocalizations.of(context)!;
     final library = context.watch<MediaLibraryViewModel>();
-    final themeViewModel = context.watch<ThemeViewModel?>();
-    final activeTheme = themeViewModel?.activeTheme ?? AppThemes.deepDark;
-    final ambientTracks = library.tracks.where((t) => t.busType == AudioBusType.ambient).toList();
+    final tracks = library.tracks.where((t) => t.busType == AudioBusType.ambient).toList();
 
-    final l10n = AppLocalizations.of(context);
-
-    return AlertDialog(
-      title: Row(
-        children: [
-          const Icon(Icons.waves_rounded, color: Colors.tealAccent),
-          const SizedBox(width: 8),
-          Text(l10n?.addAmbientDialogTitle ?? 'Add Ambient Layer', style: const TextStyle(fontSize: 16)),
-        ],
-      ),
-      content: SizedBox(
-        width: 420,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n?.selectTrackFromLibrary ?? 'Select a track from the media library:', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-              const SizedBox(height: 8),
-              if (ambientTracks.isNotEmpty)
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 180),
-                  decoration: BoxDecoration(
-                    color: activeTheme.surface,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white12),
-                  ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: ambientTracks.length,
-                    itemBuilder: (context, index) {
-                      final track = ambientTracks[index];
-                      final isSelected = _selectedTrack?.id == track.id;
-                      return ListTile(
-                        dense: true,
-                        selected: isSelected,
-                        selectedTileColor: activeTheme.primary.withValues(alpha: 0.2),
-                        leading: Icon(Icons.music_note, color: isSelected ? activeTheme.primary : Colors.white38, size: 18),
-                        title: Text(track.title, style: const TextStyle(fontSize: 13)),
-                        onTap: () {
-                          setState(() {
-                            _selectedTrack = track;
-                            _customPath = track.filePath;
-                            _customTitle = track.title;
-                          });
-                        },
-                      );
-                    },
-                  ),
-                ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.folder_open_rounded, size: 16),
-                label: Text(l10n?.selectLocalAudioFile ?? 'Choose local audio file...'),
-                onPressed: () async {
-                  final result = await FilePicker.platform.pickFiles(
-                    type: FileType.custom,
-                    allowedExtensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a'],
-                  );
-                  if (result != null && result.files.single.path != null) {
-                    final path = result.files.single.path!;
-                    final name = result.files.single.name.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
-                    setState(() {
-                      _selectedTrack = null;
-                      _customPath = path;
-                      _customTitle = name;
-                    });
-                  }
-                },
-              ),
-              if (_customTitle.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text('${l10n?.selected ?? "Selected: "}$_customTitle', style: TextStyle(color: activeTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
-              ],
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Text('${l10n?.volume ?? "Volume"}:', style: const TextStyle(fontSize: 12)),
-                  Expanded(
-                    child: Slider(
-                      value: _volume,
-                      onChanged: (v) => setState(() => _volume = v),
-                    ),
-                  ),
-                  Text('${(_volume * 100).toInt()}%', style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n?.persistentLayerCheckbox ?? 'Persistent layer (do not reset on scene change)', style: const TextStyle(fontSize: 13)),
-                value: _isPersistent,
-                activeTrackColor: activeTheme.primary,
-                onChanged: (v) => setState(() => _isPersistent = v),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return DsDialog(
+      title: l10n.addAmbientDialogTitle,
+      description: l10n.addAmbientDialogDesc,
+      icon: 'waves',
+      closeLabel: l10n.close,
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n?.cancel ?? 'Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _customPath.isEmpty
+        DsButton.ghost(label: l10n.cancel, onPressed: () => Navigator.of(context).pop()),
+        DsButton.primary(
+          key: const ValueKey('add_ambient_confirm_btn'),
+          label: l10n.addLayerBtn,
+          icon: 'plus',
+          onPressed: _path.isEmpty
               ? null
               : () {
-                  final layerId = _selectedTrack?.id ?? const Uuid().v4();
                   widget.ambient.addLayer(
                     AmbientLayer(
-                      id: layerId,
-                      title: _customTitle.isNotEmpty ? _customTitle : (l10n?.ambient ?? 'Ambient'),
-                      filePath: _customPath,
+                      id: _track?.id ?? const Uuid().v4(),
+                      title: _title.isNotEmpty ? _title : l10n.ambient,
+                      filePath: _path,
                       volume: _volume,
-                      isPersistent: _isPersistent,
-                      isActive: false,
+                      isPersistent: _persistent,
+                      iconName: _icon,
                     ),
                   );
                   Navigator.of(context).pop();
                 },
-          child: Text(l10n?.addLayerBtn ?? 'Add Layer'),
         ),
       ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.fromLibrary, style: ds.label),
+          const SizedBox(height: Spacing.s2),
+          if (tracks.isEmpty)
+            Text(l10n.noAmbientTracksInLibrary, style: ds.body.copyWith(color: ds.textMuted))
+          else
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: Sizes.rowMin * 3),
+              child: SingleChildScrollView(
+                child: TrackPickList(
+                  tracks: tracks,
+                  selected: {if (_track != null) _track!.id},
+                  onTap: (t) => setState(() {
+                    _track = t;
+                    _path = t.filePath;
+                    _title = t.title;
+                    _icon = DnDiscIcons.resolve(t.iconName, DnDiscIcons.defaultAmbient);
+                  }),
+                ),
+              ),
+            ),
+          const SizedBox(height: Spacing.s3),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: DsButton(icon: 'upload', label: l10n.chooseLocalFile, onPressed: _pickFile),
+          ),
+          if (_track == null && _title.isNotEmpty) ...[
+            const SizedBox(height: Spacing.s2),
+            Text('${l10n.selected}: $_title', style: ds.caption),
+          ],
+          const SizedBox(height: Spacing.s5),
+          Text(l10n.soundIcon, style: ds.label),
+          const SizedBox(height: Spacing.s2),
+          DsIconPicker(keys: DnDiscIcons.ambient, selected: _icon, onChanged: (k) => setState(() => _icon = k)),
+          const SizedBox(height: Spacing.s5),
+          DsSlider(
+            label: l10n.volume,
+            value: _volume,
+            onChanged: (v) => setState(() => _volume = v),
+            semanticLabel: l10n.volume,
+          ),
+          DsCheckbox(
+            value: _persistent,
+            onChanged: (v) => setState(() => _persistent = v),
+            label: l10n.persistentLayerCheckbox,
+            description: l10n.persistentLayerDesc,
+          ),
+        ],
+      ),
     );
   }
 }
